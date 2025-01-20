@@ -1,0 +1,80 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.sixcandoit'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JPA를 이용한 SQL 처리
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // HTMl에 타임리프로 명령어 적용
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // 검증(DTO)
+    // 입력폼으로 이동할 때 빈 DTO전달 해야만 검증된다.
+    // 이걸 빼버리면 아예 검증이 안된다.
+    // 입력폼name만 선언, 수정폼name, value 선언 ===> 일반
+    // 검증은 입력폼, 수정폼 모두 name, value 함께 사용
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // 스프링 웹개발 환경
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // getter와 setter를 자동화(실행시 적용)
+    compileOnly 'org.projectlombok:lombok'
+
+    // 개발환경 지원(개발시에만 적용)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Layout
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+    // modelmapper
+    implementation 'org.modelmapper:modelmapper:3.2.1'
+
+    // 임시비밀번호 발급을 위한 자바로 메일 전송 라이브러리(Gmail)
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // 보안
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    // 테스트용 DB
+    runtimeOnly 'com.h2database:h2'
+
+    // 개발용 DB
+//    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    // Swagger - API명세서를 만드는 라이브러리
+    // localhost:/8080/swagger-ui/index.html
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

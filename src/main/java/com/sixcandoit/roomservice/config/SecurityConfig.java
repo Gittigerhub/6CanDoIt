@@ -34,6 +34,7 @@ public class SecurityConfig {
             auth.requestMatchers("/ho").hasRole("HO");
             auth.requestMatchers("/bo").hasRole("BO");
             auth.requestMatchers("/manager").hasRole("MANAGER");
+            auth.requestMatchers("/office/**").permitAll();      // 조직 관리 페이지
         });
         //2-2. 로그인
         http.formLogin(login->login

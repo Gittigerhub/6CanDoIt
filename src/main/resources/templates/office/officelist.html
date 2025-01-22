@@ -24,28 +24,30 @@
 
     <div class="container">
         <h2>조직 관리</h2>
-        <form action="/action_page.php">
+        <form th:action="@{/office/officelist}" method="get">
 
             <div class="row p-5 bg-white">
                 <div class="mb-3">
                     <h3>조직 검색</h3>
                 </div>
                 <div class="col-3">
-                    <input type="radio" class="form-check-input" id="HO" name="optradio" value="HO" checked>본사
+                    <input type="radio" class="form-check-input" id="HO" name="optradio type" value="HO" checked>본사
                     <label class="form-check-label" for="HO"></label>
 
-                    <input type="radio" class="form-check-input" id="BO" name="optradio" value="BO">지사
+                    <input type="radio" class="form-check-input" id="BO" name="optradio type" value="BO">지사
                     <label class="form-check-label" for="BO"></label>
 
-                    <input type="radio" class="form-check-input" id="SHOP" name="optradio" value="SHOP">매장
+                    <input type="radio" class="form-check-input" id="SHOP" name="optradio type" value="SHOP">매장
                     <label class="form-check-label" for="SHOP"></label>
                 </div>
 
                 <div class="col-8">
-                    <input type="email" class="form-control" id="email" placeholder="조직명을 입력하세요" name="email">
+                    <!--검색할 단어 입력-->
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="조직명을 입력하세요"/>
                 </div>
 
                 <div class="col-1 d-flex justify-content-end">
+                    <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
                     <button type="submit" class="btn btn-success">조회</button>
                 </div>
             </div>
@@ -57,60 +59,36 @@
                 <h3>조직 조회</h3>
             </div>
 
-            <table class="table table-bordered" style="text-align: center">
-                <thead>
-                <tr>
-                    <th style="width: 8%">No</th>
-                    <th style="width: 20%">조직명</th>
-                    <th style="width: 24%">담당자ID</th>
-                    <th style="width: 20%">이름</th>
-                    <th style="width: 20%">연락처</th>
-                    <th style="width: 8%">상태</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>John</td>
-                    <td>Doe</td>
-                    <td>john@example.com</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                </tr>
-                <tr>
-                    <td>Mary</td>
-                    <td>Moe</td>
-                    <td>mary@example.com</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                </tr>
-                <tr>
-                    <td>July</td>
-                    <td>Dooley</td>
-                    <td>july@example.com</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                </tr>
-                <tr>
-                    <td>July</td>
-                    <td>Dooley</td>
-                    <td>july@example.com</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                </tr>
-                <tr>
-                    <td>July</td>
-                    <td>Dooley</td>
-                    <td>july@example.com</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                    <td>Doe</td>
-                </tr>
-                </tbody>
-            </table>
+            <th:block th:if="${pageinfo != null}">
+                <!--조회 테이블-->
+                <table class="table table-bordered" style="text-align: center">
+                    <thead>
+                    <tr> <!--테이블 제목-->
+                        <th style="width: 8%">No</th>
+                        <th style="width: 20%">조직명</th>
+                        <th style="width: 24%">담당자ID</th>
+                        <th style="width: 20%">이름</th>
+                        <th style="width: 20%">연락처</th>
+                        <th style="width: 8%">상태</th>
+                    </tr>
+                    </thead>
+                    <tbody> <!--조직 테이블 데이터 출력-->
+                    <tr th:each="data:${organDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                        <td th:text="${data.idx}">John</td>
+                        <td th:text="${data.organName}">Doe</td>
+                        <td th:text="${data.adminDTO.adminEmail}">john@example.com</td>
+                        <td th:text="${data.adminDTO.adminName}">Doe</td>
+                        <td th:text="${data.adminDTO.adminPhone}">Doe</td>
+                        <td th:text="${data.activeYn}">Doe</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </th:block>
+
+            <th:block th:unless="${pageinfo != null}">
+                <div>조회결과가 없습니다.</div>
+            </th:block>
+
 
             <!-- 페이지 번호 -->
             <div class="d-flex justify-content-center">
@@ -264,8 +242,8 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="data:${organ}">
-                                                <td>John</td>
+                                            <tr th:each="data:${organizationDTO}">
+                                                <td >John</td>
                                                 <td>Doe</td>
                                             </tr>
                                         </tbody>

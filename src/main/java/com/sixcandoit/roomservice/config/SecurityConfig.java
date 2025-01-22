@@ -49,6 +49,11 @@ public class SecurityConfig {
 //            auth.requestMatchers("/bo").hasRole("BO");
 //            auth.requestMatchers("/manager").hasRole("MANAGER");
         });
+
+        // H2-console 테이블 안보이는 문제 해결
+        http.headers((headers) ->
+                headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()));
+
         //2-2. 로그인
         http.formLogin(login->login
                 .loginPage("/login") //로그인은 /login맵핑으로

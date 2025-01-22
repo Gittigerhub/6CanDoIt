@@ -17,18 +17,11 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     // 결과값이 여러개이면 List<StoreEntity>, Page<StoreEntity>
     // 결과값이 하나이면 StoreEntity, Optional<StoreEntity>
 
-    // 본사 + 조직명
+    // 조직명
     // OrganizationEntity o(별칭) : 별칭은 테이블명을 약식표기(알파벳 1글자 지정)
     // String keyword => @Param("keyword") => :keyword
-    @Query("SELECT o from OrganizationEntity o where o.organName like %:keyword% and o.organType like 'HO'")
+    @Query("SELECT o from OrganizationEntity o where o.organName like %:keyword%")
     Page<OrganizationEntity> searchHO(@Param("keyword") String keyword, Pageable pageable);
 
-    // 지사 + 조직명
-    @Query("SELECT o from OrganizationEntity o where o.organName like %:keyword% and o.organType like 'BO'")
-    Page<OrganizationEntity> searchBO(@Param("keyword") String keyword, Pageable pageable);
-
-    // 매장 + 조직명
-    @Query("SELECT o from OrganizationEntity o where o.organName like %:keyword% and o.organType like 'SHOP'")
-    Page<OrganizationEntity> searchSHOP(@Param("keyword") String keyword, Pageable pageable);
 
 }

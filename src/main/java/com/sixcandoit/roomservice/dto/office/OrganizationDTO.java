@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.dto.office;
 
+import com.sixcandoit.roomservice.dto.member.AdminDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,7 @@ public class OrganizationDTO {
     private String activeYn;                // 활성 유무(N: 비 활성화, Y: 활성화)
 
     private ShopDetailDTO shopDetailDTO;    // 매장 상세 DTO
+
+    private AdminDTO adminDTO;              // 관리자 회원 DTO
 
 }

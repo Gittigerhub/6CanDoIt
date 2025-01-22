@@ -70,15 +70,19 @@ public class OrganizationService {
     ----------------------------------------------------------------------------- */
     public OrganizationDTO organRead(Integer idx) {
 
-        // 데이터베이스 조회
-        Optional<OrganizationEntity> organEntity =
-            organizationRepository.findById(idx);
+        try {
+            // 데이터베이스 조회
+            Optional<OrganizationEntity> organEntity =
+                    organizationRepository.findById(idx);
 
-        // Entity -> DTO 변환
-        OrganizationDTO organDTO = modelMapper.map(organEntity, OrganizationDTO.class);
+            // Entity -> DTO 변환
+            OrganizationDTO organDTO = modelMapper.map(organEntity, OrganizationDTO.class);
 
-        // 반환
-        return organDTO;
+            // 반환
+            return organDTO;
+        } catch (Exception e) {
+            throw new RuntimeException("조회 오류");
+        }
 
     }
 
@@ -88,24 +92,43 @@ public class OrganizationService {
         출력 : 받은 OrganizationDTO를 테이블에 저장, 실패시 저장 안됨
         설명 : 조직을 등록
     ----------------------------------------------------------------------------- */
-    public Page<OrganizationDTO> organList(Pageable page) {
+    public Page<OrganizationDTO> organList(Pageable page, String keyword, String type) {
 
-        // 1. 페이지정보를 재가공
-        int currentPage = page.getPageNumber()-1;
-        int pageSize = 5;
-        Pageable pageable = PageRequest.of(currentPage, pageSize,
-                Sort.by(Sort.Direction.DESC, "code"));
+        try {
+            // 1. 페이지정보를 재가공
+            int currentPage = page.getPageNumber()-1;
+            int pageSize = 5;
 
-        // 2. 조회
-        // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
-        Page<OrganizationEntity> organEntity = organizationRepository.findAll(pageable);
+            // 기본 키로 내림차순해서 페이지 조회
+            Pageable pageable = PageRequest.of(currentPage, pageSize,
+                    Sort.by(Sort.Direction.DESC, "idx"));
 
-        // 3. 변환
-        Page<OrganizationDTO> organDTO = organEntity.map(entity ->
-                modelMapper.map(entity, OrganizationDTO.class));
+            // 2. 조회
+            // 조회결과를 저장할 변수
+            Page<OrganizationEntity> organEntity;
 
-        // 4. 반환
-        return organDTO;
+            // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
+            if (keyword != null && type.equals("HO")) {     //검색어가 존재한다면
+                organEntity = organizationRepository.searchHO(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+            } else if (keyword != null && type.equals("BO")) {
+                organEntity = organizationRepository.searchHO(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+            } else if (keyword != null && type.equals("SHOP")) {
+                organEntity = organizationRepository.searchHO(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+            } else {                                        //검색어가 존재하지 않는다면
+                organEntity = organizationRepository.findAll(pageable);             // 모든 데이터를 대상으로 조회
+            }
+
+
+
+            // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
+            Page<OrganizationDTO> organDTO = organEntity.map(entity ->
+                    modelMapper.map(entity, OrganizationDTO.class));
+
+            // 4. 결과값을 전달
+            return organDTO;
+        } catch (Exception e) {     //오류발생시 오류 처리
+            throw new RuntimeException("조회 오류");
+        }
 
     }
 

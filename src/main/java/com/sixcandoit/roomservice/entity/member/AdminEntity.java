@@ -21,7 +21,7 @@ public class AdminEntity extends BaseEntity {
     @Id
     @Column(name = "admin_idx")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idx;             // 기본 키
+    private Integer idx;                  // 기본 키
 
     @Column(name = "admin_email")
     private String adminEmail;            // 이메일
@@ -30,13 +30,13 @@ public class AdminEntity extends BaseEntity {
     private String adminPwd;              // 비밀번호
 
     @Column(name = "admin_name")
-    private String adminName;             // 생년월일
+    private String adminName;             // 이름
 
     @Column(name = "admin_phone")
-    private String adminPhone;            // 성별
+    private String adminPhone;            // 관리자 연락처
 
     @Column(name = "active_yn")
-    private String activeYn;              // 이름
+    private String activeYn;              // 활성 유무
 
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)

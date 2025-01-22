@@ -5,18 +5,362 @@
       layout:decorate="~{layouts/superlayout}">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>조직 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!--JQuery 반드시 추가-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--Jquery를 이용한 드래그 앤 드롭, 리사이즈, 애니메이션 등 인터랙티브 기능을 구현-->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!--부트스트랩 아이콘-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--알림창 스크립트-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
 
-    <h3>조직 관리</h3>
-    <div class="container p-5 bg-white">
-        <h1>M First Bootstrap Page</h1>
-        <p>This container has a dark background color and a white text, and some extra padding and margins.44444444444444444444444444444444444444444</p>
+    <div class="container">
+        <h2>조직 관리</h2>
+        <form action="/action_page.php">
+
+            <div class="row p-5 bg-white">
+                <div class="mb-3">
+                    <h3>조직 검색</h3>
+                </div>
+                <div class="col-3">
+                    <input type="radio" class="form-check-input" id="HO" name="optradio" value="HO" checked>본사
+                    <label class="form-check-label" for="HO"></label>
+
+                    <input type="radio" class="form-check-input" id="BO" name="optradio" value="BO">지사
+                    <label class="form-check-label" for="BO"></label>
+
+                    <input type="radio" class="form-check-input" id="SHOP" name="optradio" value="SHOP">매장
+                    <label class="form-check-label" for="SHOP"></label>
+                </div>
+
+                <div class="col-8">
+                    <input type="email" class="form-control" id="email" placeholder="조직명을 입력하세요" name="email">
+                </div>
+
+                <div class="col-1 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success">조회</button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="row mt-5 p-5 bg-white">
+            <div class="mb-3">
+                <h3>조직 조회</h3>
+            </div>
+
+            <table class="table table-bordered" style="text-align: center">
+                <thead>
+                <tr>
+                    <th style="width: 8%">No</th>
+                    <th style="width: 20%">조직명</th>
+                    <th style="width: 24%">담당자ID</th>
+                    <th style="width: 20%">이름</th>
+                    <th style="width: 20%">연락처</th>
+                    <th style="width: 8%">상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>John</td>
+                    <td>Doe</td>
+                    <td>john@example.com</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                </tr>
+                <tr>
+                    <td>Mary</td>
+                    <td>Moe</td>
+                    <td>mary@example.com</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                </tr>
+                <tr>
+                    <td>July</td>
+                    <td>Dooley</td>
+                    <td>july@example.com</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                </tr>
+                <tr>
+                    <td>July</td>
+                    <td>Dooley</td>
+                    <td>july@example.com</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                </tr>
+                <tr>
+                    <td>July</td>
+                    <td>Dooley</td>
+                    <td>july@example.com</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                    <td>Doe</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- 페이지 번호 -->
+            <div class="d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#"><</a></li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">></a></li>
+                </ul>
+<!--                <ul class="pagination">-->
+<!--                    &lt;!&ndash; 현재 1페이지면 이전으로 갈 버튼이 존재하지 않게 한다. &ndash;&gt;-->
+<!--                    <li class="page-item" th:unless="${currentPage == 1}">-->
+<!--                        <a class="page-link" th:href="@{/storeList(page=${prevPage}, type=${type}, keyword=${keyword})}">이전</a>-->
+<!--                    </li>-->
+
+<!--                    &lt;!&ndash; 해당 페이지 번호 반복 &ndash;&gt;-->
+<!--                    <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}">-->
+<!--                           <li class="page-item" th:class="${page==currentPage}?'active'"> &lt;!&ndash; 현재 페이지 활성화 &ndash;&gt;-->
+<!--                              <a class="page-link" th:href="@{/storeList(page=${page}, type=${type}, keyword=${keyword})}">1</a>-->
+<!--                           </li>-->
+<!--                        </span>-->
+
+<!--                    &lt;!&ndash; 현재 페이지가 마지막 페이지면 다음으로 갈 버튼이 존재하지 않게 한다. &ndash;&gt;-->
+<!--                    <li class="page-item" th:unless="${currentPage >= endPage}">-->
+<!--                        <a class="page-link" th:href="@{/storeList(page=${nextPage}, type=${type}, keyword=${keyword})}">다음</a>-->
+<!--                    </li>-->
+<!--                </ul>-->
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button id="btn-add" type="button" class="btn btn-success">추가</button>
+            </div>
+
+        </div>
+
+
+        <!--조직 등록 모달 시작-->
+        <div class="modal fade" id="addModal" tabindex="-1" role="modal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span id="title" class="fw-light">조직 등록</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                    </div>
+                    <!--입력폼-->
+                    <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                    <input id="idx" type="hidden" name="idx"> <!--일련번호-->
+                    <form id="addForm" method="post">
+                        <div class="modal-body">
+                            <p>새로운 조직을 등록합니다.</p>
+
+                            <div class="row">
+                                <!-- 분류 -->
+                                <div class="col-sm-6 pe-0">
+                                    <div class="form-group form-group-default">
+                                        <label>*분류 :</label>
+                                        <select id="category" name="category" class="form-select" required>
+                                            <option value="HO">본사</option>
+                                            <option value="BO">지사</option>
+                                            <option value="SHOP">매장</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 조직 명 -->
+                                <div class="col-sm-12">
+                                    <div class="form-group form-group-default">
+                                        <label>*조직명 :</label>
+                                        <input id="organName" name="organName" type="text" class="form-control" placeholder="조직명을 입력하세요." required maxlength="100"/>
+                                    </div>
+                                </div>
+
+                                <!-- 조직 담당자 -->
+                                <div class="col-sm-12">
+                                    <label>*담당자 :</label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="form-group form-group-default">
+                                        <input style="background-color: lightgray" id="adminName" name="adminName" type="text" class="form-control" placeholder="담당자를 검색하세요." readonly/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <button id="btn-search" type="button" class="btn btn-success">검색</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--조직 등록 모달 끝-->
+
+
+        <!--담당자 검색 모달 시작-->
+        <div class="modal fade" id="searchModal" tabindex="-1" role="modal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span id="searchTitle" class="fw-light">담당자 조회</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                    </div>
+
+                    <div class="modal-body">
+                        <!--검색폼-->
+                        <form id="searchForm" method="post">
+                            <div class="row">
+
+                                <!-- 분류 -->
+                                <div class="col-sm-6 pe-0">
+                                    <div class="form-group form-group-default">
+                                        <label>*분류 :</label>
+                                        <select id="category2" name="category" class="form-select" required>
+                                            <option value="HO">본사</option>
+                                            <option value="BO">지사</option>
+                                            <option value="SHOP">매장</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <p class="card-category">검색</p>
+                                </div>
+                                <div class="col-9">
+                                    <div class="input-icon">
+                                        <!--검색할 단어 입력-->
+                                        <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="담당자 이름 검색"/>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <span class="input-icon-addon">
+                                        <!--검색 버튼을 클릭시 keyword의 값을 가지고 Controller에 조회를 요청한다.-->
+                                        <button type="submit" class="btn btn-primary">검색</button>
+                                    </span>
+                                </div>
+
+                                <div class="overflow-auto">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>권한</th>
+                                                <th>이름</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="data:${organ}">
+                                                <td>John</td>
+                                                <td>Doe</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--담당자 검색 모달 끝-->
+
     </div>
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+
+            // 담당자 검색 버튼을 클릭했을 때
+            $('#btn-search').on('click', function () {
+
+                // 모달창을 화면에 띄운다.
+                $("#searchModal").modal('show');
+
+            })
+
+            // 조직 목록에서 추가를 클릭했을 때
+            $("#btn-add").on('click', function() {
+
+                // 모달창을 화면에 띄운다.
+                $("#addModal").modal('show');
+
+            });
+
+            // 조직 등록 모달에서 저장 버튼 클릭 시
+            $('#addButton').on('click', function(){
+                //id가 addForm인 태그내에 있는 모든 데이터를 읽어온다.
+                var form = $("#addForm")[0];
+                var formData = new FormData(form);
+
+                //폼 검증 수행
+                if(form.checkValidity() === false) {    // 유효성 검사시 폼의 오류가 발생하면
+                    form.reportValidity();              // 브라우저에 해당 필드에 메세지를 출력
+                    return;
+                }
+
+                $('#addModal').modal('hide');           // 등록 모달창 숨김
+
+                $.ajax({
+                    // Controller에 신규등록 요청
+                    url: '/organ/register',
+                    type: 'POST',
+                    data: formData,                     // JSON.stringify(courseData),
+                    processData: false,
+                    contentType: false,
+
+                    success: function(response) {       // Controller에서 처리가 성공하였을 경우
+                        //새로운 성공 알림창을 띄운다.
+                        Swal.fire({
+                            title: "등록 완료",
+                            text: "조직이 등록되었습니다.",
+                            icon: "success"
+                        }).then(() => {
+                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function(xhr, status, error) {   // Controller에서 처리가 실패하였을 경우
+                        //새로운 오류 알림창을 띄운다.
+                        Swal.fire({
+                            title: "오류 발생",
+                            text: "문제가 발생했습니다. 다시 시도해 주세요.",
+                            icon: "error"
+                        });
+                        //변화된 내용이 없으므로 목록페이지는 다시 읽지 않는다.
+                    }
+                });
+            });
+
+        });
+
+        // Controller에서 addAttribute("Message", 메세지)로 전달시 출력되는 메세지창
+        // Sweet Alert를 이용할 경우 필요 없음
+        var successMessage = /*[[${Message}]]*/ null;
+        if (successMessage) {
+            swal(successMessage, {
+                buttons: false,
+                timer: 3000,
+            });
+        }
+    </script>
+
 </div>
 </body>
 </html>

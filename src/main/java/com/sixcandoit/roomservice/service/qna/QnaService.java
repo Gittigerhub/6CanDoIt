@@ -19,7 +19,7 @@ public class QnaService {
 
     // final 선언, 모델 맵퍼 선언
     private final QnaRepository qnaRepository;
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     // Qna의 Q 쓰기
     public void register(QnaDTO qnaDTO){

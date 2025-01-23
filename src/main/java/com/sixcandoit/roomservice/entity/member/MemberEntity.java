@@ -59,6 +59,13 @@ public class MemberEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Level level;                  // 유저 권한
 
+
+    public MemberEntity() {
+        this.level = Level.MEMBER; // 기본값 설정
+    }
+
+
+
     // 예약 테이블과 1:N 매핑
     @OneToMany(mappedBy = "memberEntity")
     private List<ReservationEntity> reservationEntities = new ArrayList<ReservationEntity>();

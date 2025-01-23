@@ -5,6 +5,7 @@ import com.sixcandoit.roomservice.entity.orders.MenuEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "shop_detail")
 public class ShopDetailEntity extends BaseEntity {
-
     @Id
     @Column(name = "shop_detail_idx")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,16 +25,16 @@ public class ShopDetailEntity extends BaseEntity {
     private String tel;                   // 매장 연락처
 
     @Column(name = "shop_detail_open_time")
-    private String openTime;              // 매장 오픈시간
+    private LocalTime openTime;              // 매장 오픈시간
 
     @Column(name = "shop_detail_close_time")
-    private String closeTime;             // 매장 마감시간
+    private LocalTime closeTime;             // 매장 마감시간
 
     @Column(name = "shop_detail_rest_day")
     private String restDay;               // 매장 휴일
 
     @Column(name = "shop_detail_opne_state")
-    private int opneState;                // 매장 상태(0:영업중, 1종료)
+    private int openState;                // 매장 상태(0:영업중, 1종료)
 
     @Column(name = "shop_detail_partner_state")
     private int partnerState;             // 매장 제휴상태(0:제휴중, 1:제휴종료, 3:제휴준비중)

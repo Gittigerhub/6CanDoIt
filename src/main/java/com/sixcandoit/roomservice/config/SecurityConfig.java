@@ -41,7 +41,7 @@ public class SecurityConfig {
             auth.requestMatchers("/modify","/logout").authenticated();  //수정,로그아웃
 
             // 조직-매장 페이지 접근 권한
-            auth.requestMatchers("office/**").permitAll();
+            auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
 
 //            auth.requestMatchers("/member").hasRole("MEMBER");  //USER사용자만 /user매핑으로 접근가능
 //            auth.requestMatchers("/admin").hasRole("ADMIN");  //ADMIN사용자만 /admin매핑으로 접근가능

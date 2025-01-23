@@ -77,6 +77,10 @@
                     <tr th:each="data:${organDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
                         <td th:text="${data.idx}">John</td>
                         <td th:text="${data.organName}">Doe</td>
+                        <td th:text="${data.adminDTO.adminEmail}">Doe</td>
+                        <td th:text="${data.organName}">Doe</td>
+                        <td th:text="${data.organName}">Doe</td>
+                        <td th:text="${data.activeYn}">Doe</td>
 
                     </tr>
                     </tbody>

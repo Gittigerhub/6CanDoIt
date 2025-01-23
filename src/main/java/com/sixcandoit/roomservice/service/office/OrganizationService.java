@@ -1,7 +1,9 @@
 package com.sixcandoit.roomservice.service.office;
 
+import com.sixcandoit.roomservice.dto.member.AdminDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
+import com.sixcandoit.roomservice.repository.member.AdminRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.util.Optional;
 @Transactional
 public class OrganizationService {
 
+    private final AdminRepository adminRepository;
     private final OrganizationRepository organizationRepository;
     private final ModelMapper modelMapper;
 
@@ -109,16 +112,14 @@ public class OrganizationService {
 
             // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
             if (keyword != null && type.equals("HO")) {     //검색어가 존재한다면
-                organEntity = organizationRepository.searchHO(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                organEntity = organizationRepository.searchOrgan(keyword, pageable);   // 검색어에 해당하는 데이터 조회
             } else if (keyword != null && type.equals("BO")) {
-                organEntity = organizationRepository.searchHO(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                organEntity = organizationRepository.searchOrgan(keyword, pageable);   // 검색어에 해당하는 데이터 조회
             } else if (keyword != null && type.equals("SHOP")) {
-                organEntity = organizationRepository.searchHO(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                organEntity = organizationRepository.searchOrgan(keyword, pageable);   // 검색어에 해당하는 데이터 조회
             } else {                                        //검색어가 존재하지 않는다면
                 organEntity = organizationRepository.findAll(pageable);             // 모든 데이터를 대상으로 조회
             }
-
-
 
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             Page<OrganizationDTO> organDTO = organEntity.map(entity ->

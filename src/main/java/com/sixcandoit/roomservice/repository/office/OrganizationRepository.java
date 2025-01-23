@@ -21,7 +21,6 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     // OrganizationEntity o(별칭) : 별칭은 테이블명을 약식표기(알파벳 1글자 지정)
     // String keyword => @Param("keyword") => :keyword
     @Query("SELECT o from OrganizationEntity o where o.organName like %:keyword%")
-    Page<OrganizationEntity> searchHO(@Param("keyword") String keyword, Pageable pageable);
-
+    Page<OrganizationEntity> searchOrgan(@Param("keyword") String keyword, Pageable pageable);
 
 }

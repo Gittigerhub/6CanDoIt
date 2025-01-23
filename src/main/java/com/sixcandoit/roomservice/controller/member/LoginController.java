@@ -35,7 +35,7 @@ public class LoginController {
     public String registerMember(@ModelAttribute MemberDTO memberDTO){
         memberService.saveMember(memberDTO);
 
-        return "redirect:/login";
+        return "redirect:/member/login";
     }
 
     // 회원 수정

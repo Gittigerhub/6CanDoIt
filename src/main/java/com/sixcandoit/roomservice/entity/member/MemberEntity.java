@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.member;
 
+import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.entity.event.MemberPointEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.orders.CartEntity;
@@ -54,6 +55,9 @@ public class MemberEntity extends BaseEntity {
 
     @Column(name = "active_yn")
     private String activeYn;               // 활성화 유무
+
+    @Enumerated(EnumType.STRING)
+    private Level level;                  // 유저 권한
 
     // 예약 테이블과 1:N 매핑
     @OneToMany(mappedBy = "memberEntity")

@@ -81,4 +81,13 @@ public class QnaController {
 
         return "redirect:/qna/list";
     }
+
+    // Qna의 Q 삭제
+    @GetMapping("/qna/delete")
+    public String delete(@RequestParam Integer idx){
+        log.info("데이터를 삭제합니다.");
+        qnaService.delete(idx);
+
+        return "redirect:/qna/list";
+    }
 }

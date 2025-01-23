@@ -60,7 +60,7 @@
                 <h3>조직 조회</h3>
             </div>
 
-            <th:block th:if="${pageinfo != null}">
+            <th:block th:if="${organDTO != null}">
                 <!--조회 테이블-->
                 <table class="table table-bordered" style="text-align: center">
                     <thead>
@@ -77,16 +77,13 @@
                     <tr th:each="data:${organDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
                         <td th:text="${data.idx}">John</td>
                         <td th:text="${data.organName}">Doe</td>
-                        <td th:text="${data.adminDTO.adminEmail}">john@example.com</td>
-                        <td th:text="${data.adminDTO.adminName}">Doe</td>
-                        <td th:text="${data.adminDTO.adminPhone}">Doe</td>
-                        <td th:text="${data.activeYn}">Doe</td>
+
                     </tr>
                     </tbody>
                 </table>
             </th:block>
 
-            <th:block th:unless="${pageinfo != null}">
+            <th:block th:unless="${organDTO != null}">
                 <div>조회결과가 없습니다.</div>
             </th:block>
 

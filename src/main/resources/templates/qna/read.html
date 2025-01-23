@@ -14,7 +14,33 @@
 
     <h3>문의 사항</h3>
     <div class="container p-5 bg-white">
-        <h1>게시글 작성</h1>
+        <div id="row" class="row">
+            <div class="col-3"></div>
+            <div class="col-6"><!--입력폼 제거-->
+                <!--디자인-->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>게시글 상세보기</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>번호:<span th:text="${qnaDTO.idx}"></span></p>
+                        <p>제목:<span th:text="${qnaDTO.qnaTitle}"></span></p>
+                        <p>내용:<span th:text="${qnaDTO.qnaContents}"></span></p>
+                        <p>등록일:
+                            <span th:text="${#temporals.format(qnaDTO.insDate, 'yyyy-MM-dd')}"></span>
+                        </p>
+                        <p>수정일:
+                            <span th:text="${#temporals.format(qnaDTO.modDate, 'yyyy-MM-dd')}"></span>
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a th:href="@{/qna/update(idx=${qnaDTO.idx})}" class="btn btn-primary">수정</a>
+                        <a th:href="@{/qna/delete(idx=${qnaDTO.idx})}" class="btn btn-danger">삭제</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3"></div>
+        </div><!--row끝-->
     </div>
 
 </div>

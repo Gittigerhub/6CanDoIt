@@ -14,7 +14,45 @@
 
     <h3>문의 사항</h3>
     <div class="container p-5 bg-white">
-        <h1>게시글 수정</h1>
+        <div id="row" class="row">
+            <div class="col-3"></div>
+            <div class="col-6">
+                <form th:action="@{/qna/update}" method="post">
+                    <!--디자인-->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>게시글 수정</h4>
+                        </div>
+                        <!--id와 name은 DTO에 변수명으로 작업-->
+                        <div class="card-body">
+                            <!--번호 숨김 처리-->
+                            <input type="hidden" name="id" th:value="${qnaDTO.idx}">
+                            <div class="mb-3 mt-3">
+                                <label for="idx" class="form-label">번호:</label>
+                                <input type="text" class="form-control" id="idx" name="idx"
+                                       th:value="${qnaDTO.idx}" readonly>
+                            </div>
+                            <div class="mb-3 mt-3"><!--게시글제목-->
+                                <label for="qnaTitle" class="form-label">제목:</label>
+                                <input type="text" class="form-control" id="qnaTitle" name="qnaTitle"
+                                       th:value="${qnaDTO.qnaTitle}">
+                            </div>
+                            <div class="mb-3 mt-3"><!--내용-->
+                                <label for="qnaContents" class="form-label">내용:</label>
+                                <textarea class="form-control" rows="5" id="qnaContents" name="qnaContents"
+                                          th:value="${qnaDTO.qnaContents}"></textarea>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">등록</button>
+                            <button type="button" class="btn btn-danger"
+                                    th:onclick="|location.href='@{/qna/list}'|">취소</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-3"></div>
+        </div><!--row끝-->
     </div>
 
 </div>

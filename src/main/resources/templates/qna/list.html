@@ -29,16 +29,21 @@
                         <th></th>
                         <th>제목</th>
                         <th>작성일</th>
+                        <th>수정일</th>
                         <th>조회수</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>FAQ</td>
-                        <td>호텔 담당자 사용 지침</td>
-                        <td>2025-01-15</td>
-                        <td>1452</td>
+                    <!--Controller에서 전달받은 list로 반복처리-->
+                    <tr th:each="data:${qnaDTOList}">
+                        <td th:text="${data.idx}"></td>
+                        <td>1:1</td>
+                        <td>
+                            <a th:href="@{read(idx=${data.idx})}" th:text="${data.qnaTitle}"></a>
+                        </td>
+                        <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${data.qnaHits}"></td>
                     </tr>
                     </tbody>
                 </table>

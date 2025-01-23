@@ -41,6 +41,8 @@ public class OfficeController {
         // 서비스에 조회 요청
         Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
 
+        System.out.println();
+
         // 조회결과를 이용한 페이지 처리
         Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
 

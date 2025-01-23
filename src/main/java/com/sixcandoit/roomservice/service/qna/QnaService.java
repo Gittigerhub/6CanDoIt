@@ -4,6 +4,7 @@ import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Log
 public class QnaService {
 
     // final 선언, 모델 맵퍼 선언
@@ -57,8 +59,9 @@ public class QnaService {
     // Qna의 Q의 개별정보, 게시글 번호의 데이터를 화면에 출력
     public QnaDTO read(Integer idx){
         Optional<QnaEntity> qnaEntity = qnaRepository.findById(idx);
-
+        log.info("게시글의 idx를 조회...");
         QnaDTO qnaDTO = modelMapper.map(qnaEntity, QnaDTO.class);
+        log.info("DTO로 변환하는 중...");
         return qnaDTO;
     }
 }

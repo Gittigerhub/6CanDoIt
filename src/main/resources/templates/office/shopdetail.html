@@ -14,9 +14,460 @@
 
     <h3>매장 상세</h3>
     <div class="container p-5 bg-white">
-        <h1>M First Bootstrap Page</h1>
-        <p>This container has a dark background color and a white text, and some extra padding and margins.44444444444444444444444444444444444444444</p>
+        <div class="container">
+            <button type="button" class="btn btn-primary" id="register-btn">등록</button>
+            <h2>매장 정보</h2>
+            <!--조회 테이블-->
+            <table class="table table-bordered" style="text-align: center">
+                <thead>
+                <tr> <!--테이블 제목-->
+                    <th style="width: 8%">No</th>
+                    <th style="width: 20%">전화번호</th>
+                    <th style="width: 20%">오픈시간</th>
+                    <th style="width: 20%">마감시간</th>
+                    <th style="width: 8%">매장 활성화</th>
+                    <th style="width: 8%">매장 타입</th>
+                    <th style="width: 16%">상태</th>
+                </tr>
+                </thead>
+                <tbody> <!--조직 테이블 데이터 출력-->
+                <tr th:each="data:${shopDetailDTOS}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                    <td th:text="${data.idx}">John</td>
+                    <td th:text="${data.tel}">Doe</td>
+                    <td th:text="${data.openTime}">john@example.com</td>
+                    <td th:text="${data.closeTime}">Doe</td>
+                    <td th:text="${data.openState}">Doe</td>
+                    <td th:text="${data.type}">Doe</td>
+                    <td>
+                        <button type="button" class="btn btn-primary shopDetailEdit" th:data-id="${data.idx}">수정
+                        </button>
+                        <button type="button" class="btn btn-secondary shopDetailDelete" th:data-id="${data.idx}">삭제
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+
+
+    <div class="modal" id="shopDetailModal">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 id="title" class="modal-title"></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="shopDetailForm">
+                    <input type="hidden" id="idx" name="idx">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row">
+                            <p>매장상세 등록</p>
+                            <!--전화번호 입력 폼-->
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group form-group-default">
+                                        <label>*전화번호 :</label>
+                                        <input id="tel" name="tel" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--매장 시작 시간, 매장 끝나는 시간-->
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*오픈시간 :</label>
+                                    <input id="openTime" name="openTime" type="time" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*닫는시간 :</label>
+                                    <input id="closeTime" name="closeTime" type="time" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*쉬는 날짜:</label>
+                                    <input id="restDay" name="restDay" type="date" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*오픈 상태:</label>
+                                    <select id="openState" name="openState" class="form-select">
+                                        <option value="0">영업중</option>
+                                        <option value="1">종료</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*제휴 상태:</label>
+                                    <select id="partnerState" name="partnerState" class="form-select">
+                                        <option value="0">제휴중</option>
+                                        <option value="1">제휴종료</option>
+                                        <option value="2">제휴준비중</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*매장 상태:</label>
+                                    <select id="type" name="type" class="form-select">
+                                        <option value="0">직영</option>
+                                        <option value="1">가맹</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*은행명:</label>
+                                    <input id="bankName" name="bankName" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*계좌주:</label>
+                                    <input id="bankOwner" name="bankOwner" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*계좌번호:</label>
+                                    <input id="bankNum" name="bankNum" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*활성화 유무:</label>
+                                    <select id="activeYn" name="activeYn" class="form-select">
+                                        <option value="0">비활성화</option>
+                                        <option value="1">활성화</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*일별 수수료:</label>
+                                    <input id="dayFee" name="dayFee" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*일별 수수료 률:</label>
+                                    <input id="dayFeePercent" name="dayFeePercent" type="text" class="form-control"
+                                           required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button id="register" class="btn btn-primary">매장등록</button>
+                            <button id="update" class="btn btn-primary">매장수정</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!--폼 끝-->
+    </div><!--모달 끝-->
+</div> <!--frgment 끝-->
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () { //문서가 준비가 되었다면
+            //등록버튼을 클릭시
+            $('#register-btn').on('click', function () {
+                //alert("등록확인");
+                //입력폼 초기화
+                var form = $('#shopDetailForm')[0];
+                form.reset();
+                $('#title').text("신규 상점 상세 등록");
+
+                $('#register').show()
+                $('#update').hide()
+
+                //대화창 출력
+                $('#shopDetailModal').modal('show');
+
+            })
+
+            //대화상자에서 등록버튼 클릭시 Controller 처리
+            $('#register').on('click', function () {
+                var form = $('#shopDetailForm')[0];
+                var formData = new FormData(form);//form내의 데이터 읽기
+
+                //폼 검증 수행
+                if (form.checkValidity() === false) {
+                    form.reportValidity(); //폼 검증
+                    return;
+                }
+                $('#shopDetailModal').modal('hide');
+
+                $.ajax({
+                    url: '/office/shopdetail/register',//맵핑
+                    type: 'POST', //전달 방식
+                    data: formData, //데이터값
+                    processData: false, //현재상태 그대로 유지하면서 전달
+                    contentType: false,
+
+                    success: function (response) {//작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "저장하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                        location.reload(); //새로 페이지 읽기
+                    },
+                    error: function () {//작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "저장을 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+
+            });//등록버튼 클릭 끝
+
+            //삭제버튼 클릭
+            $(".shopDetailDelete").on("click", function () {
+                //alert("삭제")
+                var idx = $(this).data("id");
+
+                $.ajax({
+                    url: "/office/shopdetail/delete",
+                    type: 'GET',
+                    data: {
+                        idx: idx//전달값:값
+                    },
+                    success: function (response) {//작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "삭제하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                        location.reload(); //새로 페이지 읽기
+                    },
+                    error: function () {//작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "삭제를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+            });//삭제버튼 끝
+
+            //수정버튼클릭시 대화상자 채우기
+            $(".shopDetailEdit").on("click", function () {
+                //alert("삭제")
+                var idx = $(this).data("id");
+
+                $.ajax({
+                    url: "/office/shopdetail/read",
+                    type: 'GET',
+                    data: {
+                        idx: idx//전달값:값
+                    },
+                    success: function (response) {//작업 성공시
+                        $('#title').text("매장 상세 수정");
+
+                        $('#idx').val(response.shopDetailDTO.idx);
+                        $('#tel').val(response.shopDetailDTO.tel);
+                        $('#openTime').val(response.shopDetailDTO.openTime);
+                        $('#closeTime').val(response.shopDetailDTO.closeTime);
+                        $('#restDay').val(response.shopDetailDTO.restDay);
+                        $('#openState').val(response.shopDetailDTO.openState);
+                        $('#partnerState').val(response.shopDetailDTO.partnerState);
+                        $('#type').val(response.shopDetailDTO.type);
+                        $('#bankNum').val(response.shopDetailDTO.bankNum);
+                        $('#bankName').val(response.shopDetailDTO.bankName);
+                        $('#bankOwner').val(response.shopDetailDTO.bankOwner);
+                        $('#activeYn').val(response.shopDetailDTO.activeYn);
+                        $('#dayFee').val(response.shopDetailDTO.dayFee);
+                        $('#dayFeePercent').val(response.shopDetailDTO.dayFeePercent);
+
+
+                        $('#register').hide()
+                        $('#update').show()
+
+                        //대화창 출력
+                        $('#shopDetailModal').modal('show');
+                    },
+                    error: function () {//작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "조회를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+            });//수정버튼클릭시 대화상자 채우기 끝
+            //대화상자에서 수정버튼 클릭시 Controller 처리
+            $('#update').on('click', function () {
+                var form = $('#shopDetailForm')[0];
+                var formData = new FormData(form);//form내의 데이터 읽기
+
+                //폼 검증 수행
+                if (form.checkValidity() === false) {
+                    form.reportValidity(); //폼 검증
+                    return;
+                }
+                $('#shopDetailModal').modal('hide');
+
+                $.ajax({
+                    url: '/office/shopdetail/update',//맵핑
+                    type: 'POST', //전달 방식
+                    data: formData, //데이터값
+                    processData: false, //현재상태 그대로 유지하면서 전달
+                    contentType: false,
+
+                    success: function (response) {//작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "수정하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                        location.reload(); //새로 페이지 읽기
+                    },
+                    error: function () {//작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "수정을 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+
+            });//수정버튼 클릭 끝
+        }); //document 끝
+    </script>
+</th:block>
 </body>
 </html>

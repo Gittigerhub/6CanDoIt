@@ -70,6 +70,23 @@ public class MemberService implements UserDetailsService { //사용자가 로그
         }
     }
 
+    // 회원 정보 수정
+    public void modifyMember(MemberEntity member){
+        MemberEntity existingMember = memberRepository.findByIdx(member.getIdx())
+                .orElseThrow(()->new IllegalArgumentException("해당 회원 정보를 찾을 수 없습니다."));
+        existingMember.setMemberBirth(member.getMemberBirth());
+        existingMember.setMemberGender(member.getMemberGender());
+        existingMember.setMemberName(member.getMemberName());
+        existingMember.setMemberPhone(member.getMemberPhone());
+        existingMember.setMemberAddress(member.getMemberAddress());
+        memberRepository.save(existingMember);
+    }
+
+    // 회원 ID로 회원 조회
+    public MemberEntity findByIdx(Integer idx){
+        return memberRepository.findByIdx(idx).orElse(null);
+    }
+
     //개별조회(회원수정시->회원정보 읽기)-관리자 회원수정을 할 때
     public MemberDTO readMember(String memberEmail) {
         try { //서버가 멈추는 것을 예방

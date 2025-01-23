@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.member;
 
+import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.entity.NoticeEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
@@ -37,6 +38,9 @@ public class AdminEntity extends BaseEntity {
 
     @Column(name = "active_yn")
     private String activeYn;              // 활성 유무
+
+    @Enumerated(EnumType.STRING)
+    private Level level;                  // 유저 권한
 
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)

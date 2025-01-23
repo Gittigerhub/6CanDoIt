@@ -62,6 +62,6 @@ public class RoomEntity extends BaseEntity {
 
     // 룸 테이블과 1:N 매핑
     @OneToMany(mappedBy = "roomEntity")
-    private List<RoomImgEntity> roomImgEntities = new ArrayList<RoomImgEntity>();
+    private List<RoomImgEntity> roomImgEntities;
 
 }

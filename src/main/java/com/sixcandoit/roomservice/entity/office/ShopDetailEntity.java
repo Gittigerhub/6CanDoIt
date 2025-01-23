@@ -66,10 +66,10 @@ public class ShopDetailEntity extends BaseEntity {
 
     // 정산내역 테이블과 1:N 매칭
     @OneToMany(mappedBy = "shopDetailEntity")
-    private List<CalculateEntity> calculateEntities = new ArrayList<CalculateEntity>();
+    private List<CalculateEntity> calculateEntities;
 
     // 메뉴 테이블과 1:N 매칭
     @OneToMany(mappedBy = "shopDetailEntity")
-    private List<MenuEntity> menuEntities = new ArrayList<MenuEntity>();
+    private List<MenuEntity> menuEntities;
 
 }

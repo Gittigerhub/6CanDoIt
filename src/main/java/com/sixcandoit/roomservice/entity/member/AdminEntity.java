@@ -49,10 +49,10 @@ public class AdminEntity extends BaseEntity {
 
     // 문의 사항 테이블과 1:N 매핑
     @OneToMany(mappedBy = "adminEntity")
-    private List<QnaEntity> qnaEntities = new ArrayList<QnaEntity>();
+    private List<QnaEntity> qnaEntities;
 
     // 공지 사항 테이블과 1:N 매핑
     @OneToMany(mappedBy = "adminEntity")
-    private List<NoticeEntity> noticeEntities = new ArrayList<NoticeEntity>();
+    private List<NoticeEntity> noticeEntities;
 
 }

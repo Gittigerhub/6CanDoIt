@@ -34,6 +34,6 @@ public class CartEntity extends BaseEntity {
 
     // 메뉴 테이블과 1:N 매핑
     @OneToMany(mappedBy = "cartEntity")
-    private List<MenuEntity> menuEntities = new ArrayList<MenuEntity>();
+    private List<MenuEntity> menuEntities;
 
 }

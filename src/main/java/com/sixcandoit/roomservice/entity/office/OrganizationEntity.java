@@ -38,7 +38,7 @@ public class OrganizationEntity extends BaseEntity {
 
     // 관리자 회원 테이블과 1:N 매핑
     @OneToMany(mappedBy = "organizationEntity")
-    private List<AdminEntity> adminEntities = new ArrayList<AdminEntity>();
+    private List<AdminEntity> adminEntities;
 
     // 매장 상세 테이블과 1:1 매핑
     @OneToOne(fetch = FetchType.LAZY)
@@ -47,14 +47,14 @@ public class OrganizationEntity extends BaseEntity {
 
     // 룸 테이블과 1:N 매핑
     @OneToMany(mappedBy = "organizationEntity")
-    private List<RoomEntity> roomEntities = new ArrayList<RoomEntity>();
+    private List<RoomEntity> roomEntities;
 
     // 광고 테이블과 1:N 매핑
     @OneToMany(mappedBy = "organizationEntity")
-    private List<AdvertisementEntity> advertisementEntities = new ArrayList<AdvertisementEntity>();
+    private List<AdvertisementEntity> advertisementEntities;
 
     // 이벤트 테이블과 1:N 매핑
     @OneToMany(mappedBy = "organizationEntity")
-    private List<EventEntity> eventEntities = new ArrayList<EventEntity>();
+    private List<EventEntity> eventEntities;
 
 }

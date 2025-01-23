@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.controller.member;
 
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.service.member.AdminService;
 import com.sixcandoit.roomservice.service.member.MemberService;
 import jakarta.servlet.http.HttpSession;
@@ -9,10 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,17 +35,20 @@ public class LoginController {
     public String registerMember(@ModelAttribute MemberDTO memberDTO){
         memberService.saveMember(memberDTO);
 
-        return "redirect:/login";
+        return "redirect:/member/login";
     }
 
     // 회원 수정
-    @GetMapping("/modify")
-    public String showModifyPage(){
+    @GetMapping("/modify/{idx}")
+    public String showModifyPage(@PathVariable Integer idx, Model model){
+        MemberEntity member = memberService.findByIdx(idx);
+        model.addAttribute("member", member);
         return "member/modify";
     }
 
     @PostMapping("/modify")
-    public String modifyMember(MemberDTO memberDTO){
+    public String modifyMember(@ModelAttribute MemberDTO memberDTO){
+
         return "redirect:/logout";
     }
 

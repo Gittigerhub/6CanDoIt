@@ -59,6 +59,9 @@ public class MemberService implements UserDetailsService { //사용자가 로그
             String memberPwd = passwordEncoder.encode(memberDTO.getMemberPwd()); //비밀번호 암호화처리
             MemberEntity memberEntity = modelMapper.map(memberDTO, MemberEntity.class); //DTO->Entity 변환
             memberEntity.setMemberPwd(memberPwd); //암호화한 비밀번호를 다시 저장
+            //회원 저장
+            memberRepository.save(memberEntity); //데이터베이스에 저장
+            System.out.println("회원 가입을 성공하였습니다.");
 
         } catch(IllegalStateException e) { //상태오류(데이터베이스 처리 실패시)
             //e.getMessage() 오류메세지
@@ -68,6 +71,23 @@ public class MemberService implements UserDetailsService { //사용자가 로그
             System.out.println("예기치 않은 문제가 발생하였습니다."+e.getMessage());
             throw new RuntimeException("가입 중 오류가 발생하였습니다."); //사용자가 오류처리
         }
+    }
+
+    // 회원 정보 수정
+    public void modifyMember(MemberEntity member){
+        MemberEntity existingMember = memberRepository.findByIdx(member.getIdx())
+                .orElseThrow(()->new IllegalArgumentException("해당 회원 정보를 찾을 수 없습니다."));
+        existingMember.setMemberBirth(member.getMemberBirth());
+        existingMember.setMemberGender(member.getMemberGender());
+        existingMember.setMemberName(member.getMemberName());
+        existingMember.setMemberPhone(member.getMemberPhone());
+        existingMember.setMemberAddress(member.getMemberAddress());
+        memberRepository.save(existingMember);
+    }
+
+    // 회원 ID로 회원 조회
+    public MemberEntity findByIdx(Integer idx){
+        return memberRepository.findByIdx(idx).orElse(null);
     }
 
     //개별조회(회원수정시->회원정보 읽기)-관리자 회원수정을 할 때
@@ -137,9 +157,6 @@ public class MemberService implements UserDetailsService { //사용자가 로그
             }
             if (!read.get().getMemberName().equals(memberDTO.getMemberName())) { //이름이 일치하지 않으면
                 throw new IllegalStateException("회원 이름이 일치하지 않습니다.");
-            }
-            if (!read.get().getMemberPhone().equals(memberDTO.getMemberPhone())) { //전화번호가 일치하지 않으면
-                throw new IllegalStateException("회원 전화번호가 일치하지 않습니다.");
             }
             String tempPassword = generateTempPassword(8);  //임시비밀번호 생성
             read.get().setMemberPwd(passwordEncoder.encode(tempPassword));   //임시비밀번호를 저장

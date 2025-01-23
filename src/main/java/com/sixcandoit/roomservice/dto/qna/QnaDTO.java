@@ -1,7 +1,16 @@
 package com.sixcandoit.roomservice.dto.qna;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class QnaDTO {
 
     private Integer idx;                // 기본 키

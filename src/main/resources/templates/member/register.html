@@ -18,7 +18,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h2>회원가입</h2>
-                        <form th:action="@{/register}" method="post" class="was-validated">
+                        <form th:action="@{/member/register}" method="post" class="was-validated">
                             <div class="mb-3 mt-3">
                                 <label for="memberEmail" class="form-label">이메일:</label>
                                 <input type="email" class="form-control" id="memberEmail" name="memberEmail" placeholder="이메일형식으로 입력하세요.">
@@ -71,14 +71,10 @@
                                 <label class="form-check-label" for="regiCheck">이용약관 및 정보수집에 동의합니다.</label>
                                 <div class="invalid-feedback">계속하려면 이 확인란을 선택하세요.</div>
                             </div>
-                        </form>
-
                             <div class="text-center">
-                                <form action="/member/login" method="get">
                                 <button type="submit" class="btn btn-primary">회원가입</button>
-                                </form>
                             </div>
-
+                        </form>
                     </div>
                 </div>
             </div>

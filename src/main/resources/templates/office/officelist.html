@@ -22,22 +22,23 @@
 <body>
 <div layout:fragment="content" class="p-5">
 
+    <!-- 페이지 시작 -->
     <div class="container">
         <h2>조직 관리</h2>
-        <form th:action="@{/office/officelist}" method="get">
+        <form th:action="@{/office/list}" method="get">
 
             <div class="row p-5 bg-white">
                 <div class="mb-3">
                     <h3>조직 검색</h3>
                 </div>
                 <div class="col-3">
-                    <input type="radio" class="form-check-input" id="HO" name="optradio type" value="HO" checked>본사
+                    <input type="radio" class="form-check-input" id="HO" name="type" value="HO" checked>본사
                     <label class="form-check-label" for="HO"></label>
 
-                    <input type="radio" class="form-check-input" id="BO" name="optradio type" value="BO">지사
+                    <input type="radio" class="form-check-input" id="BO" name="type" value="BO">지사
                     <label class="form-check-label" for="BO"></label>
 
-                    <input type="radio" class="form-check-input" id="SHOP" name="optradio type" value="SHOP">매장
+                    <input type="radio" class="form-check-input" id="SHOP" name="type" value="SHOP">매장
                     <label class="form-check-label" for="SHOP"></label>
                 </div>
 
@@ -59,7 +60,7 @@
                 <h3>조직 조회</h3>
             </div>
 
-            <th:block th:if="${pageinfo != null}">
+            <th:block th:if="${organDTO != null}">
                 <!--조회 테이블-->
                 <table class="table table-bordered" style="text-align: center">
                     <thead>
@@ -76,55 +77,46 @@
                     <tr th:each="data:${organDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
                         <td th:text="${data.idx}">John</td>
                         <td th:text="${data.organName}">Doe</td>
-                        <td th:text="${data.adminDTO.adminEmail}">john@example.com</td>
-                        <td th:text="${data.adminDTO.adminName}">Doe</td>
-                        <td th:text="${data.adminDTO.adminPhone}">Doe</td>
-                        <td th:text="${data.activeYn}">Doe</td>
+
                     </tr>
                     </tbody>
                 </table>
             </th:block>
 
-            <th:block th:unless="${pageinfo != null}">
+            <th:block th:unless="${organDTO != null}">
                 <div>조회결과가 없습니다.</div>
             </th:block>
 
 
-            <!-- 페이지 번호 -->
+            <!-- 페이징 처리 시작 -->
             <div class="d-flex justify-content-center">
                 <ul class="pagination">
-                    <li class="page-item"><a class="page-link" href="#"><</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">></a></li>
+                    <li class="page-item" th:if="${currentpage>1}">
+                        <a class="page-link" th:href="@{/office/list(page=${prevPage}, type=${type}, keyword=${keyword})}"><</a>
+                    </li>
+
+                    <li class="page-item" th:each="page:${#numbers.sequence(startPage, endPage, 1)}" th:class="${page == currentPage} ? 'active' : ''">
+                        <a class="page-link" th:if="${page != currentPage}"
+                           th:href="@{/office/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                        <!-- 현재 페이지일 때는 링크 없이 텍스트만 표시 -->
+                        <span th:if="${page == currentPage}" class="page-link" th:text="${page}"></span>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage<lastPage}">
+                        <a class="page-link" th:href="@{/office/list(page=${nextPage}, type=${type}, keyword=${keyword})}">></a>
+                    </li>
                 </ul>
-<!--                <ul class="pagination">-->
-<!--                    &lt;!&ndash; 현재 1페이지면 이전으로 갈 버튼이 존재하지 않게 한다. &ndash;&gt;-->
-<!--                    <li class="page-item" th:unless="${currentPage == 1}">-->
-<!--                        <a class="page-link" th:href="@{/storeList(page=${prevPage}, type=${type}, keyword=${keyword})}">이전</a>-->
-<!--                    </li>-->
-
-<!--                    &lt;!&ndash; 해당 페이지 번호 반복 &ndash;&gt;-->
-<!--                    <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}">-->
-<!--                           <li class="page-item" th:class="${page==currentPage}?'active'"> &lt;!&ndash; 현재 페이지 활성화 &ndash;&gt;-->
-<!--                              <a class="page-link" th:href="@{/storeList(page=${page}, type=${type}, keyword=${keyword})}">1</a>-->
-<!--                           </li>-->
-<!--                        </span>-->
-
-<!--                    &lt;!&ndash; 현재 페이지가 마지막 페이지면 다음으로 갈 버튼이 존재하지 않게 한다. &ndash;&gt;-->
-<!--                    <li class="page-item" th:unless="${currentPage >= endPage}">-->
-<!--                        <a class="page-link" th:href="@{/storeList(page=${nextPage}, type=${type}, keyword=${keyword})}">다음</a>-->
-<!--                    </li>-->
-<!--                </ul>-->
             </div>
+            <!-- 페이징 처리 끝 -->
 
+            <!-- 등록 모달 열기 버튼 시작 -->
             <div class="d-flex justify-content-end">
                 <button id="btn-add" type="button" class="btn btn-success">추가</button>
             </div>
+            <!-- 등록 모달 열기 버튼 끝 -->
 
         </div>
-
+        <!-- 페이지 끝 -->
 
         <!--조직 등록 모달 시작-->
         <div class="modal fade" id="addModal" tabindex="-1" role="modal" aria-hidden="true">

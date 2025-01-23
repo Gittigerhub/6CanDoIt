@@ -46,6 +46,6 @@ public class QnaEntity extends BaseEntity {
 
     // 문의 사항 댓글 테이블과 1:N 매핑
     @OneToMany(mappedBy = "qnaEntity")
-    private List<ReplyEntity> replyEntities = new ArrayList<ReplyEntity>();
+    private List<ReplyEntity> replyEntities;
 
 }

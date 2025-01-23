@@ -60,30 +60,24 @@ public class MemberEntity extends BaseEntity {
     private Level level;                  // 유저 권한
 
 
-    public MemberEntity() {
-        this.level = Level.MEMBER; // 기본값 설정
-    }
-
-
-
     // 예약 테이블과 1:N 매핑
     @OneToMany(mappedBy = "memberEntity")
-    private List<ReservationEntity> reservationEntities = new ArrayList<ReservationEntity>();
+    private List<ReservationEntity> reservationEntities;
 
     // 문의 사항 테이블과 1:N 매핑
     @OneToMany(mappedBy = "memberEntity")
-    private List<QnaEntity> qnaEntities = new ArrayList<QnaEntity>();
+    private List<QnaEntity> qnaEntities;
 
     // 회원 포인트 테이블과 1:N 매핑
     @OneToMany(mappedBy = "memberEntity")
-    private List<MemberPointEntity> memberPointEntities = new ArrayList<MemberPointEntity>();
+    private List<MemberPointEntity> memberPointEntities;
 
     // 장바구니 테이블과 1:N 매핑
     @OneToMany(mappedBy = "memberEntity")
-    private List<CartEntity> cartEntities = new ArrayList<CartEntity>();
+    private List<CartEntity> cartEntities;
 
     // 주문 테이블과 1:N 매핑
     @OneToMany(mappedBy = "memberEntity")
-    private List<OrdersEntity> ordersEntities = new ArrayList<OrdersEntity>();
+    private List<OrdersEntity> ordersEntities;
 
 }

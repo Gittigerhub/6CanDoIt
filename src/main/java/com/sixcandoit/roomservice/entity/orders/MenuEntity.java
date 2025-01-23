@@ -61,7 +61,7 @@ public class MenuEntity extends BaseEntity {
 
     // 메뉴 옵션 테이블과 1:N 매핑
     @OneToMany(mappedBy = "menuEntity")
-    private List<MenuOptionEntity> menuOptionEntities = new ArrayList<MenuOptionEntity>();
+    private List<MenuOptionEntity> menuOptionEntities;
 
     // 장바구니 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)

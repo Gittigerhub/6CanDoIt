@@ -33,8 +33,8 @@
                             </div>
                             <div class="mb-2">성별:</div>
                             <div class="form-check">
-                                <input type="radio" name="memberGender" id="male"><label for="male">남성</label>
-                                <input type="radio" name="memberGender" id="female"><label for="female">여성</label>
+                                <input type="radio" name="memberGender" id="memberGender1" value="male">남성
+                                <input type="radio" name="memberGender" id="memberGender2" value="female">여성
                             </div>
                             <div class="mt-2 mb-3">
                                 <label for="memberName" class="form-label">이름:</label>
@@ -60,11 +60,15 @@
                             <div>주문 알람 수신여부:</div>
                             <div class="form-check">
                                 <label class="form-check-label" for="alramOrder1"></label>
-                                <input type="radio" class="form-check-input" id="alramOrder1" name="optradio" value="alramOrder1" checked>예
+                                <input type="radio" class="form-check-input" id="alramOrder1" name="alramOrder" value="YES" checked>예
                             </div>
                             <div class="form-check">
                                 <label class="form-check-label" for="alramOrder2"></label>
-                                <input type="radio" class="form-check-input" id="alramOrder2" name="optradio" value="alramOrder2">아니오
+                                <input type="radio" class="form-check-input" id="alramOrder2" name="alramOrder" value="NO">아니오
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="activeYn" class="form-label" hidden="hidden">활성화 유무:</label>
+                                <input type="hidden" id="activeYn" name="activeYn" value="Y">
                             </div>
                             <div class="form-check mt-3 mb-3">
                                 <input class="form-check-input" type="checkbox" id="regiCheck" name="remember" required>

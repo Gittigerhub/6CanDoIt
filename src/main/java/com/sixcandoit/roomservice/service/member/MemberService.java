@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.service.member;
 
+import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
@@ -59,6 +60,7 @@ public class MemberService implements UserDetailsService { //사용자가 로그
             String memberPwd = passwordEncoder.encode(memberDTO.getMemberPwd()); //비밀번호 암호화처리
             MemberEntity memberEntity = modelMapper.map(memberDTO, MemberEntity.class); //DTO->Entity 변환
             memberEntity.setMemberPwd(memberPwd); //암호화한 비밀번호를 다시 저장
+            memberEntity.setLevel(Level.MEMBER);
             //회원 저장
             memberRepository.save(memberEntity); //데이터베이스에 저장
             System.out.println("회원 가입을 성공하였습니다.");

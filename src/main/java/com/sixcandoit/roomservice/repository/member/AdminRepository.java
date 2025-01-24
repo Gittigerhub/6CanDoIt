@@ -2,10 +2,12 @@ package com.sixcandoit.roomservice.repository.member;
 
 import com.sixcandoit.roomservice.entity.member.AdminEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
+import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -23,4 +25,22 @@ public interface AdminRepository extends JpaRepository<AdminEntity, Integer> {
     //회원목록 조회(다중조회)-입력받는 변수가 많은 경우 쿼리로 작성해서 변수의 수를 줄여서 사용
     @Query("SELECT a FROM AdminEntity a WHERE a.adminEmail like %:keyword% or a.adminName like %:keyword%")
     Page<AdminEntity> search(String keyword, Pageable pageable);
+
+    // =====================================================================================
+    // 조직 검색
+    // 결과값이 여러개이면 List<AdminEntity>, Page<AdminEntity>
+    // 결과값이 하나이면 AdminEntity, Optional<AdminEntity>
+
+    // 조직명 + 본사
+    @Query("SELECT a from AdminEntity a where a.organizationEntity.organName like %:keyword% and a.organizationEntity.organType like 'HO'")
+    Page<AdminEntity> searchHO(@Param("keyword") String keyword, Pageable pageable);
+
+    // 조직명 + 지사
+    @Query("SELECT a from AdminEntity a where a.organizationEntity.organName like %:keyword% and a.organizationEntity.organType like 'BO'")
+    Page<AdminEntity> searchBO(@Param("keyword") String keyword, Pageable pageable);
+
+    // 조직명 + 매장
+    @Query("SELECT a from AdminEntity a where a.organizationEntity.organName like %:keyword% and a.organizationEntity.organType like 'SHOP'")
+    Page<AdminEntity> searchSHOP(@Param("keyword") String keyword, Pageable pageable);
+
 }

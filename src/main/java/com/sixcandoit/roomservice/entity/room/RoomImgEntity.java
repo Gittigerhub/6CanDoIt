@@ -34,6 +34,6 @@ public class RoomImgEntity extends BaseEntity {
     // 룸 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_idx")
-    private RoomEntity roomEntity;
+    private RoomEntity roomJoin;
 
 }

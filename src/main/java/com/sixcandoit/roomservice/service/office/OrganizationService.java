@@ -2,7 +2,9 @@ package com.sixcandoit.roomservice.service.office;
 
 import com.sixcandoit.roomservice.dto.member.AdminDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
+import com.sixcandoit.roomservice.entity.member.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
+import com.sixcandoit.roomservice.entity.orders.CartEntity;
 import com.sixcandoit.roomservice.repository.member.AdminRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import jakarta.transaction.Transactional;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -95,7 +98,7 @@ public class OrganizationService {
         출력 : 받은 OrganizationDTO를 테이블에 저장, 실패시 저장 안됨
         설명 : 조직을 등록
     ----------------------------------------------------------------------------- */
-    public Page<OrganizationDTO> organList(Pageable page, String keyword, String type) {
+    public Page<AdminDTO> organList(Pageable page, String keyword, String type) {
 
         try {
             // 1. 페이지정보를 재가공
@@ -104,29 +107,37 @@ public class OrganizationService {
 
             // 기본 키로 내림차순해서 페이지 조회
             Pageable pageable = PageRequest.of(currentPage, pageSize,
-                    Sort.by(Sort.Direction.DESC, "idx"));
+                    Sort.by(Sort.Direction.ASC, "idx"));
 
             // 2. 조회
             // 조회결과를 저장할 변수
-            Page<OrganizationEntity> organEntity;
+            Page<AdminEntity> adminEntity;
 
             // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
             if (keyword != null && type.equals("HO")) {     //검색어가 존재한다면
-                organEntity = organizationRepository.searchOrgan(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                adminEntity = adminRepository.searchHO(keyword, pageable);   // 검색어에 해당하는 데이터 조회
             } else if (keyword != null && type.equals("BO")) {
-                organEntity = organizationRepository.searchOrgan(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                adminEntity = adminRepository.searchBO(keyword, pageable);   // 검색어에 해당하는 데이터 조회
             } else if (keyword != null && type.equals("SHOP")) {
-                organEntity = organizationRepository.searchOrgan(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                adminEntity = adminRepository.searchSHOP(keyword, pageable);   // 검색어에 해당하는 데이터 조회
             } else {                                        //검색어가 존재하지 않는다면
-                organEntity = organizationRepository.findAll(pageable);             // 모든 데이터를 대상으로 조회
+                adminEntity = adminRepository.findAll(pageable);             // 모든 데이터를 대상으로 조회
             }
 
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
-            Page<OrganizationDTO> organDTO = organEntity.map(entity ->
-                    modelMapper.map(entity, OrganizationDTO.class));
+            Page<AdminDTO> adminDTO = adminEntity.map(entity -> {
+                AdminDTO dto = modelMapper.map(entity, AdminDTO.class);
+
+                // Organization 정보를 AdminDTO에 추가
+                OrganizationDTO organizationDTO = modelMapper.map(entity.getOrganizationJoin(), OrganizationDTO.class);
+                dto.setOrganDTO(organizationDTO);
+
+                return dto;
+            });
+
 
             // 4. 결과값을 전달
-            return organDTO;
+            return adminDTO;
         } catch (Exception e) {     //오류발생시 오류 처리
             throw new RuntimeException("조회 오류");
         }

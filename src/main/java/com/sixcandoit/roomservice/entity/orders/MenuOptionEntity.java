@@ -33,6 +33,6 @@ public class MenuOptionEntity extends BaseEntity {
     // 메뉴 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_idx")
-    private MenuEntity menuEntity;
+    private MenuEntity menuJoin;
 
 }

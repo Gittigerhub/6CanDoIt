@@ -58,10 +58,10 @@ public class RoomEntity extends BaseEntity {
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_idx")
-    private OrganizationEntity organizationEntity;
+    private OrganizationEntity organizationJoin;
 
     // 룸 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "roomEntity")
-    private List<RoomImgEntity> roomImgEntities;
+    @OneToMany(mappedBy = "roomJoin")
+    private List<RoomImgEntity> roomImgJoin;
 
 }

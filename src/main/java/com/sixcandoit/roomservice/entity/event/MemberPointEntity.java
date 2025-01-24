@@ -44,6 +44,6 @@ public class MemberPointEntity extends BaseEntity {
     // 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")
-    private MemberEntity memberEntity;
+    private MemberEntity memberJOIN;
 
 }

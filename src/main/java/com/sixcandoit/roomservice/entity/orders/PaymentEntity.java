@@ -42,7 +42,7 @@ public class PaymentEntity extends BaseEntity {
     private String paymentApproval;           // 승인 번호
 
     // 주문 테이블과 1:1 매핑
-    @OneToOne(mappedBy = "paymentEntity")
-    private OrdersEntity ordersEntity;
+    @OneToOne(mappedBy = "paymentJoin")
+    private OrdersEntity ordersJoin;
 
 }

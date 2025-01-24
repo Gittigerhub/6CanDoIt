@@ -41,6 +41,6 @@ public class NoticeEntity extends BaseEntity {
     // 관리자 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_idx")
-    private AdminEntity adminEntity;
+    private AdminEntity adminJoin;
 
 }

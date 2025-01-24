@@ -33,7 +33,7 @@ public class CartEntity extends BaseEntity {
     private MemberEntity memberEntity;
 
     // 메뉴 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "cartEntity")
-    private List<MenuEntity> menuEntities;
+    @OneToMany(mappedBy = "cartJoin")
+    private List<MenuEntity> menuJoin;
 
 }

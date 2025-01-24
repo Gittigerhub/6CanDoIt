@@ -57,15 +57,15 @@ public class MenuEntity extends BaseEntity {
     // 매장 상세 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_detail_idx")
-    private ShopDetailEntity shopDetailEntity;
+    private ShopDetailEntity shopDetailJoin;
 
     // 메뉴 옵션 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "menuEntity")
-    private List<MenuOptionEntity> menuOptionEntities;
+    @OneToMany(mappedBy = "menuJoin")
+    private List<MenuOptionEntity> menuOptionJoin;
 
     // 장바구니 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_idx")
-    private CartEntity cartEntity;
+    private CartEntity cartJoin;
 
 }

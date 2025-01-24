@@ -37,15 +37,15 @@ public class QnaEntity extends BaseEntity {
     // 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")
-    private MemberEntity memberEntity;
+    private MemberEntity memberJoin;
 
     // 관리자 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_idx")
-    private AdminEntity adminEntity;
+    private AdminEntity adminJoin;
 
     // 문의 사항 댓글 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "qnaEntity")
-    private List<ReplyEntity> replyEntities;
+    @OneToMany(mappedBy = "qnaJoin")
+    private List<ReplyEntity> replyJoin;
 
 }

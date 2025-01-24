@@ -1,4 +1,4 @@
-package com.sixcandoit.roomservice.dto;
+package com.sixcandoit.roomservice.dto.notice;
 
 
 import lombok.AllArgsConstructor;

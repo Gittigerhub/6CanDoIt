@@ -32,13 +32,13 @@
                     <h3>조직 검색</h3>
                 </div>
                 <div class="col-3">
-                    <input type="radio" class="form-check-input" id="HO" name="type" value="HO" checked>본사
+                    <input type="radio" class="form-check-input" id="HO" name="type" th:value="${'HO'}" checked>본사
                     <label class="form-check-label" for="HO"></label>
 
-                    <input type="radio" class="form-check-input" id="BO" name="type" value="BO">지사
+                    <input type="radio" class="form-check-input" id="BO" name="type" th:value="${'BO'}">지사
                     <label class="form-check-label" for="BO"></label>
 
-                    <input type="radio" class="form-check-input" id="SHOP" name="type" value="SHOP">매장
+                    <input type="radio" class="form-check-input" id="SHOP" name="type" th:value="${'SHOP'}">매장
                     <label class="form-check-label" for="SHOP"></label>
                 </div>
 
@@ -59,37 +59,30 @@
             <div class="mb-3">
                 <h3>조직 조회</h3>
             </div>
-
-            <th:block th:if="${pageInfo != null}">
-                <!--조회 테이블-->
-                <table class="table table-bordered" style="text-align: center">
-                    <thead>
-                    <tr> <!--테이블 제목-->
-                        <th style="width: 8%">No</th>
-                        <th style="width: 20%">조직명</th>
-                        <th style="width: 24%">담당자ID</th>
-                        <th style="width: 20%">이름</th>
-                        <th style="width: 20%">연락처</th>
-                        <th style="width: 8%">상태</th>
-                    </tr>
-                    </thead>
-                    <tbody> <!--조직 테이블 데이터 출력-->
-                    <tr th:each="data:${pageInfo}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
-                        <td th:text="${data.organDTO.idx}"></td>
-                        <td th:text="${data.organDTO.organName}"></td>
-                        <td th:text="${data.adminEmail}"></td>
-                        <td th:text="${data.adminName}"></td>
-                        <td th:text="${data.adminPhone}"></td>
-                        <td th:text="${data.organDTO.activeYn}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </th:block>
-
-            <th:block th:unless="${pageInfo != null}">
-                <div>조회결과가 없습니다.</div>
-            </th:block>
-
+            <!--조회 테이블-->
+            <table class="table table-bordered" style="text-align: center">
+                <thead>
+                <tr> <!--테이블 제목-->
+                    <th style="width: 8%">No</th>
+                    <th style="width: 20%">조직명</th>
+                    <th style="width: 24%">담당자ID</th>
+                    <th style="width: 20%">이름</th>
+                    <th style="width: 20%">연락처</th>
+                    <th style="width: 8%">상태</th>
+                </tr>
+                </thead>
+                <tbody> <!--조직 테이블 데이터 출력-->
+                <tr th:each="data:${adminDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                    <td th:text="${data.organDTO.idx}"></td>
+                    <td th:text="${data.organDTO.organName}"></td>
+                    <td th:text="${data.adminEmail}"></td>
+                    <td th:text="${data.adminName}"></td>
+                    <td th:text="${data.adminPhone}"></td>
+                    <td th:text="${data.organDTO.activeYn}"></td>
+                </tr>
+                </tbody>
+            </table>
+                <div class="d-flex justify-content-center" th:if="${adminDTO.isEmpty()}">조회된 내역이 없습니다.</div>
 
             <!-- 페이징 처리 시작 -->
             <div class="d-flex justify-content-center">
@@ -111,6 +104,7 @@
                 </ul>
             </div>
             <!-- 페이징 처리 끝 -->
+
 
             <!-- 등록 모달 열기 버튼 시작 -->
             <div class="d-flex justify-content-end">
@@ -213,33 +207,35 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <p class="card-category">검색</p>
+                                    <label>*검색 :</label>
                                 </div>
                                 <div class="col-9">
                                     <div class="input-icon">
                                         <!--검색할 단어 입력-->
-                                        <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="담당자 이름 검색"/>
+                                        <input type="text" class="form-control" name="searchAdmin" id="searchAdmin" th:value="${searchAdmin}" placeholder="이메일 또는 이름 검색"/>
                                     </div>
                                 </div>
                                 <div class="col-3">
                                     <span class="input-icon-addon">
                                         <!--검색 버튼을 클릭시 keyword의 값을 가지고 Controller에 조회를 요청한다.-->
-                                        <button type="submit" class="btn btn-primary">검색</button>
+                                        <button type="submit" class="btn btn-primary searchBtn">검색</button>
                                     </span>
                                 </div>
 
-                                <div class="overflow-auto">
+                                <div class="overflow-auto mt-3">
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
                                                 <th>권한</th>
+                                                <th>이메일</th>
                                                 <th>이름</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="data:${organizationDTO}">
-                                                <td >John</td>
-                                                <td>Doe</td>
+                                            <tr th:each="data:${adminDTO}">
+                                                <td th:text="${data.adminlevelDescription}"></td>
+                                                <td th:text="${data.adminEmail}"></td>
+                                                <td th:text="${data.adminName}"></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -261,13 +257,66 @@
     <script th:inline="javascript">
         $(document).ready(function () {
 
-            // 담당자 검색 버튼을 클릭했을 때
+            // 담당자 검색 버튼을 클릭했을 때(시작)
             $('#btn-search').on('click', function () {
+
+                // 이전 모달창을 가린다.
+                // reset하기전 까진 내용이 안없어진다.
+                $("#addModal").modal('hide');
 
                 // 모달창을 화면에 띄운다.
                 $("#searchModal").modal('show');
 
             })
+
+            // 담당자 검색 모달 창에서 검색 버튼 클릭했을 때
+            $("#searchBtn").on("click", function () {
+                // 1. 입력 필드 값 가져오기
+                const searchValue = $("#searchAdmin").val().trim();
+
+                // 2. 입력 값 유효성 검사
+                if (!searchValue) {
+                    alert("Please enter a search term!");
+                    return;
+                }
+
+                // 3. Ajax 요청 보내기
+                $.ajax({
+                    url: "/api/admin/search", // 서버의 엔드포인트 URL
+                    type: "GET",             // GET 요청 (검색)
+                    data: { keyword: searchValue }, // 검색어 전달
+                    success: function (response) {
+                        // 4. 성공 시 검색 결과 표시
+                        displaySearchResults(response);
+                    },
+                    error: function (error) {
+                        // 5. 실패 시 에러 처리
+                        console.error("Error fetching admin data:", error);
+                        alert("Failed to fetch admin data. Please try again.");
+                    },
+                });
+            });
+            // 담당자 검색 버튼을 클릭했을 때(끝)
+
+            // 검색 결과 표시 함수
+            function displaySearchResults(results) {
+                const resultsDiv = $("#searchResults");
+                resultsDiv.empty(); // 기존 결과 초기화
+
+                if (results.length === 0) {
+                    resultsDiv.append("<p>No results found.</p>");
+                    return;
+                }
+
+                results.forEach((admin) => {
+                resultsDiv.append(`
+                        <div>
+                            <p>Name: ${admin.name}</p>
+                            <p>Email: ${admin.email}</p>
+                        </div>
+                    `);
+                });
+            }
 
             // 조직 목록에서 추가를 클릭했을 때
             $("#btn-add").on('click', function() {

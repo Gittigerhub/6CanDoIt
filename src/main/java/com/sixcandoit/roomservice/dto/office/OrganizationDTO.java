@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrganizationDTO {

@@ -121,4 +121,5 @@ public class QnaController {
 
         return "redirect:/qna/list";
     }
+
 }

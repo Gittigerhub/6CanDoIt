@@ -53,18 +53,33 @@ public class QnaService {
 
     // Qna의 Q 의 전체목록, 데이터를 화면에 출력
     // 페이지 번호를 받아서 테이블의 해당 페이지의 데이터를 읽어와서 컨트롤러에 전달
-    public Page<QnaDTO> qnaList(Pageable page){
+    public Page<QnaDTO> qnaList(Pageable page, String type, String keyword){
 
         int currentPage = page.getPageNumber()-1; // 화면의 페이지 번호를 db 페이지 번호로
         int pageLimit = 5; // 한 페이지를 구성하는 레코드 수
 
-        // 지정된 내용으로 페이지 정보를 재생산
-        // 정렬은 최신순, 내림차순 DESC
+        // 지정된 내용으로 페이지 정보를 재생산, 정렬 내림차순 DESC
         Pageable pageable = PageRequest.of(currentPage, pageLimit,
                 Sort.by(Sort.Direction.DESC, "idx"));
 
-        // 페이지 정보에 해당하는 모든 데이터 조회
-        Page<QnaEntity> qnaEntities = qnaRepository.findAll(pageable);
+        // 조회한 변수를 선언
+        // type : 제목(1), 내용(2), 전체(0)
+        Page<QnaEntity> qnaEntities;
+        if (keyword != null){ // 검색어가 존재하면
+            log.info("검색어가 존재하면...");
+            if (type.equals("1")){ // type 분류 1, 제목으로 검색할 때
+                log.info("제목으로 검색을 하는 중...");
+                qnaEntities = qnaRepository.searchQnaTitle(keyword, pageable);
+            } else if (type.equals("2")){ // type 분류 2, 내용으로 검색할 때
+                log.info("내용으로 검색을 하는 중...");
+                qnaEntities = qnaRepository.searchQnaContents(keyword, pageable);
+            } else { // 모든 대상으로 검색할 때
+                log.info("모든 대상으로 검색을 하는 중...");
+                qnaEntities = qnaRepository.searchAll(keyword, pageable);
+            }
+        } else { // 검색어가 존재하지 않으면 모두 검색
+            qnaEntities = qnaRepository.findAll(pageable);
+        }
 
         // Entity를 DTO로 변환 후 저장
         Page<QnaDTO> qnaDTOS = qnaEntities.map(

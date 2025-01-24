@@ -27,16 +27,22 @@ public class QnaController {
     // final 선언
     private final QnaService qnaService;
 
-    // Qna의 Q 전체 목록, 페이지
+    // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
     // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
     @GetMapping("/qna/list")
-    public String list(@PageableDefault(page = 1) Pageable pageable, Model model){
+    public String list(@PageableDefault(page = 1) Pageable page, // 페이지 정보
+                       @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
+                       @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
+                       Model model){
         // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<QnaDTO> qnaDTOS = qnaService.qnaList(pageable);
+        Page<QnaDTO> qnaDTOS = qnaService.qnaList(page, type, keyword);
         // html에 필요한 페이지 정보를 받는다.
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(qnaDTOS);
-        model.addAttribute("qnalist", qnaDTOS);
-        model.addAllAttributes(pageInfo);
+
+        model.addAttribute("qnalist", qnaDTOS); // 데이터 전달
+        model.addAllAttributes(pageInfo); // 페이지 정보
+        model.addAttribute("type", type); //검색분류
+        model.addAttribute("keyword", keyword); // 키워드
 
         return "qna/list";
     }

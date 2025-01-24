@@ -2,9 +2,13 @@ package com.sixcandoit.roomservice.controller.qna;
 
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.service.qna.QnaService;
+import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,14 +27,17 @@ public class QnaController {
     // final 선언
     private final QnaService qnaService;
 
-    // Qna의 Q 전체 목록
-    // DB에서 모든 데이터 화면에 출력
+    // Qna의 Q 전체 목록, 페이지
+    // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
     @GetMapping("/qna/list")
-    public String list(Model model){
-        log.info("모든 데이터를 읽어옵니다.");
-        List<QnaDTO> qnaDTOList = qnaService.list();
+    public String list(@PageableDefault(page = 1) Pageable pageable, Model model){
+        // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
+        Page<QnaDTO> qnaDTOS = qnaService.qnaList(pageable);
+        // html에 필요한 페이지 정보를 받는다.
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(qnaDTOS);
+        model.addAttribute("qnalist", qnaDTOS);
+        model.addAllAttributes(pageInfo);
 
-        model.addAttribute("qnaDTOList", qnaDTOList);
         return "qna/list";
     }
 
@@ -54,7 +62,7 @@ public class QnaController {
             return "qna/register"; // register로 돌아간다
         }
         // 유효성 검사 성공 시 등록 처리
-        qnaService.register(qnaDTO);
+        qnaService.qnaRegister(qnaDTO);
 
         return "redirect:/qna/list";
     }
@@ -63,7 +71,7 @@ public class QnaController {
     @GetMapping("/qna/read")
     public String read(@RequestParam Integer idx, Model model){
         log.info("개별 데이터를 읽는 중입니다.");
-        QnaDTO qnaDTO = qnaService.read(idx);
+        QnaDTO qnaDTO = qnaService.qnaRead(idx);
 
         log.info("개별 데이터를 페이지에 전달하는 중입니다.");
         model.addAttribute("qnaDTO", qnaDTO);
@@ -75,7 +83,7 @@ public class QnaController {
     @GetMapping("/qna/update")
     public String update(@RequestParam Integer idx, Model model){
         log.info("수정할 데이터를 읽는 중입니다.");
-        QnaDTO qnaDTO = qnaService.read(idx);
+        QnaDTO qnaDTO = qnaService.qnaRead(idx);
 
         log.info("개별 데이터를 페이지로 전달합니다.");
         model.addAttribute("qnaDTO", qnaDTO);
@@ -94,7 +102,7 @@ public class QnaController {
             return "qna/update"; // update로 돌아간다
         }
         // 유효성 검사 성공 시 수정 처리
-        qnaService.update(qnaDTO);
+        qnaService.qnaUpdate(qnaDTO);
 
         return "redirect:/qna/list";
     }
@@ -103,7 +111,7 @@ public class QnaController {
     @GetMapping("/qna/delete")
     public String delete(@RequestParam Integer idx){
         log.info("데이터를 삭제합니다.");
-        qnaService.delete(idx);
+        qnaService.qnaDelete(idx);
 
         return "redirect:/qna/list";
     }

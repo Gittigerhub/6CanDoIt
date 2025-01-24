@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.qna;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.member.AdminEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
@@ -34,6 +35,7 @@ public class ReplyEntity extends BaseEntity {
     // 문의 사항 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qna_idx")
+    @JsonBackReference
     private QnaEntity qnaJoin;
 
 }

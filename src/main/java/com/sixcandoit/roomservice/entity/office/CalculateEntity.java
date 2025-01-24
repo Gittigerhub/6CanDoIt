@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.office;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -46,6 +47,7 @@ public class CalculateEntity extends BaseEntity {
     // 매장 상세 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_detail_idx")
+    @JsonBackReference
     private ShopDetailEntity shopDetailJoin;
 
 }

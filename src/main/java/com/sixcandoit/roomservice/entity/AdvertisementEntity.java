@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.member.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
@@ -51,6 +52,7 @@ public class AdvertisementEntity extends BaseEntity {
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_idx")
+    @JsonBackReference
     private OrganizationEntity organizationJoin;
 
 }

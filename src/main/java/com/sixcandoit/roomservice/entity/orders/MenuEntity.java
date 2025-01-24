@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.orders;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
 import jakarta.persistence.*;
@@ -57,6 +58,7 @@ public class MenuEntity extends BaseEntity {
     // 매장 상세 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_detail_idx")
+    @JsonBackReference
     private ShopDetailEntity shopDetailJoin;
 
     // 메뉴 옵션 테이블과 1:N 매핑
@@ -66,6 +68,7 @@ public class MenuEntity extends BaseEntity {
     // 장바구니 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_idx")
+    @JsonBackReference
     private CartEntity cartJoin;
 
 }

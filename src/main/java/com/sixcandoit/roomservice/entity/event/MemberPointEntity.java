@@ -46,6 +46,6 @@ public class MemberPointEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")
     @JsonBackReference
-    private MemberEntity memberJOIN;
+    private MemberEntity memberJoin;
 
 }

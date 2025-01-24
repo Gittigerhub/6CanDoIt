@@ -32,7 +32,7 @@ public class CartEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")
     @JsonBackReference
-    private MemberEntity memberEntity;
+    private MemberEntity memberJoin;
 
     // 메뉴 테이블과 1:N 매핑
     @OneToMany(mappedBy = "cartJoin")

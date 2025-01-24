@@ -36,8 +36,52 @@
                     <div class="card-footer">
                         <a th:href="@{/qna/update(idx=${qnaDTO.idx})}" class="btn btn-primary">수정</a>
                         <a th:href="@{/qna/delete(idx=${qnaDTO.idx})}" class="btn btn-danger">삭제</a>
+
+                        <!-- 답변 등록 버튼 (모달 띄우기) -->
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#replyModal">답변 등록</button>
                     </div>
                 </div>
+                <!-- 모달 -->
+                <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="replyModalLabel">답변 등록</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form th:action="@{/reply/register}" method="post">
+                                <div class="modal-body">
+                                    <!-- QnaIdx를 숨겨서 전달 -->
+                                    <input type="hidden" th:name="qnaIdx" th:value="${qnaDTO.idx}">
+
+                                    <div class="mb-3">
+                                        <label for="replyTitle" class="form-label">답변 제목</label>
+                                        <input type="text" class="form-control" id="replyTitle" name="replyTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="replyContents" class="form-label">답변 내용</label>
+                                        <textarea class="form-control" id="replyContents" name="replyContents" rows="4" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                                    <button type="submit" class="btn btn-primary">저장</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 답변 목록 -->
+                <h5>답변 목록</h5>
+                <div th:each="reply : ${qnaDTO.replyList}" class="card mt-3">
+                    <div class="card-body">
+                        <h6 th:text="${reply.replyTitle}"></h6>
+                        <p th:text="${reply.replyContents}"></p>
+                        <p class="text-muted" th:text="${#temporals.format(reply.insDate, 'yyyy-MM-dd')}"></p>
+                    </div>
+                </div>
+
                 <a th:href="@{/qna/list}" class="btn btn-secondary">목록</a>
             </div>
             <div class="col"></div>

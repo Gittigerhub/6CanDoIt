@@ -2,7 +2,9 @@ package com.sixcandoit.roomservice.service.qna;
 
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
+import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
+import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
@@ -25,6 +27,7 @@ public class QnaService {
 
     // final 선언, 모델 맵퍼 선언
     private final QnaRepository qnaRepository;
+    private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
 
     // Qna의 Q 쓰기
@@ -40,9 +43,22 @@ public class QnaService {
         // 데이터의 id를 조회
         Optional<QnaEntity> qnaEntity = qnaRepository.findById(qnaDTO.getIdx());
 
-        if (qnaEntity.isPresent()){ // 존재하면 수정
+        if (qnaEntity.isPresent()){ // QnaEntity가 존재하면
+            //해당 QnaEntity에 관련된 답변이 존재하는지 확인
+            log.info("해당 QnaEntity에 관련된 답변이 존재하는지 확인...");
+            Optional<ReplyEntity> replyEntity = replyRepository.findByQnaJoin(qnaEntity.get());
+
+            if (replyEntity.isPresent()){ // 답변이 존재하면 수정 불가
+                log.info("답변이 존재하면 수정 불가...");
+                throw new IllegalStateException("답변이 완료된 문의사항은 수정이 불가합니다.");
+            }
+
+            // 답변이 없으면 QnaEntity 수정 진행
+            log.info("답변이 없으면 QnaEntity 수정 진행...");
             QnaEntity qnaEntitys = modelMapper.map(qnaDTO, QnaEntity.class);
             qnaRepository.save(qnaEntitys);
+        } else {
+            throw new IllegalStateException("수정할 QnA가 존재하지 않습니다.");
         }
     }
 

@@ -29,13 +29,13 @@ public class ReplyEntity extends BaseEntity {
     @Column(name = "reply_contents")
     private String replyContents;        // 내용
 
-    @Column(name = "reply_hits")
-    private int replyHits;               // 조회 수
-
     // 문의 사항 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qna_idx")
     @JsonBackReference
     private QnaEntity qnaJoin;
+
+    //@Column(name = "reply_hits")
+    //private int replyHits;               // 조회 수
 
 }

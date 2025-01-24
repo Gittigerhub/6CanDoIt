@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,5 +29,6 @@ public class QnaDTO {
     private int qnaHits = 0;               // 조회 수
     private LocalDateTime insDate;      // 작성 일자
     private LocalDateTime modDate;      // 수정 일자
+    private List<ReplyDTO> replyList;    // 댓글 목록
 
 }

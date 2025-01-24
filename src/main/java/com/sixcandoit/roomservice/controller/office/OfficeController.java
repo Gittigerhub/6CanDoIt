@@ -46,11 +46,10 @@ public class OfficeController {
         // 조회결과를 이용한 페이지 처리
         Map<String,Integer> pageInfo = pageNationUtil.Pagination(adminDTO);
 
-        // 페이지 정보, 검색어, 조회데이터를 전달
+        // 페이지 정보, 검색어, 조회데이터 조직 타입을 전달
         model.addAllAttributes(pageInfo);
         model.addAttribute("keyword", keyword);
         model.addAttribute("adminDTO", adminDTO);
-        // 조직 타입을 전달
         model.addAttribute("type", type);
 
         return "office/officelist";

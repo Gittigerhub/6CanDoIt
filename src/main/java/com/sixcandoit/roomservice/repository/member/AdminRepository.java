@@ -32,15 +32,15 @@ public interface AdminRepository extends JpaRepository<AdminEntity, Integer> {
     // 결과값이 하나이면 AdminEntity, Optional<AdminEntity>
 
     // 조직명 + 본사
-    @Query("SELECT a from AdminEntity a where a.organizationEntity.organName like %:keyword% and a.organizationEntity.organType like 'HO'")
+    @Query("SELECT a from AdminEntity a where a.organizationJoin.organName like %:keyword% and a.organizationJoin.organType like 'HO'")
     Page<AdminEntity> searchHO(@Param("keyword") String keyword, Pageable pageable);
 
     // 조직명 + 지사
-    @Query("SELECT a from AdminEntity a where a.organizationEntity.organName like %:keyword% and a.organizationEntity.organType like 'BO'")
+    @Query("SELECT a from AdminEntity a where a.organizationJoin.organName like %:keyword% and a.organizationJoin.organType like 'BO'")
     Page<AdminEntity> searchBO(@Param("keyword") String keyword, Pageable pageable);
 
     // 조직명 + 매장
-    @Query("SELECT a from AdminEntity a where a.organizationEntity.organName like %:keyword% and a.organizationEntity.organType like 'SHOP'")
+    @Query("SELECT a from AdminEntity a where a.organizationJoin.organName like %:keyword% and a.organizationJoin.organType like 'SHOP'")
     Page<AdminEntity> searchSHOP(@Param("keyword") String keyword, Pageable pageable);
 
 }

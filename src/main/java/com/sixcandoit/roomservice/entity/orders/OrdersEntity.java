@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.orders;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import jakarta.persistence.*;
@@ -36,11 +37,13 @@ public class OrdersEntity extends BaseEntity {
     // 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")
+    @JsonBackReference
     private MemberEntity memberJoin;
 
     // 결제 내역 테이블과 1:1 매핑
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_idx")
+    @JsonBackReference
     private PaymentEntity paymentJoin;
 
 }

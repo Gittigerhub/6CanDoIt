@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.room;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import jakarta.persistence.*;
@@ -29,6 +30,7 @@ public class ReservationEntity extends BaseEntity {
     // 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")
+    @JsonBackReference
     private MemberEntity memberJoin;
 
 }

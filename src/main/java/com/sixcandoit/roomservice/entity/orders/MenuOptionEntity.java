@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.orders;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class MenuOptionEntity extends BaseEntity {
     // 메뉴 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_idx")
+    @JsonBackReference
     private MenuEntity menuJoin;
 
 }

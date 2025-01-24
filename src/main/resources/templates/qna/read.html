@@ -15,8 +15,8 @@
     <h3>문의 사항</h3>
     <div class="container p-5 bg-white">
         <div id="row" class="row">
-            <div class="col-3"></div>
-            <div class="col-6"><!--입력폼 제거-->
+            <div class="col"></div>
+            <div class="col-10"><!--입력폼 제거-->
                 <!--디자인-->
                 <div class="card">
                     <div class="card-header">
@@ -38,8 +38,9 @@
                         <a th:href="@{/qna/delete(idx=${qnaDTO.idx})}" class="btn btn-danger">삭제</a>
                     </div>
                 </div>
+                <a th:href="@{/qna/list}" class="btn btn-secondary">목록</a>
             </div>
-            <div class="col-3"></div>
+            <div class="col"></div>
         </div><!--row끝-->
     </div>
 

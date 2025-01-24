@@ -79,7 +79,7 @@ public class NoticeController {
         log.info("수정된 데이터 저장...");
         noticeService.update(noticeDTO);
 
-        return "redirect:/list";
+        return "redirect:/notice/list";
     }
     // 목록에서 삭제버튼을 클릭했을 때 삭제 처리
     //@GetMapping("/delete/{id}") = rest방식
@@ -88,7 +88,7 @@ public class NoticeController {
         log.info("삭제 처리...");
         noticeService.delete(idx);
 
-        return "redirect:/list";
+        return "redirect:/notice/list";
     }
 }
 

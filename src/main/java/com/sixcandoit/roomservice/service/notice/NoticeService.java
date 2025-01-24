@@ -1,12 +1,12 @@
 package com.sixcandoit.roomservice.service.notice;
 
-import com.sixcandoit.roomservice.controller.notice.*;
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
-import com.sixcandoit.roomservice.entity.NoticeEntity;
+import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
 
 import com.sixcandoit.roomservice.repository.NoticeRepository;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -59,5 +59,13 @@ public class NoticeService {
 
 
     public void register(NoticeDTO noticeDTO) {
+    }
+
+    public NoticeDTO noticeRead(Integer idx) {
+        return null;
+    }
+
+    public void noticeUpdate(@Valid NoticeDTO noticeDTO) {
+
     }
 }

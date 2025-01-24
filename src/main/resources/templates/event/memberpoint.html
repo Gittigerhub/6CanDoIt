@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/superlayout}">
+<head>
+    <meta charset="UTF-8">
+    <title>매장 상세</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content" class="p-5">
+
+    <h3>포인트 상세</h3>
+    <div class="container p-5 bg-white">
+        <div class="container">
+            <button type="button" class="btn btn-primary" id="register-btn">등록</button>
+            <h2>포인트 정보</h2>
+            <!--조회 테이블-->
+            <table class="table table-bordered" style="text-align: center">
+                <thead>
+                <tr> <!--테이블 제목-->
+                    <th style="width: 8%">No</th>
+                    <th style="width: 10%">회원 이름</th>
+                    <th style="width: 24%">회원 아이디</th>
+                    <th style="width: 18%">현재 포인트</th>
+                    <th style="width: 18%">총 포인트</th>
+                    <th style="width: 22%">포인트 종료날</th>
+                    <th style="width: 16%">상태</th>
+                </tr>
+                </thead>
+                <tbody> <!--조직 테이블 데이터 출력-->
+                <tr th:each="data:${memberPointDTOS}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                    <td th:text="${data.idx}">John</td>
+                    <td th:text="${data.memberJoin.memberName}">Doe</td>
+                    <td th:text="${data.memberJoin.memberEmail}">john@example.com</td>
+                    <td th:text="${data.memberPoint}">Doe</td>
+                    <td th:text="${data.memberPointTotal}">Doe</td>
+                    <td th:text="${data.memberPointEndDate}">Doe</td>
+                    <td>
+                        <button type="button" class="btn btn-primary memberPointEdit" th:data-id="${data.idx}">수정
+                        </button>
+                        <button type="button" class="btn btn-secondary memberPointDelete" th:data-id="${data.idx}">삭제
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="modal" id="memberPointModal">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 id="title" class="modal-title"></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="memberPointForm">
+                    <input type="hidden" id="idx" name="idx">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <!--매장 시작 시간, 매장 끝나는 시간-->
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*회원 이메일  :</label>
+                                    <input id="memberEmail" name="memberJoin.memberEmail" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*현재 포인트 :</label>
+                                    <input id="memberPoint" name="memberPoint" type="number" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*총 포인트:</label>
+                                    <input id="memberPointTotal" name="memberPointTotal" type="number" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*포인트 발급일:</label>
+                                   <input id="memberPointStartDate" name="memberPointStartDate" type="datetime-local" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*포인트 종료일:</label>
+                                    <input id="memberPointEndDate" name="memberPointEndDate" type="datetime-local" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*포인트 사용여부:</label>
+                                    <select id="memberPointOperationYn" name="memberPointOperationYn" class="form-select">
+                                        <option value="N">미사용</option>
+                                        <option value="Y">사용</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*포인트 내용:</label>
+                                    <input id="memberPointContents" name="memberPointContents" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button id="register" class="btn btn-primary">포인트등록</button>
+                            <button id="update" class="btn btn-primary">포인트수정</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!--폼 끝-->
+    </div><!--모달 끝-->
+</div> <!--frgment 끝-->
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () { //문서가 준비가 되었다면
+            //등록버튼을 클릭시
+            $('#register-btn').on('click', function () {
+                //alert("등록확인");
+                //입력폼 초기화
+                var form = $('#memberPointForm')[0];
+                form.reset();
+                $('#title').text("포인트 상세 등록");
+
+                $('#memberEmail').prop('readonly', false); //입력창에서는 회원이메일을 입력
+
+                $('#register').show()
+                $('#update').hide()
+
+                //대화창 출력
+                $('#memberPointModal').modal('show');
+
+            })
+
+            //대화상자에서 등록버튼 클릭시 Controller 처리
+            $('#register').on('click', function () {
+                var form = $('#memberPointForm')[0];
+                var formData = new FormData(form);//form내의 데이터 읽기
+
+                //폼 검증 수행
+                if (form.checkValidity() === false) {
+                    form.reportValidity(); //폼 검증
+                    return;
+                }
+                $('#memberPointModal').modal('hide');
+
+                $.ajax({
+                    url: '/event/memberpoint/register',//맵핑
+                    type: 'POST', //전달 방식
+                    data: formData, //데이터값
+                    processData: false, //현재상태 그대로 유지하면서 전달
+                    contentType: false,
+
+                    success: function (response) {//작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "저장하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                        location.reload(); //새로 페이지 읽기
+                    },
+                    error: function () {//작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "저장을 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+
+            });//등록버튼 클릭 끝
+
+            //삭제버튼 클릭
+            $(".memberPointDelete").on("click", function () {
+                //alert("삭제")
+                var idx = $(this).data("id");
+
+                $.ajax({
+                    url: "/event/memberpoint/delete",
+                    type: 'GET',
+                    data: {
+                        idx: idx//전달값:값
+                    },
+                    success: function (response) {//작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "삭제하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                        location.reload(); //새로 페이지 읽기
+                    },
+                    error: function () {//작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "삭제를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+            });//삭제버튼 끝
+
+            //수정버튼클릭시 대화상자 채우기
+            $(".memberPointEdit").on("click", function () {
+                //alert("삭제")
+                var idx = $(this).data("id");
+
+                $.ajax({
+                    url: "/event/memberpoint/read",
+                    type: 'GET',
+                    data: {
+                        idx: idx//전달값:값
+                    },
+                    success: function (response) {//작업 성공시
+                        $('#title').text("포인트 상세 수정");
+
+                        $('#idx').val(response.memberPointDTO.idx);
+                        $('#memberEmail').val(response.memberPointDTO.memberJoin.memberEmail);
+                        $('#memberPoint').val(response.memberPointDTO.memberPoint);
+                        $('#memberPointTotal').val(response.memberPointDTO.memberPointTotal);
+                        $('#memberPointStartDate').val(response.memberPointDTO.memberPointStartDate);
+                        $('#memberPointEndDate').val(response.memberPointDTO.memberPointEndDate);
+                        $('#memberPointOperationYn').val(response.memberPointDTO.memberPointOperationYn);
+                        $('#memberPointContents').val(response.memberPointDTO.memberPointContents);
+
+                        $('#memberEmail').prop('readonly', true); //수정창에서는 회원이메일을 읽기전용
+
+                        $('#register').hide()
+                        $('#update').show()
+
+                        //대화창 출력
+                        $('#memberPointModal').modal('show');
+                    },
+                    error: function () {//작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "조회를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+            });//수정버튼클릭시 대화상자 채우기 끝
+            //대화상자에서 수정버튼 클릭시 Controller 처리
+            $('#update').on('click', function () {
+                var form = $('#memberPointForm')[0];
+                var formData = new FormData(form);//form내의 데이터 읽기
+
+                //폼 검증 수행
+                if (form.checkValidity() === false) {
+                    form.reportValidity(); //폼 검증
+                    return;
+                }
+                $('#memberPointModal').modal('hide');
+
+                $.ajax({
+                    url: '/event/memberpoint/update',//맵핑
+                    type: 'POST', //전달 방식
+                    data: formData, //데이터값
+                    processData: false, //현재상태 그대로 유지하면서 전달
+                    contentType: false,
+
+                    success: function (response) {//작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "수정하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                        location.reload(); //새로 페이지 읽기
+                    },
+                    error: function () {//작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "수정을 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+
+            });//수정버튼 클릭 끝
+        }); //document 끝
+    </script>
+</th:block>
+</body>
+</html>

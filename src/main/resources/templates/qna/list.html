@@ -14,7 +14,27 @@
     <h3>문의 사항</h3>
 
     <div class="container bg-white">
-        <h4>검색</h4>
+        <h4>검색</h4> <!--검색 기능(keyword) 시작-->
+        <form th:action="@{/qna/list}" method="get">
+            <div class="row"><!--틀-->
+                <div class="col-6">
+                    <div class="input-group mb-3">
+                        <select class="form-select" name="type"><!--type-->
+                            <option th:selected="${type==null}"></option>
+                            <option value="0" th:selected="${type=='0'}">전체</option><!--검색 후 선택값으로 설정-->
+                            <option value="1" th:selected="${type=='1'}">제목만</option>
+                            <option value="2" th:selected="${type=='2'}">내용만</option>
+                        </select>
+                        <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
+                        <button class="btn btn-success" type="submit">검색</button>
+                    </div>
+                </div><!--검색-->
+                <div class="col-5"></div>
+                <div class="col-1">
+                    <a th:href="@{/qna/register}" class="btn btn-primary">등록</a>
+                </div><!--추가버튼-->
+            </div>
+        </form>  <!--검색 기능(keyword) 끝-->
     </div>
 
     <div class="container bg-white">
@@ -70,12 +90,10 @@
                         </li>
                     </ul>
                 </div><!--페이징 끝-->
-                <a th:href="@{/qna/register}" class="btn btn-primary">등록</a>
             </div>
             <div class="col"></div>
         </div>
     </div>
-
 </div>
 </body>
 </html>

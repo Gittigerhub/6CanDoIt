@@ -15,9 +15,9 @@
     <h3>문의 사항</h3>
     <div class="container p-5 bg-white">
         <div id="row" class="row">
-            <div class="col-3"></div>
-            <div class="col-6">
-                <form th:action="@{/qna/register}" method="post">
+            <div class="col"></div>
+            <div class="col-10">
+                <form th:action="@{/qna/register}" th:object="${qnaDTO}" method="post">
                     <!--디자인-->
                     <div class="card">
                         <div class="card-header">
@@ -27,20 +27,29 @@
                         <div class="card-body">
                             <div class="mb-3 mt-3"><!--게시글제목-->
                                 <label for="qnaTitle" class="form-label">제목:</label>
-                                <input type="text" class="form-control" id="qnaTitle" name="qnaTitle" placeholder="제목을 입력하세요." >
+                                <input type="text" th:field="*{qnaTitle}" class="form-control" id="qnaTitle" name="qnaTitle" placeholder="제목을 입력하세요." >
+                                <span th:if="${#fields.hasErrors('qnaTitle')}"
+                                      style="color: red;"
+                                      th:errors="*{qnaTitle}"></span> <!-- 오류 메시지 출력 -->
                             </div>
                             <div class="mb-3 mt-3"><!--내용-->
                                 <label for="qnaContents">내용:</label>
-                                <textarea class="form-control" rows="5" id="qnaContents" name="qnaContents"></textarea>
+                                <textarea th:field="*{qnaContents}" class="form-control" rows="5" id="qnaContents" name="qnaContents"></textarea>
+                                <span th:if="${#fields.hasErrors('qnaContents')}"
+                                      style="color: red;"
+                                      th:errors="*{qnaContents}"></span> <!-- 오류 메시지 출력 -->
                             </div>
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">등록</button>
+                            <button type="reset" class="btn btn-secondary">초기화</button>
+                            <button type="button" class="btn btn-danger"
+                                    th:onclick="|location.href='@{/qna/list}'|">취소</button>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="col-3"></div>
+            <div class="col"></div>
         </div><!--row끝-->
     </div>
 

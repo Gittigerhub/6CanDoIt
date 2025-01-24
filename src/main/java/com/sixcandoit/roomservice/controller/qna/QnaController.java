@@ -1,12 +1,13 @@
 package com.sixcandoit.roomservice.controller.qna;
 
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
-import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.service.qna.QnaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,19 +35,28 @@ public class QnaController {
 
     // Qna의 Q 등록
     @GetMapping("/qna/register")
-    public String register(){
+    public String register(Model model){
         log.info("질문 페이지로 이동합니다.");
+
+        model.addAttribute("qnaDTO", new QnaDTO()); // 빈 QnaDTO 객체 전달
 
         return "qna/register";
     }
 
     // Qna의 Q 등록 저장 처리
     @PostMapping("/qna/register")
-    public String registerProc(@ModelAttribute QnaDTO qnaDTO){
+    public String registerProc(@Valid @ModelAttribute QnaDTO qnaDTO,
+                               BindingResult bindingResult){
         log.info("질문한 내용을 저장합니다.");
+
+        if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
+            log.info("유효성 검사 오류 발생");
+            return "qna/register"; // register로 돌아간다
+        }
+        // 유효성 검사 성공 시 등록 처리
         qnaService.register(qnaDTO);
 
-        return "qna/list";
+        return "redirect:/qna/list";
     }
 
     // Qna의 Q 읽기
@@ -75,8 +85,15 @@ public class QnaController {
 
     // Qna의 Q 수정할 게시글 수정하기
     @PostMapping("/qna/update")
-    public String updateProc(@ModelAttribute QnaDTO qnaDTO){
+    public String updateProc(@Valid @ModelAttribute QnaDTO qnaDTO,
+                             BindingResult bindingResult){
         log.info("수정된 데이터를 저장합니다.");
+
+        if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
+            log.info("유효성 검사 오류 발생");
+            return "qna/update"; // update로 돌아간다
+        }
+        // 유효성 검사 성공 시 수정 처리
         qnaService.update(qnaDTO);
 
         return "redirect:/qna/list";

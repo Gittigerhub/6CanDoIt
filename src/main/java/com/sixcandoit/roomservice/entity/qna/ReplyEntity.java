@@ -34,6 +34,6 @@ public class ReplyEntity extends BaseEntity {
     // 문의 사항 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qna_idx")
-    private QnaEntity qnaEntity;
+    private QnaEntity qnaJoin;
 
 }

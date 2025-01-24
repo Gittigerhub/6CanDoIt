@@ -45,14 +45,14 @@ public class AdminEntity extends BaseEntity {
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_idx")
-    private OrganizationEntity organizationEntity;
+    private OrganizationEntity organizationJoin;
 
     // 문의 사항 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "adminEntity")
-    private List<QnaEntity> qnaEntities;
+    @OneToMany(mappedBy = "adminJoin")
+    private List<QnaEntity> qnaJoin;
 
     // 공지 사항 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "adminEntity")
-    private List<NoticeEntity> noticeEntities;
+    @OneToMany(mappedBy = "adminJoin")
+    private List<NoticeEntity> noticeJoin;
 
 }

@@ -51,6 +51,6 @@ public class AdvertisementEntity extends BaseEntity {
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_idx")
-    private OrganizationEntity organizationEntity;
+    private OrganizationEntity organizationJoin;
 
 }

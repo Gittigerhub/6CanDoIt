@@ -1,7 +1,9 @@
 package com.sixcandoit.roomservice.controller.office;
 
+import com.sixcandoit.roomservice.dto.member.AdminDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
+import com.sixcandoit.roomservice.entity.member.AdminEntity;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.service.office.ShopDetailService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -36,20 +38,18 @@ public class OfficeController {
     @GetMapping("/list")
     public String list(@PageableDefault(page=1) Pageable page,
                        @RequestParam(value="keyword", defaultValue = "") String keyword,
-                       String type, Model model) {
+                       @RequestParam(value="type", defaultValue = "") String type, Model model) {
 
         // 서비스에 조회 요청
-        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
-
-        System.out.println();
+        Page<AdminDTO> adminDTO = organizationService.organList(page, type, keyword);
 
         // 조회결과를 이용한 페이지 처리
-        Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
+        Map<String,Integer> pageInfo = pageNationUtil.Pagination(adminDTO);
 
         // 페이지 정보, 검색어, 조회데이터를 전달
         model.addAllAttributes(pageInfo);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("organDTO", organDTO);
+        model.addAttribute("adminDTO", adminDTO);
         // 조직 타입을 전달
         model.addAttribute("type", type);
 

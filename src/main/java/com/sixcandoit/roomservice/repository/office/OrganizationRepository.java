@@ -12,15 +12,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrganizationRepository extends JpaRepository<OrganizationEntity, Integer> {
 
-    // 분류(총판명 총판ID, 총판장ID, 총판장), 키워드(찾을 내용)
-    // 본사 + 조직명, 지사 + 조직명, 매장 + 조직명
-    // 결과값이 여러개이면 List<StoreEntity>, Page<StoreEntity>
-    // 결과값이 하나이면 StoreEntity, Optional<StoreEntity>
 
-    // 조직명
-    // OrganizationEntity o(별칭) : 별칭은 테이블명을 약식표기(알파벳 1글자 지정)
-    // String keyword => @Param("keyword") => :keyword
-    @Query("SELECT o from OrganizationEntity o where o.organName like %:keyword%")
-    Page<OrganizationEntity> searchOrgan(@Param("keyword") String keyword, Pageable pageable);
 
 }

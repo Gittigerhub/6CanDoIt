@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.dto.member;
 
 import com.sixcandoit.roomservice.constant.Level;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.NoticeEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
@@ -34,6 +35,8 @@ public class AdminDTO implements UserDetails {
     private Level adminlevel;
     //열거형 키(설명)
     private String adminlevelDescription; //열거형 설명을 저장할 변수
+
+    private OrganizationDTO organDTO;     // 조직 테이블 DTO
 
     //해당키와 설명을 저장하는 사용자 함수를 선언
     public void setAdminlevel(Level adminlevel) {

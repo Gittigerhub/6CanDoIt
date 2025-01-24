@@ -37,24 +37,24 @@ public class OrganizationEntity extends BaseEntity {
     private String activeYn;              // 활성화 유무
 
     // 관리자 회원 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationEntity")
-    private List<AdminEntity> adminEntities;
+    @OneToMany(mappedBy = "organizationJoin")
+    private List<AdminEntity> adminJoin;
 
     // 매장 상세 테이블과 1:1 매핑
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_detail_idx")
-    private ShopDetailEntity shopDetailEntity;
+    private ShopDetailEntity shopDetailJoin;
 
     // 룸 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationEntity")
-    private List<RoomEntity> roomEntities;
+    @OneToMany(mappedBy = "organizationJoin")
+    private List<RoomEntity> roomJoin;
 
     // 광고 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationEntity")
-    private List<AdvertisementEntity> advertisementEntities;
+    @OneToMany(mappedBy = "organizationJoin")
+    private List<AdvertisementEntity> advertisementJoin;
 
     // 이벤트 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationEntity")
-    private List<EventEntity> eventEntities;
+    @OneToMany(mappedBy = "organizationJoin")
+    private List<EventEntity> eventJoin;
 
 }

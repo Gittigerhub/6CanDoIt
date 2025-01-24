@@ -50,6 +50,6 @@ public class EventEntity extends BaseEntity {
     // 관리자 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_idx")
-    private OrganizationEntity organizationEntity;
+    private OrganizationEntity organizationJoin;
 
 }

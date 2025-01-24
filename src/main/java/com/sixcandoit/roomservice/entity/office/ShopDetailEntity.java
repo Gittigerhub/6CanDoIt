@@ -61,15 +61,15 @@ public class ShopDetailEntity extends BaseEntity {
     private float dayFeePercent;         // 매장 일별 수수료 %
 
     // 조직 테이블과 1:1 매핑
-    @OneToOne(mappedBy = "shopDetailEntity")
-    private OrganizationEntity organizationEntity;
+    @OneToOne(mappedBy = "shopDetailJoin")
+    private OrganizationEntity organizationJoin;
 
     // 정산내역 테이블과 1:N 매칭
-    @OneToMany(mappedBy = "shopDetailEntity")
-    private List<CalculateEntity> calculateEntities;
+    @OneToMany(mappedBy = "shopDetailJoin")
+    private List<CalculateEntity> calculateJoins;
 
     // 메뉴 테이블과 1:N 매칭
-    @OneToMany(mappedBy = "shopDetailEntity")
-    private List<MenuEntity> menuEntities;
+    @OneToMany(mappedBy = "shopDetailJoin")
+    private List<MenuEntity> menuJoin;
 
 }

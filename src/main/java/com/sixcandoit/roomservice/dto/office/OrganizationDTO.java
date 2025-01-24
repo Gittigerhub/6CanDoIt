@@ -25,11 +25,6 @@ public class OrganizationDTO {
 
     private ShopDetailDTO shopDetailDTO;    // 매장 상세 DTO
 
-    private AdminDTO adminDTO;              // 관리자 회원 DTO
-
-
-
-
-
+    private List<AdminDTO> adminDTO;        // 관리자 회원 DTOlist
 
 }

@@ -25,7 +25,7 @@ public class MemberPointEntity extends BaseEntity {
     private Integer idx;                         // 기본 키
 
     @Column(name = "member_point")
-    private int memberPoint;                     // 포인트 제목
+    private int memberPoint;                     // 얻은 포인트
 
     @Column(name = "member_point_total")
     private int memberPointTotal;                // 총 포인트

@@ -20,7 +20,7 @@
                 <!--디자인-->
                 <div class="card">
                     <div class="card-header">
-                        <h4>게시글 상세보기</h4>
+                        <h4>Q 상세보기</h4>
                     </div>
                     <div class="card-body">
                         <p>번호:<span th:text="${qnaDTO.idx}"></span></p>
@@ -41,7 +41,8 @@
                         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#replyModal">답변 등록</button>
                     </div>
                 </div>
-                <!-- 모달 -->
+
+                <!-- 답변 등록 모달 -->
                 <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -52,7 +53,7 @@
                             <form th:action="@{/reply/register}" method="post">
                                 <div class="modal-body">
                                     <!-- QnaIdx를 숨겨서 전달 -->
-                                    <input type="hidden" th:name="qnaIdx" th:value="${qnaDTO.idx}">
+                                    <input type="hidden" name="qnaIdx" th:value="${qnaDTO.idx}">
 
                                     <div class="mb-3">
                                         <label for="replyTitle" class="form-label">답변 제목</label>
@@ -70,24 +71,82 @@
                             </form>
                         </div>
                     </div>
-                </div>
+                </div><!-- 답변 등록 모달 끝 -->
 
                 <!-- 답변 목록 -->
-                <h5>답변 목록</h5>
                 <div th:each="reply : ${qnaDTO.replyList}" class="card mt-3">
+                    <div class="card-header">
+                        <h4>A 목록</h4>
+                    </div>
                     <div class="card-body">
-                        <h6 th:text="${reply.replyTitle}"></h6>
-                        <p th:text="${reply.replyContents}"></p>
-                        <p class="text-muted" th:text="${#temporals.format(reply.insDate, 'yyyy-MM-dd')}"></p>
+                        <p>제목:<span th:text="${reply.replyTitle}"></span></p>
+                        <p>내용:<span th:text="${reply.replyContents}"></span></p>
+                        <p>등록일:
+                            <span th:text="${#temporals.format(reply.insDate, 'yyyy-MM-dd')}"></span>
+                        </p>
+                        <p>수정일:
+                            <span th:text="${#temporals.format(reply.modDate, 'yyyy-MM-dd')}"></span>
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <!-- 답변 수정 버튼 (모달 띄우기) -->
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal2"
+                                th:data-replyidx="${reply.idx}">답변 수정</button>
+                        <!-- 답변 삭제 버튼 -->
+                        <a th:href="@{'/reply/delete?idx=' + ${reply.idx} + '&qnaIdx=' + ${qnaDTO.idx}}" class="btn btn-danger">삭제</a>
+                    </div>
+                </div><!-- 답변 목록 끝 -->
+
+                <!-- 답변 수정 모달 -->
+                <div class="modal fade" id="replyModal2" tabindex="-1" aria-labelledby="replyModalLabel2" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="replyModalLabel2">답변 수정</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form th:action="@{/reply/update}" method="post">
+                                <div class="modal-body">
+                                    <!-- replyIdx만 hidden으로 전달 -->
+                                    <input type="hidden" name="idx" id="idx">
+
+                                    <div class="mb-3">
+                                        <label for="replyTitle" class="form-label">답변 제목</label>
+                                        <input type="text" class="form-control" id="replyTitle2" name="replyTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="replyContents" class="form-label">답변 내용</label>
+                                        <textarea class="form-control" id="replyContents2" name="replyContents" rows="4" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                                    <button type="submit" class="btn btn-primary">저장</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
+
 
                 <a th:href="@{/qna/list}" class="btn btn-secondary">목록</a>
             </div>
             <div class="col"></div>
         </div><!--row끝-->
     </div>
-
 </div>
+<script>
+    // 답변 수정 버튼 클릭 시 모달에 값 채우기
+    var replyModal = document.getElementById('replyModal2');
+    replyModal.addEventListener('show.bs.modal', function (event) {
+        // 버튼에서 데이터를 가져오기
+        var button = event.relatedTarget; // 버튼을 클릭한 element
+        var idx = button.getAttribute('data-idx');
+
+        // 모달 내의 hidden 필드에 값 설정
+        var modal = replyModal.querySelector('form');
+        modal.querySelector('input[name="idx"]').value = idx;
+    });
+</script>
 </body>
 </html>

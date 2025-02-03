@@ -143,6 +143,9 @@ public class MemberPointService {
 
         return memberPointDTOlist;
     }
+    /*-------------------------------------------------
+
+
     /* 회원별 포인트 등록 */
     /* 회원별 포인트 수정 */
     /* 회원별 포인트 삭제 */

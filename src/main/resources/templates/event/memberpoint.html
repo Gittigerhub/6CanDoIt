@@ -16,18 +16,20 @@
     <div class="container p-5 bg-white">
         <div class="container">
             <button type="button" class="btn btn-primary" id="register-btn">등록</button>
-            <h2>포인트 정보</h2>
+            <h2>총 포인트: </h2>
+
             <!--조회 테이블-->
             <table class="table table-bordered" style="text-align: center">
                 <thead>
                 <tr> <!--테이블 제목-->
-                    <th style="width: 8%">No</th>
+                    <th style="width: 4%">No</th>
                     <th style="width: 10%">회원 이름</th>
-                    <th style="width: 24%">회원 아이디</th>
-                    <th style="width: 18%">현재 포인트</th>
-                    <th style="width: 18%">총 포인트</th>
-                    <th style="width: 22%">포인트 종료날</th>
-                    <th style="width: 16%">상태</th>
+                    <th style="width: 16%">회원 아이디</th>
+                    <th style="width: 16%">계산 된 포인트</th>
+                    <th style="width: 10%">총 포인트</th>
+                    <th style="width: 16%">포인트 종료날</th>
+                    <th style="width: 8%">사용여부</th>
+                    <th style="width: 20%">상태</th>
                 </tr>
                 </thead>
                 <tbody> <!--조직 테이블 데이터 출력-->
@@ -35,9 +37,11 @@
                     <td th:text="${data.idx}">John</td>
                     <td th:text="${data.memberJoin.memberName}">Doe</td>
                     <td th:text="${data.memberJoin.memberEmail}">john@example.com</td>
-                    <td th:text="${data.memberPoint}">Doe</td>
-                    <td th:text="${data.memberPointTotal}">Doe</td>
+                    <td th:if="${data.memberPointOperationYn}=='Y'" th:text="'-'+${data.memberPoint}">Doe</td>
+                    <td th:if="${data.memberPointOperationYn}=='N'" th:text="'+'+${data.memberPoint}">Doe</td>
+                    <td><span class="totalPoints">0</span></td>
                     <td th:text="${data.memberPointEndDate}">Doe</td>
+                    <td th:text="${data.memberPointOperationYn}"></td>
                     <td>
                         <button type="button" class="btn btn-primary memberPointEdit" th:data-id="${data.idx}">수정
                         </button>
@@ -68,23 +72,16 @@
                         <div class="row mt-2">
                             <div class="col-sm-6">
                                 <div class="form-group form-group-default">
-                                    <label>*회원 이메일  :</label>
-                                    <input id="memberEmail" name="memberJoin.memberEmail" type="text" class="form-control" required/>
+                                    <label>*회원 이메일 :</label>
+                                    <input id="memberEmail" name="memberJoin.memberEmail" type="text"
+                                           class="form-control" required/>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group form-group-default">
-                                    <label>*현재 포인트 :</label>
-                                    <input id="memberPoint" name="memberPoint" type="number" class="form-control" required/>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-2">
-                            <div class="col-sm-12">
-                                <div class="form-group form-group-default">
-                                    <label>*총 포인트:</label>
-                                    <input id="memberPointTotal" name="memberPointTotal" type="number" class="form-control" required/>
+                                    <label>* 포인트 :</label>
+                                    <input id="memberPoint" name="memberPoint" type="number" class="form-control"
+                                           required/>
                                 </div>
                             </div>
                         </div>
@@ -93,13 +90,15 @@
                             <div class="col-sm-6">
                                 <div class="form-group form-group-default">
                                     <label>*포인트 발급일:</label>
-                                   <input id="memberPointStartDate" name="memberPointStartDate" type="datetime-local" class="form-control" required/>
+                                    <input id="memberPointStartDate" name="memberPointStartDate" type="datetime-local"
+                                           class="form-control" required/>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group form-group-default">
                                     <label>*포인트 종료일:</label>
-                                    <input id="memberPointEndDate" name="memberPointEndDate" type="datetime-local" class="form-control" required/>
+                                    <input id="memberPointEndDate" name="memberPointEndDate" type="datetime-local"
+                                           class="form-control" required/>
                                 </div>
                             </div>
                         </div>
@@ -108,7 +107,8 @@
                             <div class="col-sm-12">
                                 <div class="form-group form-group-default">
                                     <label>*포인트 사용여부:</label>
-                                    <select id="memberPointOperationYn" name="memberPointOperationYn" class="form-select">
+                                    <select id="memberPointOperationYn" name="memberPointOperationYn"
+                                            class="form-select">
                                         <option value="N">미사용</option>
                                         <option value="Y">사용</option>
                                     </select>
@@ -121,7 +121,8 @@
                             <div class="col-sm-12">
                                 <div class="form-group form-group-default">
                                     <label>*포인트 내용:</label>
-                                    <input id="memberPointContents" name="memberPointContents" type="text" class="form-control" required/>
+                                    <input id="memberPointContents" name="memberPointContents" type="text"
+                                           class="form-control" required/>
                                 </div>
                             </div>
                         </div>
@@ -141,6 +142,8 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         $(document).ready(function () { //문서가 준비가 되었다면
+            let totalPoints = 0;
+
             //등록버튼을 클릭시
             $('#register-btn').on('click', function () {
                 //alert("등록확인");
@@ -401,6 +404,34 @@
                 });
 
             });//수정버튼 클릭 끝
+
+            // 총합이 찍히는 함수
+            function calculateTotalPoints() {
+
+
+                $("tbody tr").each(function () {
+                    let pointText = $(this).find("td:eq(3)").text().trim();
+                    let points = parseInt(pointText, 10);
+
+                    if (!isNaN(points)) {
+                        totalPoints += points;
+                        if(points<=0){
+                            totalPoints=0;
+                        }
+                    }
+                    $(".totalPoints").text(totalPoints);
+                });
+
+
+
+
+
+            }
+
+
+
+            calculateTotalPoints();
+
         }); //document 끝
     </script>
 </th:block>

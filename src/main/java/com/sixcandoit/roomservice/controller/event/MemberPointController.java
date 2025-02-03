@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.controller.event;
 
 import com.sixcandoit.roomservice.dto.event.MemberPointDTO;
+import com.sixcandoit.roomservice.entity.event.MemberPointEntity;
 import com.sixcandoit.roomservice.service.event.MemberPointService;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -16,9 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,15 +30,23 @@ public class MemberPointController {
     private final ModelMapper modelMapper;
     private final PageNationUtil pageNationUtil;
     private final MemberPointService memberPointService;
+
+
     
     //포인트 목록
     @GetMapping("/memberpoint")
-    public String memberPoint(Model model) {
+    public String memberPoint( Model model) {
         try {
             log.info("get에 들어옴");
             List<MemberPointDTO> memberPointDTOS = memberPointService.list();
 
+
+
+
+
             model.addAttribute("memberPointDTOS", memberPointDTOS);
+
+
 
             return "event/memberpoint";
         } catch (Exception e){
@@ -51,9 +59,12 @@ public class MemberPointController {
     @ResponseBody
     public ResponseEntity<String> MemberPointRegister(@ModelAttribute MemberPointDTO memberPointDTO){
         try {
+
             memberPointService.register(memberPointDTO);
             System.out.println("저장성공");
+
             return  ResponseEntity.ok("등록하였습니다.");
+
         }catch (Exception e){
             System.out.println("저장실패");
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("등록을 실패 하였습니다.");
@@ -93,12 +104,15 @@ public class MemberPointController {
         try {
             memberPointService.update(memberPointDTO);
             //System.out.println("수정성5공!!!");
+
             return  ResponseEntity.ok("수정하였습니다.");
         }catch (Exception e){
             //System.out.println("수정실패!!!");
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패 하였습니다.");
         }
     }
+
+
 
 
 }

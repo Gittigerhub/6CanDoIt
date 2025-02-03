@@ -1,7 +1,7 @@
 package com.sixcandoit.roomservice.service.notice;
 
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
-import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
+import com.sixcandoit.roomservice.entity.NoticeEntity;
 
 import com.sixcandoit.roomservice.repository.NoticeRepository;
 

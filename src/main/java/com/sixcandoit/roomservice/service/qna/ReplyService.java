@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.service.qna;
 
-import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.dto.qna.ReplyDTO;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
@@ -12,8 +11,9 @@ import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -35,31 +35,41 @@ public class ReplyService {
         QnaEntity qnaEntity = optionalQnaEntity.orElseThrow(EntityNotFoundException::new);
         // 없을 시 예외처리
 
-        ReplyEntity replyEntity =
-                modelMapper.map(replyDTO, ReplyEntity.class);
+        // 이미 해당 질문에 답변이 존재하는지 확인
+        Optional<ReplyEntity> existingReply = replyRepository.findByQnaJoin(qnaEntity);
+        if (existingReply.isPresent()) {
+            throw new IllegalStateException("이 질문에는 이미 답변이 존재합니다.");
+        }
+
+        // 답변이 없으면 새로운 답변 등록
+        ReplyEntity replyEntity = modelMapper.map(replyDTO, ReplyEntity.class);
         replyEntity.setQnaJoin(qnaEntity);
 
         replyRepository.save(replyEntity);
     }
 
-    // Qna의 A 읽기
-    public ReplyDTO replyRead(Integer idx){
-        return null;
+    // 답변 조회
+    public ReplyEntity getReply(Integer idx) {
+        Optional<ReplyEntity> replyEntity = this.replyRepository.findById(idx);
+        if (replyEntity.isPresent()){
+            return replyEntity.get();
+        }else {
+            throw new NotFoundException("답변이 존재하지 않습니다.");
+        }
     }
 
-    // Qna의 A 수정
-    public ReplyDTO replyUpdate(ReplyDTO replyDTO){
-        return null;
+    // 답변 수정
+    public void replyUpdate(ReplyEntity replyEntity,
+                            String replyTitle,
+                            String replyContents){
+        replyEntity.setReplyTitle(replyTitle);
+        replyEntity.setReplyContents(replyContents);
+        replyEntity.setModDate(LocalDateTime.now());
+        this.replyRepository.save(replyEntity);
     }
 
     // Qna의 A 삭제
-    public void replyDelete(Long rno){
+    public void replyDelete(Integer idx){
+        replyRepository.deleteById(idx);
     }
-
-    // Qna의 A 목록
-    public List<ReplyDTO> replyList(){
-        return null;
-    }
-
-
 }

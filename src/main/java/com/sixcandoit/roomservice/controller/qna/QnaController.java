@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -72,6 +73,7 @@ public class QnaController {
     // Qna의 Q 읽기
     @GetMapping("/qna/read")
     public String read(@RequestParam Integer idx, Model model){
+        qnaService.count(idx); // 조회수 증가
         log.info("개별 데이터를 읽는 중입니다.");
         QnaDTO qnaDTO = qnaService.qnaRead(idx);
 

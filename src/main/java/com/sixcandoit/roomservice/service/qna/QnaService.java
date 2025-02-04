@@ -7,16 +7,17 @@ import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.tomcat.util.http.fileupload.FileUpload;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +25,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log
 public class QnaService {
+
+
 
     // final 선언, 모델 맵퍼 선언
     private final QnaRepository qnaRepository;
@@ -35,6 +38,7 @@ public class QnaService {
         // DTO로 Entity 변환
         QnaEntity qnaEntity = modelMapper.map(qnaDTO, QnaEntity.class);
         // 저장
+
         qnaRepository.save(qnaEntity);
     }
 
@@ -57,6 +61,7 @@ public class QnaService {
             log.info("답변이 없으면 QnaEntity 수정 진행...");
             QnaEntity qnaEntitys = modelMapper.map(qnaDTO, QnaEntity.class);
             qnaRepository.save(qnaEntitys);
+
         } else {
             throw new IllegalStateException("수정할 QnA가 존재하지 않습니다.");
         }
@@ -104,12 +109,21 @@ public class QnaService {
         return qnaDTOS;
     }
 
+    // 아니면 조회수 증가를 만들어따로
+    public void count(Integer idx){
+        QnaEntity qnaEntity = qnaRepository.findById(idx)
+                        .orElseThrow();
+
+        qnaEntity.setQnaHits(qnaEntity.getQnaHits()+1);
+
+        qnaRepository.save(qnaEntity);
+    }
     // Qna의 Q의 개별정보, 게시글 번호의 데이터를 화면에 출력
     public QnaDTO qnaRead(Integer idx){
         Optional<QnaEntity> qnaEntity = qnaRepository.findById(idx);
-        log.info("게시글의 idx를 조회...");
+
         QnaDTO qnaDTO = modelMapper.map(qnaEntity, QnaDTO.class);
-        log.info("DTO로 변환하는 중...");
+
         return qnaDTO;
     }
 }

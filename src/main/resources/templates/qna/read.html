@@ -112,11 +112,11 @@
 
                                     <div class="mb-3">
                                         <label for="replyTitle" class="form-label">답변 제목</label>
-                                        <input type="text" class="form-control" id="replyTitle2" name="replyTitle" th:value="${reply.replyTitle}" required>
+                                        <input type="text" th:value="${reply.replyTitle}" class="form-control" id="replyTitle2" name="replyTitle" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="replyContents" class="form-label">답변 내용</label>
-                                        <textarea class="form-control" id="replyContents2" name="replyContents" th:value="${reply.replyContents}" rows="4" required></textarea>
+                                        <textarea th:text="${reply.replyContents}" class="form-control" id="replyContents2" name="replyContents" rows="4" required></textarea>
                                     </div>
                                 </div>
                                 <div class="modal-footer">

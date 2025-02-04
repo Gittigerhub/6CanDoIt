@@ -26,9 +26,10 @@ public class QnaDTO {
     @Size(min = 1, message = "내용은 공백일 수 없습니다.")
     private String qnaContents;        // 내용
 
-    private int qnaHits = 0;               // 조회 수
+    private int qnaHits;               // 조회 수
     private LocalDateTime insDate;      // 작성 일자
     private LocalDateTime modDate;      // 수정 일자
     private List<ReplyDTO> replyList;    // 댓글 목록
+    private String qnaImg;              // 문의사항 이미지
 
 }

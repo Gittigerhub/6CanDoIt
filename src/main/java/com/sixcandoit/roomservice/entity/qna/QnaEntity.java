@@ -32,7 +32,7 @@ public class QnaEntity extends BaseEntity {
     @Column(name = "qna_contents")
     private String qnaContents;        // 내용
 
-    @Column(name = "qna_hits")
+    @Column(name = "qna_hits", columnDefinition = "integer default 0", nullable = false)
     private int qnaHits;               // 조회 수
 
     // 회원 테이블과 N:1 매핑
@@ -50,5 +50,7 @@ public class QnaEntity extends BaseEntity {
     // 문의 사항 댓글 테이블과 1:N 매핑
     @OneToMany(mappedBy = "qnaJoin")
     private List<ReplyEntity> replyJoin;
+
+    private String qnaImg;              // 문의사항 이미지
 
 }

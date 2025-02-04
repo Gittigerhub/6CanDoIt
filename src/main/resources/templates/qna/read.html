@@ -98,7 +98,7 @@
                 </div><!-- 답변 목록 끝 -->
 
                 <!-- 답변 수정 모달 -->
-                <div class="modal fade" id="replyModal2" tabindex="-1" aria-labelledby="replyModalLabel2" aria-hidden="true">
+                <div th:each="reply : ${qnaDTO.replyList}" class="modal fade" id="replyModal2" tabindex="-1" aria-labelledby="replyModalLabel2" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -107,16 +107,16 @@
                             </div>
                             <form th:action="@{/reply/update}" method="post">
                                 <div class="modal-body">
-                                    <!-- replyIdx만 hidden으로 전달 -->
-                                    <input type="hidden" name="idx" id="idx">
+                                    <!-- QnaIdx를 숨겨서 전달 -->
+                                    <input type="hidden" name="qnaIdx" th:value="${qnaDTO.idx}">
 
                                     <div class="mb-3">
                                         <label for="replyTitle" class="form-label">답변 제목</label>
-                                        <input type="text" class="form-control" id="replyTitle2" name="replyTitle" required>
+                                        <input type="text" class="form-control" id="replyTitle2" name="replyTitle" th:value="${reply.replyTitle}" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="replyContents" class="form-label">답변 내용</label>
-                                        <textarea class="form-control" id="replyContents2" name="replyContents" rows="4" required></textarea>
+                                        <textarea class="form-control" id="replyContents2" name="replyContents" th:value="${reply.replyContents}" rows="4" required></textarea>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -126,7 +126,7 @@
                             </form>
                         </div>
                     </div>
-                </div>
+                </div><!-- 답변 수정 모달 끝 -->
 
 
                 <a th:href="@{/qna/list}" class="btn btn-secondary">목록</a>
@@ -136,17 +136,6 @@
     </div>
 </div>
 <script>
-    // 답변 수정 버튼 클릭 시 모달에 값 채우기
-    var replyModal = document.getElementById('replyModal2');
-    replyModal.addEventListener('show.bs.modal', function (event) {
-        // 버튼에서 데이터를 가져오기
-        var button = event.relatedTarget; // 버튼을 클릭한 element
-        var idx = button.getAttribute('data-idx');
-
-        // 모달 내의 hidden 필드에 값 설정
-        var modal = replyModal.querySelector('form');
-        modal.querySelector('input[name="idx"]').value = idx;
-    });
 </script>
 </body>
 </html>

@@ -29,43 +29,52 @@ public class ReplyService {
 
     // Qna의 A 쓰기
     public void replyRegister(ReplyDTO replyDTO) {
-        Optional<QnaEntity> optionalQnaEntity =
+        Optional<QnaEntity> QnaEntity =
                 qnaRepository.findById(replyDTO.getQnaIdx());
 
-        QnaEntity qnaEntity = optionalQnaEntity.orElseThrow(EntityNotFoundException::new);
+        QnaEntity qnaEntity = QnaEntity.orElseThrow(EntityNotFoundException::new);
         // 없을 시 예외처리
 
         // 이미 해당 질문에 답변이 존재하는지 확인
-        Optional<ReplyEntity> existingReply = replyRepository.findByQnaJoin(qnaEntity);
-        if (existingReply.isPresent()) {
+        Optional<ReplyEntity> replyEntity = replyRepository.findByQnaJoin(qnaEntity);
+        if (replyEntity.isPresent()) {
             throw new IllegalStateException("이 질문에는 이미 답변이 존재합니다.");
         }
 
         // 답변이 없으면 새로운 답변 등록
-        ReplyEntity replyEntity = modelMapper.map(replyDTO, ReplyEntity.class);
-        replyEntity.setQnaJoin(qnaEntity);
+        ReplyEntity replyEntitys = modelMapper.map(replyDTO, ReplyEntity.class);
+        replyEntitys.setQnaJoin(qnaEntity);
 
-        replyRepository.save(replyEntity);
-    }
-
-    // 답변 조회
-    public ReplyEntity getReply(Integer idx) {
-        Optional<ReplyEntity> replyEntity = this.replyRepository.findById(idx);
-        if (replyEntity.isPresent()){
-            return replyEntity.get();
-        }else {
-            throw new NotFoundException("답변이 존재하지 않습니다.");
-        }
+        replyRepository.save(replyEntitys);
     }
 
     // 답변 수정
-    public void replyUpdate(ReplyEntity replyEntity,
-                            String replyTitle,
-                            String replyContents){
-        replyEntity.setReplyTitle(replyTitle);
-        replyEntity.setReplyContents(replyContents);
-        replyEntity.setModDate(LocalDateTime.now());
-        this.replyRepository.save(replyEntity);
+    public void replyUpdate(ReplyDTO replyDTO) {
+        // Qna idx 조회
+        log.info("qna있는지조회한다...");
+        Optional<QnaEntity> QnaEntity =
+                qnaRepository.findById(replyDTO.getQnaIdx());
+
+        // Qna 없을 시 예외처리
+        QnaEntity qnaEntity = QnaEntity.orElseThrow(EntityNotFoundException::new);
+
+        log.info("답변이있는지조회한다...");
+        // 해당 질문에 답변이 존재하는지 확인
+        Optional<ReplyEntity> replyEntity = replyRepository.findByQnaJoin(qnaEntity);
+
+        if (replyEntity.isPresent()) { // 존재하면 수정
+            log.info("답변이존재하면...");
+            ReplyEntity replyEntity1 = replyEntity.get();
+            // 기존 답변 삭제
+            log.info("기존답변을삭제...");
+            replyRepository.delete(replyEntity1);
+
+            log.info("새로수정된답변저장...");
+            // 새로 수정된 답변 저장
+            ReplyEntity replyEntitys = modelMapper.map(replyDTO, ReplyEntity.class);
+            replyEntitys.setQnaJoin(qnaEntity);
+            replyRepository.save(replyEntitys);
+        }
     }
 
     // Qna의 A 삭제

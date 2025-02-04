@@ -72,7 +72,7 @@
                 </tr>
                 </thead>
                 <tbody> <!--조직 테이블 데이터 출력-->
-                <tr th:each="data:${adminDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                <tr th:each="data:${adminLoginDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
                     <td th:text="${data.organDTO.idx}"></td>
                     <td th:text="${data.organDTO.organName}"></td>
                     <td th:text="${data.adminEmail}"></td>
@@ -82,7 +82,7 @@
                 </tr>
                 </tbody>
             </table>
-                <div class="d-flex justify-content-center" th:if="${adminDTO.isEmpty()}">조회된 내역이 없습니다.</div>
+                <div class="d-flex justify-content-center" th:if="${adminLoginDTO.isEmpty()}">조회된 내역이 없습니다.</div>
 
             <!-- 페이징 처리 시작 -->
             <div class="d-flex justify-content-center">
@@ -232,7 +232,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="data:${adminDTO}">
+                                            <tr th:each="data:${adminLoginDTO}">
                                                 <td th:text="${data.adminlevelDescription}"></td>
                                                 <td th:text="${data.adminEmail}"></td>
                                                 <td th:text="${data.adminName}"></td>

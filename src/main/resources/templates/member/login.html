@@ -18,24 +18,35 @@
       <div class="card">
         <div class="card-body">
           <h2>로그인</h2>
-          <form th:action="@{/login}" method="post" class="was-validated">
+          <form th:action="@{/member/login}" method="post" class="was-validated">
+              <div th:if="${param.error}">
+                  <div class="alert alert-danger mt-4">
+                      아이디 비번이 문제니?
+                  </div>
+              </div>
+
             <div class="mb-3 mt-3">
               <label for="memberEmail" class="form-label">이메일:</label>
               <input type="email" class="form-control" id="memberEmail" name="memberEmail" placeholder="이메일을 입력하세요.">
               <div class="invalid-feedback">이메일을 입력해주세요.</div>
             </div>
+
             <div class="mb-3">
               <label for="memberPwd" class="form-label">비밀번호:</label>
               <input type="password" class="form-control" id="memberPwd" name="memberPwd" placeholder="비밀번호를 입력하세요.">
               <div class="invalid-feedback">비밀번호를 입력해주세요.</div>
             </div>
+
             <div class="mt-3 text-center">
               <div class="text-center">
-                <form action="/member/modify" method="post">
-                  <button type="submit" class="btn btn-primary">로그인</button>
-                </form>
+<!--                <form action="/member/modify" method="post">-->
+<!--                  <button type="submit" class="btn btn-primary">로그인</button>-->
+<!--                </form>-->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">로그인</button>
+                    <button type="button" class="btn btn-primary mt-1">비회원 주문하기</button>
+                </div>
               </div>
-              <button type="button" class="btn btn-primary mt-1">비회원 주문하기</button>
             </div>
             <div class="mt-2 text-center">
               <button type="button" class="btn btn-link">

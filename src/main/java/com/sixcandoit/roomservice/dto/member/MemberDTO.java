@@ -1,23 +1,14 @@
 package com.sixcandoit.roomservice.dto.member;
 
 import com.sixcandoit.roomservice.constant.Level;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberDTO implements UserDetails {
+public class MemberDTO {
     private Integer idx;             // 기본 키
     private String memberType;             // 회원 가입타입
     private String memberEmail;            // 이메일
@@ -38,51 +29,5 @@ public class MemberDTO implements UserDetails {
         this.level = level; //키 값 저장
         this.membersDescription =
                 level != null? level.getDescription():null;
-    }
-
-    //UserDetails를 사용자 커스텀으로 변경
-
-    //비밀번호 오버라이딩
-    @Override
-    public String getPassword() {
-        return "memberPwd";
-    }
-    //이메일 오버라이딩
-    @Override
-    public String getUsername() {
-        return "memberEmail";
-    }
-    //권한 오버라이딩
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(level != null){
-            switch (level){
-                case MEMBER:
-                    return Collections.singletonList(new SimpleGrantedAuthority("ROLE_MEMBER"));
-            }
-        }
-        return Collections.emptyList();
-    }
-
-
-    //계정 만료 여부
-    @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
-    }
-    //계정 차단 여부
-    @Override
-    public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
-    }
-    //자격 증명 여부
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
-    }
-    //계정 활성화 여부
-    @Override
-    public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
     }
 }

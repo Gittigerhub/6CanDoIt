@@ -1,10 +1,9 @@
 package com.sixcandoit.roomservice.service.office;
 
-import com.sixcandoit.roomservice.dto.member.AdminDTO;
+import com.sixcandoit.roomservice.dto.member.AdminLoginDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.member.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
-import com.sixcandoit.roomservice.entity.orders.CartEntity;
 import com.sixcandoit.roomservice.repository.member.AdminRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import jakarta.transaction.Transactional;
@@ -16,8 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -100,7 +97,7 @@ public class OrganizationService {
         출력 : 받은 OrganizationDTO를 테이블에 저장, 실패시 저장 안됨
         설명 : 조직을 등록
     ----------------------------------------------------------------------------- */
-    public Page<AdminDTO> organList(Pageable page, String type, String keyword) {
+    public Page<AdminLoginDTO> organList(Pageable page, String type, String keyword) {
 
         try {
             // 1. 페이지정보를 재가공
@@ -139,8 +136,8 @@ public class OrganizationService {
             }
 
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
-            Page<AdminDTO> adminDTO = adminEntity.map(entity -> {
-                AdminDTO dto = modelMapper.map(entity, AdminDTO.class);
+            Page<AdminLoginDTO> adminDTO = adminEntity.map(entity -> {
+                AdminLoginDTO dto = modelMapper.map(entity, AdminLoginDTO.class);
 
                 // Organization 정보를 AdminDTO에 추가
                 OrganizationDTO organizationDTO = modelMapper.map(entity.getOrganizationJoin(), OrganizationDTO.class);
@@ -164,17 +161,17 @@ public class OrganizationService {
         출력 : searchAdmin로 조회된 회원 출력
         설명 : 관리자 회원 조회
     ----------------------------------------------------------------------------- */
-    public List<AdminDTO> adminList(String searchAdmin) {
+    public List<AdminLoginDTO> adminList(String searchAdmin) {
 
         try {
             // 1. 조회
             List<AdminEntity> adminEntities = adminRepository.searchAdminKey(searchAdmin);
 
             // 2. 조회한 결과를 HTML에서 사용할 DTO로 변환
-            List<AdminDTO> adminDTO = adminEntities.stream().map(adminEntity -> modelMapper.map(adminEntity, AdminDTO.class)).collect(Collectors.toList());
+            List<AdminLoginDTO> adminLoginDTO = adminEntities.stream().map(adminEntity -> modelMapper.map(adminEntity, AdminLoginDTO.class)).collect(Collectors.toList());
 
             // 3. 결과값을 전달
-            return adminDTO;
+            return adminLoginDTO;
 
         } catch (Exception e) {     //오류발생시 오류 처리
             throw new RuntimeException("관리자 조회 오류");

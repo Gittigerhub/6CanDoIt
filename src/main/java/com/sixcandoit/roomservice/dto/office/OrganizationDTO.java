@@ -1,11 +1,9 @@
 package com.sixcandoit.roomservice.dto.office;
 
-import com.sixcandoit.roomservice.dto.member.AdminDTO;
-import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
+import com.sixcandoit.roomservice.dto.member.AdminLoginDTO;
 import lombok.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -26,6 +24,6 @@ public class OrganizationDTO {
 
     private ShopDetailDTO shopDetailDTO;    // 매장 상세 DTO
 
-    private List<AdminDTO> adminDTO;        // 관리자 회원 DTOlist
+    private List<AdminLoginDTO> adminLoginDTO;        // 관리자 회원 DTOlist
 
 }

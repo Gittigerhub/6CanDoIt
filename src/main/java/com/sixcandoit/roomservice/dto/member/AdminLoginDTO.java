@@ -5,7 +5,6 @@ import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.NoticeEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
-import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,7 +20,7 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminDTO implements UserDetails {
+public class AdminLoginDTO implements UserDetails {
 
     private Integer idx;             // 기본 키
     private String adminEmail;            // 이메일

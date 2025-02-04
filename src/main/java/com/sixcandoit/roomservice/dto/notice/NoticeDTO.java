@@ -17,6 +17,7 @@ public class NoticeDTO {
     private String  noticeContents; //내용
     private String noticeType; //공지타입
     private Integer noticeHits; //조회수
+    private Integer noticeDate; //작성일
 
 
 

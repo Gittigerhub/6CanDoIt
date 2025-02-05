@@ -7,16 +7,13 @@ import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.tomcat.util.http.fileupload.FileUpload;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -25,8 +22,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log
 public class QnaService {
-
-
 
     // final 선언, 모델 맵퍼 선언
     private final QnaRepository qnaRepository;

@@ -62,27 +62,33 @@
             <!--조회 테이블-->
             <table class="table table-bordered" style="text-align: center">
                 <thead>
-                <tr> <!--테이블 제목-->
+                <tr style="height: 50px; vertical-align: middle"> <!--테이블 제목-->
                     <th style="width: 8%">No</th>
-                    <th style="width: 20%">조직명</th>
-                    <th style="width: 24%">담당자ID</th>
-                    <th style="width: 20%">이름</th>
+                    <th style="width: 8%">분류</th>
+                    <th style="width: 24%">명칭</th>
+                    <th style="width: 32%">주소</th>
                     <th style="width: 20%">연락처</th>
                     <th style="width: 8%">상태</th>
                 </tr>
                 </thead>
                 <tbody> <!--조직 테이블 데이터 출력-->
-                <tr th:each="data:${adminLoginDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
-                    <td th:text="${data.organDTO.idx}"></td>
-                    <td th:text="${data.organDTO.organName}"></td>
-                    <td th:text="${data.adminEmail}"></td>
-                    <td th:text="${data.adminName}"></td>
-                    <td th:text="${data.adminPhone}"></td>
-                    <td th:text="${data.organDTO.activeYn}"></td>
+                <tr style="height: 50px; vertical-align: middle" th:each="data:${organDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                    <td th:text="${data.idx}"></td>
+                    <td th:text="${data.organType}"></td>
+                    <td>
+                        <a th:href="@{/office/organ(idx=${data.idx})}" th:if="${data.organType != 'SHOP'}" th:text="${data.organName}"></a>
+                        <a th:href="@{#}" th:if="${data.organType == 'SHOP'}" th:text="${data.organName}"></a>
+                    </td>
+                    <td th:text="${data.organAddress}"></td>
+                    <td th:text="${data.organTel}"></td>
+                    <td>
+                        <button style="font-size: 12px" th:if="${data.activeYn == 'Y'}" class="btn btn-primary">활성화</button>
+                        <button style="font-size: 12px" th:unless="${data.activeYn == 'Y'}" class="btn btn-danger">비활성화</button>
+                    </td>
                 </tr>
                 </tbody>
             </table>
-                <div class="d-flex justify-content-center" th:if="${adminLoginDTO.isEmpty()}">조회된 내역이 없습니다.</div>
+                <div class="d-flex justify-content-center" th:if="${organDTO.isEmpty()}">조회된 내역이 없습니다.</div>
 
             <!-- 페이징 처리 시작 -->
             <div class="d-flex justify-content-center">
@@ -127,7 +133,8 @@
                     </div>
                     <!--입력폼-->
                     <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
-                    <input id="idx" type="hidden" name="idx"> <!--일련번호-->
+                    <input id="adminIdx" type="hidden" name="idx">   <!-- 관리자 회원의 일련번호 -->
+                    <input type="hidden" name="activeYn" value="Y">  <!-- 조직 활성 유무 기본(Y) -->
                     <form id="addForm" method="post">
                         <div class="modal-body">
                             <p>새로운 조직을 등록합니다.</p>
@@ -137,7 +144,7 @@
                                 <div class="col-sm-6 pe-0">
                                     <div class="form-group form-group-default">
                                         <label>*분류 :</label>
-                                        <select id="category" name="category" class="form-select" required>
+                                        <select id="category" name="organType" class="form-select" required>
                                             <option value="HO">본사</option>
                                             <option value="BO">지사</option>
                                             <option value="SHOP">매장</option>
@@ -148,23 +155,27 @@
                                 <!-- 조직 명 -->
                                 <div class="col-sm-12">
                                     <div class="form-group form-group-default">
-                                        <label>*조직명 :</label>
-                                        <input id="organName" name="organName" type="text" class="form-control" placeholder="조직명을 입력하세요." required maxlength="100"/>
+                                        <label>*업체명 :</label>
+                                        <input id="organName" name="organName" type="text" class="form-control" placeholder="업체명을 입력하세요." required maxlength="100"/>
                                     </div>
                                 </div>
 
-                                <!-- 조직 담당자 -->
+                                <!-- 조직 주소 -->
                                 <div class="col-sm-12">
-                                    <label>*담당자 :</label>
-                                </div>
-                                <div class="col-sm-9">
                                     <div class="form-group form-group-default">
-                                        <input style="background-color: lightgray" id="adminName" name="adminName" type="text" class="form-control" placeholder="담당자를 검색하세요." readonly/>
+                                        <label>*주소 :</label>
+                                        <input id="organAddress" name="organAddress" type="text" class="form-control" placeholder="주소를 입력하세요." required maxlength="100"/>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
-                                    <button id="btn-search" type="button" class="btn btn-success">검색</button>
+
+                                <!-- 조직 연락처 -->
+                                <div class="col-sm-12">
+                                    <div class="form-group form-group-default">
+                                        <label>*대표 연락처 :</label>
+                                        <input id="organTel" name="organTel" type="text" class="form-control" placeholder="대표 연락처를 입력하세요." required maxlength="100"/>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                         <div class="modal-footer border-0">
@@ -177,146 +188,10 @@
         </div>
         <!--조직 등록 모달 끝-->
 
-
-        <!--담당자 검색 모달 시작-->
-        <div class="modal fade" id="searchModal" tabindex="-1" role="modal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <span id="searchTitle" class="fw-light">담당자 조회</span>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
-                    </div>
-
-                    <div class="modal-body">
-                        <!--검색폼-->
-                        <form id="searchForm" method="post">
-                            <div class="row">
-
-                                <!-- 분류 -->
-                                <div class="col-sm-6 pe-0">
-                                    <div class="form-group form-group-default">
-                                        <label>*분류 :</label>
-                                        <select id="category2" name="category" class="form-select" required>
-                                            <option value="HO">본사</option>
-                                            <option value="BO">지사</option>
-                                            <option value="SHOP">매장</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-12">
-                                    <label>*검색 :</label>
-                                </div>
-                                <div class="col-9">
-                                    <div class="input-icon">
-                                        <!--검색할 단어 입력-->
-                                        <input type="text" class="form-control" name="searchAdmin" id="searchAdmin" th:value="${searchAdmin}" placeholder="이메일 또는 이름 검색"/>
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <span class="input-icon-addon">
-                                        <!--검색 버튼을 클릭시 keyword의 값을 가지고 Controller에 조회를 요청한다.-->
-                                        <button type="submit" class="btn btn-primary searchBtn">검색</button>
-                                    </span>
-                                </div>
-
-                                <div class="overflow-auto mt-3">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>권한</th>
-                                                <th>이메일</th>
-                                                <th>이름</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr th:each="data:${adminLoginDTO}">
-                                                <td th:text="${data.adminlevelDescription}"></td>
-                                                <td th:text="${data.adminEmail}"></td>
-                                                <td th:text="${data.adminName}"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--담당자 검색 모달 끝-->
-
     </div>
 
     <script th:inline="javascript">
         $(document).ready(function () {
-
-            // 담당자 검색 버튼을 클릭했을 때(시작)
-            $('#btn-search').on('click', function () {
-
-                // 이전 모달창을 가린다.
-                // reset하기전 까진 내용이 안없어진다.
-                $("#addModal").modal('hide');
-
-                // 모달창을 화면에 띄운다.
-                $("#searchModal").modal('show');
-
-            })
-
-            // 담당자 검색 모달 창에서 검색 버튼 클릭했을 때
-            $("#searchBtn").on("click", function () {
-                // 1. 입력 필드 값 가져오기
-                const searchValue = $("#searchAdmin").val().trim();
-
-                // 2. 입력 값 유효성 검사
-                if (!searchValue) {
-                    alert("Please enter a search term!");
-                    return;
-                }
-
-                // 3. Ajax 요청 보내기
-                $.ajax({
-                    url: "/api/admin/search", // 서버의 엔드포인트 URL
-                    type: "GET",             // GET 요청 (검색)
-                    data: { keyword: searchValue }, // 검색어 전달
-                    success: function (response) {
-                        // 4. 성공 시 검색 결과 표시
-                        displaySearchResults(response);
-                    },
-                    error: function (error) {
-                        // 5. 실패 시 에러 처리
-                        console.error("Error fetching admin data:", error);
-                        alert("Failed to fetch admin data. Please try again.");
-                    },
-                });
-            });
-            // 담당자 검색 버튼을 클릭했을 때(끝)
-
-            // 검색 결과 표시 함수
-            function displaySearchResults(results) {
-                const resultsDiv = $("#searchResults");
-                resultsDiv.empty(); // 기존 결과 초기화
-
-                if (results.length === 0) {
-                    resultsDiv.append("<p>No results found.</p>");
-                    return;
-                }
-
-                results.forEach((admin) => {
-                resultsDiv.append(`
-                        <div>
-                            <p>Name: ${admin.name}</p>
-                            <p>Email: ${admin.email}</p>
-                        </div>
-                    `);
-                });
-            }
 
             // 조직 목록에서 추가를 클릭했을 때
             $("#btn-add").on('click', function() {
@@ -328,6 +203,7 @@
 
             // 조직 등록 모달에서 저장 버튼 클릭 시
             $('#addButton').on('click', function(){
+
                 //id가 addForm인 태그내에 있는 모든 데이터를 읽어온다.
                 var form = $("#addForm")[0];
                 var formData = new FormData(form);
@@ -342,7 +218,7 @@
 
                 $.ajax({
                     // Controller에 신규등록 요청
-                    url: '/organ/register',
+                    url: '/office/organ/register',
                     type: 'POST',
                     data: formData,                     // JSON.stringify(courseData),
                     processData: false,
@@ -371,16 +247,6 @@
             });
 
         });
-
-        // Controller에서 addAttribute("Message", 메세지)로 전달시 출력되는 메세지창
-        // Sweet Alert를 이용할 경우 필요 없음
-        var successMessage = /*[[${Message}]]*/ null;
-        if (successMessage) {
-            swal(successMessage, {
-                buttons: false,
-                timer: 3000,
-            });
-        }
     </script>
 
 </div>

@@ -20,10 +20,12 @@ public class OrganizationDTO {
 
     private String organAddress;            // 조직 주소
 
+    private String organTel;                // 조직 대표 연락처
+
     private String activeYn;                // 활성 유무(N: 비 활성화, Y: 활성화)
 
     private ShopDetailDTO shopDetailDTO;    // 매장 상세 DTO
 
-    private List<AdminLoginDTO> adminLoginDTO;        // 관리자 회원 DTOlist
+    private List<AdminLoginDTO> adminDTO;        // 관리자 회원 DTOlist
 
 }

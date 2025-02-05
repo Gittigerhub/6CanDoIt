@@ -1,10 +1,7 @@
 package com.sixcandoit.roomservice.service.office;
 
-import com.sixcandoit.roomservice.dto.admin.AdminLoginDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
-import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
-import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +21,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class OrganizationService {
 
-    private final AdminRepository adminRepository;
     private final OrganizationRepository organizationRepository;
     private final ModelMapper modelMapper;
 
@@ -43,8 +37,12 @@ public class OrganizationService {
             // DTO -> Entity로 변환
             OrganizationEntity organ = modelMapper.map(organizationDTO, OrganizationEntity.class);
 
+            // ActiveYn의 최초 기본값은 "Y"
+            organ.setActiveYn("Y");
+
             // Entity 테이블에 저장
             organizationRepository.save(organ);
+
         } catch (Exception e) {             // 오류발생시 오류 처리
             throw new RuntimeException("등록 실패");
         }
@@ -59,11 +57,24 @@ public class OrganizationService {
     ----------------------------------------------------------------------------- */
     public void organUpdate(OrganizationDTO organizationDTO) {
 
-        // DTO -> Entity로 변환
-        OrganizationEntity organ = modelMapper.map(organizationDTO, OrganizationEntity.class);
+        try {
+            // idx로 데이터 조회
+            Optional<OrganizationEntity> read =
+                    organizationRepository.findById(organizationDTO.getIdx());
 
-        // Entity 테이블에 저장
-        organizationRepository.save(organ);
+            if(!read.isPresent()){                      // 조회 값이 없다면
+                throw new RuntimeException("상점 조회 실패");
+            }
+            else {                                      // 조회 값이 있다면
+                // DTO -> Entity로 변환
+                OrganizationEntity organ = modelMapper.map(organizationDTO, OrganizationEntity.class);
+
+                // Entity 테이블에 저장
+                organizationRepository.save(organ);
+            }
+        } catch (Exception e){
+            throw new RuntimeException("상점 수정 실패: "+e.getMessage());
+        }
 
     }
 
@@ -92,89 +103,63 @@ public class OrganizationService {
     }
 
     /* -----------------------------------------------------------------------------
-        함수명 : Page<OrganizationDTO> organList(Pagealbe page)
+        함수명 : Page<OrganizationDTO> organList(Pageable page, String type, String keyword)
         인수 : 입력 폼으로 부터 받는 OrganizationDTO
         출력 : 받은 OrganizationDTO를 테이블에 저장, 실패시 저장 안됨
         설명 : 조직을 등록
     ----------------------------------------------------------------------------- */
-    public Page<AdminLoginDTO> organList(Pageable page, String type, String keyword) {
+    public Page<OrganizationDTO> organList(Pageable page, String type, String keyword) {
+
+        System.out.println(page);
+        System.out.println(type);
+        System.out.println(keyword);
 
         try {
             // 1. 페이지정보를 재가공
             int currentPage = page.getPageNumber() - 1;
             int pageSize = 5;
 
-            // 기본 키로 내림차순해서 페이지 조회
+            // 기본 키로 올림차순해서 페이지 조회
             Pageable pageable = PageRequest.of(currentPage, pageSize,
                     Sort.by(Sort.Direction.ASC, "idx"));
 
             // 2. 조회
             // 조회결과를 저장할 변수
-            Page<AdminEntity> adminEntity;
+            Page<OrganizationEntity> organizationEntities;
 
             // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
             if (keyword == null) {                           // 타입만 존재한다면
                 if (type.equals("HO")) {
-                    adminEntity = adminRepository.searchHO(pageable);     // 타입에 해당하는 데이터 조회
+                    organizationEntities = organizationRepository.searchHO(pageable);     // 타입에 해당하는 데이터 조회
                 } else if (type.equals("BO")) {
-                    adminEntity = adminRepository.searchBO(pageable);     // 타입에 해당하는 데이터 조회
+                    organizationEntities = organizationRepository.searchBO(pageable);     // 타입에 해당하는 데이터 조회
                 } else if (type.equals("SHOP")) {
-                    adminEntity = adminRepository.searchSHOP(pageable);   // 타입에 해당하는 데이터 조회
+                    organizationEntities = organizationRepository.searchSHOP(pageable);   // 타입에 해당하는 데이터 조회
                 } else {
-                    adminEntity = adminRepository.searchAll(pageable);      // 모든 데이터를 대상으로 조회
+                    organizationEntities = organizationRepository.findAll(pageable);      // 모든 데이터를 대상으로 조회
                 }
-            } else {                   // 검색어와 타입이 존재한다면
+            } else {                                          // 검색어와 타입이 존재한다면
                 if (type.equals("HO")) {
-                    adminEntity = adminRepository.searchHOKey(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                    organizationEntities = organizationRepository.searchHOName(keyword, pageable);      // 검색어에 해당하는 데이터 조회
                 } else if (type.equals("BO")) {
-                    adminEntity = adminRepository.searchBOKey(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                    organizationEntities = organizationRepository.searchBOName(keyword, pageable);      // 검색어에 해당하는 데이터 조회
                 } else if (type.equals("SHOP")) {
-                    adminEntity = adminRepository.searchSHOPKey(keyword, pageable);   // 검색어에 해당하는 데이터 조회
+                    organizationEntities = organizationRepository.searchSHOPName(keyword, pageable);    // 검색어에 해당하는 데이터 조회
                 } else {
-                    adminEntity = adminRepository.searchAll(pageable);      // 모든 데이터를 대상으로 조회
+                    organizationEntities = organizationRepository.findAll(pageable);                    // 모든 데이터를 대상으로 조회
                 }
             }
 
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
-            Page<AdminLoginDTO> adminDTO = adminEntity.map(entity -> {
-                AdminLoginDTO dto = modelMapper.map(entity, AdminLoginDTO.class);
-
-                // Organization 정보를 AdminDTO에 추가
-                OrganizationDTO organizationDTO = modelMapper.map(entity.getOrganizationJoin(), OrganizationDTO.class);
-                dto.setOrganDTO(organizationDTO);
-
-                return dto;
-            });
+            Page<OrganizationDTO> organizationDTOS =
+                    organizationEntities.map(entity ->
+                            modelMapper.map(entity, OrganizationDTO.class));
 
             // 4. 결과값을 전달
-            return adminDTO;
+            return organizationDTOS;
 
         } catch (Exception e) {     //오류발생시 오류 처리
             throw new RuntimeException("조회 오류");
-        }
-
-    }
-
-    /* -----------------------------------------------------------------------------
-        함수명 : List<AdminDTO> adminList(String searchAdmin)
-        인수 : 검색 모달에서 받은 searchAdmin 검색어
-        출력 : searchAdmin로 조회된 회원 출력
-        설명 : 관리자 회원 조회
-    ----------------------------------------------------------------------------- */
-    public List<AdminLoginDTO> adminList(String searchAdmin) {
-
-        try {
-            // 1. 조회
-            List<AdminEntity> adminEntities = adminRepository.searchAdminKey(searchAdmin);
-
-            // 2. 조회한 결과를 HTML에서 사용할 DTO로 변환
-            List<AdminLoginDTO> adminLoginDTO = adminEntities.stream().map(adminEntity -> modelMapper.map(adminEntity, AdminLoginDTO.class)).collect(Collectors.toList());
-
-            // 3. 결과값을 전달
-            return adminLoginDTO;
-
-        } catch (Exception e) {     //오류발생시 오류 처리
-            throw new RuntimeException("관리자 조회 오류");
         }
 
     }

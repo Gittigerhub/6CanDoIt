@@ -2,12 +2,15 @@ package com.sixcandoit.roomservice.entity.office;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.AdvertisementEntity;
-import com.sixcandoit.roomservice.entity.event.EventEntity;
-import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
+import com.sixcandoit.roomservice.entity.base.BaseEntity;
+import com.sixcandoit.roomservice.entity.event.EventEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -32,6 +35,9 @@ public class OrganizationEntity extends BaseEntity {
 
     @Column(name = "organ_address")
     private String organAddress;          // 조직 주소
+
+    @Column(name = "organ_tel")
+    private String organTel;              // 조직 대표 연락처
 
     @Column(name = "active_yn")
     private String activeYn;              // 활성화 유무

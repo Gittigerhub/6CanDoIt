@@ -38,4 +38,15 @@ public class CartEntity extends BaseEntity {
     @OneToMany(mappedBy = "cartJoin")
     private List<MenuEntity> menuJoin;
 
+    //카트 생성 메소드
+    public static CartEntity createCartEntity(MemberEntity memberJoin, int cartMenuCount) {
+        if(cartMenuCount<= 0){  //메뉴 수량이 1 이상이어야 카트가 생성되도록 조건 설정
+            throw new IllegalArgumentException("메뉴 수량은 1 이상이어야 합니다.");
+        }
+
+        CartEntity cart = new CartEntity();
+        cart.setCartMenuCount(cartMenuCount);
+        cart.setMemberJoin(memberJoin);
+        return cart;
+    }
 }

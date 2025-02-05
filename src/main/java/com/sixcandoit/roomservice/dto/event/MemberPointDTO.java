@@ -1,9 +1,6 @@
 package com.sixcandoit.roomservice.dto.event;
 
-import com.sixcandoit.roomservice.dto.member.MemberDTO;
-import com.sixcandoit.roomservice.entity.base.BaseEntity;
-import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import jakarta.persistence.*;
+import com.sixcandoit.roomservice.dto.member.MemberLoginDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +19,6 @@ public class MemberPointDTO  {
     private LocalDateTime memberPointEndDate;    // 포인트 만료일
     private String memberPointOperationYn;       // 포인트 사용여부(N:미사용, Y:사용)
     private String memberPointContents;          // 포인트 내용
-    private MemberDTO memberJoin;                 // 회원 정보
+    private MemberLoginDTO memberJoin;                 // 회원 정보
 
 }

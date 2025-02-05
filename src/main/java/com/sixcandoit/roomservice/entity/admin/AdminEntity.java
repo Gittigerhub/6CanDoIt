@@ -1,4 +1,4 @@
-package com.sixcandoit.roomservice.entity.member;
+package com.sixcandoit.roomservice.entity.admin;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.constant.Level;

@@ -1,4 +1,4 @@
-package com.sixcandoit.roomservice.dto.member;
+package com.sixcandoit.roomservice.dto.admin;
 
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
@@ -20,7 +20,7 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminDTO implements UserDetails {
+public class AdminLoginDTO implements UserDetails {
 
     private Integer idx;             // 기본 키
     private String adminEmail;            // 이메일

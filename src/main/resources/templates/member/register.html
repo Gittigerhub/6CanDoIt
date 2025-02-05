@@ -13,117 +13,117 @@
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
-    <div layout:fragment="content" class="container-fluid">
-        <div class="row mt-5">
-            <div class="col-4"></div>
-            <div class="col-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h2>회원가입</h2>
-                        <form th:action="@{/member/register}" method="post" class="was-validated">
-                            <div class="mb-3 mt-3">
-                                <label for="memberEmail" class="form-label">이메일:</label>
-                                <input type="email" class="form-control" id="memberEmail" name="memberEmail" placeholder="이메일형식으로 입력하세요.">
+<div layout:fragment="content" class="container-fluid">
+    <div class="row mt-5">
+        <div class="col-4"></div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2>회원가입</h2>
+                    <form th:action="@{/member/register}" method="post" class="was-validated">
+                        <div class="mb-3 mt-3">
+                            <label for="memberEmail" class="form-label">이메일:</label>
+                            <input type="email" class="form-control" id="memberEmail" name="memberEmail" placeholder="이메일형식으로 입력하세요.">
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberPwd" class="form-label">비밀번호:</label>
+                            <input type="password" class="form-control" id="memberPwd" name="memberPwd" placeholder="영문자와 숫자로 구성하세요.">
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberBirth" class="form-label">생년월일:</label>
+                            <input type="date" class="form-control" id="memberBirth" name="memberBirth" value="" max="9999-12-31">
+                        </div>
+                        <div class="mb-2">성별:</div>
+                        <div class="form-check">
+                            <input type="radio" name="memberGender" id="memberGender1" value="male">남성
+                            <input type="radio" name="memberGender" id="memberGender2" value="female">여성
+                        </div>
+                        <div class="mt-2 mb-3">
+                            <label for="memberName" class="form-label">이름:</label>
+                            <input type="text" class="form-control" id="memberName" name="memberName" placeholder="이름을 입력하세요.">
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberPhone" class="form-label">연락처:</label>
+                            <input type="text" class="form-control" id="memberPhone" name="memberPhone" placeholder="'-'없이 숫자만 입력" maxlength="11">
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberPostcode" class="form-label">주소:</label>
+                            <div class="signUp-input-area d-flex mb-1 col-lg-7">
+                                <input type="text" class="form-control input-lg" id="memberPostcode" placeholder="우편번호" style="height: 40px;">
+                                <input type="button" class="btn btn-secondary" style="text-align:center; height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
                             </div>
-                            <div class="mb-3">
-                                <label for="memberPwd" class="form-label">비밀번호:</label>
-                                <input type="password" class="form-control" id="memberPwd" name="memberPwd" placeholder="영문자와 숫자로 구성하세요.">
-                            </div>
-                            <div class="mb-3">
-                                <label for="memberBirth" class="form-label">생년월일:</label>
-                                <input type="date" class="form-control" id="memberBirth" name="memberBirth" value="" max="9999-12-31">
-                            </div>
-                            <div class="mb-2">성별:</div>
-                            <div class="form-check">
-                                <input type="radio" name="memberGender" id="memberGender1" value="male">남성
-                                <input type="radio" name="memberGender" id="memberGender2" value="female">여성
-                            </div>
-                            <div class="mt-2 mb-3">
-                                <label for="memberName" class="form-label">이름:</label>
-                                <input type="text" class="form-control" id="memberName" name="memberName" placeholder="이름을 입력하세요.">
-                            </div>
-                            <div class="mb-3">
-                                <label for="memberPhone" class="form-label">연락처:</label>
-                                <input type="text" class="form-control" id="memberPhone" name="memberPhone" placeholder="'-'없이 숫자만 입력" maxlength="11">
-                            </div>
-                            <div class="mb-3">
-                                <label for="memberPostcode" class="form-label">주소:</label>
-                                <div class="signUp-input-area d-flex mb-1 col-lg-7">
-                                    <input type="text" class="form-control input-lg" id="memberPostcode" placeholder="우편번호" style="height: 40px;">
-                                    <input type="button" class="btn btn-secondary" style="text-align:center; height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
-                                </div>
-                            </div>
-                            <div class="signUp-input-area mb-1">
-                                <input type="text"  class="form-control" id="memberAddress" placeholder="주소">
-                            </div>
-                            <div class="signUp-input-area mb-1">
-                                <input type="text" class="form-control"  id="memberDetailAddress" placeholder="상세주소">
-                            </div>
-                            <div class="signUp-input-area mb-1">
-                                <input type="text" class="form-control"  id="memberExtraAddress" placeholder="참고항목">
-                            </div>
-                            <div>주문 알람 수신여부:</div>
-                            <div class="form-check">
-                                <label class="form-check-label" for="alramOrder1"></label>
-                                <input type="radio" class="form-check-input" id="alramOrder1" name="alramOrder" value="YES" checked>예
-                            </div>
-                            <div class="form-check">
-                                <label class="form-check-label" for="alramOrder2"></label>
-                                <input type="radio" class="form-check-input" id="alramOrder2" name="alramOrder" value="NO">아니오
-                            </div>
-                            <div class="mb-3 mt-3">
-                                <label for="activeYn" class="form-label" hidden="hidden">활성화 유무:</label>
-                                <input type="hidden" id="activeYn" name="activeYn" value="Y">
-                            </div>
-                            <div class="form-check mt-3 mb-3">
-                                <input class="form-check-input" type="checkbox" id="regiCheck" name="remember" required>
-                                <label class="form-check-label" for="regiCheck">이용약관 및 정보수집에 동의합니다.</label>
-                                <div class="invalid-feedback">계속하려면 이 확인란을 선택하세요.</div>
-                            </div>
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-primary">회원가입</button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="signUp-input-area mb-1">
+                            <input type="text"  class="form-control" id="memberAddress" placeholder="주소">
+                        </div>
+                        <div class="signUp-input-area mb-1">
+                            <input type="text" class="form-control"  id="memberDetailAddress" placeholder="상세주소">
+                        </div>
+                        <div class="signUp-input-area mb-1">
+                            <input type="text" class="form-control"  id="memberExtraAddress" placeholder="참고항목">
+                        </div>
+                        <div>주문 알람 수신여부:</div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="alramOrder1"></label>
+                            <input type="radio" class="form-check-input" id="alramOrder1" name="alramOrder" value="YES" checked>예
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="alramOrder2"></label>
+                            <input type="radio" class="form-check-input" id="alramOrder2" name="alramOrder" value="NO">아니오
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label for="activeYn" class="form-label" hidden="hidden">활성화 유무:</label>
+                            <input type="hidden" id="activeYn" name="activeYn" value="Y">
+                        </div>
+                        <div class="form-check mt-3 mb-3">
+                            <input class="form-check-input" type="checkbox" id="regiCheck" name="remember" required>
+                            <label class="form-check-label" for="regiCheck">이용약관 및 정보수집에 동의합니다.</label>
+                            <div class="invalid-feedback">계속하려면 이 확인란을 선택하세요.</div>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">회원가입</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="col-4"></div>
         </div>
-        <script>
-            function execDaumPostcode() {
-                new daum.Postcode({
-                    oncomplete: function(data) {
-                        var addr = '';
-                        var extraAddr = '';
-
-                        if (data.userSelectedType === 'R') {
-                            addr = data.roadAddress;
-                        } else {
-                            addr = data.jibunAddress;
-                        }
-
-                        if (data.userSelectedType === 'R') {
-                            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                                extraAddr += data.bname;
-                            }
-                            if (data.buildingName !== '' && data.apartment === 'Y') {
-                                extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                            }
-                            if (extraAddr !== '') {
-                                extraAddr = ' (' + extraAddr + ')';
-                            }
-                            document.getElementById("memberExtraAddress").value = extraAddr;
-                        } else {
-                            document.getElementById("memberExtraAddress").value = '';
-                        }
-
-                        document.getElementById('memberPostcode').value = data.zonecode;
-                        document.getElementById("memberAddress").value = addr;
-                        document.getElementById("memberDetailAddress").focus();
-                    }
-                }).open();
-            }
-        </script>
+        <div class="col-4"></div>
     </div>
+    <script>
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var addr = '';
+                    var extraAddr = '';
+
+                    if (data.userSelectedType === 'R') {
+                        addr = data.roadAddress;
+                    } else {
+                        addr = data.jibunAddress;
+                    }
+
+                    if (data.userSelectedType === 'R') {
+                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                            extraAddr += data.bname;
+                        }
+                        if (data.buildingName !== '' && data.apartment === 'Y') {
+                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        if (extraAddr !== '') {
+                            extraAddr = ' (' + extraAddr + ')';
+                        }
+                        document.getElementById("memberExtraAddress").value = extraAddr;
+                    } else {
+                        document.getElementById("memberExtraAddress").value = '';
+                    }
+
+                    document.getElementById('memberPostcode').value = data.zonecode;
+                    document.getElementById("memberAddress").value = addr;
+                    document.getElementById("memberDetailAddress").focus();
+                }
+            }).open();
+        }
+    </script>
+</div>
 </body>
 </html>

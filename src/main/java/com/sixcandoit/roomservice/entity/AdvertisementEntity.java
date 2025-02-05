@@ -2,7 +2,6 @@ package com.sixcandoit.roomservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
-import com.sixcandoit.roomservice.entity.member.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

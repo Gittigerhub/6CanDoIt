@@ -1,14 +1,16 @@
 package com.sixcandoit.roomservice.service.member;
 
-import com.sixcandoit.roomservice.dto.member.AdminDTO;
-import com.sixcandoit.roomservice.dto.member.MemberDTO;
-import com.sixcandoit.roomservice.entity.member.AdminEntity;
+import com.sixcandoit.roomservice.constant.Level;
+import com.sixcandoit.roomservice.dto.member.MemberLoginDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import com.sixcandoit.roomservice.repository.member.AdminRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.EmailService;
+import groovy.util.logging.Log;
+import groovy.util.logging.Log4j2;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,27 +21,41 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.util.Optional;
 
+//Gmail에서 이메일 전송하도록 설정
+//이메일 비밀키 발급
+//임시 비밀번호를 이메일로 발송
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AdminService implements UserDetailsService {
-    private final AdminRepository adminRepository;
-    private final ModelMapper modelMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+@Log4j2
+public class MemberLoginService implements UserDetailsService { //사용자가 로그인정보 변경
+    private final MemberRepository memberRepository; //SQL처리
+    private final ModelMapper modelMapper; //변환
+    private final PasswordEncoder passwordEncoder; //비밀번호 암호화
+    private final EmailService emailService; //이메일로 임시번호 발급
 
     @Override
-    public UserDetails loadUserByUsername(String adminEmail)
+    public UserDetails loadUserByUsername(String memberEmail)
             throws UsernameNotFoundException { //입력받은 아이디가 없으면 예외처리
         //사용자아이디로 조회해서
-        Optional<AdminEntity> adminEntity = adminRepository.findByAdminEmail(adminEmail);
+        log.info("아이디 조회 ㄱㄱ");
+//        Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
+        Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
 
-        if (adminEntity.isPresent()) { //아이디가 존재하면
-            AdminDTO adminDTO = modelMapper.map(adminEntity, AdminDTO.class);
+        log.info(memberEntity.toString()+"로드바이유저네임 진입 여부 확인");
 
-            return adminDTO;
+        if (memberEntity.isPresent()) { //아이디가 존재하면
+            log.info("present");
+
+            UserDetails memberLoginDTO = User.withUsername(memberEntity.get().getMemberName())
+                    .password(memberEntity.get().getMemberPwd())
+                    .build();
+
+            log.info(memberLoginDTO.toString());
+            return memberLoginDTO;
         } else { //존재하지 않으면 예외처리
-            throw new UsernameNotFoundException(adminEmail);
+            throw new UsernameNotFoundException(memberEmail);
         }
 
 
@@ -47,18 +63,22 @@ public class AdminService implements UserDetailsService {
     }
 
     //회원가입
-    public void saveAdmin(AdminDTO adminDTO) {
+    public void saveMember(MemberLoginDTO memberLoginDTO) {
         try { //서버가 멈추는 것을 예방
-            Long totalCount = adminRepository.count(); //저장된 회원수를 읽어온다.
-            Optional<AdminEntity> read = adminRepository.findByAdminEmail(adminDTO.getAdminEmail()); //아이디 조회(아이디 중복)
+            Long totalCount = memberRepository.count(); //저장된 회원수를 읽어온다.
+            Optional<MemberEntity> read = memberRepository.findByMemberEmail(memberLoginDTO.getMemberEmail()); //아이디 조회(아이디 중복)
 
             if(read.isPresent()) { //이미 가입된 아이디이면
                 throw new IllegalStateException("이미 가입된 회원입니다.");
             }
 
-            String adminPwd = passwordEncoder.encode(adminDTO.getAdminPwd()); //비밀번호 암호화처리
-            AdminEntity adminEntity = modelMapper.map(adminDTO, AdminEntity.class); //DTO->Entity 변환
-            adminEntity.setAdminPwd(adminPwd); //암호화한 비밀번호를 다시 저장
+            String memberPwd = passwordEncoder.encode(memberLoginDTO.getMemberPwd()); //비밀번호 암호화처리
+            MemberEntity memberEntity = modelMapper.map(memberLoginDTO, MemberEntity.class); //DTO->Entity 변환
+            memberEntity.setMemberPwd(memberPwd); //암호화한 비밀번호를 다시 저장
+            memberEntity.setLevel(Level.MEMBER);
+            //회원 저장
+            memberRepository.save(memberEntity); //데이터베이스에 저장
+            System.out.println("회원 가입을 성공하였습니다.");
 
         } catch(IllegalStateException e) { //상태오류(데이터베이스 처리 실패시)
             //e.getMessage() 오류메세지
@@ -70,13 +90,30 @@ public class AdminService implements UserDetailsService {
         }
     }
 
+    // 회원 정보 수정
+    public void modifyMember(MemberEntity member){
+        MemberEntity existingMember = memberRepository.findByIdx(member.getIdx())
+                .orElseThrow(()->new IllegalArgumentException("해당 회원 정보를 찾을 수 없습니다."));
+        existingMember.setMemberBirth(member.getMemberBirth());
+        existingMember.setMemberGender(member.getMemberGender());
+        existingMember.setMemberName(member.getMemberName());
+        existingMember.setMemberPhone(member.getMemberPhone());
+        existingMember.setMemberAddress(member.getMemberAddress());
+        memberRepository.save(existingMember);
+    }
+
+    // 회원 ID로 회원 조회
+    public MemberEntity findByIdx(Integer idx){
+        return memberRepository.findByIdx(idx).orElse(null);
+    }
+
     //개별조회(회원수정시->회원정보 읽기)-관리자 회원수정을 할 때
-    public AdminDTO readAdmin(String adminEmail) {
+    public MemberLoginDTO readMember(String memberEmail) {
         try { //서버가 멈추는 것을 예방
-            Optional<AdminEntity> read = adminRepository.findByAdminEmail(adminEmail);
+            Optional<MemberEntity> read = memberRepository.findByMemberEmail(memberEmail);
             if(read.isPresent()) { //검색한 회원이 존재하면
-                AdminDTO adminDTO = modelMapper.map(read, AdminDTO.class);
-                return adminDTO;
+                MemberLoginDTO memberLoginDTO = modelMapper.map(read, MemberLoginDTO.class);
+                return memberLoginDTO;
             }
             return null;
         } catch(IllegalStateException e) { //상태오류(데이터베이스 처리 실패시)
@@ -91,9 +128,9 @@ public class AdminService implements UserDetailsService {
 
     //회원정보 수정
     //수정(비밀번호 입력, 이름, 전화번호, 주소, 새비밀번호)
-    public void modifyAdmin(AdminDTO adminDTO) {
+    public void modifyMember(MemberLoginDTO memberLoginDTO) {
         try { //서버가 멈추는 것을 예방
-            Optional<AdminEntity> read = adminRepository.findByAdminEmail(adminDTO.getAdminEmail()); //존재여부 검색
+            Optional<MemberEntity> read = memberRepository.findByMemberEmail(memberLoginDTO.getMemberEmail()); //존재여부 검색
            /* if(read.isPresent()) { //회원이 존재하면 수정
                 //비밀번호 확인을 통해 2차 검증
                 String password = passwordEncoder.encode(memberDTO.getPassword());
@@ -111,13 +148,13 @@ public class AdminService implements UserDetailsService {
             if(!read.isPresent()) { //회원이 존재하면 수정
                 throw new IllegalStateException("일치하는 회원이 없습니다.");
             }
-            String adminPwd = passwordEncoder.encode(adminDTO.getAdminPwd());
-            if(!passwordEncoder.matches(adminPwd, read.get().getAdminPwd())) {
+            String MemberPwd = passwordEncoder.encode(memberLoginDTO.getMemberPwd());
+            if(!passwordEncoder.matches(MemberPwd, read.get().getMemberPwd())) {
                 throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
             }
-            AdminEntity adminEntity = modelMapper.map(adminDTO, AdminEntity.class);
-            adminEntity.setAdminPwd(adminPwd);
-            adminRepository.save(adminEntity);
+            MemberEntity memberEntity = modelMapper.map(memberLoginDTO, MemberEntity.class);
+            memberEntity.setMemberPwd(MemberPwd);
+            memberRepository.save(memberEntity);
         } catch(IllegalStateException e) { //상태오류(데이터베이스 처리 실패시)
             //e.getMessage() 오류메세지
             System.out.println("회원 수정을 실패하였습니다."+e.getMessage());
@@ -129,30 +166,27 @@ public class AdminService implements UserDetailsService {
     }
 
     // 임시비밀번호 발급(아이디, 회원명, 전화번호를 입력받아서 일치하면 해당 메일(아이디)로 임시비밀번호를 전송)
-    public void passwordSend(AdminDTO adminDTO) {
+    public void passwordSend(MemberLoginDTO memberLoginDTO) {
         try { //서버가 멈추는 것을 예방
-            Optional<AdminEntity> read = adminRepository.findByAdminEmail(adminDTO.getAdminEmail()); //조회
+            Optional<MemberEntity> read = memberRepository.findByMemberEmail(memberLoginDTO.getMemberEmail()); //조회
             if (!read.isPresent()) {    //일치하는 회원이 없으면(!)
                 throw new IllegalStateException("일치하는 회원이 존재하지 않습니다.");
             }
-            if (!read.get().getAdminName().equals(adminDTO.getAdminName())) { //이름이 일치하지 않으면
+            if (!read.get().getMemberName().equals(memberLoginDTO.getMemberName())) { //이름이 일치하지 않으면
                 throw new IllegalStateException("회원 이름이 일치하지 않습니다.");
             }
-            if (!read.get().getAdminPhone().equals(adminDTO.getAdminPhone())) { //전화번호가 일치하지 않으면
-                throw new IllegalStateException("회원 전화번호가 일치하지 않습니다.");
-            }
             String tempPassword = generateTempPassword(8);  //임시비밀번호 생성
-            read.get().setAdminPwd(passwordEncoder.encode(tempPassword));   //임시비밀번호를 저장
-            adminRepository.save(read.get());  //데이터베이스에 저장
+            read.get().setMemberPwd(passwordEncoder.encode(tempPassword));   //임시비밀번호를 저장
+            memberRepository.save(read.get());  //데이터베이스에 저장
 
             //임시비밀번호를 회원 이메일(아이디)로 전달
             String emailSubject = "임시비밀번호 발급";  //메일 제목
-            String emailText = "안녕하세요."+read.get().getAdminName()+"님.\n" +
+            String emailText = "안녕하세요."+read.get().getMemberName()+"님.\n" +
                     "요청하신 임시 비밀번호는 다음과 같습니다.\n" +
                     tempPassword+ "\n" +
                     "로그인 후 반드시 비밀번호를 변경해 주십시오";  //본문 내용
 
-            emailService.sendEmail(read.get().getAdminEmail(), emailSubject, emailText);    //메일 전송
+            emailService.sendEmail(read.get().getMemberEmail(), emailSubject, emailText);    //메일 전송
         } catch(IllegalStateException e) { //상태오류(데이터베이스 처리 실패시)
             //e.getMessage() 오류메세지
             System.out.println("회원 가입을 실패하였습니다."+e.getMessage());

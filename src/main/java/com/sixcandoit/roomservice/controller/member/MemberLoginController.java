@@ -1,30 +1,31 @@
 package com.sixcandoit.roomservice.controller.member;
 
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.dto.member.MemberLoginDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import com.sixcandoit.roomservice.service.member.AdminService;
-import com.sixcandoit.roomservice.service.member.MemberService;
+import com.sixcandoit.roomservice.service.admin.AdminLoginService;
+import com.sixcandoit.roomservice.service.member.MemberLoginService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/member")
-public class LoginController {
-    private final MemberService memberService; // 서비스 연동
-    private final AdminService adminService;
+@Log4j2
+public class MemberLoginController {
+    private final MemberLoginService memberLoginService; // 서비스 연동
+    private final AdminLoginService adminLoginService;
 
     @GetMapping("/")
-    public String IndexForm() {
+    public String IndexForm(HttpSession session, MemberDTO memberDTO) {
+        session.setAttribute("memberName", memberDTO.getMemberName());
         return "index";
     }
+
     // 회원가입
     @GetMapping("/register")
     public String showRegisterPage(){
@@ -32,8 +33,8 @@ public class LoginController {
     }
 
     @PostMapping("/register")
-    public String registerMember(@ModelAttribute MemberDTO memberDTO){
-        memberService.saveMember(memberDTO);
+    public String registerMember(@ModelAttribute MemberLoginDTO memberLoginDTO){
+        memberLoginService.saveMember(memberLoginDTO);
 
         return "redirect:/member/login";
     }
@@ -41,13 +42,13 @@ public class LoginController {
     // 회원 수정
     @GetMapping("/modify/{idx}")
     public String showModifyPage(@PathVariable Integer idx, Model model){
-        MemberEntity member = memberService.findByIdx(idx);
+        MemberEntity member = memberLoginService.findByIdx(idx);
         model.addAttribute("member", member);
         return "member/modify";
     }
 
     @PostMapping("/modify")
-    public String modifyMember(@ModelAttribute MemberDTO memberDTO){
+    public String modifyMember(@ModelAttribute MemberLoginDTO memberLoginDTO){
 
         return "redirect:/logout";
     }
@@ -59,8 +60,8 @@ public class LoginController {
     }
 
     @PostMapping("/password")
-    public String modifyPassword(@ModelAttribute MemberDTO memberDTO){
-        memberService.passwordSend(memberDTO);
+    public String modifyPassword(@ModelAttribute MemberLoginDTO memberLoginDTO){
+        memberLoginService.passwordSend(memberLoginDTO);
         //스크립트로 출력할 메세지를 전달
 
         return "redirect:/login";
@@ -69,6 +70,8 @@ public class LoginController {
     // 로그인
     @GetMapping("/login")
     public String showLoginPage(){
+        log.info("showLoginPage");
+
         return "member/login";
     }
 

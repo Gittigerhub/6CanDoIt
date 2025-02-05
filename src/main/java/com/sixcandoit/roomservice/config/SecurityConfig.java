@@ -56,15 +56,23 @@ public class SecurityConfig {
                 headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()));
 
         //2-2. 로그인
-        http.formLogin(login->login
-                .loginPage("/login") //로그인은 /login맵핑으로
-                .defaultSuccessUrl("/") //로그인 성공시 / 페이지로 이동
-                .usernameParameter("memberName") //memberName
-                .permitAll() //모든 사용자가 로그인폼 사용
-                .successHandler(new CustomAuthenticationSuccessHandler())); //로그인 성공시처리할 클래스
+//        http.formLogin(login->login
+//                .loginPage("/login") //로그인은 /login맵핑으로
+//                .defaultSuccessUrl("/",true) //로그인 성공시 / 페이지로 이동
+//                .usernameParameter("memberEmail")
+//                .passwordParameter("memberPwd")
+//                .permitAll() //모든 사용자가 로그인폼 사용
+//                .successHandler(new CustomAuthenticationSuccessHandler())); //로그인 성공시처리할 클래스
 
         //2-3. csrf보안(일단 비활성화, http의 변조방지)
-        http.csrf(AbstractHttpConfigurer::disable);
+        http.csrf(AbstractHttpConfigurer::disable).formLogin(login->login
+                .loginPage("/member/login") //로그인은 /login맵핑으로
+                .defaultSuccessUrl("/member/",true) //로그인 성공시 / 페이지로 이동
+                .usernameParameter("memberEmail")
+                .passwordParameter("memberPwd")
+                .permitAll() //모든 사용자가 로그인폼 사용
+                .successHandler(new CustomAuthenticationSuccessHandler())
+                .failureUrl("/member/login?error=true")); //로그인 성공시처리할 클래스
 
         //2-4. 로그아웃
         http.logout(logout->logout

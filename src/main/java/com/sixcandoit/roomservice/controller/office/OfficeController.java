@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.controller.office;
 
-import com.sixcandoit.roomservice.dto.admin.AdminLoginDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
@@ -40,15 +39,15 @@ public class OfficeController {
                        @RequestParam(value="type", defaultValue = "") String type, Model model) {
 
         // 서비스에 조회 요청
-        Page<AdminLoginDTO> adminDTO = organizationService.organList(page, type, keyword);
+        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
 
         // 조회결과를 이용한 페이지 처리
-        Map<String,Integer> pageInfo = pageNationUtil.Pagination(adminDTO);
+        Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
 
-        // 페이지 정보, 검색어, 조회데이터 조직 타입을 전달
+        // 페이지 정보, 조회내용, 검색어, 조직 타입을 전달
         model.addAllAttributes(pageInfo);
+        model.addAttribute("organDTO", organDTO);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("adminDTO", adminDTO);
         model.addAttribute("type", type);
 
         return "office/officelist";
@@ -57,11 +56,42 @@ public class OfficeController {
 
     @PostMapping("/organ/register")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
-    public ResponseEntity<String> registerProc(@ModelAttribute OrganizationDTO organizationDTO) {
+    public ResponseEntity<String> register(@ModelAttribute OrganizationDTO organizationDTO) {
 
         try {
             // 서비스에 등록 요청
             organizationService.organRegister(organizationDTO);
+
+            // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
+            return ResponseEntity.ok("등록 하였습니다.");
+        } catch (Exception e) {
+            log.error("등록 중 오류발생", e);
+
+            // 등록 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장을 실패하였습니다.");
+        }
+
+    }
+
+    // 모달로 수정시 페이지 값 집어넣기
+    @GetMapping("/organ/read")
+    @ResponseBody
+    public Map<String, Object> MemberPointRead(@RequestParam Integer idx, Map map){
+        OrganizationDTO organizationDTO = organizationService.organRead(idx);
+        Map<String,Object> response = new HashMap<>();
+        response.put("organizationDTO",organizationDTO);
+
+        return response;
+    }
+
+    // 모달로 수정 진행
+    @PostMapping("/organ/update")
+    @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
+    public ResponseEntity<String> update(@ModelAttribute OrganizationDTO organizationDTO) {
+
+        try {
+            // 서비스에 등록 요청
+            organizationService.organUpdate(organizationDTO);
 
             // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
             return ResponseEntity.ok("등록 하였습니다.");
@@ -86,6 +116,21 @@ public class OfficeController {
 
         return "office/organdetail";
 
+    }
+
+    // 조직 삭제
+    @GetMapping("/organ/delete")
+    @ResponseBody
+    public ResponseEntity<String> MemberPointDelete(@RequestParam Integer idx){
+
+        try {
+            // idx로 데이터를 조회하여 삭제
+            organizationService.organDelete(idx);
+
+            return  ResponseEntity.ok("삭제하였습니다.");
+        }catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제를 실패 하였습니다.");
+        }
     }
 
     //상점 목록
@@ -121,8 +166,7 @@ public class OfficeController {
     @GetMapping("/shopdetail/delete")
     @ResponseBody
     public ResponseEntity<String> ShopDetailDelete(@RequestParam Integer idx){
-       // System.out.println("삭제");
-       // System.out.println(idx);
+
         try {
             shopDetailService.delete(idx);
 

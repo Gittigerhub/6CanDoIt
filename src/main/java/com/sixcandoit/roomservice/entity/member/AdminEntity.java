@@ -2,14 +2,16 @@ package com.sixcandoit.roomservice.entity.member;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.constant.Level;
-import com.sixcandoit.roomservice.entity.NoticeEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
+import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity

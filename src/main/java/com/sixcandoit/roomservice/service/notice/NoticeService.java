@@ -1,9 +1,10 @@
 package com.sixcandoit.roomservice.service.notice;
 
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
-import com.sixcandoit.roomservice.entity.NoticeEntity;
 
-import com.sixcandoit.roomservice.repository.NoticeRepository;
+
+import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
+import com.sixcandoit.roomservice.repository.notice.NoticeRepository;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -24,7 +25,8 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final ModelMapper modelMapper;
     //Controller와 Service는 DTO로 전달
-    public void insert(NoticeDTO noticeDTO) {//삽입,입력폼에서 입력받은 내용을 데이터베이스 저장
+
+    public void register(NoticeDTO noticeDTO) {//삽입,입력폼에서 입력받은 내용을 데이터베이스 저장
         //DTO로 Entity변환
         //map은 변수,값으로 구성된 배열
         //noticeDTO변수들을 NoticeEntity에 변수에 맞게 변한
@@ -50,22 +52,11 @@ public class NoticeService {
         List<NoticeDTO> noticeDTOS = Arrays.asList(modelMapper.map(noticeEntities, NoticeDTO[].class));
         return noticeDTOS;
     }
-    public NoticeDTO read(Integer id) {//개별정보,게시글번호의 데이터를 화면에 출력
-        Optional<NoticeEntity> noticeEntity = noticeRepository.findById(id);
+    public NoticeDTO read(Integer idx) {//개별정보,게시글번호의 데이터를 화면에 출력
+        Optional<NoticeEntity> noticeEntity = noticeRepository.findById(idx);
 
         NoticeDTO noticeDTO = modelMapper.map(noticeEntity, NoticeDTO.class);
         return noticeDTO;
     }
 
-
-    public void register(NoticeDTO noticeDTO) {
-    }
-
-    public NoticeDTO noticeRead(Integer idx) {
-        return null;
-    }
-
-    public void noticeUpdate(@Valid NoticeDTO noticeDTO) {
-
-    }
 }

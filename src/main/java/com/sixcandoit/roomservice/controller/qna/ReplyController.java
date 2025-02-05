@@ -5,6 +5,7 @@ import com.sixcandoit.roomservice.dto.qna.ReplyDTO;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
 import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.service.qna.ReplyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Controller;
@@ -26,14 +27,14 @@ public class ReplyController {
     // Qna의 A 읽기 -> Q 상세보기에서 목록 출력
     // Qna의 A 등록 -> 모달 처리
     @PostMapping("/reply/register")
-    public String register(@RequestParam Integer qnaIdx,
+    public String register(@Valid @RequestParam Integer qnaIdx,
                            @ModelAttribute ReplyDTO replyDTO,
                            BindingResult bindingResult,
                            Model model){
         if (bindingResult.hasErrors()){
             // 오류가 있으면 질문 페이지로 돌아간다.
             model.addAttribute("qnaDTO", qnaService.qnaRead(qnaIdx));
-            return "qna/read?idx=" + qnaIdx;
+            return "redirect:/qna/read?idx=" + qnaIdx;
         }
         // 답변 등록 처리
         replyService.replyRegister(replyDTO);
@@ -41,16 +42,21 @@ public class ReplyController {
         return "redirect:/qna/read?idx=" + qnaIdx;
     }
 
-    // Qna의 A 수정
+    // Qna의 A 수정 처리
     @PostMapping("/reply/update")
-    public String update(@PathVariable("idx") Integer idx, Integer qnaIdx) {
+    public String update(@Valid @RequestParam Integer qnaIdx,
+                         @ModelAttribute ReplyDTO replyDTO,
+                         BindingResult bindingResult,
+                         Model model) {
+        log.info("수정할 데이터 저장...");
+        if (bindingResult.hasErrors()){
+            // 오류가 있으면 질문 페이지로 돌아간다.
+            model.addAttribute("qnaDTO", qnaService.qnaRead(qnaIdx));
+            return "redirect:/qna/read?idx=" + qnaIdx;
+        }
+         //답변 등록 처리
+        replyService.replyUpdate(replyDTO);
 
-        ReplyEntity replyEntity = this.replyService.getReply(idx);
-
-        replyEntity.setReplyTitle(replyEntity.getReplyTitle());
-        replyEntity.setReplyContents(replyEntity.getReplyContents());
-
-        // 수정 후 해당 Q&A 상세 페이지로 리다이렉트
         return "redirect:/qna/read?idx=" + qnaIdx;
 
     }

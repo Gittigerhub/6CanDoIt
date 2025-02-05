@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,6 +27,9 @@ public class RoomEntity extends BaseEntity {
 
     @Column(name = "room_name")
     private String roomName;                // 객실 이름
+
+    @Column(name = "room_info")
+    private String roomInfo;                // 객실 정보
 
     @Column(name = "room_type")
     private String roomType;                // 객실 타입(STD:스탠다드, ROH:런 오브 하우스, MOD:모더레이트, SUP:슈페리어, DLX:디럭스, STU:스튜디오, JRSTE:쥬니어 스위트, STE:스위트, PH:팬트하우스)

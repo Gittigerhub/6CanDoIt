@@ -2,10 +2,9 @@ package com.sixcandoit.roomservice.dto.member;
 
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
-import com.sixcandoit.roomservice.entity.NoticeEntity;
+import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
-import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

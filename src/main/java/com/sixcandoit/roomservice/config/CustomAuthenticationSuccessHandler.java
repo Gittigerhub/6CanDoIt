@@ -21,6 +21,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         //UserDetails을 사용자가 오버라이딩 변경을 하면 해당정보를 전달
         UserDetails user = (UserDetails) authentication.getPrincipal();
 
-        response.sendRedirect("/"); //시작페이지로 이동
+        response.sendRedirect("/member/"); //시작페이지로 이동
     }
 }

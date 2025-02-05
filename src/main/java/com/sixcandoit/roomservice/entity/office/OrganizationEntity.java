@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.AdvertisementEntity;
 import com.sixcandoit.roomservice.entity.event.EventEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
-import com.sixcandoit.roomservice.entity.member.AdminEntity;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity

@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.controller.office;
 
-import com.sixcandoit.roomservice.dto.member.AdminLoginDTO;
+import com.sixcandoit.roomservice.dto.admin.AdminLoginDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
 import com.sixcandoit.roomservice.service.office.OrganizationService;

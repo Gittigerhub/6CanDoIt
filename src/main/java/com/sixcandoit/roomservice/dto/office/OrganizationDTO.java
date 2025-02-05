@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.dto.office;
 
-import com.sixcandoit.roomservice.dto.member.AdminLoginDTO;
+import com.sixcandoit.roomservice.dto.admin.AdminLoginDTO;
 import lombok.*;
 
 import java.util.List;

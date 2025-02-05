@@ -1,4 +1,4 @@
-package com.sixcandoit.roomservice.dto.member;
+package com.sixcandoit.roomservice.dto.admin;
 
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;

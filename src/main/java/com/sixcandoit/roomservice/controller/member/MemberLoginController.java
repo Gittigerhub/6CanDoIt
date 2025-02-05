@@ -1,8 +1,9 @@
 package com.sixcandoit.roomservice.controller.member;
 
+import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.member.MemberLoginDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import com.sixcandoit.roomservice.service.member.AdminLoginService;
+import com.sixcandoit.roomservice.service.admin.AdminLoginService;
 import com.sixcandoit.roomservice.service.member.MemberLoginService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -15,19 +16,20 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/member")
 @Log4j2
-public class LoginController {
+public class MemberLoginController {
     private final MemberLoginService memberLoginService; // 서비스 연동
     private final AdminLoginService adminLoginService;
 
     @GetMapping("/")
-    public String IndexForm() {
+    public String IndexForm(HttpSession session, MemberDTO memberDTO) {
+        session.setAttribute("memberName", memberDTO.getMemberName());
         return "index";
     }
 
     // 회원가입
     @GetMapping("/register")
     public String showRegisterPage(){
-        return "exregister";
+        return "member/register";
     }
 
     @PostMapping("/register")

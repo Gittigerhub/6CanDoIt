@@ -10,6 +10,7 @@ import groovy.util.logging.Log4j2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,13 +39,20 @@ public class MemberLoginService implements UserDetailsService { //사용자가 �
     public UserDetails loadUserByUsername(String memberEmail)
             throws UsernameNotFoundException { //입력받은 아이디가 없으면 예외처리
         //사용자아이디로 조회해서
-        log.info("ghghg");
+        log.info("아이디 조회 ㄱㄱ");
+//        Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
         Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
+
         log.info(memberEntity.toString()+"로드바이유저네임 진입 여부 확인");
 
         if (memberEntity.isPresent()) { //아이디가 존재하면
-            MemberLoginDTO memberLoginDTO = modelMapper.map(memberEntity, MemberLoginDTO.class);
+            log.info("present");
 
+            UserDetails memberLoginDTO = User.withUsername(memberEntity.get().getMemberName())
+                    .password(memberEntity.get().getMemberPwd())
+                    .build();
+
+            log.info(memberLoginDTO.toString());
             return memberLoginDTO;
         } else { //존재하지 않으면 예외처리
             throw new UsernameNotFoundException(memberEmail);

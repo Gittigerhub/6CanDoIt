@@ -1,8 +1,6 @@
-package com.sixcandoit.roomservice.repository.member;
+package com.sixcandoit.roomservice.repository.admin;
 
-import com.sixcandoit.roomservice.entity.member.AdminEntity;
-import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

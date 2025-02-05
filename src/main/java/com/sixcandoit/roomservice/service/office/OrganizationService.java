@@ -1,10 +1,10 @@
 package com.sixcandoit.roomservice.service.office;
 
-import com.sixcandoit.roomservice.dto.member.AdminLoginDTO;
+import com.sixcandoit.roomservice.dto.admin.AdminLoginDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
-import com.sixcandoit.roomservice.entity.member.AdminEntity;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
-import com.sixcandoit.roomservice.repository.member.AdminRepository;
+import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

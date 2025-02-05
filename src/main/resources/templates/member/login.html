@@ -19,11 +19,7 @@
         <div class="card-body">
           <h2>로그인</h2>
           <form th:action="@{/member/login}" method="post" class="was-validated">
-              <div th:if="${param.error}">
-                  <div class="alert alert-danger mt-4">
-                      아이디 비번이 문제니?
-                  </div>
-              </div>
+
 
             <div class="mb-3 mt-3">
               <label for="memberEmail" class="form-label">이메일:</label>

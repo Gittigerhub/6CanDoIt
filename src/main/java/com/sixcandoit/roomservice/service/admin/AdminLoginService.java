@@ -1,20 +1,12 @@
-package com.sixcandoit.roomservice.service.member;
+package com.sixcandoit.roomservice.service.admin;
 
-import com.sixcandoit.roomservice.dto.member.AdminLoginDTO;
-import com.sixcandoit.roomservice.entity.member.AdminEntity;
-import com.sixcandoit.roomservice.repository.member.AdminRepository;
+import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.SecureRandom;
-import java.util.Optional;
 
 @Service
 @Transactional

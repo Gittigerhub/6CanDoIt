@@ -48,9 +48,10 @@
               </div>
             </div>
             <div class="card-footer">
-              <button type="submit" class="btn btn-primary">수정</button>
-              <button type="button" class="btn btn-danger"
-                      th:onclick="|location.href='@{/notice/list}'|">취소</button>
+              <a th:href="@{/notice/list}" class="btn btn-secondary">목록</a>
+              <a th:href="@{/notice/list}" class="btn btn-primary">완료</a>
+              <a th:href="@{/notice/list}" class="btn btn-danger">취소</a>
+
             </div>
           </div>
         </form>

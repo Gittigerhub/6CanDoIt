@@ -13,34 +13,38 @@
 <div layout:fragment="content" class="p-5">
     <div class="container p-5 bg-white">
         <h2 class="text-center mb-4">공지사항 등록</h2>
-        <form th:action="@{/notice/register}" method="post">
+        <form th:action="@{/notice/register}" th:object="${noticeDTO}" method="post">
             <!-- 제목 입력 필드 -->
             <div class="mb-3">
                 <label for="noticeTitle" class="form-label">제목</label>
-                <input type="text" class="form-control" id="noticeTitle" name="noticeTitle" required>
+                <input type="text" th:field="*{noticeTitle}" class="form-control" id="noticeTitle" name="noticeTitle" required>
+                <span th:if="${#fields.hasErrors('noticeTitle')}"
+                      style="color: red;"
+                      th:errors="*{noticeTitle}"></span>
             </div>
 
             <!-- 내용 입력 필드 -->
             <div class="mb-3">
                 <label for="noticeContent" class="form-label">내용</label>
-                <textarea class="form-control" id="noticeContent" name="noticeContent" rows="4" required></textarea>
+                <textarea th:field="*{noticeContents}" class="form-control" id="noticeContent" name="noticeContent" rows="4" required></textarea>
+                <span th:if="${#fields.hasErrors('noticeContents')}"
+                      style="color: red;"
+                      th:errors="*{noticeContents}"></span>
             </div>
 
-            <!-- 작성자 입력 필드 -->
-            <div class="mb-3">
-                <label for="noticeAuthor" class="form-label">작성자</label>
-                <input type="text" class="form-control" id="noticeAuthor" name="noticeAuthor" required>
-            </div>
 
             <!-- 작성일 입력 필드 (자동으로 오늘 날짜로 설정될 수 있음) -->
             <div class="mb-3">
                 <label for="noticeDate" class="form-label">작성일</label>
-                <input type="date" class="form-control" id="noticeDate" name="noticeDate" value="${T(java.time.LocalDate).now()}" required>
+                <input type="date" th:field="*{noticeDate}" class="form-control" id="noticeDate" name="noticeDate" value="${T(java.time.LocalDate).now()}" required>
+                <span th:if="${#fields.hasErrors('noticeDate')}"
+                      style="color: red;"
+                      th:errors="*{noticeDate}"></span>
             </div>
 
             <!-- 등록 버튼 -->
             <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary">등록</button>
+                <a th:href="@{/notice/list}" class="btn btn-primary">등록</a>
             </div>
         </form>
     </div>

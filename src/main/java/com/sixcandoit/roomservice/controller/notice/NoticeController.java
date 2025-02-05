@@ -36,8 +36,10 @@ public class NoticeController {
     }
     // 추가버튼을 클릭했을 때 입력폼 페이지
     @GetMapping("/notice/register")
-    public String register(){
+    public String register(Model model){
         log.info("입력폼 페이지 이동...");
+
+        model.addAttribute("noticeDTO", new NoticeDTO());
 
         return "notice/register";
     }
@@ -46,7 +48,7 @@ public class NoticeController {
     @PostMapping("/notice/register")
     public String registerProc(@Valid @ModelAttribute NoticeDTO noticeDTO,
                                BindingResult bindingResult){
-        log.info("입력폼 내용을 저장...");
+        log.info("입력폼 내용을 저장");
 
         if (bindingResult.hasErrors()){
             log.info("유효성 검사 오류 발생");
@@ -61,18 +63,16 @@ public class NoticeController {
     // Form으로 전달시에는 get, post로 전달가능
     // 그외는 get 전달
     @GetMapping("/notice/read")
-    public String read(@RequestParam Integer idx, Model model){
+    public String read(Model model){
         log.info("개별읽기...");
-        NoticeDTO noticeDTO = noticeService.read(idx);  // 전달자가 있으면 변수로 받는다.
-
-        log.info("개별정보를 페이지에 전달...");
-        model.addAttribute("noticeEntity", noticeDTO);
+       NoticeDTO noticeDTO = noticeService.read(1);
+        model.addAttribute("noticeDTO", noticeDTO);
 
         return "notice/read";
     }
     // 목록에서 수정버튼을 클릭했을 때 수정폼 페이지
     @GetMapping("/notice/update")
-    public String updateForm(@RequestParam Integer idx, Model model) {
+    public String update(@RequestParam Integer idx, Model model) {
         log.info("수정할 데이터 읽기...");
         NoticeDTO noticeDTO = noticeService.read(idx);
 
@@ -97,10 +97,9 @@ public class NoticeController {
             return "redirect:/notice/list";
 
     }
-    // 목록에서 삭제버튼을 클릭했을 때 삭제 처리
-    //@GetMapping("/delete/{id}") = rest방식
+
     @GetMapping("/notice/delete")
-    public String deleteProc(@RequestParam Integer idx){
+    public String delete(@RequestParam Integer idx){
         log.info("삭제 처리...");
         noticeService.delete(idx);
 

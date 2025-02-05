@@ -42,7 +42,7 @@
 
             <thead>
             <tr class="table-secondary text-center">
-                <th >NO</th>
+                <th>NO</th>
                 <th></th>
                 <th>제목</th>
                 <th>작성일</th>
@@ -53,43 +53,43 @@
             <tbody>
             <tr class="text-center">
                 <td>1</td>
-                <td><button type="button" class="btn btn-danger">필독</button></td>
+                <td><a th:href="@{notice/read}" class="btn btn-danger">필독</a></td>
                 <td>프로그램관리자 페이지 사용서 v.1</td>
                 <td>2025-01-15</td>
                 <td></td>
-                <td><button type="button" class="btn btn-primary">수정</button></td>
+                <td><a th:href="@{notice/update}" class="btn btn-primary">수정</a></td>
             </tr>
             <tr class="text-center">
                 <td>2</td>
-                <td><button type="button" class="btn btn-danger">필독</button></td>
+                <td><a th:href="@{notice/read}" class="btn btn-danger">필독</a></td>
                 <td>정보 조회 요청 또는 변경 요청을 위한 양식 첨부파일</td>
                 <td>2025-01-15</td>
                 <td></td>
-                <td><button type="button" class="btn btn-primary">수정</button></td>
+                <td><a th:href="@{notice/update}" class="btn btn-primary">수정</a></td>
             </tr>
             <tr class="text-center">
                 <td>3</td>
-                <td><button type="button" class="btn btn-danger">필독</button></td>
+                <td><a th:href="@{notice/read}" class="btn btn-danger">필독</a></td>
                 <td>비밀번호 변경 방식에 대하여</td>
                 <td>2025-01-15</td>
                 <td></td>
-                <td><button type="button" class="btn btn-primary">수정</button></td>
+                <td><a th:href="@{notice/update}" class="btn btn-primary">수정</a></td>
             </tr>
             <tr class="text-center">
                 <td>4</td>
-                <td><button type="button" class="btn btn-danger">필독</button></td>
+                <td><a th:href="@{notice/read}" class="btn btn-danger">필독</a></td>
                 <td>다국어 추가 요청시</td>
                 <td>2025-01-15</td>
                 <td></td>
-                <td><button type="button" class="btn btn-primary">수정</button></td>
+                <td><a th:href="@{notice/update}" class="btn btn-primary">수정</a></td>
             </tr>
             <tr class="text-center">
                 <td>5</td>
-                <td><button type="button" class="btn btn-danger">필독</button></td>
+                <td><a th:href="@{notice/read}" class="btn btn-danger">필독</a></td>
                 <td>지사, 매장 추가시</td>
                 <td>2025-01-15</td>
                 <td></td>
-                <td><button type="button" class="btn btn-primary">수정</button></td>
+                <td><a th:href="@{notice/update}" class="btn btn-primary">수정</a></td>
             </tr>
             </tbody>
         </table>
@@ -100,8 +100,8 @@
                 <li class="page-item"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a></li>
 
             </ul>
-            <div class="d-flex justify-content-end">
-              <a  th:href="@{/notice/register}" class="btn btn-primary">등록</a>
+            <div class="d-flex justify-content-end" mt-3>
+              <a th:href="@{/notice/register}" class="btn btn-primary">등록</a>
             </div>
         </div>
     </div>

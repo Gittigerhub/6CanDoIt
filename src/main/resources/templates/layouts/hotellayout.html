@@ -28,23 +28,29 @@
     }
 
     /* 사이드바 크기 축소 */
-    #sidebar {
-        width: 200px; /* 사이드바를 200px로 줄임 */
+    #hotelsidebar {
+        position: fixed; /* 고정 위치 */
+        top: 0;
+        left: 0;
+        width: 200px; /* 사이드바의 너비 */
+        height: 100%; /* 화면 전체 높이를 차지하도록 설정 */
         background-color: #343a40;
         color: white;
     }
 
-    /* 본문 영역을 넓힘 */
+    /* 본문 영역을 사이드바 우측에 맞춰서 펼침 */
     #body-wrapper {
-        flex-grow: 1;
+        margin-left: 300px; /* 사이드바 너비만큼 여백 */
         padding: 20px;
+        flex-grow: 1;
     }
 
 </style>
 
 <div class="d-flex">
-    <th:block th:replace="~{fragments/hotelsidebar::hotelsidebar}"></th:block>
-
+    <div id="hotelsidebar">
+        <th:block th:replace="~{fragments/hotelsidebar::hotelsidebar}"></th:block>
+    </div>
     <div id="body-wrapper">
         <div layout:fragment="content" class="container-fluid"></div>
     </div>

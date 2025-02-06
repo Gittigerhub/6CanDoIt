@@ -58,11 +58,11 @@ public class AdvertisementController {
     // 모달 광고 등록하기
     @PostMapping("/register")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
-    public ResponseEntity<String> register(@ModelAttribute AdvertisementDTO advertisementDTO) {
+    public ResponseEntity<String> register(@ModelAttribute AdvertisementDTO advertisementDTO, Integer organidx) {
 
         try {
             // 서비스에 등록 요청
-            advertisementService.adRegister(advertisementDTO);
+            advertisementService.adRegister(advertisementDTO, organidx);
 
             // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
             return ResponseEntity.ok("광고 등록이 성공적으로 되었습니다.");

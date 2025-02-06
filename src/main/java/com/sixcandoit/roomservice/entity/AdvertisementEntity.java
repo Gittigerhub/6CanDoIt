@@ -49,7 +49,7 @@ public class AdvertisementEntity extends BaseEntity {
     private int adHits;                  // 조회 수
 
     // 조직 테이블과 N:1 매핑
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "organ_idx")
     @JsonBackReference
     private OrganizationEntity organizationJoin;

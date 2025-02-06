@@ -55,9 +55,9 @@
                 <tr style="height: 50px; vertical-align: middle"> <!--테이블 제목-->
                     <th style="width: 8%">No</th>
                     <th style="width: 17%">업체명</th>
-                    <th style="width: 25%">제목</th>
+                    <th style="width: 30%">제목</th>
                     <th style="width: 22%">사이트 주소</th>
-                    <th style="width: 20%">기간</th>
+                    <th style="width: 15%">기간</th>
                     <th style="width: 8%">상태</th>
                 </tr>
                 </thead>
@@ -65,11 +65,18 @@
                 <tr style="height: 50px; vertical-align: middle" th:each="data:${advertisementDTOS}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
                     <td th:text="${data.idx}"></td>
                     <td th:text="${data.organization.organName}"></td>
-                    <td th:text="${data.adTitle}"></td>
+                    <td>
+                        <a th:href="@{/advertisement/read(idx=${data.idx})}" th:text="${data.adTitle}"></a>
+                    </td>
                     <td th:text="${data.adLinkUrl}"></td>
-                    <td th:text="${data.adStartDate}"></td>
-                    <td th:text="${data.adEndDate}"></td>
-                    <td th:text="${data.adState}"></td>
+                    <td>
+                        <span th:text="${#temporals.format(data.adStartDate, 'yy/MM/dd HH:mm')}"></span> ~
+                        <span th:text="${#temporals.format(data.adEndDate, 'yy/MM/dd HH:mm')}"></span>
+                    </td>
+                    <td>
+                        <button style="font-size: 12px" th:if="${data.adState == 'Y'}" class="btn btn-primary">활성화</button>
+                        <button style="font-size: 12px" th:unless="${data.adState == 'Y'}" class="btn btn-danger">비활성화</button>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -79,26 +86,26 @@
             <div class="d-flex justify-content-center">
                 <ul class="pagination">
                     <li class="page-item" th:if="${currentPage>1}">
-                        <a class="page-link" th:href="@{/office/list(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                        <a class="page-link" th:href="@{/advertisement/list(page=1, type=${type}, keyword=${keyword})}">≪</a>
                     </li>
 
                     <li class="page-item" th:if="${currentPage>1}">
-                        <a class="page-link" th:href="@{/office/list(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                        <a class="page-link" th:href="@{/advertisement/list(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
                     </li>
 
                     <li class="page-item" th:each="page:${#numbers.sequence(startPage, endPage, 1)}" th:class="${page == currentPage} ? 'active' : ''">
                         <a class="page-link" th:if="${page != currentPage}"
-                           th:href="@{/office/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                           th:href="@{/advertisement/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
                         <!-- 현재 페이지일 때는 링크 없이 텍스트만 표시 -->
                         <span th:if="${page == currentPage}" class="page-link" th:text="${page}"></span>
                     </li>
 
                     <li class="page-item" th:if="${currentPage<endPage}">
-                        <a class="page-link" th:href="@{/office/list(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                        <a class="page-link" th:href="@{/advertisement/list(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
                     </li>
 
                     <li class="page-item" th:if="${currentPage<endPage}">
-                        <a class="page-link" th:href="@{/office/list(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                        <a class="page-link" th:href="@{/advertisement/list(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
                     </li>
                 </ul>
             </div>
@@ -133,11 +140,12 @@
 
                         <div class="row">
                             <!-- 연관 조직 -->
+                            <input type="hidden" id="organidx" name="organidx">
                             <div class="col-sm-12">
                                 <div class="form-group form-group-default">
                                     <label>*업체 :</label>
                                     <span class="d-flex">
-                                        <input style="width: 83%; background: ghostwhite" id="organName" name="organName" type="text" class="form-control me-3" readonly>
+                                        <input style="width: 83%; background: ghostwhite" id="organ" name="organ" type="text" class="form-control me-3" readonly>
                                         <button type="button" id="searchButton" class="btn btn-success">검색</button> <!-- 조직 검색 버튼 -->
                                     </span>
                                 </div>
@@ -192,8 +200,8 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0">
-                        <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                        <button type="button" id="addButton" class="btn btn-success">저장</button> <!--신규등록 저장버튼-->
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
                     </div>
                 </form>
             </div>
@@ -218,7 +226,7 @@
                         <p>업체를 검색합니다.</p>
 
                         <div class="row">
-                            <!-- 연관 조직 -->
+                            <!-- 연관 조직 분류 -->
                             <div class="col-3">
                                 <div class="form-group form-group-default">
                                     <label>*분류 :</label>
@@ -229,43 +237,36 @@
                                     </select>
                                 </div>
                             </div>
-
+                            <!-- 연관 조직 명칭 -->
                             <div class="col-sm-12">
                                 <div class="form-group form-group-default">
                                     <label>*업체 검색 :</label>
                                     <span class="d-flex">
                                         <!--검색할 단어 입력-->
-                                        <input type="text" style="width: 83%" class="form-control me-3" name="keyword" th:value="${keyword}" placeholder="조직명을 입력하세요"/>
+                                        <input type="text" id="searchWord" name="searchWord" style="width: 83%" class="form-control me-3" placeholder="조직명을 입력하세요"/>
                                         <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
-                                        <button type="submit" class="btn btn-success">조회</button>
+                                        <button type="button" id="searchOrgan" class="btn btn-success">조회</button>
                                     </span>
                                 </div>
                             </div>
-
-                            <!--조회 테이블-->
-                            <table class="table table-bordered mt-2" style="text-align: center">
-                                <thead>
-                                <tr style="height: 50px; vertical-align: middle"> <!--테이블 제목-->
-                                    <th style="width: 20%">분류</th>
-                                    <th style="width: 50%">업체명</th>
-                                    <th style="width: 30%">상태</th>
-                                </tr>
-                                </thead>
-                                <tbody> <!--조직 테이블 데이터 출력-->
-                                <tr class="overflow-auto" style="height: 50px; vertical-align: middle" th:each="data:${organizationDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
-                                    <td th:text="${data.idx}"></td>
-                                    <td th:text="${data.organization.organName}"></td>
-                                    <td th:text="${data.adTitle}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            <div class="d-flex justify-content-center" th:if="${advertisementDTOS.isEmpty()}">조회된 내역이 없습니다.</div>
-
                         </div>
                     </div>
+                    <!--조회 테이블-->
+                    <table class="table table-bordered mt-2" id="resultsTable" style="text-align: center">
+                        <thead>
+                        <tr style="height: 50px; vertical-align: middle">
+                            <th style="width: 20%">분류</th>
+                            <th style="width: 50%">업체명</th>
+                            <th style="width: 30%">상태</th>
+                        </tr>
+                        </thead>
+                        <tbody class="overflow-auto">
+                            <!-- 검색 결과가 동적으로 추가됨 -->
+                        </tbody>
+                    </table>
+
                     <div class="modal-footer border-0">
-                        <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
                     </div>
                 </form>
             </div>
@@ -279,6 +280,13 @@
             // 광고 등록 모달에서 검색 버튼을 클릭했을 때
             $("#searchButton").on('click', function() {
 
+                // 폼 리셋
+                var form = $("#searchForm")[0];
+                form.reset();
+
+                // 테이블 내용 초기화 (tbody 비우기)
+                $("#searchModal tbody").empty();  // tbody 내부의 모든 내용 삭제
+
                 // 이전 모달창을 화면에서 숨긴다.
                 $("#addModal").modal('hide');
 
@@ -287,8 +295,71 @@
 
             });
 
+            // 조회 버튼 클릭 시
+            $("#searchOrgan").on("click", function(e) {
+
+                var searchType = $("#searchType").val();
+                var searchWord = $("#searchWord").val();
+
+                $.ajax({
+                    url: "/advertisement/search/list",
+                    type: "POST",
+                    data: {
+                        searchType: searchType,
+                        searchWord: searchWord
+                    },
+                    dataType: "json",
+                    success: function(data) {
+
+                        var tbody = $("#resultsTable tbody");
+                        tbody.empty();  // 기존 결과 초기화
+
+                        var row = "";
+                        // 각 결과 객체를 <tr> 태그로 추가
+                        $.each(data, function(index, item) {
+                            row += `
+                                        <tr style="height: 50px; vertical-align: middle">
+                                            <td>${item.organType}</td>
+                                            <td class="organ-name">${item.organName}<input type="hidden" class="idx" value="${item.idx}"></td>
+                                            <td>${item.activeYn}</td>
+                                        </tr>
+                                    `;
+                        });
+                        tbody.append(row);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("검색 오류:", error);
+                        alert("검색 중 오류가 발생했습니다.");
+                    }
+                });
+            });
+
+            // 업체명 클릭시
+            // 동적으로 생성된 .organ-name 요소에 대해서도 클릭 이벤트를 처리
+            $(document).on('click', '.organ-name', function() {
+
+                // 클릭한 td의 텍스트 값 가져오기
+                var organ = $(this).text();
+                var organIdx = $(".idx").val();
+
+                // 이전 모달 input에 organName 값 넣기
+                $("#organ").val(organ);
+                $("#organidx").val(organIdx);
+
+                // 검색 모달창을 숨긴다
+                $("#searchModal").modal('hide');
+
+                // 이전 모달창을 화면에 띄운다.
+                $("#addModal").modal('show');
+
+            });
+
             // 광고 목록에서 추가를 클릭했을 때
             $("#btn-add").on('click', function() {
+
+                // 폼 리셋
+                var form = $("#addForm")[0];
+                form.reset();
 
                 // 모달창을 화면에 띄운다.
                 $("#addModal").modal('show');
@@ -312,7 +383,7 @@
 
                 $.ajax({
                     // Controller에 신규등록 요청
-                    url: '/office/organ/register',
+                    url: '/advertisement/register',
                     type: 'POST',
                     data: formData,                     // JSON.stringify(courseData),
                     processData: false,
@@ -322,7 +393,7 @@
                         // 새로운 성공 알림창을 띄운다.
                         Swal.fire({
                             title: "등록 완료",
-                            text: "조직이 등록되었습니다.",
+                            text: "광고가 등록되었습니다.",
                             icon: "success"
                         }).then(() => {
                             location.reload();          // 현재 목록페이지를 다시 읽어온다.

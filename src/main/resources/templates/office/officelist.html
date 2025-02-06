@@ -203,6 +203,10 @@
             // 조직 목록에서 추가를 클릭했을 때
             $("#btn-add").on('click', function() {
 
+                // 폼 리셋
+                var form = $("#addForm")[0];
+                form.reset();
+
                 // 모달창을 화면에 띄운다.
                 $("#addModal").modal('show');
 

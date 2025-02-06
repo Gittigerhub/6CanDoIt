@@ -10,6 +10,369 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+<div layout:fragment="content" class="p-5">
 
+    <!-- 페이지 시작 -->
+    <div class="container">
+        <h2>광고 관리</h2>
+
+        <div class="row p-5 bg-white">
+            <div class="mb-3">
+                <h3>광고 상세정보</h3>
+            </div>
+
+            <!-- 상세 테이블 시작 -->
+            <input type="hidden" name="idx" id="adIdx" th:data-id="${advertisementDTO.idx}">
+            <table class="table table-bordered" style="text-align: center">
+                <tbody> <!--조직 테이블 데이터 출력-->
+                <tr style="height: 50px; vertical-align: middle">
+                    <th style="width: 10%">분류</th>
+                    <td style="width: 40%; text-align: left" th:text="${advertisementDTO.adTitle}"></td>
+                    <th style="width: 10%">상태</th>
+                    <td style="width: 40%">
+                        <div class="d-flex">
+                            <button style="font-size: 12px" th:if="${organDTO.activeYn == 'Y'}" th:value="${organDTO.activeYn}" class="btn btn-primary justify-content-start">활성화</button>
+                            <button style="font-size: 12px" th:unless="${organDTO.activeYn == 'Y'}" th:value="${organDTO.activeYn}" class="btn btn-danger justify-content-start">비활성화</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th>업체명</th>
+                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <th>대표 연락처</th>
+                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                </tr>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th>주소</th>
+                    <td colspan="3" style="text-align: left" th:text="${organDTO.organAddress}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <!-- 상세 테이블 끝 -->
+
+            <!-- 수정/취소 버튼 -->
+            <div class="d-flex justify-content-end mt-5">
+                <button type="button" class="btn btn-success mx-4" id="btn-update" th:data-id="${organDTO.idx}">수정</button>
+                <button type="button" class="btn btn-danger btn-delete" th:data-id="${organDTO.idx}">삭제</button>
+            </div>
+        </div>
+
+    </div>
+    <!-- 페이지 끝 -->
+
+    <!-- 수정 모달 시작 -->
+    <div class="modal" id="updatemodal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 id="title" class="modal-title"></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- 폼 시작 -->
+                <form id="updatemodalForm">
+                    <input type="hidden" id="idx" name="idx">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <div class="form-group form-group-default">
+                                    <label>*상태 :</label>
+                                    <select id="activeYn" name="activeYn" class="form-select" required>
+                                        <option value="Y" th:selected="${organDTO.activeYn == 'Y'}">활성화</option>
+                                        <option value="N" th:selected="${organDTO.activeYn == 'N'}">비활성화</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group form-group-default">
+                                    <label>*분류 :</label>
+                                    <select id="organType" name="organType" class="form-select" required>
+                                        <option value="HO">본사</option>
+                                        <option value="BO">지사</option>
+                                        <option value="SHOP">매장</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group form-group-default">
+                                    <label>*업체명 :</label>
+                                    <input id="organName" name="organName" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group form-group-default">
+                                    <label>*주소 :</label>
+                                    <input id="organAddress" name="organAddress" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group form-group-default">
+                                    <label>*대표 연락처 :</label>
+                                    <input id="organTel" name="organTel" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-success mx-2" id="update">저장</button>
+                            <button type="button" class="btn btn-secondary" id="cancel">취소</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- 폼 끝 -->
+            </div>
+        </div>
+    </div>
+    <!-- 수정 모달 끝 -->
+
+    <!-- 삭제 모달 시작 -->
+    <div class="modal" id="deletemodal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">조직 삭제</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div class="form-group form-group-default">
+                                <p>삭제버튼을 클릭하면 정보가 삭제됩니다. 삭제하시겠습니까?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button" class="btn btn-danger mx-2" id="delete">삭제</button>
+                        <button type="button" class="btn btn-secondary" id="cancel2">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 삭제 모달 끝 -->
+
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+        // 문서가 준비가 되었다면
+        $(document).ready(function () {
+
+            // 삭제모달 버튼 클릭 시
+            $(".btn-delete").on("click", function () {
+
+                $("#deletemodal").modal('show')
+
+            });
+
+            // 삭제모달 취소버튼 클릭 시
+            $("#cancel2").on("click", function () {
+
+                $("#deletemodal").modal('hide')
+
+            });
+
+            // 삭제 버튼 클릭
+            $("#delete").on("click", function () {
+                var idx = $('#organDTOidx').data("id")
+
+                $.ajax({
+                    url: "/office/organ/delete",
+                    type: 'GET',
+                    data: {
+                        idx: idx                        // 전달값 : 값
+                    },
+                    success: function (response) {      // 작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "삭제하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        }).then(() => {
+                            // 삭제 완료 후 '/office/list'로 리디렉션
+                            location.href = "/office/list";  // 페이지 이동
+                        });
+                    },
+                    error: function () {                // 작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "삭제를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+            });
+            // 삭제모달 삭제버튼 클릭 시 끝
+
+            // 수정모달 취소버튼 클릭 시
+            $("#cancel").on("click", function () {
+
+                $("#updatemodal").modal('hide')
+
+            });
+
+
+            // 수정버튼 클릭시 대화상자 채우기
+            $("#btn-update").on("click", function () {
+                console.log("버튼 클릭됨!")
+                var idx = $(this).data("id");
+
+                console.log(idx)
+
+                $.ajax({
+                    url: "/office/organ/read",
+                    type: 'GET',
+                    data: {
+                        idx: idx                   // 전달값:값
+                    },
+                    success: function (response) {  // 작업 성공시
+                        console.log(response.organizationDTO)
+                        $('#title').text("조직 정보 수정");
+
+                        $('#idx').val(response.organizationDTO.idx);
+                        $('#organName').val(response.organizationDTO.organName);
+                        $('#organAddress').val(response.organizationDTO.organAddress);
+                        $('#organTel').val(response.organizationDTO.organTel);
+                        $('#activeYn').val(response.organizationDTO.activeYn);
+
+                        //대화창 출력
+                        $('#updatemodal').modal('show');
+
+                    },
+                    error: function () {            // 작업 실패시
+                        //새로운 오류 알림창을 띄운다.
+                        Swal.fire({
+                            title: "오류 발생",
+                            icon: "error",
+                            text: "문제가 발생했습니다. 다시 시도해 주세요.",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                            //변화된 내용이 없으므로 목록페이지는 다시 읽지 않는다.
+                        });
+                    }
+                });
+            });
+            // 수정버튼 클릭시 대화상자 채우기 끝
+
+            // 대화상자에서 저장 버튼 클릭시 수정진행
+            $('#update').on('click', function () {
+                var form = $('#updatemodalForm')[0];
+                var formData = new FormData(form);      // form내의 데이터 읽기
+
+                //폼 검증 수행
+                if (form.checkValidity() === false) {
+                    form.reportValidity();              // 폼 검증
+                    return;
+                }
+                $('#updatemodal').modal('hide');
+
+                $.ajax({
+                    url: '/office/organ/update',   // 맵핑
+                    type: 'POST',                       // 전달 방식
+                    data: formData,                     // 데이터 값
+                    processData: false,                 // 현재상태 그대로 유지하면서 전달
+                    contentType: false,
+
+                    success: function (response) {      //작업 성공시
+                        Swal.fire({
+                            //새로운 성공 알림창을 띄운다.
+                            title: "수정 완료",
+                            text: "정보가 수정되었습니다.",
+                            icon: "success",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        }).then(() => {
+                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function () {                //작업 실패시
+                        Swal.fire({
+                            title: "오류 발생",
+                            icon: "error",
+                            text: "문제가 발생했습니다. 다시 시도해 주세요.",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+
+            });
+            // 대화상자에서 저장 버튼 클릭시 수정진행 끝
+
+        });
+    </script>
+</th:block>
 </body>
 </html>

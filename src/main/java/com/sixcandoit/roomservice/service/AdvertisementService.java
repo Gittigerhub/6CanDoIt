@@ -31,17 +31,23 @@ public class AdvertisementService {
     private final OrganizationRepository organizationRepository;
     private final ModelMapper modelMapper;
 
-    // 광고 등록
-    public void adRegister(AdvertisementDTO advertisementDTO){
+    /* -----------------------------------------------------------------------------
+        함수명 : void adRegister(AdvertisementDTO advertisementDTO, Integer idx)
+        인수 : AdvertisementDTO advertisementDTO, Integer idx
+        출력 : 없음
+        설명 : 전달받은 데이터를 데이터베이스에 저장하여 광고 등록
+    ----------------------------------------------------------------------------- */
+    public void adRegister(AdvertisementDTO advertisementDTO, Integer organidx) {
 
         try {
             // DTO -> Entity로 변환
             AdvertisementEntity advertisementEntity = modelMapper.map(advertisementDTO, AdvertisementEntity.class);
 
             // 조직 ID로 조회하여 데이터 가져오기
-            OrganizationEntity organization = organizationRepository.findById(advertisementDTO.getOrganization().getIdx())
+            OrganizationEntity organization = organizationRepository.findById(organidx)
                     .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
 
+            System.out.println(organization);
             // 광고테이블에 연관관계 조직테이블 추가
             advertisementEntity.setOrganizationJoin(organization);
 
@@ -53,8 +59,13 @@ public class AdvertisementService {
 
     }
 
-    // 광고 수정
-    public void adUpdate(AdvertisementDTO advertisementDTO){
+    /* -----------------------------------------------------------------------------
+        함수명 : void adUpdate(AdvertisementDTO advertisementDTO)
+        인수 : AdvertisementDTO advertisementDTO
+        출력 : 없음
+        설명 : 전달받은 데이터를 데이터베이스에서 조회하여 수정
+    ----------------------------------------------------------------------------- */
+    public void adUpdate(AdvertisementDTO advertisementDTO) {
 
         // idx로 수정할 데이터 조회
         Optional<AdvertisementEntity> advertisementEntity = advertisementRepository.findById(advertisementDTO.getIdx());
@@ -81,16 +92,26 @@ public class AdvertisementService {
 
     }
 
-    // 광고 삭제
-    public void adDelete(Integer idx){
+    /* -----------------------------------------------------------------------------
+        함수명 : void adDelete(Integer idx)
+        인수 : Integer idx
+        출력 : 없음
+        설명 : 전달받은 데이터를 데이터베이스에서 조회하여 삭제
+    ----------------------------------------------------------------------------- */
+    public void adDelete(Integer idx) {
 
         // idx로 조회하여 삭제
         advertisementRepository.deleteById(idx);
 
     }
 
-    // 광고 목록
-    public Page<AdvertisementDTO> adList(Pageable page, String type, String keyword){
+    /* -----------------------------------------------------------------------------
+        함수명 : Page<AdvertisementDTO> adList(Pageable page, String type, String keyword)
+        인수 : Pageable page, String type, String keyword
+        출력 : 타입과 키워드로 검색된 데이터의 리스트 출력
+        설명 : 전달받은 데이터를 데이터베이스에서 조회하여 리스트 출력
+    ----------------------------------------------------------------------------- */
+    public Page<AdvertisementDTO> adList(Pageable page, String type, String keyword) {
 
         // 1. 페이지정보를 재가공
         int currentPage = page.getPageNumber()-1;       // 화면의 페이지 번호를 db 페이지 번호로
@@ -126,17 +147,22 @@ public class AdvertisementService {
         return advertisementDTOS;
     }
 
-    // 업체 조회
-    public List<OrganizationDTO> searchOrgan(String searchType, String searchWord){
+    /* -----------------------------------------------------------------------------
+        함수명 : List<OrganizationDTO> searchOrgan(String searchType, String searchWord)
+        인수 : String searchType, String searchWord
+        출력 : 타입과 키워드로 검색된 데이터의 리스트 출력
+        설명 : 전달받은 데이터를 데이터베이스에서 조회하여 업체 리스트 출력
+    ----------------------------------------------------------------------------- */
+    public List<OrganizationDTO> searchOrgan(String searchType, String searchWord) {
 
         // 1. 조회
         List<OrganizationEntity> organizationEntities;
 
         // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
-        if (searchWord == null) {                         // 타입만 존재한다면
+        if (searchWord == null && searchWord.trim().isEmpty()) {                         // 타입만 존재한다면
             organizationEntities = organizationRepository.findByOrganType(searchType);
         } else {                                          // 검색어와 타입이 존재한다면
-            organizationEntities = organizationRepository.findByOrganTypeAndOrganNameLikeIgnoreCase(searchType, searchWord);
+            organizationEntities = organizationRepository.findByOrganTypeAndOrganNameLikeIgnoreCase(searchType, "%" + searchWord + "%");
         }
 
         // 2. Entity를 DTO로 변환 후 저장
@@ -148,8 +174,13 @@ public class AdvertisementService {
         return organizationDTOS;
     }
 
-    // 광고 상세보기
-    public AdvertisementDTO adRead(Integer idx){
+    /* -----------------------------------------------------------------------------
+        함수명 : AdvertisementDTO adRead(Integer idx)
+        인수 : Integer idx
+        출력 : 뷰 페이지로 데이터 전달
+        설명 : 전달받은 데이터를 데이터베이스에서 조회하여 출력
+    ----------------------------------------------------------------------------- */
+    public AdvertisementDTO adRead(Integer idx) {
 
         // idx로 데이터 조회
         Optional<AdvertisementEntity> advertisementEntity = advertisementRepository.findById(idx);

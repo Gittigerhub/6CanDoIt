@@ -11,5 +11,339 @@
 </head>
 <body>
 
+<div layout:fragment="content" class="p-5">
+
+    <!-- 페이지 시작 -->
+    <div class="container">
+        <h2>광고 관리</h2>
+        <form th:action="@{/advertisement/list}" method="get">
+
+            <div class="row p-5 bg-white">
+                <div class="mb-3">
+                    <h3>광고 검색</h3>
+                </div>
+                <div class="col-3">
+                    <div class="form-group form-group-default">
+                        <select id="type" name="type" class="form-select" required>
+                            <option value="0">전체</option>
+                            <option value="1">제목</option>
+                            <option value="2">조직명</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-8">
+                    <!--검색할 단어 입력-->
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="조직명을 입력하세요"/>
+                </div>
+
+                <div class="col-1 d-flex justify-content-end">
+                    <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
+                    <button type="submit" class="btn btn-success">조회</button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="row mt-5 p-5 bg-white">
+            <div class="mb-3">
+                <h3>광고 조회</h3>
+            </div>
+            <!--조회 테이블-->
+            <table class="table table-bordered" style="text-align: center">
+                <thead>
+                <tr style="height: 50px; vertical-align: middle"> <!--테이블 제목-->
+                    <th style="width: 8%">No</th>
+                    <th style="width: 17%">업체명</th>
+                    <th style="width: 25%">제목</th>
+                    <th style="width: 22%">사이트 주소</th>
+                    <th style="width: 20%">기간</th>
+                    <th style="width: 8%">상태</th>
+                </tr>
+                </thead>
+                <tbody> <!--조직 테이블 데이터 출력-->
+                <tr style="height: 50px; vertical-align: middle" th:each="data:${advertisementDTOS}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                    <td th:text="${data.idx}"></td>
+                    <td th:text="${data.organization.organName}"></td>
+                    <td th:text="${data.adTitle}"></td>
+                    <td th:text="${data.adLinkUrl}"></td>
+                    <td th:text="${data.adStartDate}"></td>
+                    <td th:text="${data.adEndDate}"></td>
+                    <td th:text="${data.adState}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center" th:if="${advertisementDTOS.isEmpty()}">조회된 내역이 없습니다.</div>
+
+            <!-- 페이징 처리 시작 -->
+            <div class="d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item" th:if="${currentPage>1}">
+                        <a class="page-link" th:href="@{/office/list(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage>1}">
+                        <a class="page-link" th:href="@{/office/list(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                    </li>
+
+                    <li class="page-item" th:each="page:${#numbers.sequence(startPage, endPage, 1)}" th:class="${page == currentPage} ? 'active' : ''">
+                        <a class="page-link" th:if="${page != currentPage}"
+                           th:href="@{/office/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                        <!-- 현재 페이지일 때는 링크 없이 텍스트만 표시 -->
+                        <span th:if="${page == currentPage}" class="page-link" th:text="${page}"></span>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage<endPage}">
+                        <a class="page-link" th:href="@{/office/list(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage<endPage}">
+                        <a class="page-link" th:href="@{/office/list(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- 페이징 처리 끝 -->
+
+
+            <!-- 등록 모달 열기 버튼 시작 -->
+            <div class="d-flex justify-content-end">
+                <button id="btn-add" type="button" class="btn btn-success">추가</button>
+            </div>
+            <!-- 등록 모달 열기 버튼 끝 -->
+
+        </div>
+        <!-- 페이지 끝 -->
+    </div>
+
+    <!-- 광고 등록 모달 시작 -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="modal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="title" class="fw-light">광고 등록</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                </div>
+                <!--입력폼-->
+                <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                <form id="addForm" method="post">
+                    <div class="modal-body">
+                        <p>새로운 광고를 등록합니다.</p>
+
+                        <div class="row">
+                            <!-- 연관 조직 -->
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*업체 :</label>
+                                    <span class="d-flex">
+                                        <input style="width: 83%; background: ghostwhite" id="organName" name="organName" type="text" class="form-control me-3" readonly>
+                                        <button type="button" id="searchButton" class="btn btn-success">검색</button> <!-- 조직 검색 버튼 -->
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- 광고 상태 -->
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*진행 여부 :</label>
+                                    <select id="adState" name="adState" class="form-select" required>
+                                        <option value="Y">진행</option>
+                                        <option value="N">미진행</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 광고 제목 -->
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*제목 :</label>
+                                    <input id="adTitle" name="adTitle" type="text" class="form-control" placeholder="제목을 입력하세요." required maxlength="100"/>
+                                </div>
+                            </div>
+
+                            <!-- 광고 링크 -->
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*링크 :</label>
+                                    <input id="adLinkUrl" name="adLinkUrl" type="text" class="form-control" placeholder="링크를 입력하세요." required maxlength="100"/>
+                                </div>
+                            </div>
+
+                            <!-- 광고 기간 -->
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*기간 :</label>
+                                    <span class="d-flex">
+                                        <input style="width: 47%" id="adStartDate" name="adStartDate" type="datetime-local" class="form-control" required/>&nbsp;~&nbsp;
+                                        <input style="width: 47%" id="adEndDate" name="adEndDate" type="datetime-local" class="form-control" required/>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- 광고 이미지 -->
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*이미지 첨부 :</label>
+                                    <input id="adImgUrl" name="adImgUrl" type="text" class="form-control" placeholder="대표 연락처를 입력하세요." required maxlength="100"/>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- 광고 등록 모달 끝 -->
+
+    <!-- 광고 검색 모달 시작 -->
+    <div class="modal fade" id="searchModal" tabindex="-1" role="modal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="searchTitle" class="fw-light">업체 검색</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                </div>
+                <!--입력폼-->
+                <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                <form id="searchForm" method="post">
+                    <div class="modal-body">
+                        <p>업체를 검색합니다.</p>
+
+                        <div class="row">
+                            <!-- 연관 조직 -->
+                            <div class="col-3">
+                                <div class="form-group form-group-default">
+                                    <label>*분류 :</label>
+                                    <select id="searchType" name="searchType" class="form-select" required>
+                                        <option value="HO">본사</option>
+                                        <option value="BO">지사</option>
+                                        <option value="SHOP">매장</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*업체 검색 :</label>
+                                    <span class="d-flex">
+                                        <!--검색할 단어 입력-->
+                                        <input type="text" style="width: 83%" class="form-control me-3" name="keyword" th:value="${keyword}" placeholder="조직명을 입력하세요"/>
+                                        <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
+                                        <button type="submit" class="btn btn-success">조회</button>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!--조회 테이블-->
+                            <table class="table table-bordered mt-2" style="text-align: center">
+                                <thead>
+                                <tr style="height: 50px; vertical-align: middle"> <!--테이블 제목-->
+                                    <th style="width: 20%">분류</th>
+                                    <th style="width: 50%">업체명</th>
+                                    <th style="width: 30%">상태</th>
+                                </tr>
+                                </thead>
+                                <tbody> <!--조직 테이블 데이터 출력-->
+                                <tr class="overflow-auto" style="height: 50px; vertical-align: middle" th:each="data:${organizationDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                                    <td th:text="${data.idx}"></td>
+                                    <td th:text="${data.organization.organName}"></td>
+                                    <td th:text="${data.adTitle}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-center" th:if="${advertisementDTOS.isEmpty()}">조회된 내역이 없습니다.</div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- 광고 검색 모달 끝 -->
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+
+            // 광고 등록 모달에서 검색 버튼을 클릭했을 때
+            $("#searchButton").on('click', function() {
+
+                // 이전 모달창을 화면에서 숨긴다.
+                $("#addModal").modal('hide');
+
+                // 검색 모달창을 화면에 띄운다.
+                $("#searchModal").modal('show');
+
+            });
+
+            // 광고 목록에서 추가를 클릭했을 때
+            $("#btn-add").on('click', function() {
+
+                // 모달창을 화면에 띄운다.
+                $("#addModal").modal('show');
+
+            });
+
+            // 광고 등록 모달에서 저장 버튼 클릭 시
+            $('#addButton').on('click', function(){
+
+                // id가 addForm인 태그내에 있는 모든 데이터를 읽어온다.
+                var form = $("#addForm")[0];
+                var formData = new FormData(form);
+
+                // 폼 검증 수행
+                if(form.checkValidity() === false) {    // 유효성 검사시 폼의 오류가 발생하면
+                    form.reportValidity();              // 브라우저에 해당 필드에 메세지를 출력
+                    return;
+                }
+
+                $('#addModal').modal('hide');           // 등록 모달창 숨김
+
+                $.ajax({
+                    // Controller에 신규등록 요청
+                    url: '/office/organ/register',
+                    type: 'POST',
+                    data: formData,                     // JSON.stringify(courseData),
+                    processData: false,
+                    contentType: false,
+
+                    success: function(response) {       // Controller에서 처리가 성공하였을 경우
+                        // 새로운 성공 알림창을 띄운다.
+                        Swal.fire({
+                            title: "등록 완료",
+                            text: "조직이 등록되었습니다.",
+                            icon: "success"
+                        }).then(() => {
+                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function(xhr, status, error) {   // Controller에서 처리가 실패하였을 경우
+                        // 새로운 오류 알림창을 띄운다.
+                        Swal.fire({
+                            title: "오류 발생",
+                            text: "문제가 발생했습니다. 다시 시도해 주세요.",
+                            icon: "error"
+                        });
+                        // 변화된 내용이 없으므로 목록페이지는 다시 읽지 않는다.
+                    }
+                });
+            });
+
+        });
+    </script>
+
+</div>
+
 </body>
 </html>

@@ -25,8 +25,6 @@ public class AdvertisementDTO {
 
     private String adState;               // 상태(N:안함, Y:진행중)
 
-    private String activeYn;              // 활성유무(N: 비활성, Y: 활성)
-
     private int adHits;                   // 조회 수
 
     private OrganizationDTO organization; // 조직 DTO

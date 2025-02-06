@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.controller.qna;
 
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
+import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
@@ -12,8 +13,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
@@ -23,6 +26,7 @@ import java.util.Map;
 public class QnaController {
     // final 선언
     private final QnaService qnaService;
+    private final MemberRepository memberRepository;
 
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
     // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
@@ -64,6 +68,7 @@ public class QnaController {
             log.info("유효성 검사 오류 발생");
             return "qna/register"; // register로 돌아간다
         }
+
         // 유효성 검사 성공 시 등록 처리
         qnaService.qnaRegister(qnaDTO);
 
@@ -120,4 +125,10 @@ public class QnaController {
         return "redirect:/qna/list";
     }
 
+    @GetMapping("/qna/favYn/update")
+    public String updateFavYn(@RequestParam Integer idx, @RequestParam String favYn) {
+        // favYn 값에 따라 자주 묻는 질문을 등록하거나 해제하는 로직
+        qnaService.updateFavYn(idx, favYn);
+        return "redirect:/qna/read?idx=" + idx; // 상세 페이지로 리다이렉트
+    }
 }

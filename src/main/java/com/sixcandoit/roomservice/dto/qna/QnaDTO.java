@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.dto.qna;
 
+import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -31,5 +32,14 @@ public class QnaDTO {
     private LocalDateTime modDate;      // 수정 일자
     private List<ReplyDTO> replyList;    // 댓글 목록
     private String qnaImg;              // 문의사항 이미지
+    private String favYn;              // 자주 묻는 질문 설정 (Y: 활성, N: 비활성)
 
+    private MemberDTO memberDTO;       // Member 참조
+
+    public QnaDTO setMemberDTO(MemberDTO memberDTO){
+        this.memberDTO = memberDTO;
+        return this;
+    }
+
+    private String memberIdx;           // 멤버 idx
 }

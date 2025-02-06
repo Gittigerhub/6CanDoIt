@@ -1,11 +1,9 @@
 package com.sixcandoit.roomservice.service;
 
 import com.sixcandoit.roomservice.dto.AdvertisementDTO;
-import com.sixcandoit.roomservice.dto.qna.QnaDTO;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.AdvertisementEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
-import com.sixcandoit.roomservice.entity.qna.QnaEntity;
-import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
 import com.sixcandoit.roomservice.repository.AdvertisementRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import jakarta.transaction.Transactional;
@@ -18,7 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -124,6 +124,28 @@ public class AdvertisementService {
                 data -> modelMapper.map(data, AdvertisementDTO.class));
 
         return advertisementDTOS;
+    }
+
+    // 업체 조회
+    public List<OrganizationDTO> searchOrgan(String searchType, String searchWord){
+
+        // 1. 조회
+        List<OrganizationEntity> organizationEntities;
+
+        // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
+        if (searchWord == null) {                         // 타입만 존재한다면
+            organizationEntities = organizationRepository.findByOrganType(searchType);
+        } else {                                          // 검색어와 타입이 존재한다면
+            organizationEntities = organizationRepository.findByOrganTypeAndOrganNameLikeIgnoreCase(searchType, searchWord);
+        }
+
+        // 2. Entity를 DTO로 변환 후 저장
+        List<OrganizationDTO> organizationDTOS = organizationEntities.stream()
+                .map( data -> modelMapper.map( data, OrganizationDTO.class) )
+                .collect(Collectors.toList());
+
+        // 3. 조회 값 반환
+        return organizationDTOS;
     }
 
     // 광고 상세보기

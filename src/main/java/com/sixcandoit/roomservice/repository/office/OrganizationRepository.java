@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface OrganizationRepository extends JpaRepository<OrganizationEntity, Integer> {
 
@@ -36,5 +38,15 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     // 매사 + 조직명
     @Query("SELECT o FROM OrganizationEntity o WHERE o.organName like %:keyword% and o.organType = 'SHOP'")
     Page<OrganizationEntity> searchSHOPName(@Param("keyword") String keyword, Pageable pageable);
+
+    // ==============================
+
+    // 분류에 따른 조회
+    List<OrganizationEntity> findByOrganType(String searchType);
+
+    List<OrganizationEntity> findByOrganTypeAndOrganNameLikeIgnoreCase(String searchType, String searchWord);
+    // 본사 + 조직명
+
+
 
 }

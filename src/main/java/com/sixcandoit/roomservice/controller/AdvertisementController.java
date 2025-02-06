@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.controller;
 
 import com.sixcandoit.roomservice.dto.AdvertisementDTO;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.service.AdvertisementService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -70,6 +72,28 @@ public class AdvertisementController {
 
             // 등록 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("광고 등록을 실패하였습니다.");
+        }
+
+    }
+
+    // 모달 광고 등록 업체 조회
+    @PostMapping("/search/list")
+    @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
+    public ResponseEntity<List<OrganizationDTO>> searchOrgan(@RequestParam(value = "searchType", defaultValue = "") String searchType,
+                                              @RequestParam(value = "searchWord", defaultValue = "") String searchWord) {
+
+        try {
+            // 서비스에 조회 요청
+            List<OrganizationDTO> organizationDTO = advertisementService.searchOrgan(searchType, searchWord);
+
+            // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
+            return ResponseEntity.ok(organizationDTO);
+
+        } catch (Exception e) {
+            log.error("등록 중 오류발생", e);
+
+            // 등록 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
     }

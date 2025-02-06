@@ -3,6 +3,7 @@ package com.sixcandoit.roomservice.service.qna;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
+import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,16 @@ public class QnaService {
     private final QnaRepository qnaRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
+    private final MemberRepository memberRepository;
 
     // Qna의 Q 쓰기
     public void qnaRegister(QnaDTO qnaDTO){
-        // DTO로 Entity 변환
-        QnaEntity qnaEntity = modelMapper.map(qnaDTO, QnaEntity.class);
+        // DTO를 Entity로 변환
+        QnaEntity qnaEntity =
+                modelMapper.map(qnaDTO, QnaEntity.class);
+        // FavYn의 기본값 N(1:1 질문)으로 설정
+        qnaEntity.setFavYn("N");
         // 저장
-
         qnaRepository.save(qnaEntity);
     }
 
@@ -72,7 +76,7 @@ public class QnaService {
     public Page<QnaDTO> qnaList(Pageable page, String type, String keyword){
 
         int currentPage = page.getPageNumber()-1; // 화면의 페이지 번호를 db 페이지 번호로
-        int pageLimit = 5; // 한 페이지를 구성하는 레코드 수
+        int pageLimit = 10; // 한 페이지를 구성하는 레코드 수
 
         // 지정된 내용으로 페이지 정보를 재생산, 정렬 내림차순 DESC
         Pageable pageable = PageRequest.of(currentPage, pageLimit,
@@ -120,6 +124,28 @@ public class QnaService {
         QnaDTO qnaDTO = modelMapper.map(qnaEntity, QnaDTO.class);
 
         return qnaDTO;
+    }
+
+    // 자주 묻는 질문 설정 (favYn) 업데이트
+    public void updateFavYn(Integer idx, String favYn) {
+        // Qna 엔티티 조회
+        Optional<QnaEntity> qnaEntityOpt = qnaRepository.findById(idx);
+
+        if (qnaEntityOpt.isPresent()) {
+            // QnaEntity 가져오기
+            QnaEntity qnaEntity = qnaEntityOpt.get();
+
+            // favYn 값 업데이트
+            qnaEntity.setFavYn(favYn);
+
+            // 변경된 값을 DB에 저장
+            qnaRepository.save(qnaEntity);
+
+            log.info("Qna(idx=" + idx + ")의 favYn이 " + favYn + "으로 업데이트되었습니다.");
+        } else {
+            // 해당 Qna가 존재하지 않으면 예외 처리
+            throw new IllegalStateException("해당 Qna가 존재하지 않습니다.");
+        }
     }
 }
 

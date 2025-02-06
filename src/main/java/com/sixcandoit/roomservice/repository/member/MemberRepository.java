@@ -26,5 +26,3 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Integer> {
     @Query("SELECT m FROM MemberEntity m WHERE m.memberEmail like %:keyword% or m.memberName like %:keyword%")
     Page<MemberEntity> search(String keyword, Pageable pageable);
 }
-
-// ㅡㅡ 아놔

@@ -20,26 +20,35 @@
                 <!--디자인-->
                 <div class="card">
                     <div class="card-header">
-                        <h4>Q 상세보기</h4>
+                        <h4>Q</h4>
                     </div>
                     <div class="card-body">
                         <p>번호:<span th:text="${qnaDTO.idx}"></span></p>
                         <p>제목:<span th:text="${qnaDTO.qnaTitle}"></span></p>
                         <p>내용:<span th:text="${qnaDTO.qnaContents}"></span></p>
                         <p>등록일:
-                            <span th:text="${#temporals.format(qnaDTO.insDate, 'yyyy-MM-dd')}"></span>
+                            <span th:text="${#temporals.format(qnaDTO.insDate, 'yyyy-MM-dd HH:mm')}"></span>
                         </p>
                         <p>수정일:
-                            <span th:text="${#temporals.format(qnaDTO.modDate, 'yyyy-MM-dd')}"></span>
+                            <span th:text="${#temporals.format(qnaDTO.modDate, 'yyyy-MM-dd HH:mm')}"></span>
                         </p>
                     </div>
                     <div class="card-footer">
                         <a th:href="@{/qna/update(idx=${qnaDTO.idx})}" class="btn btn-primary">수정</a>
                         <a th:href="@{/qna/delete(idx=${qnaDTO.idx})}" class="btn btn-danger">삭제</a>
-
+                        <!-- 자주 묻는 질문 등록 (a 태그) -->
+                        <a th:if="${qnaDTO.favYn == 'N'}"
+                           th:href="@{/qna/favYn/update(idx=${qnaDTO.idx}, favYn='Y')}"
+                           class="btn btn-warning">자주 묻는 질문으로 등록</a>
+                        <!-- 자주 묻는 질문 해제 (a 태그) -->
+                        <a th:if="${qnaDTO.favYn == 'Y'}"
+                           th:href="@{/qna/favYn/update(idx=${qnaDTO.idx}, favYn='N')}"
+                           class="btn btn-secondary">자주 묻는 질문 해제</a>
+                        <p>자주 묻는 질문 상태: <span th:text="${qnaDTO.favYn}"></span></p>
                         <!-- 답변 등록 버튼 (모달 띄우기) -->
                         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#replyModal">답변 등록</button>
                     </div>
+
                 </div>
 
                 <!-- 답변 등록 모달 -->
@@ -76,16 +85,16 @@
                 <!-- 답변 목록 -->
                 <div th:each="reply : ${qnaDTO.replyList}" class="card mt-3">
                     <div class="card-header">
-                        <h4>A 목록</h4>
+                        <h4>A</h4>
                     </div>
                     <div class="card-body">
                         <p>제목:<span th:text="${reply.replyTitle}"></span></p>
                         <p>내용:<span th:text="${reply.replyContents}"></span></p>
                         <p>등록일:
-                            <span th:text="${#temporals.format(reply.insDate, 'yyyy-MM-dd')}"></span>
+                            <span th:text="${#temporals.format(reply.insDate, 'yyyy-MM-dd HH:mm')}"></span>
                         </p>
                         <p>수정일:
-                            <span th:text="${#temporals.format(reply.modDate, 'yyyy-MM-dd')}"></span>
+                            <span th:text="${#temporals.format(reply.modDate, 'yyyy-MM-dd HH:mm')}"></span>
                         </p>
                     </div>
                     <div class="card-footer">
@@ -135,7 +144,11 @@
         </div><!--row끝-->
     </div>
 </div>
-<script>
-</script>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+    </script>
+</th:block>
+
 </body>
 </html>

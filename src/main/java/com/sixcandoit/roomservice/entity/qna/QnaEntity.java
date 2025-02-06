@@ -34,6 +34,9 @@ public class QnaEntity extends BaseEntity {
     @Column(name = "qna_hits", columnDefinition = "integer default 0", nullable = false)
     private int qnaHits;               // 조회 수
 
+    @Column(name = "fav_yn")
+    private String favYn;              // 자주 묻는 질문 설정 (Y: 활성, N: 비활성)
+
     // 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")

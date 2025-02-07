@@ -1,62 +1,82 @@
 package com.sixcandoit.roomservice.service.notice;
 
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
-
-
 import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
 import com.sixcandoit.roomservice.repository.notice.NoticeRepository;
-
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
+@Log
+@RequiredArgsConstructor // Lombok을 이용한 생성자 자동 생성
 public class NoticeService {
-    //@Autowired
-    //private NoticeRepository noticeRepostiory;
-    private final NoticeRepository noticeRepository;
-    private final ModelMapper modelMapper;
-    //Controller와 Service는 DTO로 전달
 
-    public void register(NoticeDTO noticeDTO) {//삽입,입력폼에서 입력받은 내용을 데이터베이스 저장
-        //DTO로 Entity변환
-        //map은 변수,값으로 구성된 배열
-        //noticeDTO변수들을 NoticeEntity에 변수에 맞게 변한
+    private final NoticeRepository noticeRepository; // final로 설정 (반드시 주입되어야 함)
+    private final ModelMapper modelMapper;
+
+    public void noticeRegister(NoticeDTO noticeDTO) {
         NoticeEntity noticeEntity = modelMapper.map(noticeDTO, NoticeEntity.class);
         noticeRepository.save(noticeEntity);
     }
-    public void update(NoticeDTO noticeDTO) {//수정,수정폼에서 수정한 내용을 데이터베이스 저장
-        //해당 데이터의 id로 조회해서
-        Optional<NoticeEntity> noticeEntity = noticeRepository.findById(noticeDTO.getIdx());
 
-        if (noticeEntity.isPresent()) {//존재하면 수정
+    public void noticeUpdate(NoticeDTO noticeDTO) {
+        Optional<NoticeEntity> noticeEntity = noticeRepository.findById(noticeDTO.getIdx());
+        if (noticeEntity.isPresent()) {
             NoticeEntity noticeEntity1 = modelMapper.map(noticeDTO, NoticeEntity.class);
             noticeRepository.save(noticeEntity1);
         }
     }
-    public void delete(Integer idx) {//삭제,게시글번호로 해당 자료를 데이터베이스에서 삭제
-        noticeRepository.deleteById(idx);
-    }
-    public List<NoticeDTO> list() {//전체목록,데이터베이스에서 모든 데이터를 화면에 출력
-        List<NoticeEntity> noticeEntities = noticeRepository.findAll(); //모두조회
-        //Repository<->Service Entity<-> DTO Controller
-        //여러개의 레코드를 하나씩 DTO로 변환해서 다시 배열에 저장
-        List<NoticeDTO> noticeDTOS = Arrays.asList(modelMapper.map(noticeEntities, NoticeDTO[].class));
-        return noticeDTOS;
-    }
-    public NoticeDTO read(Integer idx) {//개별정보,게시글번호의 데이터를 화면에 출력
-        Optional<NoticeEntity> noticeEntity = noticeRepository.findById(idx);
 
-        NoticeDTO noticeDTO = modelMapper.map(noticeEntity, NoticeDTO.class);
-        return noticeDTO;
+    public void noticeDelete(Integer idx) {noticeRepository.deleteById(idx);}
+
+    public Page<NoticeDTO> noticeList(Pageable page, String type, String keyword) {
+        Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
+
+        Page<NoticeEntity> noticeEntities;
+
+
+        if (keyword != null) {
+            log.info("검색어가 존재하면");
+            if (type.equals("1")) {
+                log.info("제목으로 검색을 하는 중");
+                noticeEntities = noticeRepository.searchNoticeTitle(keyword, pageable);
+            } else if (type.equals("2")) {
+                log.info("내용으로 검색하는 중");
+                noticeEntities = noticeRepository.searchNoticeContents(keyword, pageable);
+            } else {
+                log.info("모든 대상으로 검색을 하는 중");
+                noticeEntities = noticeRepository.searchAll(keyword, pageable);
+            }
+        } else {
+            noticeEntities = noticeRepository.findAll(pageable);
+        }
+
+        return noticeEntities.map(data -> modelMapper.map(data, NoticeDTO.class));
     }
 
-}
+    public void count(Integer idx) {
+        NoticeEntity noticeEntity = noticeRepository.findById(idx).orElseThrow();
+        noticeEntity.setNoticeHits(noticeEntity.getNoticeHits() + 1);
+        noticeRepository.save(noticeEntity);
+    }
+    public NoticeDTO noticeRead(Integer idx) {
+        // 1. 게시글 조회
+        NoticeEntity noticeEntity = noticeRepository.findById(idx)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. idx=" + idx));
+
+        // 2. Entity -> DTO 변환
+        return modelMapper.map(noticeEntity, NoticeDTO.class);
+    }
+
+    }
+

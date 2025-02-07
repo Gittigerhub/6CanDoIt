@@ -3,7 +3,6 @@ package com.sixcandoit.roomservice.service.qna;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
-import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ public class QnaService {
     private final QnaRepository qnaRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
-    private final MemberRepository memberRepository;
 
     // Qna의 Q 쓰기
     public void qnaRegister(QnaDTO qnaDTO){

@@ -9,6 +9,10 @@ import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -23,6 +27,10 @@ public class RoomService {
     public void roomRegister(RoomDTO roomDTO){
         // DTO로 Entity 변환
         RoomEntity roomEntity = modelMapper.map(roomDTO, RoomEntity.class);
+        // 룸 기본 값:
+        roomEntity.setRoomView("N"); // 창문 없음
+        roomEntity.setRoomSeason("off"); // 비성수기
+        roomEntity.setRoomCondition("Y"); // 청소 완료
         // 저장
         roomRepository.save(roomEntity);
     }
@@ -30,5 +38,19 @@ public class RoomService {
     // 룸 수정
     // 룸 삭제
     // 룸 목록
+    public List<RoomDTO> roomList(){
+        // 모두 조회
+        List<RoomEntity> roomEntities = roomRepository.findAll();
+        // DTO로 변환 -> 배열에 저장 -> List 변환
+        List<RoomDTO> roomDTOS = Arrays.asList(modelMapper.map(roomEntities, RoomDTO[].class));
+
+        return roomDTOS;
+    }
     // 룸 상세보기
+    public RoomDTO roomDetail(Integer idx){
+        Optional<RoomEntity> roomEntity = roomRepository.findById(idx);
+
+        RoomDTO roomDTO = modelMapper.map(roomEntity, RoomDTO.class);
+        return roomDTO;
+    }
 }

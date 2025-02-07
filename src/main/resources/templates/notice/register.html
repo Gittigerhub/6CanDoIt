@@ -11,9 +11,11 @@
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
+
+
     <div class="container p-5 bg-white">
         <h2 class="text-center mb-4">공지사항 등록</h2>
-        <form th:action="@{/notice/register}" th:object="${noticeDTO}" method="post">
+        <form th:action="@{/notice/register}" th:object="${noticeDTO}" method="post" enctype="multipart/form-data">
             <!-- 제목 입력 필드 -->
             <div class="mb-3">
                 <label for="noticeTitle" class="form-label">제목</label>
@@ -44,7 +46,10 @@
 
             <!-- 등록 버튼 -->
             <div class="d-flex justify-content-center">
-                <a th:href="@{/notice/list}" class="btn btn-primary">등록</a>
+                <button type="submit" class="btn btn-primary">등록</button>
+                <button type="reset" class="btn btn-secondary">초기화</button>
+                <button type="button" class="btn btn-danger"
+                        th:onclick="|location.href='@{/notice/list}'|">취소</button>
             </div>
         </form>
     </div>

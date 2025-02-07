@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -34,10 +36,14 @@ public class NoticeEntity extends BaseEntity {
     @Column(name = "notice_hits")
     private int noticeHits;               // 조회 수
 
+    @Column(name = "notice_date")
+    private LocalDate noticeDate;
+
     // 관리자 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_idx")
     @JsonBackReference
     private AdminEntity adminJoin;
 
-}
+
+    }

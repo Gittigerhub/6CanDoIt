@@ -24,15 +24,76 @@
                             <h4>객실 등록</h4>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3 mt-3"><!--객실 이름-->
-                                <label for="qnaTitle" class="form-label">객실 이름:</label>
-                                <input type="text" th:field="*{roomName}" class="form-control" id="qnaTitle" name="qnaTitle" placeholder="객실 이름을 입력하세요.">
+                            <div class="mb-3 mt-3"><!--객실 유형-->
+                                <label for="roomType" class="form-label">객실 타입:</label>
+                                <select id="roomType" th:field="*{roomType}" class="form-select" aria-label="Default select example">
+                                    <option value="STD" selected>스탠다드</option>
+                                    <option value="ROH">런 오브 하우스</option>
+                                    <option value="MOD">모더레이트</option>
+                                    <option value="SUP">슈페리어</option>
+                                    <option value="DLX">디럭스</option>
+                                    <option value="STU">스튜디오</option>
+                                    <option value="JRSTE">쥬니어 스위트</option>
+                                    <option value="STE">스위트</option>
+                                    <option value="PH">팬트하우스</option>
+                                </select>
+                                <label for="roomName" class="form-label">객실 이름:</label>
+                                <input type="text" th:field="*{roomName}" class="form-control" id="roomName" name="roomName">
+                                <label for="roomBed" class="form-label">침대 유형:</label>
+                                <select id="roomBed" th:field="*{roomBed}" class="form-select" aria-label="Default select example">
+                                    <option value="0" selected>싱글 사이즈</option>
+                                    <option value="1">더블 사이즈</option>
+                                    <option value="2">퀸 사이즈</option>
+                                    <option value="3">킹 사이즈</option>
+                                </select>
+                                <label for="roomSize" class="form-label">객실 크기:</label>
+                                <input type="number" th:field="*{roomSize}" class="form-control" id="roomSize" name="roomSize">
+                                <label for="roomNum" class="form-label">투숙객 수:</label>
+                                <input type="number" th:field="*{roomNum}" class="form-control" id="roomNum" name="roomNum">
+                                <label for="roomPrice" class="form-label">객실 가격:</label>
+                                <input type="number" th:field="*{roomPrice}" class="form-control" id="roomPrice" name="roomPrice">
                             </div>
                             <div class="mb-3 mt-3"><!--객실 정보-->
-                                <label for="qnaContents">객실 정보:</label>
-                                <textarea th:field="*{roomInfo}" class="form-control" rows="5" id="qnaContents" name="qnaContents" placeholder="객실 정보를 입력하세요."></textarea>
+                                <label for="roomInfo">객실 정보:</label>
+                                <textarea th:field="*{roomInfo}" class="form-control" rows="5" id="roomInfo" name="roomInfo" placeholder="객실 정보를 입력하세요."></textarea>
                             </div>
-                        </div>
+                            <div class="mb-3 mt-3"><!--객실 옵션-->
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" th:field="*{roomWifi}" name="roomWifi" id="inlineCheckbox1" value="Y">
+                                    <label class="form-check-label" for="inlineCheckbox1">무료 WiFi</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" th:field="*{roomTv}" name="roomTv" id="inlineCheckbox2" value="Y">
+                                    <label class="form-check-label" for="inlineCheckbox2">TV</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" th:field="*{roomAir}" name="roomAir" id="inlineCheckbox3" value="Y">
+                                    <label class="form-check-label" for="inlineCheckbox3">에어컨</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" th:field="*{roomBath}" name="roomBath" id="inlineCheckbox4" value="Y">
+                                    <label class="form-check-label" for="inlineCheckbox4">전용 욕실</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" th:field="*{roomBreakfast}" name="roomBreakfast" id="inlineCheckbox5" value="Y">
+                                    <label class="form-check-label" for="inlineCheckbox5">무료 조식 제공</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" th:field="*{roomSmokingYn}" name="roomSmokingYn" id="inlineCheckbox6" value="Y">
+                                    <label class="form-check-label" for="inlineCheckbox6">흡연 가능 여부</label>
+                                </div>
+                            </div>
+                            <div class="mb-3 mt-3"><!--체크인 체크아웃 시간 지정-->
+                                <div class="mb-3">
+                                    <label for="roomCheckIn" class="form-label">체크인 시간:</label>
+                                    <input type="time" th:field="*{roomCheckIn}" class="form-control" id="roomCheckIn" name="roomCheckIn">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="roomCheckOut" class="form-label">체크아웃 시간:</label>
+                                    <input type="time" th:field="*{roomCheckOut}" class="form-control" id="roomCheckOut" name="roomCheckOut">
+                                </div>
+                            </div>
+                            </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">등록</button>
                             <button type="reset" class="btn btn-secondary">초기화</button>

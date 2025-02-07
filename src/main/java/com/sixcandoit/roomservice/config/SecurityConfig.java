@@ -25,12 +25,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         //2-1. 매핑 권한(permitALL(), hasRole(), hasAnyRole())
+        //Controller의 모든 매핑에 대한 권한을 부여(**-모든 매핑 대응)
         http.authorizeHttpRequests((auth)->{
             auth.requestMatchers("/assets/**", "/css/**", "/js/**").permitAll();
-           //Controller의 모든 매핑에 대한 권한을 부여(**-모든 매핑 대응)
-            auth.requestMatchers("/**").permitAll();  //시작페이지는 모든 사용자 접근 가능
             auth.requestMatchers("/h2-console/**").permitAll();   //모든 매핑 허용
 
+            //시작페이지는 모든 사용자 접근 가능
             // 메인페이지 및 서브페이지
             auth.requestMatchers("/").permitAll();
 
@@ -38,10 +38,15 @@ public class SecurityConfig {
             auth.requestMatchers("/login","/register", "/password").permitAll();
 
             //인증된 사용자만 접근 가능
-            auth.requestMatchers("/modify","/logout").authenticated();  //수정,로그아웃
+            //auth.requestMatchers("/modify","/logout").authenticated();  //수정,로그아웃
 
             // 조직-매장 페이지 접근 권한
             auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
+
+            // 광고 페이지 접근 권한
+            auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
+
+            // 이벤트, 회원포인트 페이지 접근 권한
             auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
 
 //            auth.requestMatchers("/member").hasRole("MEMBER");  //USER사용자만 /user매핑으로 접근가능

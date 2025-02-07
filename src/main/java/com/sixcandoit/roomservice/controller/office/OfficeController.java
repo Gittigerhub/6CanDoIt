@@ -29,7 +29,7 @@ public class OfficeController {
 
     private final OrganizationService organizationService;
     private final ModelMapper modelMapper;
-    private final PageNationUtil   pageNationUtil;
+    private final PageNationUtil pageNationUtil;
     private final ShopDetailService shopDetailService;
 
 

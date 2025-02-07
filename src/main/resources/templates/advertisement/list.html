@@ -55,9 +55,8 @@
                 <tr style="height: 50px; vertical-align: middle"> <!--테이블 제목-->
                     <th style="width: 8%">No</th>
                     <th style="width: 17%">업체명</th>
-                    <th style="width: 30%">제목</th>
-                    <th style="width: 22%">사이트 주소</th>
-                    <th style="width: 15%">기간</th>
+                    <th style="width: 41%">제목</th>
+                    <th style="width: 26%">기간</th>
                     <th style="width: 8%">상태</th>
                 </tr>
                 </thead>
@@ -68,10 +67,9 @@
                     <td>
                         <a th:href="@{/advertisement/read(idx=${data.idx})}" th:text="${data.adTitle}"></a>
                     </td>
-                    <td th:text="${data.adLinkUrl}"></td>
                     <td>
-                        <span th:text="${#temporals.format(data.adStartDate, 'yy/MM/dd HH:mm')}"></span> ~
-                        <span th:text="${#temporals.format(data.adEndDate, 'yy/MM/dd HH:mm')}"></span>
+                        <span th:text="${#temporals.format(data.adStartDate, 'yyyy/MM/dd HH:mm')}"></span> ~
+                        <span th:text="${#temporals.format(data.adEndDate, 'yyyy/MM/dd HH:mm')}"></span>
                     </td>
                     <td>
                         <button style="font-size: 12px" th:if="${data.adState == 'Y'}" class="btn btn-primary">활성화</button>

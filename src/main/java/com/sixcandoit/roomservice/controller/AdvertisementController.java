@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -99,10 +100,11 @@ public class AdvertisementController {
     }
 
     // 광고 수정하기
-    @PostMapping("/update")
+    @PostMapping("/update/update")
     @ResponseBody
-    public ResponseEntity<String> ShopDetailUpdate(@ModelAttribute AdvertisementDTO advertisementDTO){
+    public ResponseEntity<String> qweUpdate(@ModelAttribute AdvertisementDTO advertisementDTO) throws Exception {
 
+        log.info("업데이트 진행");
         try {
             // 서비스에 수정 요청
             advertisementService.adUpdate(advertisementDTO);
@@ -115,6 +117,17 @@ public class AdvertisementController {
             // 수정 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패 하였습니다.");
         }
+    }
+
+    // 모달로 수정시 페이지 값 집어넣기
+    @GetMapping("/update/read")
+    @ResponseBody
+    public Map<String, Object> updateRead(@RequestParam Integer idx, Map map){
+        AdvertisementDTO advertisementDTO = advertisementService.adRead(idx);
+        Map<String,Object> response = new HashMap<>();
+        response.put("advertisementDTO",advertisementDTO);
+
+        return response;
     }
 
     // 광고 상세보기
@@ -132,15 +145,18 @@ public class AdvertisementController {
     }
 
     // 광고 삭제하기
-    @PostMapping("/delete")
-    public String delete(Integer idx){
+    @GetMapping("/delete")
+    @ResponseBody
+    public ResponseEntity<String> MemberPointDelete(@RequestParam Integer idx){
 
-        log.info("데이터를 삭제합니다.");
+        try {
+            // idx로 데이터를 조회하여 삭제
+            advertisementService.adDelete(idx);
 
-        // idx로 조회한 데이터 삭제
-        advertisementService.adDelete(idx);
-
-        return "redirect:/advertisement/list";
+            return  ResponseEntity.ok("삭제하였습니다.");
+        }catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제를 실패 하였습니다.");
+        }
     }
 
 }

@@ -42,14 +42,11 @@ public class AdvertisementEntity extends BaseEntity {
     @Column(name = "ad_state")
     private String adState;              // 상태(N:안함, Y:진행중)
 
-    @Column(name = "active_yn")
-    private String activeYn;             // 활성유무(N: 비활성, Y: 활성)
-
     @Column(name = "ad_hits")
     private int adHits;                  // 조회 수
 
     // 조직 테이블과 N:1 매핑
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_idx")
     @JsonBackReference
     private OrganizationEntity organizationJoin;

@@ -67,27 +67,32 @@ public class AdvertisementService {
     ----------------------------------------------------------------------------- */
     public void adUpdate(AdvertisementDTO advertisementDTO) {
 
-        // idx로 수정할 데이터 조회
-        Optional<AdvertisementEntity> advertisementEntity = advertisementRepository.findById(advertisementDTO.getIdx());
+        try {
+            // idx로 수정할 데이터 조회
+            Optional<AdvertisementEntity> advertisementEntity = advertisementRepository.findById(advertisementDTO.getIdx());
 
-        if (advertisementEntity.isPresent()){               // advertisementEntity가 존재하면
+            if (advertisementEntity.isPresent()){               // advertisementEntity가 존재하면
 
-            log.info("수정 진행");
-            // DTO -> Entity로 변환
-            AdvertisementEntity advertisement = modelMapper.map(advertisementDTO, AdvertisementEntity.class);
+                log.info("수정 진행");
+                // DTO -> Entity로 변환
+                AdvertisementEntity advertisement = modelMapper.map(advertisementDTO, AdvertisementEntity.class);
+                log.info(advertisement);
+                // 조직 ID로 조회하여 데이터 가져오기
+                OrganizationEntity organization = organizationRepository.findById(advertisementDTO.getOrganization().getIdx())
+                        .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
 
-            // 조직 ID로 조회하여 데이터 가져오기
-            OrganizationEntity organization = organizationRepository.findById(advertisementDTO.getOrganization().getIdx())
-                    .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
+                log.info(organization);
+                // 광고테이블에 연관관계 조직테이블 데이터 추가
+                advertisement.setOrganizationJoin(organization);
+                log.info(advertisement);
+                // Entity 테이블에 저장
+                advertisementRepository.save(advertisement);
 
-            // 광고테이블에 연관관계 조직테이블 데이터 추가
-            advertisement.setOrganizationJoin(organization);
-
-            // Entity 테이블에 저장
-            advertisementRepository.save(advertisement);
-
-        } else {                                            // advertisementEntity가 존재하지 않으면
-            throw new IllegalStateException("수정할 데이터가 존재하지 않습니다.");
+            } else {                                            // advertisementEntity가 존재하지 않으면
+                throw new IllegalStateException("수정할 데이터가 존재하지 않습니다.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("조직 수정 실패: "+e.getMessage());
         }
 
     }

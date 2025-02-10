@@ -62,13 +62,17 @@ public class SecurityConfig{
     public SecurityFilterChain filterChain1(HttpSecurity http) throws Exception {
         //사용권한
         http//.addFilterBefore(userAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .securityMatcher("/admin/**").authorizeRequests()
-                .requestMatchers("/","/assets/**", "/css/**", "/js/**", "/img/**", "/images/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/admin/login").permitAll()
-                .requestMatchers("/login", "/logout", "/member/register", "/admin/register").permitAll()
-                .requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER")
-                .requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
+                .securityMatcher("/admin/**").authorizeHttpRequests((auth)-> {
+                    auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**").permitAll();
+                    auth.requestMatchers("/h2-console/**").permitAll();
+                    auth.requestMatchers("/admin/login").permitAll();
+                    auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register").permitAll();
+                    auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER");
+                    auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
+                    // 조직-매장 페이지 접근 권한
+                    auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
+                    auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
+                        });
 
         //관리자회원 로그인
         http.formLogin(login -> login
@@ -97,12 +101,16 @@ public class SecurityConfig{
     @Order(2)
     public SecurityFilterChain filterChain2(HttpSecurity http) throws Exception {
         //사용권한
-        http.authorizeRequests()
-                .requestMatchers("/","/assets/**", "/css/**", "/js/**", "/img/**", "/images/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/login", "/logout", "/member/register", "/admin/register").permitAll()
-                .requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER")
-                .requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
+        http.authorizeHttpRequests((auth)-> {
+            auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**").permitAll();
+            auth.requestMatchers("/h2-console/**").permitAll();
+            auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register").permitAll();
+            auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER");
+            auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
+            // 조직-매장 페이지 접근 권한
+            auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
+            auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
+                });
 
         //http.exceptionHandling(exceptionHandling ->exceptionHandling
         //         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())

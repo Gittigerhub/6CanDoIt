@@ -7,10 +7,7 @@ import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -19,6 +16,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
+@Builder
 @Table(name = "admin")
 public class AdminEntity extends BaseEntity {
 
@@ -30,8 +29,8 @@ public class AdminEntity extends BaseEntity {
     @Column(name = "admin_email")
     private String adminEmail;            // 이메일
 
-    @Column(name = "admin_pwd")
-    private String adminPwd;              // 비밀번호
+//    @Column(name = "admin_pwd")
+    private String password;              // 비밀번호
 
     @Column(name = "admin_name")
     private String adminName;             // 이름
@@ -42,6 +41,7 @@ public class AdminEntity extends BaseEntity {
     @Column(name = "active_yn")
     private String activeYn;              // 활성 유무
 
+    // 관리자, 회원 구분을 위한 권한 분류
     @Enumerated(EnumType.STRING)
     private Level level;                  // 유저 권한
 

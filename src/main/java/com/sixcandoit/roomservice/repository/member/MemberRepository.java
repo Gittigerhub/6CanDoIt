@@ -20,7 +20,10 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Integer> {
     Optional<MemberEntity> findByMemberEmail(String memberEmail);
 
     //아이디와 비밀번호 조회(개별조회)
-    Optional<MemberEntity> findByMemberEmailAndMemberPwd(String memberEmail, String memberPwd);
+    Optional<MemberEntity> findByMemberEmailAndPassword(String memberEmail, String password);
+
+    // 삭제
+    void deleteByMemberEmail(String memberEmail);
 
     //회원목록 조회(다중조회)-입력받는 변수가 많은 경우 쿼리로 작성해서 변수의 수를 줄여서 사용
     @Query("SELECT m FROM MemberEntity m WHERE m.memberEmail like %:keyword% or m.memberName like %:keyword%")

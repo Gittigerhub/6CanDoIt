@@ -1,10 +1,8 @@
 package com.sixcandoit.roomservice.controller.member;
 
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
-import com.sixcandoit.roomservice.dto.member.MemberLoginDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import com.sixcandoit.roomservice.service.admin.AdminLoginService;
-import com.sixcandoit.roomservice.service.member.MemberLoginService;
+import com.sixcandoit.roomservice.service.member.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -16,39 +14,43 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/member")
 @Log4j2
-public class MemberLoginController {
-    private final MemberLoginService memberLoginService; // 서비스 연동
-    private final AdminLoginService adminLoginService;
+public class MemberController {
 
-    @GetMapping("/")
-    public String IndexForm(HttpSession session, MemberDTO memberDTO) {
-        session.setAttribute("memberName", memberDTO.getMemberName());
-        return "index";
-    }
+    private final MemberService memberService;
 
     // 회원가입
     @GetMapping("/register")
-    public String showRegisterPage(){
+    public String memberRegister() {
         return "member/register";
     }
 
     @PostMapping("/register")
-    public String registerMember(@ModelAttribute MemberLoginDTO memberLoginDTO){
-        memberLoginService.saveMember(memberLoginDTO);
+    public String registerProc(@ModelAttribute MemberDTO memberDTO){
 
-        return "redirect:/member/login";
+        if (memberService.register(memberDTO) == null){
+            return "redirect:/register";
+        }
+
+        return "redirect:/";
     }
 
     // 회원 수정
-    @GetMapping("/modify/{idx}")
-    public String showModifyPage(@PathVariable Integer idx, Model model){
-        MemberEntity member = memberLoginService.findByIdx(idx);
-        model.addAttribute("member", member);
+    @GetMapping("/modify")
+    public String showModifyPage(HttpSession session, Model model){
+        String memberEmail = (String) session.getAttribute("memberEmail");
+        MemberDTO memberDTO = new MemberDTO();
+
+        if (memberEmail != null){
+            memberDTO = memberService.read(memberEmail);
+        }
+
+        model.addAttribute("memberDTO", memberDTO);
         return "member/modify";
     }
 
     @PostMapping("/modify")
-    public String modifyMember(@ModelAttribute MemberLoginDTO memberLoginDTO){
+    public String modifyMember(@ModelAttribute MemberDTO memberDTO){
+        memberService.modify(memberDTO);
 
         return "redirect:/logout";
     }
@@ -56,15 +58,15 @@ public class MemberLoginController {
     // 임시비밀번호 발급
     @GetMapping("/password")
     public String showPasswordPage(){
-        return "member/password";
+        return "/password";
     }
 
     @PostMapping("/password")
-    public String modifyPassword(@ModelAttribute MemberLoginDTO memberLoginDTO){
-        memberLoginService.passwordSend(memberLoginDTO);
+    public String modifyPassword(@ModelAttribute MemberDTO memberDTO){
+//        memberService.passwordSend(memberDTO);
         //스크립트로 출력할 메세지를 전달
 
-        return "redirect:/login";
+        return "redirect:member/login";
     }
 
     // 로그인
@@ -78,9 +80,10 @@ public class MemberLoginController {
     // 로그아웃
     @GetMapping("/logout")
     public String showLogoutPage(HttpSession session){
-        session.invalidate(); // 해당 접속 컴퓨터의 섹션 정보를 삭제
 
-        return "redirect:/"; // 메인 또는 로그인
+        session.invalidate();
+
+        return "redirect:member/login";
     }
 
 

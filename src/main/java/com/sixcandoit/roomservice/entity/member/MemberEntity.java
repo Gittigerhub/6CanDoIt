@@ -33,8 +33,8 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "member_email")
     private String memberEmail;            // 이메일
 
-    @Column(name = "member_pwd")
-    private String memberPwd;              // 비밀번호
+//    @Column(name = "member_pwd")
+    private String password;              // 비밀번호
 
     @Column(name = "member_birth")
     private String memberBirth;            // 생년월일

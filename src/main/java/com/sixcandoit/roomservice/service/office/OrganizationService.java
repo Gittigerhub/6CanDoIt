@@ -63,7 +63,7 @@ public class OrganizationService {
                     organizationRepository.findById(organizationDTO.getIdx());
 
             if(!read.isPresent()){                      // 조회 값이 없다면
-                throw new RuntimeException("상점 조회 실패");
+                throw new RuntimeException("조직 조회 실패");
             }
             else {                                      // 조회 값이 있다면
                 // DTO -> Entity로 변환
@@ -73,7 +73,7 @@ public class OrganizationService {
                 organizationRepository.save(organ);
             }
         } catch (Exception e){
-            throw new RuntimeException("상점 수정 실패: "+e.getMessage());
+            throw new RuntimeException("조직 수정 실패: "+e.getMessage());
         }
 
     }

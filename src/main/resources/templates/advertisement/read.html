@@ -17,34 +17,42 @@
         <h2>광고 관리</h2>
 
         <div class="row p-5 bg-white">
-            <div class="mb-3">
-                <h3>광고 상세정보</h3>
+            <div class="mb-3 d-flex">
+                <h3 class="me-4">광고 상세정보</h3>
+                <span>
+                    <button style="font-size: 12px" th:if="${advertisementDTO.adState == 'Y'}" th:value="${advertisementDTO.adState}" class="btn btn-primary justify-content-start">진행중</button>
+                    <button style="font-size: 12px" th:unless="${advertisementDTO.adState == 'Y'}" th:value="${advertisementDTO.adState}" class="btn btn-danger justify-content-start">미진행</button>
+                </span>
             </div>
 
             <!-- 상세 테이블 시작 -->
-            <input type="hidden" name="idx" id="adIdx" th:data-id="${advertisementDTO.idx}">
+            <input type="hidden" id="adIdx" th:data-id="${advertisementDTO.idx}">
             <table class="table table-bordered" style="text-align: center">
                 <tbody> <!--조직 테이블 데이터 출력-->
                 <tr style="height: 50px; vertical-align: middle">
-                    <th style="width: 10%">분류</th>
-                    <td style="width: 40%; text-align: left" th:text="${advertisementDTO.adTitle}"></td>
-                    <th style="width: 10%">상태</th>
-                    <td style="width: 40%">
-                        <div class="d-flex">
-                            <button style="font-size: 12px" th:if="${organDTO.activeYn == 'Y'}" th:value="${organDTO.activeYn}" class="btn btn-primary justify-content-start">활성화</button>
-                            <button style="font-size: 12px" th:unless="${organDTO.activeYn == 'Y'}" th:value="${organDTO.activeYn}" class="btn btn-danger justify-content-start">비활성화</button>
-                        </div>
+                    <th style="width: 10%">업체명</th>
+                    <td colspan="2" style="width: 90%; text-align: left" th:text="${advertisementDTO.organization.organName}"></td>
+                </tr>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th style="width: 10%">제목</th>
+                    <td colspan="2" style="width: 90%; text-align: left" th:text="${advertisementDTO.adTitle}"></td>
+                </tr>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th style="width: 10%">링크</th>
+                    <td colspan="2" style="text-align: left" >
+                        <a th:href="@{advertisementDTO.adTitle}" th:text="${advertisementDTO.adLinkUrl}"></a>
                     </td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
-                    <th>업체명</th>
-                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
-                    <th>대표 연락처</th>
-                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                    <th>이미지</th>
+                    <td colspan="2" style="text-align: left" th:text="${advertisementDTO.adImgUrl}"></td>
                 </tr>
-                <tr style="height: 50px; vertical-align: middle">
-                    <th>주소</th>
-                    <td colspan="3" style="text-align: left" th:text="${organDTO.organAddress}"></td>
+                <tr>
+                    <th>기간</th>
+                    <td colspan="2" style="text-align: left">
+                        <span th:text="${#temporals.format(advertisementDTO.adStartDate, 'yyyy/MM/dd HH:mm')}"></span> ~
+                        <span th:text="${#temporals.format(advertisementDTO.adEndDate, 'yyyy/MM/dd HH:mm')}"></span>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -52,8 +60,8 @@
 
             <!-- 수정/취소 버튼 -->
             <div class="d-flex justify-content-end mt-5">
-                <button type="button" class="btn btn-success mx-4" id="btn-update" th:data-id="${organDTO.idx}">수정</button>
-                <button type="button" class="btn btn-danger btn-delete" th:data-id="${organDTO.idx}">삭제</button>
+                <button type="button" class="btn btn-success mx-4" id="btn-update" th:data-id="${advertisementDTO.idx}">수정</button>
+                <button type="button" class="btn btn-danger btn-delete" th:data-id="${advertisementDTO.idx}">삭제</button>
             </div>
         </div>
 
@@ -70,7 +78,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <!-- 폼 시작 -->
-                <form id="updatemodalForm">
+                <form id="updatemodalForm" method="post">
                     <input type="hidden" id="idx" name="idx">
                     <!-- Modal body -->
                     <div class="modal-body">
@@ -78,40 +86,54 @@
                             <div class="col-12">
                                 <div class="form-group form-group-default">
                                     <label>*상태 :</label>
-                                    <select id="activeYn" name="activeYn" class="form-select" required>
-                                        <option value="Y" th:selected="${organDTO.activeYn == 'Y'}">활성화</option>
-                                        <option value="N" th:selected="${organDTO.activeYn == 'N'}">비활성화</option>
+                                    <select id="adState" name="adState" class="form-select mt-2" required>
+                                        <option value="Y" th:selected="${advertisementDTO.adState == 'Y'}">진행중</option>
+                                        <option value="N" th:selected="${advertisementDTO.adState == 'N'}">미진행</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <div class="form-group form-group-default">
-                                    <label>*분류 :</label>
-                                    <select id="organType" name="organType" class="form-select" required>
-                                        <option value="HO">본사</option>
-                                        <option value="BO">지사</option>
-                                        <option value="SHOP">매장</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12">
+                            <div class="col-12 mt-2">
                                 <div class="form-group form-group-default">
                                     <label>*업체명 :</label>
-                                    <input id="organName" name="organName" type="text" class="form-control" required/>
+                                    <span class="d-flex">
+                                        <input style="width: 83%; background: ghostwhite" id="organName" name="organName" type="text" class="form-control me-3" readonly>
+                                        <button type="button" id="searchButton" class="btn btn-success">검색</button> <!-- 조직 검색 버튼 -->
+                                    </span>
                                 </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-12 mt-2">
                                 <div class="form-group form-group-default">
-                                    <label>*주소 :</label>
-                                    <input id="organAddress" name="organAddress" type="text" class="form-control" required/>
+                                    <label>*제목 :</label>
+                                    <input id="adTitle" name="adTitle" type="text" class="form-control mt-2" required/>
                                 </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-12 mt-2">
                                 <div class="form-group form-group-default">
-                                    <label>*대표 연락처 :</label>
-                                    <input id="organTel" name="organTel" type="text" class="form-control" required/>
+                                    <label>*링크 :</label>
+                                    <input id="adLinkUrl" name="adLinkUrl" type="text" class="form-control mt-2" required/>
                                 </div>
                             </div>
+                            <div class="col-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*이미지 첨부 :</label>
+                                    <input id="adImgUrl" name="adImgUrl" type="text" class="form-control mt-2" required/>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*기간 :</label>
+                                    <span class="d-flex mt-2">
+                                        <input style="width: 47%" id="adStartDate" name="adStartDate" type="datetime-local" class="form-control" required/>&nbsp;~&nbsp;
+                                        <input style="width: 47%" id="adEndDate" name="adEndDate" type="datetime-local" class="form-control" required/>
+                                    </span>
+                                </div>
+                            </div>
+                            <input id="adHits" name="adHits" type="hidden" class="form-control mt-2" required/>
+                            <input id="organType" name="organType" type="hidden" class="form-control mt-2" required/>
+                            <input id="organAddress" name="organAddress" type="hidden" class="form-control mt-2" required/>
+                            <input id="organIdx" name="idx" type="hidden" class="form-control mt-2" required/>
+                            <input id="activeYn" name="activeYn" type="hidden" class="form-control mt-2" required/>
+                            <input id="organTel" name="organTel" type="hidden" class="form-control mt-2" required/>
                         </div>
 
                         <!-- Modal footer -->
@@ -133,7 +155,7 @@
             <div class="modal-content">
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">조직 삭제</h4>
+                    <h4 class="modal-title">광고 삭제</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <!-- Modal body -->
@@ -156,6 +178,71 @@
     </div>
     <!-- 삭제 모달 끝 -->
 
+    <!-- 검색 모달 시작 -->
+    <div class="modal fade" id="searchModal" tabindex="-1" role="modal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="searchTitle" class="fw-light">업체 검색</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                </div>
+                <!--입력폼-->
+                <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                <form id="searchForm" method="post">
+                    <div class="modal-body">
+                        <p>업체를 검색합니다.</p>
+
+                        <div class="row">
+                            <!-- 연관 조직 분류 -->
+                            <div class="col-3">
+                                <div class="form-group form-group-default">
+                                    <label>*분류 :</label>
+                                    <select id="searchType" name="searchType" class="form-select" required>
+                                        <option value="HO">본사</option>
+                                        <option value="BO">지사</option>
+                                        <option value="SHOP">매장</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- 연관 조직 명칭 -->
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*업체 검색 :</label>
+                                    <span class="d-flex">
+                                        <!--검색할 단어 입력-->
+                                        <input type="text" id="searchWord" name="searchWord" style="width: 83%" class="form-control me-3" placeholder="조직명을 입력하세요"/>
+                                        <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
+                                        <button type="button" id="searchOrgan" class="btn btn-success">조회</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--조회 테이블-->
+                    <table class="table table-bordered mt-2" id="resultsTable" style="text-align: center">
+                        <thead>
+                        <tr style="height: 50px; vertical-align: middle">
+                            <th style="width: 20%">분류</th>
+                            <th style="width: 50%">업체명</th>
+                            <th style="width: 30%">상태</th>
+                        </tr>
+                        </thead>
+                        <tbody class="overflow-auto">
+                        <!-- 검색 결과가 동적으로 추가됨 -->
+                        </tbody>
+                    </table>
+
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- 검색 모달 끝 -->
+
 </div>
 
 <th:block layout:fragment="script">
@@ -163,6 +250,83 @@
 
         // 문서가 준비가 되었다면
         $(document).ready(function () {
+
+            // 광고 수정 모달에서 검색 버튼을 클릭했을 때
+            $("#searchButton").on('click', function() {
+
+                // 폼 리셋
+                var form = $("#searchForm")[0];
+                form.reset();
+
+                // 테이블 내용 초기화 (tbody 비우기)
+                $("#searchModal tbody").empty();  // tbody 내부의 모든 내용 삭제
+
+                // 이전 모달창을 화면에서 숨긴다.
+                $("#addModal").modal('hide');
+
+                // 검색 모달창을 화면에 띄운다.
+                $("#searchModal").modal('show');
+
+            });
+
+            // 조회 버튼 클릭 시
+            $("#searchOrgan").on("click", function(e) {
+
+                var searchType = $("#searchType").val();
+                var searchWord = $("#searchWord").val();
+
+                $.ajax({
+                    url: "/advertisement/search/list",
+                    type: "POST",
+                    data: {
+                        searchType: searchType,
+                        searchWord: searchWord
+                    },
+                    dataType: "json",
+                    success: function(data) {
+
+                        var tbody = $("#resultsTable tbody");
+                        tbody.empty();  // 기존 결과 초기화
+
+                        var row = "";
+                        // 각 결과 객체를 <tr> 태그로 추가
+                        $.each(data, function(index, item) {
+                            row += `
+                                        <tr style="height: 50px; vertical-align: middle">
+                                            <td>${item.organType}</td>
+                                            <td class="organ-name">${item.organName}<input type="hidden" class="idx" value="${item.idx}"></td>
+                                            <td>${item.activeYn}</td>
+                                        </tr>
+                                    `;
+                        });
+                        tbody.append(row);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("검색 오류:", error);
+                        alert("검색 중 오류가 발생했습니다.");
+                    }
+                });
+            });
+
+            // 업체명 클릭시
+            // 동적으로 생성된 .organ-name 요소에 대해서도 클릭 이벤트를 처리
+            $(document).on('click', '.organ-name', function() {
+
+                // 클릭한 td의 텍스트 값 가져오기
+                var organ = $(this).text();
+                var organIdx = $(".idx").val();
+
+                // 이전 모달 input에 organName 값 넣기
+                $("#organ").val(organ);
+                $("#organidx").val(organIdx);
+
+                // 검색 모달창을 숨긴다
+                $("#searchModal").modal('hide');
+
+                // 이전 모달창을 화면에 띄운다.
+                $("#addModal").modal('show');
+
+            });
 
             // 삭제모달 버튼 클릭 시
             $(".btn-delete").on("click", function () {
@@ -180,10 +344,14 @@
 
             // 삭제 버튼 클릭
             $("#delete").on("click", function () {
-                var idx = $('#organDTOidx').data("id")
+
+                var idx = $('#adIdx').data("id")
+
+                console.log(idx)
+                $("#deletemodal").modal('hide')
 
                 $.ajax({
-                    url: "/office/organ/delete",
+                    url: "/advertisement/delete",
                     type: 'GET',
                     data: {
                         idx: idx                        // 전달값 : 값
@@ -208,11 +376,11 @@
                             allowEscapeKey: false,
                             allowEnterKey: false
                         }).then(() => {
-                            // 삭제 완료 후 '/office/list'로 리디렉션
-                            location.href = "/office/list";  // 페이지 이동
+                            // 삭제 완료 후 '/advertisement/list'로 리디렉션
+                            location.href = "/advertisement/list";  // 페이지 이동
                         });
                     },
-                    error: function () {                // 작업 실패시
+                    error: function () {                            // 작업 실패시
                         Swal.fire({
                             icon: null,
                             text: "삭제를 실패하였습니다",
@@ -247,26 +415,32 @@
 
             // 수정버튼 클릭시 대화상자 채우기
             $("#btn-update").on("click", function () {
-                console.log("버튼 클릭됨!")
+
                 var idx = $(this).data("id");
 
-                console.log(idx)
-
                 $.ajax({
-                    url: "/office/organ/read",
+                    url: "/advertisement/update/read",
                     type: 'GET',
                     data: {
-                        idx: idx                   // 전달값:값
+                        idx: idx                    // 전달값:값
                     },
                     success: function (response) {  // 작업 성공시
-                        console.log(response.organizationDTO)
-                        $('#title').text("조직 정보 수정");
+                        $('#title').text("광고 정보 수정");
 
-                        $('#idx').val(response.organizationDTO.idx);
-                        $('#organName').val(response.organizationDTO.organName);
-                        $('#organAddress').val(response.organizationDTO.organAddress);
-                        $('#organTel').val(response.organizationDTO.organTel);
-                        $('#activeYn').val(response.organizationDTO.activeYn);
+                        $('#idx').val(response.advertisementDTO.idx);
+                        $('#adTitle').val(response.advertisementDTO.adTitle);
+                        $('#adLinkUrl').val(response.advertisementDTO.adLinkUrl);
+                        $('#adImgUrl').val(response.advertisementDTO.adImgUrl);
+                        $('#adStartDate').val(response.advertisementDTO.adStartDate);
+                        $('#adEndDate').val(response.advertisementDTO.adEndDate);
+                        $('#adState').val(response.advertisementDTO.adState);
+                        $('#adHits').val(response.advertisementDTO.adHits);
+                        $('#organName').val(response.advertisementDTO.organization.organName);
+                        $('#organType').val(response.advertisementDTO.organization.organType);
+                        $('#organAddress').val(response.advertisementDTO.organization.organAddress);
+                        $('#organIdx').val(response.advertisementDTO.organization.idx);
+                        $('#activeYn').val(response.advertisementDTO.organization.activeYn);
+                        $('#organTel').val(response.advertisementDTO.organization.organTel);
 
                         //대화창 출력
                         $('#updatemodal').modal('show');
@@ -305,6 +479,22 @@
                 var form = $('#updatemodalForm')[0];
                 var formData = new FormData(form);      // form내의 데이터 읽기
 
+                // organization 객체를 JSON 문자열로 변환하여 전송
+                var organization = {
+                    idx: $('#organIdx').val(),
+                    organName: $('#organName').val(),
+                    organType: $('#organType').val(),
+                    activeYn: $('#activeYn').val(),
+                    organAddress: $('#organAddress').val(),
+                    organTel: $('#organTel').val()
+                };
+                formData.append("organization", JSON.stringify(organization));
+
+                // FormData 내부 데이터 확인 (디버깅)
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
                 //폼 검증 수행
                 if (form.checkValidity() === false) {
                     form.reportValidity();              // 폼 검증
@@ -313,7 +503,7 @@
                 $('#updatemodal').modal('hide');
 
                 $.ajax({
-                    url: '/office/organ/update',   // 맵핑
+                    url: "/advertisement/update/update",       // 맵핑
                     type: 'POST',                       // 전달 방식
                     data: formData,                     // 데이터 값
                     processData: false,                 // 현재상태 그대로 유지하면서 전달

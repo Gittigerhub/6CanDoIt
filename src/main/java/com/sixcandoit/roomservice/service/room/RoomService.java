@@ -31,12 +31,34 @@ public class RoomService {
         roomEntity.setRoomView("N"); // 창문 없음
         roomEntity.setRoomSeason("off"); // 비성수기
         roomEntity.setRoomCondition("Y"); // 청소 완료
+
         // 저장
         roomRepository.save(roomEntity);
     }
 
     // 룸 수정
+    public void roomUpdate(RoomDTO roomDTO){
+        // 룸 데이터의 idx를 조회
+        log.info("룸 데이터의 idx를 조회한다...");
+        Optional<RoomEntity> roomEntity = roomRepository.findById(roomDTO.getIdx());
+
+        if (roomEntity.isPresent()){ // RoomEntity가 존재하면
+            // DTO로 Entity 변환
+            RoomEntity roomEntitys = modelMapper.map(roomDTO, RoomEntity.class);
+            log.info("저장을 수행한다...");
+            // 저장
+            roomRepository.save(roomEntitys);
+
+        } else {
+            throw new IllegalStateException("수정할 Room이 존재하지 않습니다.");
+        }
+    }
+
     // 룸 삭제
+    public void roomDelete(Integer idx){
+        roomRepository.deleteById(idx);
+    }
+
     // 룸 목록
     public List<RoomDTO> roomList(){
         // 모두 조회
@@ -46,11 +68,13 @@ public class RoomService {
 
         return roomDTOS;
     }
+
     // 룸 상세보기
     public RoomDTO roomDetail(Integer idx){
         Optional<RoomEntity> roomEntity = roomRepository.findById(idx);
 
         RoomDTO roomDTO = modelMapper.map(roomEntity, RoomDTO.class);
+
         return roomDTO;
     }
 }

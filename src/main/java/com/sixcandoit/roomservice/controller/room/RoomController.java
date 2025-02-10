@@ -7,11 +7,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Controller
@@ -44,8 +46,10 @@ public class RoomController {
 
     // 룸 등록 저장 처리
     @PostMapping("/room/register")
-    public String registerProc(@Valid @ModelAttribute RoomDTO roomDTO){
+    public String registerProc(@Valid @ModelAttribute RoomDTO roomDTO,
+                               BindingResult bindingResult){
         log.info("새로운 룸을 등록합니다.");
+
         // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
         if (roomDTO.getRoomWifi() == null) {
             roomDTO.setRoomWifi("N");
@@ -65,15 +69,27 @@ public class RoomController {
         if (roomDTO.getRoomSmokingYn() == null) {
             roomDTO.setRoomSmokingYn("N");
         }
+        // 체크인, 체크아웃 값이 없으면 기본값을 설정
+        if (roomDTO.getRoomCheckIn() == null) {
+            roomDTO.setRoomCheckIn(LocalTime.of(14, 0)); // 기본 체크인 시간 (14:00)
+        }
+        if (roomDTO.getRoomCheckOut() == null) {
+            roomDTO.setRoomCheckOut(LocalTime.of(11, 0)); // 기본 체크아웃 시간 (11:00)
+        }
+
+        if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
+            log.info("유효성 검사 오류 발생");
+            return "room/register"; // register로 돌아간다
+        }
+
         // 등록 처리
         roomService.roomRegister(roomDTO);
 
         return "redirect:/room/list";
     }
-    // 룸 수정
-    // 룸 삭제
+
     // 룸 상세보기
-    @GetMapping("/qna/detail")
+    @GetMapping("/room/detail")
     public String detail(@RequestParam Integer idx, Model model){
         log.info("개별 데이터를 읽는 중입니다.");
         RoomDTO roomDTO = roomService.roomDetail(idx);
@@ -82,5 +98,50 @@ public class RoomController {
         model.addAttribute("roomDTO", roomDTO);
 
         return "room/detail";
+    }
+
+    // 룸 수정 불러오기
+    @GetMapping("/room/update")
+    public String update(@RequestParam Integer idx, Model model){
+        log.info("수정할 데이터를 읽는 중입니다.");
+        RoomDTO roomDTO = roomService.roomDetail(idx);
+
+        log.info("개별 데이터를 페이지로 전달합니다.");
+        model.addAttribute("roomDTO", roomDTO);
+
+        return "room/update";
+    }
+
+    // 룸 수정 수정하기
+    @PostMapping("/room/update")
+    public String updateProc(@Valid @ModelAttribute RoomDTO roomDTO,
+                             BindingResult bindingResult){
+        log.info("수정된 데이터를 저장합니다.");
+
+        if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
+            log.info("유효성 검사 오류 발생");
+            return "room/update"; // update로 돌아간다
+        }
+
+        // 체크인, 체크아웃 값이 없으면 기본값을 설정
+        if (roomDTO.getRoomCheckIn() == null) {
+            roomDTO.setRoomCheckIn(LocalTime.of(14, 0)); // 기본 체크인 시간 (14:00)
+        }
+        if (roomDTO.getRoomCheckOut() == null) {
+            roomDTO.setRoomCheckOut(LocalTime.of(11, 0)); // 기본 체크아웃 시간 (11:00)
+        }
+        // 유효성 검사 성공 시 수정 처리
+        roomService.roomUpdate(roomDTO);
+
+        return "redirect:/room/list";
+    }
+
+    // 룸 삭제
+    @GetMapping("/room/delete")
+    public String delete(@RequestParam Integer idx){
+        log.info("데이터를 삭제합니다.");
+        roomService.roomDelete(idx);
+
+        return "redirect:/room/list";
     }
 }

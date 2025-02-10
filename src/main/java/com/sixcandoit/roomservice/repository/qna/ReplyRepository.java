@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface ReplyRepository extends JpaRepository<ReplyEntity, Integer> {
 
     Optional<ReplyEntity> findByQnaJoin(QnaEntity qnaEntity);
+
 }

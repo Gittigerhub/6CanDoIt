@@ -33,6 +33,9 @@
                             <option value="0" th:selected="${type=='0'}">전체</option><!--검색 후 선택값으로 설정-->
                             <option value="1" th:selected="${type=='1'}">제목만</option>
                             <option value="2" th:selected="${type=='2'}">내용만</option>
+                            <option value="3" th:selected="${type=='3'}">제목+내용</option>
+                            <option value="4" th:selected="${type=='4'}">답변만</option>
+                            <option value="5" th:selected="${type=='5'}">자주 묻는 질문만</option>
                         </select>
                         <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
                         <button class="btn btn-success" type="submit">검색</button>

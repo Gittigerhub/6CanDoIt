@@ -18,12 +18,18 @@
         <div id="row" class="row">
             <div class="col"></div>
             <div class="col-10">
-                <form th:action="@{/room/register}" th:object="${roomDTO}" method="post" enctype="multipart/form-data">
+                <form th:action="@{/room/update}" th:object="${roomDTO}" method="post" enctype="multipart/form-data">
                     <div class="card">
                         <div class="card-header">
                             <h4>객실 등록</h4>
                         </div>
                         <div class="card-body">
+                            <!--번호 숨김 처리-->
+                            <input type="hidden" name="id" th:value="${roomDTO.idx}">
+                            <div class="mb-3 mt-3">
+                                <label for="idx" class="form-label">번호:</label>
+                                <input type="text" class="form-control" id="idx" name="idx"
+                                       th:value="${roomDTO.idx}" readonly>
                             <div class="mb-3 mt-3"><!--객실 유형-->
                                 <label for="roomType" class="form-label">객실 타입:</label>
                                 <select id="roomType" th:field="*{roomType}" class="form-select" aria-label="Default select example">

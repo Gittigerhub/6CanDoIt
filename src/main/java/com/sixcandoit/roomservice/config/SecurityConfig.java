@@ -1,141 +1,96 @@
 package com.sixcandoit.roomservice.config;
 
-import com.sixcandoit.roomservice.config.CustomLoginSuccessHandler;
-import com.sixcandoit.roomservice.service.admin.AdminLoginService;
-import com.sixcandoit.roomservice.service.member.MemberLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+//사용자 보안 설정
 @Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
-public class SecurityConfig{
-
-    //암호
+@EnableWebSecurity  //웹보안 활성화(2.7버전에서 extends와 동일)
+@RequiredArgsConstructor    //클래스 자동생성(외부 클래스 추가)
+public class SecurityConfig {
+    //1. 비밀번호 암호화 설정
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    //관리자 로그인 서비스
+    //2. 필터링(try~catch 대신 throws 선언)
     @Bean
-    public AdminLoginService adminLoginService() {
-        return new AdminLoginService();
-    }
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+        //2-1. 매핑 권한(permitALL(), hasRole(), hasAnyRole())
+        //Controller의 모든 매핑에 대한 권한을 부여(**-모든 매핑 대응)
+        http.authorizeHttpRequests((auth)->{
+            auth.requestMatchers("/assets/**", "/css/**", "/js/**").permitAll();
+            auth.requestMatchers("/h2-console/**").permitAll();   //모든 매핑 허용
 
-    //일반 로그인 서비스
-    @Bean
-    public MemberLoginService memberLoginService() {
-        return new MemberLoginService();
-    }
+            //시작페이지는 모든 사용자 접근 가능
+            // 메인페이지 및 서브페이지
+            auth.requestMatchers("/").permitAll();
 
-    //관리자 로그인처리 등록
-    @Bean
-    public DaoAuthenticationProvider adminProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(adminLoginService());
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
+            //회원 관련(모든 사용자)-로그인, 회원가입, 임시비밀번호 발급
+            auth.requestMatchers("/login","/register", "/password").permitAll();
 
-    //일반 로그인처리 등록
-    @Bean
-    public DaoAuthenticationProvider memberProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(memberLoginService());
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
+            //인증된 사용자만 접근 가능
+            //auth.requestMatchers("/modify","/logout").authenticated();  //수정,로그아웃
 
-    @Bean
-    @Order(1)
-    public SecurityFilterChain filterChain1(HttpSecurity http) throws Exception {
-        //사용권한
-        http//.addFilterBefore(userAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .securityMatcher("/admin/**").authorizeHttpRequests((auth)-> {
-                    auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**").permitAll();
-                    auth.requestMatchers("/h2-console/**").permitAll();
-                    auth.requestMatchers("/admin/login").permitAll();
-                    auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register").permitAll();
-                    auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER");
-                    auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
-                    // 조직-매장 페이지 접근 권한
-                    auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
-                    auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
-                        });
-
-        //관리자회원 로그인
-        http.formLogin(login -> login
-                .defaultSuccessUrl("/admin/", true)
-                .failureUrl("/admin/login?error=true")
-                .loginPage("/admin/login")
-                .usernameParameter("adminEmail")
-                .permitAll()
-                .successHandler(new CustomLoginSuccessHandler()));
-
-        //CSRF 보호를 비활성화
-        http.csrf(AbstractHttpConfigurer::disable);
-
-        //로그아웃
-        http.logout(logout-> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/admin/login")); //로그아웃
-
-        //관리자인 경우 관리자 로그인처리
-        http.authenticationProvider(adminProvider());
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain filterChain2(HttpSecurity http) throws Exception {
-        //사용권한
-        http.authorizeHttpRequests((auth)-> {
-            auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**").permitAll();
-            auth.requestMatchers("/h2-console/**").permitAll();
-            auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register").permitAll();
-            auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER");
-            auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
             // 조직-매장 페이지 접근 권한
             auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
+
+            // 광고 페이지 접근 권한
+            auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
+
+            // 이벤트, 회원포인트 페이지 접근 권한
             auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
-                });
 
-        //http.exceptionHandling(exceptionHandling ->exceptionHandling
-        //         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-        // );
+            // 룸 페이지 접근 권한
+            auth.requestMatchers("/room/**").permitAll();
 
-        //일반회원 로그인
-        http.formLogin(login -> login
-                .defaultSuccessUrl("/member/", true)
-                .failureUrl("/member/login?error=true")
-                .loginPage("/member/login")
+            // 문의사항 페이지 접근 권한
+            auth.requestMatchers("/qna/**", "/reply/**").permitAll();
+
+//            auth.requestMatchers("/member").hasRole("MEMBER");  //USER사용자만 /user매핑으로 접근가능
+//            auth.requestMatchers("/admin").hasRole("ADMIN");  //ADMIN사용자만 /admin매핑으로 접근가능
+//            auth.requestMatchers("/ho").hasRole("HO");
+//            auth.requestMatchers("/bo").hasRole("BO");
+//            auth.requestMatchers("/manager").hasRole("MANAGER");
+        });
+
+        // H2-console 테이블 안보이는 문제 해결
+        http.headers((headers) ->
+                headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()));
+
+        //2-2. 로그인
+//        http.formLogin(login->login
+//                .loginPage("/login") //로그인은 /login맵핑으로
+//                .defaultSuccessUrl("/",true) //로그인 성공시 / 페이지로 이동
+//                .usernameParameter("memberEmail")
+//                .passwordParameter("memberPwd")
+//                .permitAll() //모든 사용자가 로그인폼 사용
+//                .successHandler(new CustomAuthenticationSuccessHandler())); //로그인 성공시처리할 클래스
+
+        //2-3. csrf보안(일단 비활성화, http의 변조방지)
+        http.csrf(AbstractHttpConfigurer::disable).formLogin(login->login
+                .loginPage("/member/login") //로그인은 /login맵핑으로
+                .defaultSuccessUrl("/member/",true) //로그인 성공시 / 페이지로 이동
                 .usernameParameter("memberEmail")
-                .permitAll()
-                .successHandler(new CustomLoginSuccessHandler()));
+                .passwordParameter("memberPwd")
+                .permitAll() //모든 사용자가 로그인폼 사용
+                .successHandler(new CustomLoginSuccessHandler())
+                .failureUrl("/member/login?error=true")); //로그인 성공시처리할 클래스
 
-        //CSRF 보호를 비활성화
-        http.csrf(AbstractHttpConfigurer::disable);
+        //2-4. 로그아웃
+        http.logout(logout->logout
+                .logoutUrl("/logout") //로그아웃 맵핑
+                .logoutSuccessUrl("/login") //로그아웃 성공시 로그인 페이지로 이동
+        );
 
-        //로그아웃
-        http.logout(logout-> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/member/login")); //로그아웃
-
-        //일반 사용자인 경우 일반 사용자로그인 처리
-        http.authenticationProvider(memberProvider());
         return http.build();
     }
-
 }

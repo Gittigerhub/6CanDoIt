@@ -41,7 +41,7 @@ public class QnaService {
 
     // Qna의 Q 수정
     public void qnaUpdate(QnaDTO qnaDTO){
-        // 데이터의 id를 조회
+        // 데이터의 idx를 조회
         Optional<QnaEntity> qnaEntity = qnaRepository.findById(qnaDTO.getIdx());
 
         if (qnaEntity.isPresent()){ // QnaEntity가 존재하면
@@ -81,7 +81,7 @@ public class QnaService {
                 Sort.by(Sort.Direction.DESC, "idx"));
 
         // 조회한 변수를 선언
-        // type : 제목(1), 내용(2), 전체(0)
+        // type : 제목(1), 내용(2), 제목+내용(2), 답변만(4), 자주 묻는 질문(5), 전체(0)
         Page<QnaEntity> qnaEntities;
         if (keyword != null){ // 검색어가 존재하면
             log.info("검색어가 존재하면...");
@@ -91,9 +91,18 @@ public class QnaService {
             } else if (type.equals("2")){ // type 분류 2, 내용으로 검색할 때
                 log.info("내용으로 검색을 하는 중...");
                 qnaEntities = qnaRepository.searchQnaContents(keyword, pageable);
-            } else { // 모든 대상으로 검색할 때
-                log.info("모든 대상으로 검색을 하는 중...");
-                qnaEntities = qnaRepository.searchAll(keyword, pageable);
+            } else if (type.equals("3")){ // type 분류 3, 제목+내용으로 검색할 때
+                log.info("제목+내용으로 검색을 하는 중...");
+                qnaEntities = qnaRepository.searchQnaAll(keyword, pageable);
+            } else if (type.equals("4")){ // type 분류 4, 답변만 검색할 때
+                log.info("답변만 검색하는 중...");
+                qnaEntities = qnaRepository.searchReplyAll(keyword, pageable);
+            } else if (type.equals("5")) { // type 분류 5, 자주 묻는 질문만 검색할 때
+                log.info("자주 묻는 질문만 검색 중...");
+                qnaEntities = qnaRepository.searchFavYn(pageable);
+            } else { // 전체 검색 = 0
+                log.info("전체 조회 검색 중...");
+                qnaEntities = qnaRepository.searchQnaAndReply(keyword, pageable);
             }
         } else { // 검색어가 존재하지 않으면 모두 검색
             qnaEntities = qnaRepository.findAll(pageable);

@@ -8,7 +8,8 @@
     <title>룸 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
+    <!--아이콘-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">    <style>
         a {
             text-decoration: none; /* 밑줄 없애기 */
             color: black; /* 글자 색을 검은색으로 변경 */
@@ -24,7 +25,7 @@
             <div class="mb-3">
                 <h3>객실 목록</h3>
             </div>
-            <div class="col"></div>
+            <div class="col-1"></div>
             <div class="col-10">
                 <table class="table table-hover">
                     <thead class="table table-dark">
@@ -56,12 +57,14 @@
                                 <!--객실 이름-->
                                 <h5 th:text="${data.roomName}"></h5>
                             </a>
-                            <!--침대 타입-->
-                            <p th:if="${data.roomBed == 0}">싱글 침대</p>
-                            <p th:if="${data.roomBed == 1}">더블 침대</p>
-                            <p th:if="${data.roomBed == 2}">퀸 침대</p>
-                            <p th:if="${data.roomBed == 3}">킹 침대</p>
-                            <!--객실 옵션-->
+                            <p><!--침대 타입-->
+                                <span th:if="${data.roomBed == 0}">싱글 침대</span>
+                                <span th:if="${data.roomBed == 1}">더블 침대</span>
+                                <span th:if="${data.roomBed == 2}">퀸 침대</span>
+                                <span th:if="${data.roomBed == 3}">킹 침대</span>
+                                <i class="bi bi-usb-mini-fill"></i>
+                            </p>
+                            <!--객실 옵션--><i class="bi bi-tags-fill"></i>
                             <span th:text="${data.roomSize} + ' ㎡'" class="badge rounded-pill text-bg-light"></span>
                             <span th:if="${data.roomSmokingYn == 'Y'}" class="badge rounded-pill text-bg-light">흡연 가능</span>
                             <span th:unless="${data.roomSmokingYn == 'Y'}" class="badge rounded-pill text-bg-light">금연</span>
@@ -76,12 +79,17 @@
                             </p>
                         </td>
                         <!--투숙객 수-->
-                        <td th:text="${data.roomNum}"></td>
+                        <td>
+                            <p>
+                                <i class="bi bi-people-fill"></i>
+                                <span th:text="${data.roomNum}"></span>
+                            </p>
+                        </td>
                         <!--가격-->
                         <td th:text="${data.roomPrice}"></td>
                         <!--조식여부-->
                         <td>
-                            <p th:if="${data.roomBreakfast == 'Y'}">조식 있음</p>
+                            <p th:if="${data.roomBreakfast == 'Y'}">무료 조식</p>
                             <p th:unless="${data.roomBreakfast == 'Y'}">조식 없음</p>
                         </td>
                         <!--성수기 여부-->
@@ -93,7 +101,10 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col"></div>
+            <div class="col-1"></div>
+            <div class="mt-3 d-flex justify-content-end">
+                <a th:href="@{/room/register}" class="btn btn-outline-primary">등록</a>
+            </div>
         </div>
     </div>
 </div>

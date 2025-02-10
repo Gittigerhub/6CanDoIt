@@ -1,5 +1,7 @@
 package com.sixcandoit.roomservice.dto.room;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +16,15 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class RoomDTO {
     private Integer idx;                    // 기본 키
+
+    @NotBlank
+    @Size(min = 1, max = 30, message = "객실 이름을 입력하세요.")
     private String roomName;                // 객실 이름
+
+    @NotBlank
+    @Size(min = 1, message = "객실에 대한 상세 정보를 입력해주세요.")
     private String roomInfo;                // 객실 정보
+
     private String roomType;                // 객실 타입(STD:스탠다드, ROH:런 오브 하우스, MOD:모더레이트, SUP:슈페리어, DLX:디럭스, STU:스튜디오, JRSTE:쥬니어 스위트, STE:스위트, PH:팬트하우스)
     private String roomView;                // 객실 뷰 종류(O:오션뷰, C:시티뷰, M:마운틴뷰, G:가든뷰)
     private int roomNum = 2;                // 투숙객 수

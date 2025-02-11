@@ -1,7 +1,10 @@
 package com.sixcandoit.roomservice.controller.notice;
 
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
+import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.service.notice.NoticeService;
+import com.sixcandoit.roomservice.service.qna.QnaService;
+import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -17,8 +20,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 import java.util.Map;
+
 
 @Controller // get, post 매핑만 사용이 가능
 @RequiredArgsConstructor
@@ -32,32 +35,30 @@ public class NoticeController {
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
     // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
     @GetMapping("/notice/list")
-    public String list(@RequestParam(name = "type", required = false) String type,
-    @RequestParam(name = "keyword", required = false) String keyword,
-    @PageableDefault(size = 10, sort = "idx", direction = Sort.Direction.DESC) Pageable pageable,
-    Model model) {
+    public String list(@PageableDefault(page = 1) Pageable page, // 페이지 정보
+                       @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
+                       @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
+                       Model model){
         // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<NoticeDTO> noticeDTOPage=noticeService.noticeList(pageable, type, keyword);
 
+        Page<NoticeDTO> noticeDTOS = noticeService.noticeList(page, type, keyword);
+        // html에 필요한 페이지 정보를 받는다.
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(noticeDTOS);
 
-
-        model.addAttribute("noticeDTO", noticeDTOPage.getContent()); // 데이터 전달
-        model.addAttribute("currentPage", noticeDTOPage.getNumber() + 1);
-        model.addAttribute("startPage", Math.max(1, noticeDTOPage.getNumber() - 5));
-        model.addAttribute("endPage", Math.min(noticeDTOPage.getTotalPages(), noticeDTOPage.getNumber() +
-                5));
-        model.addAttribute("type", type);
-        model.addAttribute("keyword", keyword);
+        model.addAttribute("noticelist", noticeDTOS); // 데이터 전달
+        model.addAllAttributes(pageInfo); // 페이지 정보
+        model.addAttribute("type", type); //검색분류
+        model.addAttribute("keyword", keyword); // 키워드
 
         return "notice/list";
     }
 
     // Qna의 Q 등록
     @GetMapping("/notice/register")
-    public String register(Model model) {
+    public String register (Model model){
         log.info("질문 페이지로 이동합니다.");
 
-        model.addAttribute("noticeDTO", new NoticeDTO()); // 빈 QnaDTO 객체 전달
+        model.addAttribute("noticeDTO", new NoticeDTO());
 
         return "notice/register";
     }
@@ -81,15 +82,15 @@ public class NoticeController {
 
 
     @GetMapping("/notice/read")
-    public String read(@RequestParam ("idx") Integer idx, Model model) {
-            noticeService.count(idx);
-            log.info("개별 데이터를 읽는 중입니다");
-            NoticeDTO noticeDTO = noticeService.noticeRead(idx);
+    public String read(@RequestParam  Integer idx, Model model) {
+        noticeService.count(idx);
+        log.info("개별 데이터를 읽는 중입니다");
+        NoticeDTO noticeDTO = noticeService.noticeRead(idx);
 
-            log.info("개별 데이터를 페이지에 전달하는 중입니다");
-            model.addAttribute("noticeDTO",noticeDTO);
+        log.info("개별 데이터를 페이지에 전달하는 중입니다");
+        model.addAttribute("noticeDTO",noticeDTO);
 
-            return "notice/read";
+        return "notice/read";
     }
 
     @GetMapping("/notice/update")

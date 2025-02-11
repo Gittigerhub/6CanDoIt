@@ -32,8 +32,13 @@ public class NoticeDTO {
 
     private int noticeHits; //조회수
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd:mm:ss")
     private LocalDate noticeDate;//작성일
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDate modDate;//수정일
+
+
 
 
 }

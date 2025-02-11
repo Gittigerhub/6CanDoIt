@@ -23,7 +23,7 @@ public class MenuService {
     private final ModelMapper modelMapper;
 
     //메뉴 등록
-    public Integer menuRegister(MenuDTO menuDTO) {
+    public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> multipartFiles) {
 
         //MenuDTO -> Entity로 변환
         MenuEntity menuEntity = modelMapper.map(menuDTO, MenuEntity.class);
@@ -48,6 +48,21 @@ public class MenuService {
         return menuDTO;
 
     }
+
+//    public MenuDTO menuRead(Integer idx, String memberEmail) {
+//
+//        MenuEntity menuEntity
+//                = menuRepository.findById(idx).orElseThrow(EntityNotFoundException::new);
+//
+//        MenuDTO menuDTO = modelMapper.map(menuEntity, MenuDTO.class)
+//                .setMenuImg();
+//    }
+//
+//    public PageRequestDTO<MenuDTO> menuList(PageRequestDTO pageRequestDTO, String email) {
+//        Pageable pageable = pageRequestDTO.getPageable("idx");
+//        Page<MenuEntity> menuEntities
+//                = menuRepository.
+//    }
 
     //메뉴 수정
     public MenuDTO menuUpdate(MenuDTO menuDTO, Integer idx, List<MultipartFile> multipartFiles, Integer[] delidx, Long mainidx) {

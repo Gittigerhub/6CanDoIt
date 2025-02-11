@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,28 +24,31 @@ public class NoticeService {
 
     private final NoticeRepository noticeRepository; // final로 설정 (반드시 주입되어야 함)
     private final ModelMapper modelMapper;
-
     public void noticeRegister(NoticeDTO noticeDTO) {
-        NoticeEntity noticeEntity = modelMapper.map(noticeDTO, NoticeEntity.class);
+        NoticeEntity noticeEntity =
+                modelMapper.map(noticeDTO, NoticeEntity.class);
+        //저장
         noticeRepository.save(noticeEntity);
     }
 
     public void noticeUpdate(NoticeDTO noticeDTO) {
+        //데이터의 idx를 조회
         Optional<NoticeEntity> noticeEntity = noticeRepository.findById(noticeDTO.getIdx());
+
         if (noticeEntity.isPresent()) {
             NoticeEntity noticeEntity1 = modelMapper.map(noticeDTO, NoticeEntity.class);
             noticeRepository.save(noticeEntity1);
         }
     }
 
-    public void noticeDelete(Integer idx) {noticeRepository.deleteById(idx);}
+    public void noticeDelete(Integer idx) {
+        noticeRepository.deleteById(idx);
+    }
 
     public Page<NoticeDTO> noticeList(Pageable page, String type, String keyword) {
         Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
 
         Page<NoticeEntity> noticeEntities;
-
-
         if (keyword != null) {
             log.info("검색어가 존재하면");
             if (type.equals("1")) {
@@ -60,23 +64,28 @@ public class NoticeService {
         } else {
             noticeEntities = noticeRepository.findAll(pageable);
         }
+        Page<NoticeDTO> noticeDTOS =noticeEntities.map(
+                data -> modelMapper.map(data, NoticeDTO.class));
 
-        return noticeEntities.map(data -> modelMapper.map(data, NoticeDTO.class));
+
+        return noticeDTOS;
     }
 
     public void count(Integer idx) {
         NoticeEntity noticeEntity = noticeRepository.findById(idx).orElseThrow();
+
         noticeEntity.setNoticeHits(noticeEntity.getNoticeHits() + 1);
+
         noticeRepository.save(noticeEntity);
     }
+
     public NoticeDTO noticeRead(Integer idx) {
         // 1. 게시글 조회
-        NoticeEntity noticeEntity = noticeRepository.findById(idx)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. idx=" + idx));
+        Optional<NoticeEntity> noticeEntity = noticeRepository.findById(idx);
 
-        // 2. Entity -> DTO 변환
-        return modelMapper.map(noticeEntity, NoticeDTO.class);
+        NoticeDTO noticeDTO = modelMapper.map(noticeEntity, NoticeDTO.class);
+
+        return noticeDTO;
+
     }
-
-    }
-
+}

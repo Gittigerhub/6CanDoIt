@@ -46,6 +46,7 @@
                         <th>No</th>
                         <th>제목</th>
                         <th>작성일</th>
+                        <th>수정일</th>
                         <th>조회수</th>
                     </tr>
                     </thead>
@@ -55,7 +56,9 @@
                         <td>
                             <a th:href="@{/notice/read(idx=${data.idx})}" th:text="${data.noticeTitle}"></a>
                         </td>
-                        <td th:text="${#temporals.format(data.noticeDate, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${#dates.format(data.noticeDate, 'yyyy-MM-dd HH:mm')}"></td>
+
+                        <td th:text="${#dates.format(data.modDate, 'yyyy-MM-dd HH:mm')}"></td>
 
                         <td th:text="${data.noticeHits}"></td>
                     </tr>
@@ -93,6 +96,6 @@
         <a th:href="@{/notice/register}" class="btn btn-primary">등록</a>
     </div>
 </div>
-</div>
+
 </body>
 </html>

@@ -61,4 +61,12 @@ public class OrdersEntity extends BaseEntity {
     //주문일
     private LocalDateTime ordersDate;
 
+
+    public void setOrdersMenuEntityList(OrdersMenuEntity ordersMenuEntity) {
+        this.ordersMenuEntityList.add(ordersMenuEntity);
+    }
+
+    public void setOrdersMenuEntityList(List<OrdersMenuEntity> ordersMenuEntityList) {
+        this.ordersMenuEntityList = ordersMenuEntityList;
+    }
 }

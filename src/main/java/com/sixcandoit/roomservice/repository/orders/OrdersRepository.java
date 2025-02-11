@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
 
@@ -14,6 +15,8 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
     public List<OrdersEntity> findOrdersEntity(String memberEmail, Pageable pageable);
     @Query("select count(o) from OrdersEntity o where o.memberJoin.memberEmail = :memberEmail")
     public Integer totalcount(String memberEmail);
+
+    Optional<OrdersEntity> findByIdx(Integer orderIdx);
 
     //public List<OrdersEntity> findByMemberEmailOrdersByOrdersDateDesc(String memberEmail, Pageable pageable);
 }

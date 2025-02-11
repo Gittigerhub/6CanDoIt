@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.dto.orders;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,6 +38,22 @@ public class MenuDTO {
 
     private List<MenuOptionDTO> menuOptionDTOList;
 
+//    private List<MenuImgDTO> menuImgDTOList;
+
     private LocalDateTime insDate;
+
+    //통합 이미지 파일이 나온다면 그거로 설정
+//    public MenuDTO setMenuImgDTOList(List<MenuImg> menuImgList) {
+//        ModelMapper modelMapper = new ModelMapper();
+//
+//        List<MenuImgDTO> menuImgDTOS =
+//                menuImgList.stream().map(
+//                        itemImg -> modelMapper.map(itemImg, MenuImgDTO.class)
+//                ).collect(Collectors.toList();
+//
+//                this.menuImgDTOList = menuImgDTOS;
+//
+//                return this;
+//    }
 
 }

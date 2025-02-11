@@ -80,25 +80,31 @@ public class EventService {
     출력 : 없음
     설명 : 이벤트 정보를 수정할때 사용;
   ---------------------------------------------------*/
-    public void update(EventDTO eventDTO ){
+    public void update(EventDTO eventDTO){
         try {
             Optional<EventEntity> read = eventRepository.findById(eventDTO.getIdx());
 
             if(!read.isPresent()){
                 throw new RuntimeException("이벤트 조회 실패");
             }
-            else if(read(eventDTO.getIdx()).getEventImg()!=null){
+            else{
+                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventTitleImg());
                 fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventImg());
+
+
+                String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
+                String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
+
+                EventEntity eventEntity = modelMapper.map(eventDTO,EventEntity.class);
+
+                eventEntity.setEventTitleImg(newTitleImageName);
+                eventEntity.setEventImg(newContentImageName);
+
+
+
+                eventRepository.save(eventEntity);
             }
-            String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
-            String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
 
-            read(eventDTO.getIdx()).setEventTitleImg(newTitleImageName);
-            read(eventDTO.getIdx()).setEventImg(newContentImageName);
-
-
-            EventEntity eventEntity = modelMapper.map(read,EventEntity.class);
-            eventRepository.save(eventEntity);
         } catch (Exception e){
             throw new RuntimeException("이벤트 수정 실패: "+e.getMessage());
         }
@@ -112,6 +118,9 @@ public class EventService {
     ---------------------------------------------------*/
     public void delete(Integer idx){
         try {
+
+            fileUpload.FileDelete(imgLocation,read(idx).getEventImg());
+            fileUpload.FileDelete(imgLocation,read(idx).getEventTitleImg());
             eventRepository.deleteById(idx);
         } catch (Exception e){
             throw new RuntimeException("포인트 삭제 실패: "+e.getMessage());

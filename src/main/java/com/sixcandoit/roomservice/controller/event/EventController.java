@@ -1,24 +1,24 @@
 package com.sixcandoit.roomservice.controller.event;
 
 import com.sixcandoit.roomservice.dto.event.EventDTO;
-import com.sixcandoit.roomservice.dto.event.MemberPointDTO;
-import com.sixcandoit.roomservice.entity.event.EventEntity;
-import com.sixcandoit.roomservice.repository.event.EventRepository;
 import com.sixcandoit.roomservice.service.event.EventService;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.naming.Name;
-import java.security.Principal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,22 +36,22 @@ public class EventController {
 
 
     //이벤트 목록
-    @GetMapping("/ev")
+    @GetMapping("/event")
     public String event(Model model) {
         try {
             log.info("get에 들어옴");
             List<EventDTO> eventDTOS = eventService.list();
+
             model.addAttribute("eventDTOS", eventDTOS);
 
-
-            return "/event/ev";
+            return "event/event";
         } catch (Exception e) {
             throw new RuntimeException("이벤트 목록 맵핑 실패: " + e.getMessage());
         }
     }
 
     //이벤트 등록
-    @PostMapping("/ev/register")
+    @PostMapping("/event/register")
     @ResponseBody
     public ResponseEntity<String> EventRegister(@ModelAttribute EventDTO eventDTO) {
 
@@ -69,8 +69,8 @@ public class EventController {
     }
 
 
-    //포인트 삭제
-    @GetMapping("/ev/delete")
+    //이벤트 삭제
+    @GetMapping("/event/delete")
     @ResponseBody
     public ResponseEntity<String> EventDelete(@RequestParam Integer idx) {
         // System.out.println("삭제");
@@ -85,18 +85,22 @@ public class EventController {
 
     }
 
-    //포인트 수정
-    @PostMapping("/ev/read")
+    //이벤트 자세히 보기
+    @PostMapping("/event/read")
     @ResponseBody
-    public Map<String, Object> EventRead(@RequestParam Integer idx, Map map) {
+    public Map<String, Object> EventRead(@RequestParam Integer idx) {
         EventDTO eventDTO = eventService.read(idx);
         Map<String, Object> response = new HashMap<>();
         response.put("eventDTO", eventDTO);
 
+
+
         return response;
     }
 
-    @PostMapping("/ev/update")
+
+    //이벤트 수정
+    @PostMapping("/event/update")
     @ResponseBody
     public ResponseEntity<String> EventUpdate(@ModelAttribute EventDTO eventDTO) {
         //System.out.println(eventDTO.toString());
@@ -104,12 +108,16 @@ public class EventController {
             eventService.update(eventDTO);
             //System.out.println("수정성5공!!!");
 
-            return ResponseEntity.ok("수정하였습니다.");
+            return ResponseEntity.ok("수정을 성공하였습니다.");
         } catch (Exception e) {
             //System.out.println("수정실패!!!");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패 하였습니다.");
         }
     }
+
+
+
+
 
 }
 

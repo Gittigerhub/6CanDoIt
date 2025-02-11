@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +31,7 @@ public class FileUpload {
 
 
             try {
+                System.out.println("path주소:"+path);
                 File foloder = new File(imgLocation);
                 if (!foloder.exists()) {
                     boolean result = foloder.mkdir();
@@ -45,14 +48,10 @@ public class FileUpload {
                 return null;
 
             }
+
             return fileName;
 
     }
-
-
-
-
-
 
      /*------------------------------
     함수명 : void FileDelete(String imgLocation, String imageFileName)
@@ -61,10 +60,10 @@ public class FileUpload {
     설명 : 이미지파일을 새로운이름으로 지정된 폴더에 저장하고 새로운이름을 전달
      ------------------------------*/
     public  void FileDelete(String imgLocation, String imageFileName){
-        String deleteFileNmae = imgLocation+imageFileName;
+        String deleteFileName = imgLocation+imageFileName;
 
         try {
-            File deleteFile= new File(deleteFileNmae);
+            File deleteFile= new File(deleteFileName);
             if(deleteFile.exists()){
                 deleteFile.delete();
             }
@@ -72,6 +71,8 @@ public class FileUpload {
             System.err.println("이미지 삭제에서 문제 발생");
         }
     }
+
+
 
 
 

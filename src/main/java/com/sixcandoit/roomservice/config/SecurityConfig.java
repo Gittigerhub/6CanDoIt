@@ -109,7 +109,7 @@ public class SecurityConfig{
             auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
             // 조직-매장 페이지 접근 권한
             auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
-            auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
+            auth.requestMatchers("/event/**", "/event/memberpoint/**", "/upload/**","/event/update").permitAll();
                 });
 
         //http.exceptionHandling(exceptionHandling ->exceptionHandling

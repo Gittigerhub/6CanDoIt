@@ -8,6 +8,7 @@
     <title>이벤트 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
@@ -30,11 +31,13 @@
                         <td th:text="${events.eventTitle}">John</td>
                         <td th:text="${events.eventStartDate}">Doe</td>
                         <td th:text="${events.eventEndDate}">john@example.com</td>
-                        <td>
+                        <td class="button_and_image">
                             <button type="button" class="btn btn-primary eventEdit" th:data-id="${events.idx}">상세보기
                             </button>
                             <button type="button" class="btn btn-secondary eventDelete" th:data-id="${events.idx}">삭제
                             </button>
+                            <input type="hidden" th:class="event_Title_Img" th:value="${events.eventTitleImg}">
+                            <input type="hidden" th:class="event_Img" th:value="${events.eventImg}">
                         </td>
                     </tr>
                     </tbody>
@@ -42,7 +45,6 @@
             </div>
 
             <div class="modal" id="eventModal">
-
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <!-- Modal Header -->
@@ -58,7 +60,7 @@
                                 <div class="row mt-2">
                                     <div class="col-sm-12">
                                         <div class="form-group form-group-default">
-                                            <label>*이벤트 이름 :</label>
+                                            <label>*이벤트 이름:</label>
                                             <input id="eventTitle" name="eventTitle" type="text"
                                                    class="form-control" required/>
                                         </div>
@@ -67,7 +69,7 @@
                                 <div class="row mt-2">
                                     <div class="col-sm-12">
                                         <div class="form-group form-group-default">
-                                            <label>* 이벤트 내용 :</label>
+                                            <label>* 이벤트 내용:</label>
                                             <textarea id="eventContents" name="eventContents" cols="60"
                                                       rows="3"></textarea>
                                         </div>
@@ -115,22 +117,43 @@
 
                                 <div class="row mt-2">
                                     <div class="col-sm-6">
-                                        <div class="form-group form-group-default">
+                                        <div class="form-group form-group-default " id="titleImg">
                                             <label>*배너 이미지 등록:</label>
-                                            <input type="file" id="event_title_img" name="titleFile">
+                                            <input type="file" class="event_title_img" id="event_title_file"
+                                                   name="titleFile" onchange="previewImage(this,'View_area_tilte')"><br>
+                                            <span id='View_area_tilte'
+                                                  style='position:relative; color: black; border: 0px solid black;'></span>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <div class="form-group form-group-default">
+                                        <div class="form-group form-group-default " id="mainImg">
                                             <label>*메인 이미지 등록:</label>
-                                            <input type="file" id="event_img" name="contentFile">
+                                            <input type="file" class="event_img" id="event_img_file" name="contentFile"
+                                                   onchange="previewImage(this,'View_area_main')"><br>
+                                            <span id='View_area_main'
+                                                  style='position:relative; color: black; border: 0px solid black;'></span>
                                         </div>
                                     </div>
                                 </div>
+                                <!--<th:block class="ImgBlock" th:if="">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+
+                                            <div>
+                                                <img class="imgTitleInput" th:src="0" width="150" height="150">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <img class="imgContentInput" th:src="0" width="150" height="150">
+                                        </div>
+                                    </div>
+                                </th:block>-->
+
+
                                 <!-- Modal footer -->
                                 <div class="modal-footer">
                                     <button id="register" class="btn btn-primary" type="button">이벤트등록</button>
-                                    <button id="update" class="btn btn-primary" type="button">이벤트수정</button>
+                                    <button id="update" class="btn btn-primary" type="submit">이벤트수정</button>
                                 </div>
                             </div>
                         </form>
@@ -146,8 +169,10 @@
 
 
 <th:block layout:fragment="script">
+    <script src="/js/preview.js"></script>
     <script th:inline="javascript">
         $(document).ready(function () { //문서가
+
 
             $('#register-btn').on('click', function () {
                 //alert("등록확인");
@@ -164,25 +189,27 @@
                 $('#eventModal').modal('show')
 
 
+            });
 
-            })
-            $("#register").on("click",function (){
+            $("#register").on("click", function () {
                 var form = $("#eventForm")[0]
-                var formdata= new FormData(form);
+                var formdata = new FormData(form);
 
                 //폼 검증 수행
                 if (form.checkValidity() === false) {
                     form.reportValidity(); //폼 검증
                     return;
                 }
+
+
                 $("#eventModal").modal("hide")
 
                 $.ajax({
-                    url:'/event/ev/register',
-                    type:'POST',
+                    url: '/event/event/register',
+                    type: 'POST',
                     data: formdata,
-                    processData:false,
-                    contentType:false,
+                    processData: false,
+                    contentType: false,
 
                     success: function (response) {//작업 성공시
                         Swal.fire({
@@ -195,7 +222,7 @@
                                 content: 'text-dark',
                             },
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 10000,
                             willOpen: () => {
                                 Swal.showLoading();
                             },
@@ -219,7 +246,7 @@
                             showConfirmButton: false,
                             timer: 2000,
                             willOpen: () => {
-                                //Swal.showLoading();
+                                Swal.showLoading();
                             },
                             buttonsStyling: false,
                             allowOutsideClick: false,
@@ -229,16 +256,32 @@
                     }
                 });
 
-            });
+
+            });//등록 끝
 
             $(".eventEdit").on("click", function () {
                 //alert("삭제")
                 let idx = $(this).data("id")
                 console.log(idx)
 
+                var row = $(this).closest("tr");
+
+                // Retrieve the values from the hidden input fields within that row
+                var eventTitleImg = row.find(".event_Title_Img").val(); // 이벤트 제목 이미지 경로
+                var eventImg = row.find(".event_Img").val(); // 이벤트 이미지 경로
+
+                // Construct the image URLs
+                var imageUrlTitle = "/upload/" + eventTitleImg;
+                var imageUrl = "/upload/" + eventImg;
+
+
+                console.log("이미지 경로:" + imageUrlTitle);
+                console.log("이미지 경로:" + imageUrl);
+
+
                 $.ajax({
-                    url: "/event/ev/read",
-                    type: 'POST',
+                    url: "/event/event/read",
+                    type: 'POSt',
                     data: {
                         idx: idx//전달값:값
                     },
@@ -261,17 +304,24 @@
                         $('#eventEndDate').val(response.eventDTO.eventEndDate);
                         $('#activeYn').val(response.eventDTO.activeYn);
                         $('#eventState').val(response.eventDTO.eventState);
-                        $('#event_title_img').val(response.eventDTO.titleFile);
-                        $('#event_img').val(response.eventDTO.contentFile);
+                        $('#event_title_file').val(response.eventDTO.titleFile);
+                        $('#event_file').val(response.eventDTO.contentFile);
 
 
+                        console.log("이미지 경로:" + imageUrlTitle);
+                        console.log("이미지 경로:" + imageUrl);
+
+                        $(".imgTitleInput").attr("src", imageUrlTitle);
+                        $(".imgContentInput").attr("src", imageUrl);
 
 
                         $('#register').hide()
                         $('#update').show()
 
+
                         //대화창 출력
                         $('#eventModal').modal('show');
+
                     },
                     error: function () {//작업 실패시
                         Swal.fire({
@@ -293,9 +343,24 @@
                             allowEscapeKey: false,
                             allowEnterKey: false
                         });
+
+
                     }
+
+
                 });
+
+
+            });// 자세히 보기 버튼 끝
+
+            $('#eventModal').on('hidden.bs.modal', function (e) {
+                var imageUrlTitle = "";
+                var imageUrl = "";
+                $(".imgTitleInput").attr("src", imageUrlTitle);
+                $(".imgContentInput").attr("src", imageUrl);
+                console.log("모달 닫힘")
             });
+
 
             $('#update').on('click', function () {
                 var form = $('#eventForm')[0];
@@ -306,10 +371,10 @@
                     form.reportValidity(); //폼 검증
                     return;
                 }
-                $('#eventModal').modal('hide');
+
 
                 $.ajax({
-                    url: '/event/ev/update',//맵핑
+                    url: '/event/event/update',//맵핑
                     type: 'POST', //전달 방식
                     data: formData, //데이터값
                     processData: false, //현재상태 그대로 유지하면서 전달
@@ -326,7 +391,7 @@
                                 content: 'text-dark',
                             },
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 10000,
                             willOpen: () => {
                                 Swal.showLoading();
                             },
@@ -360,8 +425,9 @@
                     }
                 });
 
-            });//수정버튼 클릭 끝
+                $('#eventModal').modal('hide');
 
+            });//수정버튼 클릭 끝
 
             //삭제버튼 클릭
             $(".eventDelete").on("click", function () {
@@ -369,7 +435,7 @@
                 var idx = $(this).data("id");
 
                 $.ajax({
-                    url: "/event/ev/delete",
+                    url: "/event/event/delete",
                     type: 'GET',
                     data: {
                         idx: idx//전달값:값
@@ -420,11 +486,14 @@
                 });
             });//삭제버튼 끝
 
+            //사진 숨기기
+
 
         });
 
 
     </script>
+
 </th:block>
 </body>
 

@@ -4,9 +4,11 @@ import com.sixcandoit.roomservice.dto.orders.CartDetailDTO;
 import com.sixcandoit.roomservice.entity.orders.CartMenuEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface CartMenuRepository extends JpaRepository<CartMenuEntity, Integer> {
 
     public CartMenuEntity findByCartEntity_IdxAndIdx(Integer cartIdx, Integer menuIdx);

@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public class RoomService {
         if (roomEntity.isPresent()){ // RoomEntity가 존재하면
             // DTO로 Entity 변환
             RoomEntity roomEntitys = modelMapper.map(roomDTO, RoomEntity.class);
+
             log.info("저장을 수행한다...");
             // 저장
             roomRepository.save(roomEntitys);
@@ -61,8 +63,10 @@ public class RoomService {
 
     // 룸 목록
     public List<RoomDTO> roomList(){
+        // 내림차순으로 roomPrice 기준 정렬
+        Sort sort = Sort.by(Sort.Order.desc("roomPrice"));  // 'roomPrice' 필드를 내림차순으로 정렬
         // 모두 조회
-        List<RoomEntity> roomEntities = roomRepository.findAll();
+        List<RoomEntity> roomEntities = roomRepository.findAll(sort);
         // DTO로 변환 -> 배열에 저장 -> List 변환
         List<RoomDTO> roomDTOS = Arrays.asList(modelMapper.map(roomEntities, RoomDTO[].class));
 
@@ -76,5 +80,27 @@ public class RoomService {
         RoomDTO roomDTO = modelMapper.map(roomEntity, RoomDTO.class);
 
         return roomDTO;
+    }
+
+    // 자주 묻는 질문 설정 (favYn) 업데이트
+    public void updateSeason(Integer idx, String roomSeason) {
+        // Room 엔티티 조회
+        Optional<RoomEntity> roomEntity = roomRepository.findById(idx);
+
+        if (roomEntity.isPresent()) {
+            // RoomEntity 가져오기
+            RoomEntity roomEntitys = roomEntity.get();
+
+            // roomSeason 값 업데이트
+            roomEntitys.setRoomSeason(roomSeason);
+
+            // 변경된 값을 DB에 저장
+            roomRepository.save(roomEntitys);
+
+            log.info("Room(idx=" + idx + ")의 roomSeason이 " + roomSeason + "으로 업데이트되었습니다.");
+        } else {
+            // 해당 Room이 존재하지 않으면 예외 처리
+            throw new IllegalStateException("해당 Room이 존재하지 않습니다.");
+        }
     }
 }

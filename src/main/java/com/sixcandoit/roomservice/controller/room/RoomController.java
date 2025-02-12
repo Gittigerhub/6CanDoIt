@@ -144,4 +144,11 @@ public class RoomController {
 
         return "redirect:/room/list";
     }
+
+    // 성수기 등록 및 해제
+    @GetMapping("/room/roomSeason/update")
+    public String updateSeason(@RequestParam Integer idx, @RequestParam String roomSeason){
+        roomService.updateSeason(idx, roomSeason);
+        return "redirect:/room/detail?idx=" + idx; // 상세 페이지로 리다이렉트
+    }
 }

@@ -75,6 +75,15 @@
                     <div class="card-footer">
                         <a th:href="@{/room/update(idx=${roomDTO.idx})}" class="btn btn-primary">수정</a>
                         <a th:href="@{/room/delete(idx=${roomDTO.idx})}" class="btn btn-danger">삭제</a>
+                        <!-- 성수기 등록 (a 태그) -->
+                        <a th:if="${roomDTO.roomSeason == 'off'}"
+                           th:href="@{/room/roomSeason/update(idx=${roomDTO.idx}, roomSeason='peak')}"
+                           class="btn btn-warning">성수기로 변경</a>
+                        <!-- 성수기 해제 (a 태그) -->
+                        <a th:if="${roomDTO.roomSeason == 'peak'}"
+                           th:href="@{/room/roomSeason/update(idx=${roomDTO.idx}, roomSeason='off')}"
+                           class="btn btn-secondary">비성수기로 변경</a>
+                        <p>현재 시즌: <span th:text="${roomDTO.roomSeason}"></span></p>
                     </div>
 
                 </div>

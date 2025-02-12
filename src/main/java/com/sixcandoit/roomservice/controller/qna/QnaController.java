@@ -125,9 +125,9 @@ public class QnaController {
         return "redirect:/qna/list";
     }
 
+    // 자주 묻는 질문을 등록 및 해제
     @GetMapping("/qna/favYn/update")
     public String updateFavYn(@RequestParam Integer idx, @RequestParam String favYn) {
-        // favYn 값에 따라 자주 묻는 질문을 등록하거나 해제하는 로직
         qnaService.updateFavYn(idx, favYn);
         return "redirect:/qna/read?idx=" + idx; // 상세 페이지로 리다이렉트
     }

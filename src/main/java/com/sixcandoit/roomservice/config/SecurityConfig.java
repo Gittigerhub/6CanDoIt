@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.config;
 
-import com.sixcandoit.roomservice.config.CustomLoginSuccessHandler;
 import com.sixcandoit.roomservice.service.admin.AdminLoginService;
 import com.sixcandoit.roomservice.service.member.MemberLoginService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -76,6 +74,8 @@ public class SecurityConfig{
                     auth.requestMatchers("/qna/**", "/reply/**").permitAll();
                     // 룸 관리 페이지 접근 권한
                     auth.requestMatchers("/room/**").permitAll();
+                    // 공지사항 페이지 접근 권한
+                    auth.requestMatchers("/notice/**").permitAll();
                         });
 
         //관리자회원 로그인
@@ -118,6 +118,8 @@ public class SecurityConfig{
             auth.requestMatchers("/qna/**", "/reply/**").permitAll();
             // 룸 관리 페이지 접근 권한
             auth.requestMatchers("/room/**").permitAll();
+            // 공지사항 페이지 접근 권한
+            auth.requestMatchers("/notice/**").permitAll();
                 });
 
         //http.exceptionHandling(exceptionHandling ->exceptionHandling

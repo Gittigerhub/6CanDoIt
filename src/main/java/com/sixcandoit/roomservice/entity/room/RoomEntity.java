@@ -37,16 +37,16 @@ public class RoomEntity extends BaseEntity {
     @Column(name = "room_view")
     private String roomView;                // 객실 뷰 종류(O:오션뷰, C:시티뷰, M:마운틴뷰, G:가든뷰, N:창문 없음)
 
-    @Column(name = "room_num", columnDefinition = "integer default 2", nullable = false)
+    @Column(name = "room_num", nullable = false)
     private int roomNum = 2;                // 투숙객 수
 
-    @Column(name = "room_bed", columnDefinition = "integer default 0", nullable = false)
+    @Column(name = "room_bed", nullable = false)
     private int roomBed = 0;                // 침대 타입(3: 킹, 2: 퀸, 1: 더블, 0: 싱글)
 
-    @Column(name = "room_price", columnDefinition = "integer default 0", nullable = false)
+    @Column(name = "room_price", nullable = false)
     private int roomPrice = 0;                  // 객실 가격
 
-    @Column(name = "room_size", columnDefinition = "integer default 0", nullable = false)
+    @Column(name = "room_size", nullable = false)
     private int roomSize = 0;           // 객실 평수
 
     @Column(name = "room_season")
@@ -82,7 +82,7 @@ public class RoomEntity extends BaseEntity {
     @Column(name = "room_cancel_pee", columnDefinition = "float default 0.0")
     private float roomCancelPee;            // 취소 수수료
 
-    @Column(name = "room_reservation", columnDefinition = "integer default 0", nullable = false)
+    @Column(name = "room_reservation", nullable = false)
     private int roomReservation = 0;            // 객실 예약 상태(0:빈 방, 1:예약, 2:체크인, 3:체크 아웃)
 
     // 조직 테이블과 N:1 매핑

@@ -1,8 +1,6 @@
 package com.sixcandoit.roomservice.controller.qna;
 
-import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.dto.qna.ReplyDTO;
-import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
 import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.service.qna.ReplyService;
 import jakarta.validation.Valid;
@@ -11,10 +9,10 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -58,7 +56,6 @@ public class ReplyController {
         replyService.replyUpdate(replyDTO);
 
         return "redirect:/qna/read?idx=" + qnaIdx;
-
     }
 
     // Qna의 A 삭제

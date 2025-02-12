@@ -1,16 +1,17 @@
 package com.sixcandoit.roomservice.controller.notice;
 
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
-import com.sixcandoit.roomservice.dto.qna.QnaDTO;
+
+import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.notice.NoticeService;
-import com.sixcandoit.roomservice.service.qna.QnaService;
+
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +31,7 @@ import java.util.Map;
 public class NoticeController {
 
     private final NoticeService noticeService;
+    private final MemberRepository memberRepository;
 
 
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
@@ -45,7 +47,7 @@ public class NoticeController {
         // html에 필요한 페이지 정보를 받는다.
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(noticeDTOS);
 
-        model.addAttribute("noticelist", noticeDTOS); // 데이터 전달
+        model.addAttribute("noticeDTO", noticeDTOS); // 데이터 전달
         model.addAllAttributes(pageInfo); // 페이지 정보
         model.addAttribute("type", type); //검색분류
         model.addAttribute("keyword", keyword); // 키워드
@@ -82,8 +84,8 @@ public class NoticeController {
 
 
     @GetMapping("/notice/read")
-    public String read(@RequestParam  Integer idx, Model model) {
-        noticeService.count(idx);
+    public String read(@RequestParam Integer idx, Model model) {
+
         log.info("개별 데이터를 읽는 중입니다");
         NoticeDTO noticeDTO = noticeService.noticeRead(idx);
 
@@ -125,6 +127,7 @@ public class NoticeController {
     public String delete(@RequestParam Integer idx) {
         log.info("데이터를 삭제합니다.");
         noticeService.noticeDelete(idx);
+
         return "redirect:/notice/list";
     }
 }

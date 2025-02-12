@@ -16,6 +16,8 @@ import java.util.List;
 public class MenuDTO {
     private Integer idx;                 // 기본 키
 
+    private String menuCategory;        // 메뉴 카테고리(KF:한식, CF:중식, WF:양식, JF:일식, Dr:음료, Si:사이드)
+
     private String menuName;             // 메뉴 이름
 
     private String menuContent;          // 메뉴 설명
@@ -30,11 +32,15 @@ public class MenuDTO {
 
     private String menuSalesYn;          // 세일 여부(N:안함, Y:세일중)
 
-    private String menuSaleType;         // 할인구분(NONE:없음,AMOUNT:할인액,PERSENT:항인율)
+    private String menuSaleType;         // 할인구분(NONE:없음,AMOUNT:할인액,PERSENT:할인율)
+
+    private int originPrice;            // 원가
 
     private int menuSaleAmount;          // 할인액
 
     private int menuSalePercent;         // 할인율
+
+
 
     private List<MenuOptionDTO> menuOptionDTOList;
 

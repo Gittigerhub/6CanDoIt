@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.controller.orders;
 
-import com.sixcandoit.roomservice.dto.orders.CartDetailDTO;
 import com.sixcandoit.roomservice.dto.orders.CartMenuDTO;
 import com.sixcandoit.roomservice.dto.orders.CartOrdersDTO;
 import com.sixcandoit.roomservice.service.orders.CartMenuService;
@@ -11,7 +10,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -59,17 +57,17 @@ public class CartController {
     }
 
 
-    @GetMapping("/cart")
-    public String getCart(Principal principal, Model model) {
-        //사용자에게 보여줄 장바구니 목록
-        List<CartDetailDTO> cartDetailDTOList =
-                cartService.cartDetailDTOList(principal.getName());
-
-        //사용자에게 보여줄 장바구니 목록 중에 CartDetailDTO(꼭 필요한 정보만 가공한 DTO)로 담은 List
-        model.addAttribute("cartDetailDTOList", cartDetailDTOList);
-
-        return "orders/cartlist";
-    }
+//    @GetMapping("/cart")
+//    public String getCart(Principal principal, Model model) {
+//        //사용자에게 보여줄 장바구니 목록
+//        List<CartDetailDTO> cartDetailDTOList =
+//                cartService.cartDetailDTOList(principal.getName());
+//
+//        //사용자에게 보여줄 장바구니 목록 중에 CartDetailDTO(꼭 필요한 정보만 가공한 DTO)로 담은 List
+//        model.addAttribute("cartDetailDTOList", cartDetailDTOList);
+//
+//        return "orders/cartlist";
+//    }
 
     //변경
     @PostMapping("/cartmenu")

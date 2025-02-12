@@ -28,6 +28,7 @@ public class EmailService {
         } catch(MailException e) {
             //메일 보내기 실패시
             System.out.println("전송오류");
+            e.printStackTrace();
         }
     }
 }

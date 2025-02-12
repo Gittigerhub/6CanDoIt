@@ -47,20 +47,14 @@
                             <input type="text" class="form-control" id="memberPhone" name="memberPhone" placeholder="'-'없이 숫자만 입력" maxlength="11">
                         </div>
                         <div class="mb-3">
-                            <label for="memberPostcode" class="form-label">주소:</label>
+                            <label for="memberAddress" class="form-label">주소:</label>
                             <div class="signUp-input-area d-flex mb-1 col-lg-7">
                                 <input type="text" class="form-control input-lg" id="memberPostcode" placeholder="우편번호" style="height: 40px;">
                                 <input type="button" class="btn btn-secondary" style="text-align:center; height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
                             </div>
                         </div>
                         <div class="signUp-input-area mb-1">
-                            <input type="text"  class="form-control" id="memberAddress" placeholder="주소">
-                        </div>
-                        <div class="signUp-input-area mb-1">
-                            <input type="text" class="form-control"  id="memberDetailAddress" placeholder="상세주소">
-                        </div>
-                        <div class="signUp-input-area mb-1">
-                            <input type="text" class="form-control"  id="memberExtraAddress" placeholder="참고항목">
+                            <input type="text" class="form-control" id="memberAddress" name="memberAddress" placeholder="주소" style="height: 40px;">
                         </div>
                         <div>주문 알람 수신여부:</div>
                         <div class="form-check">
@@ -93,15 +87,17 @@
         function execDaumPostcode() {
             new daum.Postcode({
                 oncomplete: function(data) {
-                    var addr = '';
-                    var extraAddr = '';
+                    var fullAddress = '';  // 최종적으로 합칠 주소
+                    var extraAddr = '';    // 참고항목
 
+                    // 도로명 주소 또는 지번 주소 선택
                     if (data.userSelectedType === 'R') {
-                        addr = data.roadAddress;
+                        fullAddress = data.roadAddress;
                     } else {
-                        addr = data.jibunAddress;
+                        fullAddress = data.jibunAddress;
                     }
 
+                    // 도로명 주소일 경우 추가적인 정보 처리
                     if (data.userSelectedType === 'R') {
                         if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
                             extraAddr += data.bname;
@@ -109,20 +105,23 @@
                         if (data.buildingName !== '' && data.apartment === 'Y') {
                             extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
                         }
+                        // 참고항목이 있을 경우 추가
                         if (extraAddr !== '') {
                             extraAddr = ' (' + extraAddr + ')';
                         }
-                        document.getElementById("memberExtraAddress").value = extraAddr;
-                    } else {
-                        document.getElementById("memberExtraAddress").value = '';
                     }
 
+                    // 최종 주소에 참고항목 추가
+                    fullAddress += extraAddr;
+
+                    // 주소, 우편번호를 입력란에 채우기
                     document.getElementById('memberPostcode').value = data.zonecode;
-                    document.getElementById("memberAddress").value = addr;
-                    document.getElementById("memberDetailAddress").focus();
+                    document.getElementById("memberAddress").value = fullAddress;  // 주소를 memberAddress 필드에 삽입
                 }
             }).open();
         }
+
+
     </script>
 </div>
 </body>

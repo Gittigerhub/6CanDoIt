@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.controller.member;
 
+import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.service.member.MemberService;
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+
+    @GetMapping("/")
+    public String IndexForm(HttpSession session, MemberDTO memberDTO) {
+        session.setAttribute("memberName", memberDTO.getMemberName());
+        return "index";
+    }
 
     // 회원가입
     @GetMapping("/register")

@@ -37,8 +37,8 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
 
         if(session != null) {
-            String userid = authentication.getName();
-            session.setAttribute("userid", userid);
+            String memberEmail = authentication.getName();
+            session.setAttribute("memberEmail", memberEmail);
 
             boolean isUser = authentication.getAuthorities().stream()
                     .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER"));

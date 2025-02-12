@@ -25,15 +25,6 @@
                                 <label for="adminEmail" class="form-label">이메일:</label>
                                 <input type="email" class="form-control" id="adminEmail" th:name="adminEmail" th:value="${admin.adminEmail}" >
                             </div>
-                            <div class="mb-3">
-                                <label for="adminBirth" class="form-label">생년월일:</label>
-                                <input type="date" class="form-control" id="adminBirth" th:name="adminBirth" th:value="${admin.adminBirth}" max="9999-12-31">
-                            </div>
-                            <div class="mb-2">성별:</div>
-                            <div class="form-check">
-                                <input type="radio" name="adminGender" id="male"><label for="male">남성</label>
-                                <input type="radio" name="adminGender" id="female"><label for="female">여성</label>
-                            </div>
                             <div class="mt-2 mb-3">
                                 <label for="adminName" class="form-label">이름:</label>
                                 <input type="text" class="form-control" id="adminName" th:name="adminName" th:value="${admin.adminName}">
@@ -41,31 +32,6 @@
                             <div class="mb-3">
                                 <label for="adminPhone" class="form-label">연락처:</label>
                                 <input type="text" class="form-control" id="adminPhone" th:name="adminPhone" th:value="${admin.adminPhone}" maxlength="11">
-                            </div>
-                            <div class="mb-3">
-                                <label for="adminPostcode" class="form-label">주소:</label>
-                                <div class="signUp-input-area d-flex mb-1 col-lg-7">
-                                    <input type="text" class="form-control input-lg" id="adminPostcode" placeholder="우편번호" style="height: 40px;">
-                                    <input type="button" class="btn btn-secondary" style="text-align:center; height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
-                                </div>
-                            </div>
-                            <div class="signUp-input-area mb-1">
-                                <input type="text"  class="form-control" id="adminAddress" placeholder="주소">
-                            </div>
-                            <div class="signUp-input-area mb-1">
-                                <input type="text" class="form-control"  id="adminDetailAddress" placeholder="상세주소">
-                            </div>
-                            <div class="signUp-input-area mb-1">
-                                <input type="text" class="form-control"  id="adminExtraAddress" placeholder="참고항목">
-                            </div>
-                            <div>주문 알람 수신여부:</div>
-                            <div class="form-check">
-                                <label class="form-check-label" for="alramOrder1"></label>
-                                <input type="radio" class="form-check-input" id="alramOrder1" name="optradio" value="alramOrder1" checked>예
-                            </div>
-                            <div class="form-check">
-                                <label class="form-check-label" for="alramOrder2"></label>
-                                <input type="radio" class="form-check-input" id="alramOrder2" name="optradio" value="alramOrder2">아니오
                             </div>
                             <div class="mb-3 text-center">
                                 <button type="submit" class="btn btn-primary" value="수정">수정 완료</button>
@@ -77,41 +43,6 @@
             </div>
             <div class="col-4"></div>
         </div>
-        <script>
-            function execDaumPostcode() {
-                new daum.Postcode({
-                    oncomplete: function(data) {
-                        var addr = '';
-                        var extraAddr = '';
-
-                        if (data.userSelectedType === 'R') {
-                            addr = data.roadAddress;
-                        } else {
-                            addr = data.jibunAddress;
-                        }
-
-                        if (data.userSelectedType === 'R') {
-                            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                                extraAddr += data.bname;
-                            }
-                            if (data.buildingName !== '' && data.apartment === 'Y') {
-                                extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                            }
-                            if (extraAddr !== '') {
-                                extraAddr = ' (' + extraAddr + ')';
-                            }
-                            document.getElementById("adminExtraAddress").value = extraAddr;
-                        } else {
-                            document.getElementById("adminExtraAddress").value = '';
-                        }
-
-                        document.getElementById('adminPostcode').value = data.zonecode;
-                        document.getElementById("adminAddress").value = addr;
-                        document.getElementById("adminDetailAddress").focus();
-                    }
-                }).open();
-            }
-        </script>
     </div>
 
 

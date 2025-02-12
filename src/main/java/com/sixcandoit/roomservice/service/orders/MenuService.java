@@ -49,19 +49,31 @@ public class MenuService {
 
     }
 
-//    public MenuDTO menuRead(Integer idx, String memberEmail) {
+//    public Page<MenuDTO> menuList(Pageable page, String type, String keyword) {
+//        try {
+//            // 1. 페이지 정보를 재가공
+//            int currentPage = page.getPageNumber() - 1;  // 화면의 페이지 번호를 db 페이지 번호로
+//            int pageSize = 10; // 한 페이지를 구성하는 레코드 수
 //
-//        MenuEntity menuEntity
-//                = menuRepository.findById(idx).orElseThrow(EntityNotFoundException::new);
+//            // 지정된 내용으로 페이지 정보를 재생산, 정렬 내림차순 DESC
+//            Pageable pageable = PageRequest.of(currentPage, pageSize,
+//                    Sort.by(Sort.Direction.DESC, "idx"));
 //
-//        MenuDTO menuDTO = modelMapper.map(menuEntity, MenuDTO.class)
-//                .setMenuImg();
-//    }
+//            // 2. 조회
+//            // 조회 결과를 저장할 변수 선언
+//            Page<MenuEntity> menuEntities;
 //
-//    public PageRequestDTO<MenuDTO> menuList(PageRequestDTO pageRequestDTO, String email) {
-//        Pageable pageable = pageRequestDTO.getPageable("idx");
-//        Page<MenuEntity> menuEntities
-//                = menuRepository.
+//            // 여러개를 조회해야 할 땐 if문으로 분류에 따라 조회해야한다.
+//            // type : 메뉴명(1), 메뉴설명(2), 메뉴명+메뉴설명(3), 카테고리(4), 메뉴가격(4), 전체(0)
+//            if (keyword != null) {  //검색어가 존재하면
+//                log.info("검색어가 존재하면...");
+//                if (type.equals("1")) { //type 분류 1, 메뉴명으로 검색할 때
+//                    log.info("메뉴명으로 검색 하는 중...");
+//                    menuEntities = menuRepository.
+//                }
+//            }
+//        }
+//
 //    }
 
     //메뉴 수정

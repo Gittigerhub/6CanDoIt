@@ -41,8 +41,7 @@ public class NoticeService {
         }
     }
 
-    public void noticeDelete(Integer idx) {
-        noticeRepository.deleteById(idx);
+    public void noticeDelete(Integer idx) {noticeRepository.deleteById(idx);
     }
 
     public Page<NoticeDTO> noticeList(Pageable page, String type, String keyword) {

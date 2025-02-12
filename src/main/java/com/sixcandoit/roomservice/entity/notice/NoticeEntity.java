@@ -8,11 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -39,14 +36,6 @@ public class NoticeEntity extends BaseEntity {
     @Column(name = "notice_hits")
     private int noticeHits;               // 조회 수
 
-    @CreationTimestamp
-    @Column(name = "noticeDate", updatable = false)
-    private LocalDateTime noticeDate;
-
-    @UpdateTimestamp
-    @Column(name = "modDate")
-    private LocalDateTime modDate;
-
     // 관리자 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_idx")
@@ -54,4 +43,4 @@ public class NoticeEntity extends BaseEntity {
     private AdminEntity adminJoin;
 
 
-    }
+}

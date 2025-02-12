@@ -29,10 +29,10 @@
               <input type="hidden" name="id" th:value="${noticeDTO.idx}">
               <div class="mb-3 mt-3">
                 <label for="idx" class="form-label">번호:</label>
-                <input type="text" th:field="*{idx}" class="form-control" id="idx" name="idx" th:value="${noticeDTO.idx}">
+                <input type="text" th:field="*{idx}" class="form-control" id="idx" name="idx"
+                       th:value="${noticeDTO.idx}" readonly>
               </div>
-              <div class="mb-3 mt-3">
-                <!--게시글제목-->
+              <div class="mb-3 mt-3"><!--게시글제목-->
                 <label for="noticeTitle" class="form-label">제목:</label>
                 <input type="text" th:field="*{noticeTitle}" class="form-control" id="noticeTitle" name="noticeTitle">
                 <span th:if="${#fields.hasErrors('noticeTitle')}"
@@ -50,7 +50,7 @@
             </div>
             <div class="card-footer">
               <a th:href="@{/notice/list}" class="btn btn-secondary">목록</a>
-              <button th:href="@{/notice/list}"  class="btn btn-primary">수정 완료</button>
+              <button type="submit" class="btn btn-primary">수정 완료</button>
               <a th:href="@{/notice/list}" class="btn btn-danger">취소</a>
             </div>
           </div>

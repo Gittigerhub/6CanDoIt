@@ -7,9 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -32,13 +31,12 @@ public class NoticeDTO {
 
     private int noticeHits; //조회수
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd:mm:ss")
-    private LocalDate noticeDate;//작성일
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDate modDate;//수정일
+    private LocalDateTime insDate;//작성일
 
 
+    private LocalDateTime modDate;//수정일
 
+    private String noticeImg; //이미지
 
 }

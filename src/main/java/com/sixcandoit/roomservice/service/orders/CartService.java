@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.service.orders;
 
+import com.sixcandoit.roomservice.dto.orders.CartDetailDTO;
 import com.sixcandoit.roomservice.dto.orders.CartMenuDTO;
 import com.sixcandoit.roomservice.dto.orders.CartOrdersDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
@@ -84,23 +85,23 @@ public class CartService {
         }
     }
 
-//    public List<CartDetailDTO> cartDetailDTOList(String memberEmail) {
-//
-//        List<CartDetailDTO> cartDetailDTOList = new ArrayList<>();
-//
-//        Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
-//
-//        CartEntity cartEntity = cartRepository.findByMemberJoin_memberEmail(memberEntity.get().getMemberEmail());
-//
-//        //카트가 존재하지 않는다면
-//        if (cartEntity == null) {
-//            return cartDetailDTOList;
-//        }
-//        //장바구니에 담겨있는 메뉴를 조회
-//        cartDetailDTOList = cartMenuRepository.findByCartDetailDTOList(cartEntity.getIdx());
-//
-//        return cartDetailDTOList;
-//    }
+    public List<CartDetailDTO> cartDetailDTOList(String memberEmail) {
+
+        List<CartDetailDTO> cartDetailDTOList = new ArrayList<>();
+
+        Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
+
+        CartEntity cartEntity = cartRepository.findByMemberJoin_memberEmail(memberEntity.get().getMemberEmail());
+
+        //카트가 존재하지 않는다면
+        if (cartEntity == null) {
+            return cartDetailDTOList;
+        }
+        //장바구니에 담겨있는 메뉴를 조회
+        //cartDetailDTOList = cartMenuRepository.findByCartDetailDTOList(cartEntity.getIdx());
+
+        return cartDetailDTOList;
+    }
 
     public boolean validateCartMenu(Integer cartMenuidx,String memberEmail) {
         Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);

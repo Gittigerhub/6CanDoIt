@@ -7,7 +7,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@ToString(exclude = "orders")
+//@ToString(exclude = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

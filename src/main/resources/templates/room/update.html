@@ -30,6 +30,7 @@
                                 <label for="idx" class="form-label">번호:</label>
                                 <input type="text" class="form-control" id="idx" name="idx"
                                        th:value="${roomDTO.idx}" readonly>
+                            </div>
                             <div class="mb-3 mt-3"><!--객실 유형-->
                                 <label for="roomType" class="form-label">객실 타입:</label>
                                 <select id="roomType" th:field="*{roomType}" class="form-select" aria-label="Default select example">
@@ -106,7 +107,7 @@
                                     <input type="time" th:value="${roomDTO.roomCheckOut != null ? #temporals.format(roomDTO.roomCheckOut, 'HH:mm') : '11:00'}" class="form-control" id="roomCheckOut" name="roomCheckOut">
                                 </div>
                             </div>
-                            </div>
+                        </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">등록</button>
                             <button type="reset" class="btn btn-secondary">초기화</button>

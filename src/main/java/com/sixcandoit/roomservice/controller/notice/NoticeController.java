@@ -84,8 +84,8 @@ public class NoticeController {
 
 
     @GetMapping("/notice/read")
-    public String read(@RequestParam Integer idx, Model model) {
-
+    public String read(@RequestParam("idx") Integer idx, Model model) {
+        noticeService.count(idx);
         log.info("개별 데이터를 읽는 중입니다");
         NoticeDTO noticeDTO = noticeService.noticeRead(idx);
 
@@ -96,7 +96,7 @@ public class NoticeController {
     }
 
     @GetMapping("/notice/update")
-    public String update(@RequestParam Integer idx, Model model) {
+    public String update(@RequestParam("idx") Integer idx, Model model) {
         log.info("수정할 데이터를 읽는 중입니다.");
         NoticeDTO noticeDTO = noticeService.noticeRead(idx);
 
@@ -124,7 +124,7 @@ public class NoticeController {
 
     // Qna의 Q 삭제
     @GetMapping("/notice/delete")
-    public String delete(@RequestParam Integer idx) {
+    public String delete(@RequestParam("idx") Integer idx) {
         log.info("데이터를 삭제합니다.");
         noticeService.noticeDelete(idx);
 

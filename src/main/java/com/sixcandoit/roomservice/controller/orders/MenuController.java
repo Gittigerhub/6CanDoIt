@@ -2,20 +2,26 @@ package com.sixcandoit.roomservice.controller.orders;
 
 import com.sixcandoit.roomservice.dto.orders.MenuDTO;
 import com.sixcandoit.roomservice.service.orders.MenuService;
+import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,7 +31,7 @@ public class MenuController {
     private final MenuService menuService;
 
     //아이템 등록
-    @GetMapping("/admin/menu/new")
+    @GetMapping("/orders/registermenu")
     public String registerMenu(Model model, Principal principal) {
         if (principal == null) {
             //로그인이 안되어 있으면, 접근 불가능하도록
@@ -40,7 +46,7 @@ public class MenuController {
     }
 
     //아이템 등록
-    @PostMapping("/admin/menu/new")
+    @PostMapping("/orders/registermenu")
     public String registerMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult,
                                    List<MultipartFile> multipartFile, Model model) {
         //들어오는 값을 확인
@@ -83,7 +89,7 @@ public class MenuController {
 
             log.info("상품 등록 완료!");
 
-            return "redirect:/admin/menu/read?idx=" + savedMenuidx;
+            return "redirect:/orders/registermenu?idx=" + savedMenuidx;
         }catch (Exception e) {
             e.printStackTrace();
             log.info("파일 등록시 문제가 발생했습니다.");
@@ -93,8 +99,8 @@ public class MenuController {
     }
 
     //메뉴 목록 확인
-    @GetMapping("/admin/menu/read")
-    public String adminMenuread(Integer menuidx, Model model, RedirectAttributes redirectAttributes) {
+    @GetMapping("/orders/readmenu")
+    public String readMenu(Integer menuidx, Model model, RedirectAttributes redirectAttributes) {
 
         try {
             MenuDTO menuDTO = menuService.menuRead(menuidx);
@@ -104,21 +110,27 @@ public class MenuController {
             return "/orders/readmenu";
         }catch (EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("msg", "존재하지 않는 메뉴입니다.");
-            return "redirect:/admin/menu/list";
+            return "redirect:/orders/readmenu";
         }
     }
 
-//    @GetMapping("/admin/menu/list")
-//    public String adminMenuList(PageRequestDTO pageRequestDTO,
-//                                Model model, Principal principal) {
-//
-//        PageResponseDTO<MenuDTO> pageResponseDTO
-//                = menuService.menuList(pageRequestDTO, principal.getName());
-//
-//        model.addAttribute("pageResponseDTO", pageResponseDTO);
-//
-//        return "orders/menulist";
-//
-//    }
+    @GetMapping("/orders/menulist")
+    public String listMenu(@PageableDefault(page = 1)Pageable pagea, //페이지 정보
+                           @RequestParam(value = "type", defaultValue = "") String type, //검색 대상
+                           @RequestParam(value = "keyword", defaultValue = "") String keyword, //키워드
+                           Model model){
+        //해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
+        Page<MenuDTO> menuDTOS = menuService.menuList(pagea, type, keyword);
+        //html에 필요한 페이지 정보를 받기
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(menuDTOS);
+
+        model.addAttribute("menulist", menuDTOS); //데이터 전달
+        model.addAttribute(pageInfo);   //페이지 정보
+        model.addAttribute("type", type);   //검색 분류
+        model.addAttribute("keyword", keyword); //키워드
+
+        return "orders/menulist";
+
+    }
 
 }

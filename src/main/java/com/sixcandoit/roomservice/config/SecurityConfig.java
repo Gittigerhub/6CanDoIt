@@ -76,6 +76,8 @@ public class SecurityConfig{
                     auth.requestMatchers("/room/**").permitAll();
                     // 공지사항 페이지 접근 권한
                     auth.requestMatchers("/notice/**").permitAll();
+                    // 오더 페이지 접근 권한
+                    auth.requestMatchers("/orders/**").permitAll();
                         });
 
         //관리자회원 로그인
@@ -120,6 +122,8 @@ public class SecurityConfig{
             auth.requestMatchers("/room/**").permitAll();
             // 공지사항 페이지 접근 권한
             auth.requestMatchers("/notice/**").permitAll();
+            // 오더 페이지 접근 권한
+            auth.requestMatchers("/orders/**").permitAll();
                 });
 
         //http.exceptionHandling(exceptionHandling ->exceptionHandling

@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,6 +23,9 @@ public class MenuEntity extends BaseEntity {
     @Column(name = "menu_idx")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;                 // 기본 키
+
+    @Column(name = "menu_category")
+    private String menuCategory;        // 메뉴 카테고리(KF:한식, CF:중식, WF:양식, JF:일식, Dr:음료, Si:사이드)
 
     @Column(name = "menu_name")
     private String menuName;             // 메뉴 이름
@@ -47,7 +49,10 @@ public class MenuEntity extends BaseEntity {
     private String menuSalesYn;          // 세일 여부(N:안함, Y:세일중)
 
     @Column(name = "menu_sale_type")
-    private String menuSaleType;         // 할인구분(NONE:없음,AMOUNT:할인액,PERSENT:항인율)
+    private String menuSaleType;         // 할인구분(NONE:없음,AMOUNT:할인액,PERSENT:할인율)
+
+    @Column(name = "origin_Price")
+    private int originPrice;            // 원가
 
     @Column(name = "menu_sale_amount")
     private int menuSaleAmount;          // 할인액

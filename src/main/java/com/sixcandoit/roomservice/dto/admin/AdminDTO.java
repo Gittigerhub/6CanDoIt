@@ -25,9 +25,9 @@ public class AdminDTO {
     private Integer idx;             // 기본 키
     private String adminEmail;            // 이메일
     private String password;              // 비밀번호
-    private String adminName;             // 생년월일
-    private String adminPhone;            // 성별
-    private String activeYn;              // 이름
+    private String adminName;             // 이름
+    private String adminPhone;            // 연락처
+    private String activeYn;              // 활성 유무
 
     private Level level;
     //열거형 키(설명)

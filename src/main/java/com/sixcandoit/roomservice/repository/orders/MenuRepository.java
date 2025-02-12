@@ -28,14 +28,16 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Integer> {
     //메뉴명+메뉴설명
     @Query("SELECT u FROM MenuEntity u WHERE " +
             "u.menuName like %:keyword% or u.menuContent like %:keyword%")
-    Page<MenuEntity> seachMenuNameAndMenuContent(@Param("keyword") String keyword, Pageable page);
+    Page<MenuEntity> searchMenuNameAndMenuContent(@Param("keyword") String keyword, Pageable page);
 
     //카테고리
-    //@Query("SELECT u FROM MenuEntity u WHERE " +
-    //        ".")
-
-    //메뉴 가격
+    @Query("SELECT u FROM MenuEntity u WHERE " +
+            "u.menuCategory like %:keyword%")
+    Page<MenuEntity> searchMenuCategory(@Param("keyword") String keyword, Pageable page);
 
     //전체
+    @Query("SELECT u From MenuEntity u WHERE " +
+            "u.menuName like %:keyword% or u.menuContent like %:keyword% or u.menuCategory like %:keyword%")
+    Page<MenuEntity> searchMenuAll(@Param("keyword") String keyword, Pageable page);
 
 }

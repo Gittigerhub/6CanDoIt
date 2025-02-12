@@ -65,15 +65,15 @@ public class MemberController {
     // 임시비밀번호 발급
     @GetMapping("/password")
     public String showPasswordPage(){
-        return "/password";
+        return "member/password";
     }
 
     @PostMapping("/password")
     public String modifyPassword(@ModelAttribute MemberDTO memberDTO){
-//        memberService.passwordSend(memberDTO);
+        memberService.passwordSend(memberDTO);
         //스크립트로 출력할 메세지를 전달
 
-        return "redirect:member/login";
+        return "redirect:/login";
     }
 
     // 로그인
@@ -90,7 +90,7 @@ public class MemberController {
 
         session.invalidate();
 
-        return "redirect:member/login";
+        return "redirect:/login";
     }
 
 

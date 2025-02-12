@@ -66,15 +66,15 @@ public class AdminController {
     // 임시비밀번호 발급
     @GetMapping("/password")
     public String showPasswordPage(){
-        return "/password";
+        return "admin/password";
     }
 
     @PostMapping("/password")
     public String modifyPassword(@ModelAttribute AdminDTO adminDTO){
-//        memberService.passwordSend(memberDTO);
+        adminService.passwordSend(adminDTO);
         //스크립트로 출력할 메세지를 전달
 
-        return "redirect:admin/login";
+        return "redirect:/login";
     }
 
     // 로그인
@@ -91,6 +91,6 @@ public class AdminController {
 
         session.invalidate();
 
-        return "redirect:admin/login";
+        return "redirect:/login";
     }
 }

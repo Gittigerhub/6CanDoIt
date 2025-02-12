@@ -90,7 +90,7 @@ public class MemberService {
 
             //임시비밀번호를 회원 이메일(아이디)로 전달
             String emailSubject = "임시비밀번호 발급"; //메일제목
-            String emailText = "안녕하세요"+read.get().getMemberName()+"님.\n"+
+            String emailText = "안녕하세요 "+read.get().getMemberName()+"님.\n"+
                     "요청하신 임시 비밀번호는 다음과 같습니다.\n"+
                     tempPassword+"\n"+
                     "로그인 후 반드시 비밀번호를 변경해 주십시오."; //본문내용

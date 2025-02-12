@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -90,9 +89,5 @@ public class RoomEntity extends BaseEntity {
     @JoinColumn(name = "organ_idx")
     @JsonBackReference
     private OrganizationEntity organizationJoin;
-
-    // 룸 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "roomJoin")
-    private List<RoomImgEntity> roomImgJoin;
 
 }

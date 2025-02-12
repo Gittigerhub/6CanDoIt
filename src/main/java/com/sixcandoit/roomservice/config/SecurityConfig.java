@@ -69,6 +69,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
                     // 조직-매장 페이지 접근 권한
                     auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
+                    // 이벤트-멤버포인트 페이지 접근 권한
                     auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
                     // QnA 페이지 접근 권한
                     auth.requestMatchers("/qna/**", "/reply/**").permitAll();
@@ -78,7 +79,9 @@ public class SecurityConfig{
                     auth.requestMatchers("/notice/**").permitAll();
                     // 오더 페이지 접근 권한
                     auth.requestMatchers("/orders/**").permitAll();
-                        });
+                    // 광고 페이지 접근 권한
+                    auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
+                    });
 
         //관리자회원 로그인
         http.formLogin(login -> login
@@ -115,6 +118,7 @@ public class SecurityConfig{
             auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
             // 조직-매장 페이지 접근 권한
             auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
+            // 이벤트-멤버포인트 페이지 접근 권한
             auth.requestMatchers("/event/**", "/event/memberpoint/**", "/upload/**","/event/update").permitAll();
             // QnA 페이지 접근 권한
             auth.requestMatchers("/qna/**", "/reply/**").permitAll();
@@ -124,7 +128,9 @@ public class SecurityConfig{
             auth.requestMatchers("/notice/**").permitAll();
             // 오더 페이지 접근 권한
             auth.requestMatchers("/orders/**").permitAll();
-                });
+            // 광고 페이지 접근 권한
+            auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
+            });
 
         //http.exceptionHandling(exceptionHandling ->exceptionHandling
         //         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())

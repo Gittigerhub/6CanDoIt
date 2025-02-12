@@ -17,7 +17,7 @@ public class GMailUtil {
     //받은사람주소, 제목, 내용
     public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
-        String from = "운영자<본인메일주소>";
+        String from = "운영자<himyeongsun@gmail.com>";
 
         message.setFrom(from); //보내는 사람
         message.setTo(to); //받은사람

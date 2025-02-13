@@ -83,9 +83,6 @@ public class RoomEntity extends BaseEntity {
     @Column(name = "room_cancel_pee", columnDefinition = "float default 0.0")
     private float roomCancelPee;            // 취소 수수료
 
-    @Column(name = "room_reservation", nullable = false)
-    private int roomReservation = 0;            // 객실 예약 상태(0:빈 방, 1:예약, 2:체크인, 3:체크 아웃)
-
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_idx")

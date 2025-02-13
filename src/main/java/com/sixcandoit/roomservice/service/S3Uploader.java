@@ -1,14 +1,17 @@
 package com.sixcandoit.roomservice.service;
 
+// DTO <-> Entity <-> Repository와 관련 있는 클래스는 @Service
+// 관련 없는 클래스는 @Compoment
+
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -16,8 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
-// DTO <-> Entity <-> Repository와 관련 있는 클래스는 @Service
-// 관련 없는 클래스는 @Compoment
 
 // S3에 저장과정
 //              파일이 메모리에 존재             파일이 물리적 존재
@@ -31,7 +32,7 @@ public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
 
-    @Value("${cloud.aws.s3.bucket")
+    @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
     // 서비스에서 Upload요청 메소드

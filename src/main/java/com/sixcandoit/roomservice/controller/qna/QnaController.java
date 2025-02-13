@@ -1,7 +1,6 @@
 package com.sixcandoit.roomservice.controller.qna;
 
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
-import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -26,7 +26,6 @@ import java.util.Map;
 public class QnaController {
     // final 선언
     private final QnaService qnaService;
-    private final MemberRepository memberRepository;
 
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
     // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
@@ -103,6 +102,7 @@ public class QnaController {
     // Qna의 Q 수정할 게시글 수정하기
     @PostMapping("/qna/update")
     public String updateProc(@Valid @ModelAttribute QnaDTO qnaDTO,
+                             MultipartFile imagefile,
                              BindingResult bindingResult){
         log.info("수정된 데이터를 저장합니다.");
 

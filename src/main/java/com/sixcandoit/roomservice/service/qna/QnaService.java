@@ -5,9 +5,11 @@ import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
+import com.sixcandoit.roomservice.util.FileUpload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,11 +24,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log
 public class QnaService {
+    @Value("${imgLocation}") //이미지가 저장될 위치
+    private String imgLocation;
 
     // final 선언, 모델 맵퍼 선언
     private final QnaRepository qnaRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
+    private final FileUpload fileUpload;
 
     // Qna의 Q 쓰기
     public void qnaRegister(QnaDTO qnaDTO){
@@ -35,6 +40,7 @@ public class QnaService {
                 modelMapper.map(qnaDTO, QnaEntity.class);
         // FavYn의 기본값 N(1:1 질문)으로 설정
         qnaEntity.setFavYn("N");
+
         // 저장
         qnaRepository.save(qnaEntity);
     }

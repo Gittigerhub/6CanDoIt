@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileEntity extends BaseEntity {
+public class ImageFileEntity extends BaseEntity {
 
     @Id
     @Column(name = "image_idx")
@@ -38,7 +38,7 @@ public class FileEntity extends BaseEntity {
     @Column(name = "image_repimage_yn")
     private String repimageYn;      // 대표 이미지 여부
 
-    public FileEntity(String name, String originName, String url, String repimageYn) {
+    public ImageFileEntity(String name, String originName, String url, String repimageYn) {
         this.name = name;
         this.originName = originName;
         this.url = url;
@@ -86,7 +86,5 @@ public class FileEntity extends BaseEntity {
     @JoinColumn(name = "notice_idx")
     @JsonBackReference
     private NoticeEntity noticeJoin;
-
-
 
 }

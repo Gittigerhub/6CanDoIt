@@ -61,10 +61,10 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
     // 테스트용 DB
-    runtimeOnly 'com.h2database:h2'
+//    runtimeOnly 'com.h2database:h2'
 
     // 개발용 DB
-//    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
     // Swagger - API명세서를 만드는 라이브러리
     // localhost:/8080/swagger-ui/index.html

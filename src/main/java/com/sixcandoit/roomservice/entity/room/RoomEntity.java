@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.entity.room;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -89,5 +91,23 @@ public class RoomEntity extends BaseEntity {
     @JoinColumn(name = "organ_idx")
     @JsonBackReference
     private OrganizationEntity organizationJoin;
+
+    // 이미지 파일 테이블과 1:N 매핑
+    @OneToMany(mappedBy = "roomJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImageFileEntity> imageFileJoin;
+
+    // 객실 생성과 동시에 이미지 추가
+    public void addImage(ImageFileEntity image) {
+        this.imageFileJoin.add(image);
+        image.setRoomJoin(this);
+    }
+
+    // 기존 이미지 업데이트
+    public void updateImages(List<ImageFileEntity> newImages) {
+        this.imageFileJoin.clear();
+        for (ImageFileEntity image : newImages) {
+            this.addImage(image);
+        }
+    }
 
 }

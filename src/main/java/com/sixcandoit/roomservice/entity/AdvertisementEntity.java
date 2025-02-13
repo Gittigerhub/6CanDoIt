@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -50,5 +51,23 @@ public class AdvertisementEntity extends BaseEntity {
     @JoinColumn(name = "organ_idx")
     @JsonBackReference
     private OrganizationEntity organizationJoin;
+
+    // 이미지 파일 테이블과 1:N 매핑
+    @OneToMany(mappedBy = "advertisementJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImageFileEntity> imageFileJoin;
+
+    // 광고 생성과 동시에 이미지 추가
+    public void addImage(ImageFileEntity image) {
+        this.imageFileJoin.add(image);
+        image.setAdvertisementJoin(this);
+    }
+
+    // 기존 이미지 업데이트
+    public void updateImages(List<ImageFileEntity> newImages) {
+        this.imageFileJoin.clear();
+        for (ImageFileEntity image : newImages) {
+            this.addImage(image);
+        }
+    }
 
 }

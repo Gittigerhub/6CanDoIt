@@ -2,8 +2,8 @@ package com.sixcandoit.roomservice.entity.qna;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
-import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
+import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -59,11 +59,10 @@ public class QnaEntity extends BaseEntity {
 
     // 이미지 파일 테이블과 1:N 매핑
     @OneToMany(mappedBy = "qnaJoin", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ImageFileEntity> imageFileJoin;
+    private List<ImageFileEntity> imageFileJoin  = new ArrayList<>(); // null값이면 코드작동 안하기 때문에 초기화 진행
 
     // qna 생성과 동시에 이미지 추가
     public void addImage(ImageFileEntity image) {
-        this.imageFileJoin = new ArrayList<>(); // null값이면 코드작동 안하기 때문에 초기화 진행
         this.imageFileJoin.add(image);
         image.setQnaJoin(this);
     }

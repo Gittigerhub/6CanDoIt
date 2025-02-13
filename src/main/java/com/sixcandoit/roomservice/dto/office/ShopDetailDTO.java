@@ -1,17 +1,11 @@
 package com.sixcandoit.roomservice.dto.office;
 
-import com.sixcandoit.roomservice.entity.office.CalculateEntity;
-import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
-import com.sixcandoit.roomservice.entity.orders.MenuEntity;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter

@@ -1,6 +1,6 @@
-package com.sixcandoit.roomservice.repository.orders;
+package com.sixcandoit.roomservice.repository.menu;
 
-import com.sixcandoit.roomservice.entity.orders.MenuEntity;
+import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

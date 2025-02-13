@@ -1,6 +1,5 @@
-package com.sixcandoit.roomservice.dto.orders;
+package com.sixcandoit.roomservice.dto.Menu;
 
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

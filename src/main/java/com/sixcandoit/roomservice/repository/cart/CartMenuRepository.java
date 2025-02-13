@@ -1,6 +1,6 @@
-package com.sixcandoit.roomservice.repository.orders;
+package com.sixcandoit.roomservice.repository.cart;
 
-import com.sixcandoit.roomservice.entity.orders.CartMenuEntity;
+import com.sixcandoit.roomservice.entity.cart.CartMenuEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +13,7 @@ public interface CartMenuRepository extends JpaRepository<CartMenuEntity, Intege
 
     public List<CartMenuEntity> findByCartEntity_Idx(Integer cartIdx);
 
-//    @Query("select new com.sixcandoit.roomservice.dto.orders.CartDetailDTO(cm.idx, m.menuName, m.menuPrice, cm.count, im.menuImg)" +
+//    @Query("select new com.sixcandoit.roomservice.dto.cart.CartDetailDTO(cm.idx, m.menuName, m.menuPrice, cm.count, im.menuImg)" +
 //            " from CartMenuEntity cm" +
 //            " join cm.menuEntity m where cm.cartEntity.idx = :cartIdx" +
 //            " and im.menuEntity.idx = cm.menuEntity.idx" +

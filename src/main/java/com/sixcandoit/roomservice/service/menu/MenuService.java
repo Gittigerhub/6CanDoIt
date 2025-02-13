@@ -1,8 +1,8 @@
-package com.sixcandoit.roomservice.service.orders;
+package com.sixcandoit.roomservice.service.menu;
 
-import com.sixcandoit.roomservice.dto.orders.MenuDTO;
-import com.sixcandoit.roomservice.entity.orders.MenuEntity;
-import com.sixcandoit.roomservice.repository.orders.MenuRepository;
+import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.entity.menu.MenuEntity;
+import com.sixcandoit.roomservice.repository.menu.MenuRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

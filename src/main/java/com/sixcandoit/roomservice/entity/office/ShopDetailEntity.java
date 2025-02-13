@@ -1,12 +1,11 @@
 package com.sixcandoit.roomservice.entity.office;
 
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
-import com.sixcandoit.roomservice.entity.orders.MenuEntity;
+import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity

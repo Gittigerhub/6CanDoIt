@@ -1,4 +1,4 @@
-package com.sixcandoit.roomservice.dto.orders;
+package com.sixcandoit.roomservice.dto.cart;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

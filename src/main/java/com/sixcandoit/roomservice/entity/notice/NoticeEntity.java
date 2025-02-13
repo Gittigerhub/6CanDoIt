@@ -46,11 +46,10 @@ public class NoticeEntity extends BaseEntity {
 
     // 이미지 파일 테이블과 1:N 매핑
     @OneToMany(mappedBy = "noticeJoin", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ImageFileEntity> imageFileJoin;
+    private List<ImageFileEntity> imageFileJoin = new ArrayList<>(); // null값이면 코드작동 안하기 때문에 초기화 진행
 
     // 공지사항 생성과 동시에 이미지 추가
     public void addImage(ImageFileEntity image) {
-        this.imageFileJoin = new ArrayList<>(); // null값이면 코드작동 안하기 때문에 초기화 진행
         this.imageFileJoin.add(image);
         image.setNoticeJoin(this);
     }

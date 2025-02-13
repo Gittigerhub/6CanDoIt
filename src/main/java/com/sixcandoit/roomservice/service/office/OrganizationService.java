@@ -48,11 +48,16 @@ public class OrganizationService {
             // 이미지 등록
             List<ImageFileEntity> images = fileService.saveImages(imageFiles);
 
-            // OrganizationEntity에 이미지 정보 추가
-            organ.setImageFileJoin(images);
+            // 이미지 정보 추가
+            // 양방향 연관관계 편의 메서드 사용
+            for (ImageFileEntity image : images) {
+                organ.addImage(image);  // FK 자동 설정
+            }
+            System.out.println("FK 자동 등록");
 
             // Entity 테이블에 저장
             organizationRepository.save(organ);
+            System.out.println("저장 최최최종");
 
         } catch (Exception e) {             // 오류발생시 오류 처리
             throw new RuntimeException("등록 실패");

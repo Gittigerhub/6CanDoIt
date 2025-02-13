@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.entity.orders;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
 import jakarta.persistence.*;
@@ -75,5 +76,23 @@ public class MenuEntity extends BaseEntity {
     @JoinColumn(name = "cart_idx")
     @JsonBackReference
     private CartEntity cartJoin;
+
+    // 이미지 파일 테이블과 1:N 매핑
+    @OneToMany(mappedBy = "menuJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImageFileEntity> imageFileJoin;
+
+    // 메뉴 생성과 동시에 이미지 추가
+    public void addImage(ImageFileEntity image) {
+        this.imageFileJoin.add(image);
+        image.setMenuJoin(this);
+    }
+
+    // 기존 이미지 업데이트
+    public void updateImages(List<ImageFileEntity> newImages) {
+        this.imageFileJoin.clear();
+        for (ImageFileEntity image : newImages) {
+            this.addImage(image);
+        }
+    }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,11 +57,11 @@ public class OfficeController {
 
     @PostMapping("/organ/register")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
-    public ResponseEntity<String> register(@ModelAttribute OrganizationDTO organizationDTO) {
+    public ResponseEntity<String> register(@ModelAttribute OrganizationDTO organizationDTO, List<MultipartFile> imageFiles) {
 
         try {
             // 서비스에 등록 요청
-            organizationService.organRegister(organizationDTO);
+            organizationService.organRegister(organizationDTO, imageFiles);
 
             // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
             return ResponseEntity.ok("등록 하였습니다.");

@@ -1,15 +1,16 @@
 package com.sixcandoit.roomservice.entity.notice;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.sixcandoit.roomservice.entity.base.BaseEntity;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
+import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -42,5 +43,22 @@ public class NoticeEntity extends BaseEntity {
     @JsonBackReference
     private AdminEntity adminJoin;
 
+    // 이미지 파일 테이블과 1:N 매핑
+    @OneToMany(mappedBy = "noticeJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImageFileEntity> imageFileJoin;
+
+    // 공지사항 생성과 동시에 이미지 추가
+    public void addImage(ImageFileEntity image) {
+        this.imageFileJoin.add(image);
+        image.setNoticeJoin(this);
+    }
+
+    // 기존 이미지 업데이트
+    public void updateImages(List<ImageFileEntity> newImages) {
+        this.imageFileJoin.clear();
+        for (ImageFileEntity image : newImages) {
+            this.addImage(image);
+        }
+    }
 
 }

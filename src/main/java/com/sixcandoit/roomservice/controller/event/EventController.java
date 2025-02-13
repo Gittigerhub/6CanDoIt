@@ -7,18 +7,12 @@ import com.sixcandoit.roomservice.util.PageNationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,21 +63,21 @@ public class EventController {
     }
 
 
-    //이벤트 삭제
-    @GetMapping("/event/delete")
-    @ResponseBody
-    public ResponseEntity<String> EventDelete(@RequestParam Integer idx) {
-        // System.out.println("삭제");
-        // System.out.println(idx);
-        try {
-            eventService.delete(idx);
-
-            return ResponseEntity.ok("삭제하였습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제를 실패 하였습니다.");
-        }
-
-    }
+//    //이벤트 삭제
+//    @GetMapping("/event/delete")
+//    @ResponseBody
+//    public ResponseEntity<String> EventDelete(@RequestParam Integer idx) {
+//        // System.out.println("삭제");
+//        // System.out.println(idx);
+//        try {
+//            eventService.delete(idx);
+//
+//            return ResponseEntity.ok("삭제하였습니다.");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제를 실패 하였습니다.");
+//        }
+//
+//    }
 
     //이벤트 자세히 보기
     @PostMapping("/event/read")

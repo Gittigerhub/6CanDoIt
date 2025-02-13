@@ -1,8 +1,10 @@
 package com.sixcandoit.roomservice.service.office;
 
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
+import com.sixcandoit.roomservice.service.FileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,7 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +27,7 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final ModelMapper modelMapper;
+    private final FileService fileService;
 
 
     /* -----------------------------------------------------------------------------
@@ -31,7 +36,7 @@ public class OrganizationService {
         출력 : 없음
         설명 : 전달받은 데이터를 데이터베이스에 저장하여 조직 등록
     ----------------------------------------------------------------------------- */
-    public void organRegister(OrganizationDTO organizationDTO) {
+    public void organRegister(OrganizationDTO organizationDTO, List<MultipartFile> imageFiles) {
 
         try {
             // DTO -> Entity로 변환
@@ -39,6 +44,12 @@ public class OrganizationService {
 
             // ActiveYn의 최초 기본값은 "Y"
             organ.setActiveYn("Y");
+
+            // 이미지 등록
+            List<ImageFileEntity> images = fileService.saveImages(imageFiles);
+
+            // OrganizationEntity에 이미지 정보 추가
+            organ.setImageFileJoin(images);
 
             // Entity 테이블에 저장
             organizationRepository.save(organ);

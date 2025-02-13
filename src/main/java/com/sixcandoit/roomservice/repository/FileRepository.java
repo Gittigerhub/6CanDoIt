@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.repository;
 
-import com.sixcandoit.roomservice.entity.FileEntity;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,25 +9,34 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FileRepository extends JpaRepository<FileEntity, Integer> {
+public interface FileRepository extends JpaRepository<ImageFileEntity, Integer> {
 
-    // 이미지 검색
-    // 타입이 <연관테이블> 이면서 <해당테이블 idx> 이거나
-    // 타입이 <다른 연관테이블> 이면서 <다른 테이블 idx> 이거나 일때
-    @Query("select f from FileEntity f where" +
-            "(:type = 'organ' and f.organizationJoin.idx = :idx) or " +
-            "(:type = 'room' and f.roomJoin.idx = :idx) or " +
-            "(:type = 'adver' and f.advertisementJoin.idx = :idx) or " +
-            "(:type = 'event' and f.eventJoin.idx = :idx) or " +
-            "(:type = 'menu' and f.menuJoin.idx = :idx) or " +
-            "(:type = 'qna' and f.qnaJoin.idx = :idx) or " +
-            "(:type = 'notice' and f.noticeJoin.idx = :idx)")
-    List<FileEntity> findByType(@Param("type") String type, @Param("idx") Integer idx);
-//
-//    // 특정 조직의 모든 이미지 조회
-//    List<ImageEntity> findByOrganization(OrganizationEntity organization);
-//
-//    // 특정 조직의 대표 이미지 조회
-//    Optional<ImageEntity> findByOrganizationAndRepImageYn(OrganizationEntity organization, String repImageYn);
+    // 조직의 이미지들을 조회
+    @Query("select i from ImageFileEntity i where i.organizationJoin.idx = :idx")
+    List<ImageFileEntity> organizationJoin(@Param("idx") Integer idx);
+
+    // 객실의 이미지들을 조회
+    @Query("select i from ImageFileEntity i where i.roomJoin.idx = :idx")
+    List<ImageFileEntity> roomJoin(@Param("idx") Integer idx);
+
+    // 공지의 이미지들을 조회
+    @Query("select i from ImageFileEntity i where i.noticeJoin.idx = :idx")
+    List<ImageFileEntity> noticeJoin(@Param("idx") Integer idx);
+
+    // qna의 이미지들을 조회
+    @Query("select i from ImageFileEntity i where i.qnaJoin.idx = :idx")
+    List<ImageFileEntity> qnaJoin(@Param("idx") Integer idx);
+
+    // 메뉴의 이미지들을 조회
+    @Query("select i from ImageFileEntity i where i.menuJoin.idx = :idx")
+    List<ImageFileEntity> menuJoin(@Param("idx") Integer idx);
+
+    // 광고의 이미지들을 조회
+    @Query("select i from ImageFileEntity i where i.advertisementJoin.idx = :idx")
+    List<ImageFileEntity> advertisementJoin(@Param("idx") Integer idx);
+
+    // 이벤트의 이미지들을 조회
+    @Query("select i from ImageFileEntity i where i.eventJoin.idx = :idx")
+    List<ImageFileEntity> eventJoin(@Param("idx") Integer idx);
 
 }

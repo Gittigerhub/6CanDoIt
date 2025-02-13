@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.service;
 
-import com.sixcandoit.roomservice.entity.FileEntity;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.repository.FileRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +25,10 @@ public class FileService {
     private final FileRepository fileRepository;
 
     // 이미지 등록
-    public List<FileEntity> saveImage(List<MultipartFile> imageFiles) throws Exception {
+    public List<ImageFileEntity> saveImages(List<MultipartFile> imageFiles) throws Exception {
 
         // 모아서 반환할 리스트
-        List<FileEntity> images = new ArrayList<>();
+        List<ImageFileEntity> images = new ArrayList<>();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
 
@@ -51,7 +51,7 @@ public class FileService {
                 }
 
                 // 엔티티 셋
-                FileEntity fileEntity = new FileEntity();
+                ImageFileEntity fileEntity = new ImageFileEntity();
                 fileEntity.setName(newFileName);
                 fileEntity.setOriginName(originalFilename);
 
@@ -72,11 +72,72 @@ public class FileService {
         return images;
     }
 
-
     // 이미지 수정
-    public void updateImage(List<MultipartFile> imageFiles) {
+    public List<ImageFileEntity> updateImage(List<MultipartFile> imageFiles, String repcheck, String Join, Integer idx) throws Exception {
 
+        // 기존에 존재하던 이미지 리스트
+        List<ImageFileEntity> existingImages = new ArrayList<>();
 
+        if (Join.equals("organ")) {
+            existingImages = fileRepository.organizationJoin(idx);
+        } else if (Join.equals("room")) {
+            existingImages = fileRepository.roomJoin(idx);
+        } else if (Join.equals("notice")) {
+            existingImages = fileRepository.noticeJoin(idx);
+        } else if (Join.equals("qna")) {
+            existingImages = fileRepository.qnaJoin(idx);
+        } else if (Join.equals("event")) {
+            existingImages = fileRepository.eventJoin(idx);
+        } else if (Join.equals("adver")) {
+            existingImages = fileRepository.advertisementJoin(idx);
+        } else if (Join.equals("menu")) {
+            existingImages = fileRepository.menuJoin(idx);
+        }
+
+        if (imageFiles != null && !imageFiles.isEmpty()) {
+
+            for (MultipartFile imagefile : imageFiles) {
+
+                // 빈 파일인지 확인
+                if (imagefile.isEmpty()) {
+                    log.warn("빈 파일이 업로드 되었습니다.:{}", imagefile.getOriginalFilename());
+                    continue;
+                }
+
+                // FileEntity에 저장할 오리지널네임
+                String originalFilename = imagefile.getOriginalFilename();
+                // S3 업로드 성공 시, 생성된 파일 이름
+                String newFileName = "";
+
+                // FileEntity에 저장할 url
+                if (originalFilename != null) { // 작업 할 파일이 존재하면
+                    newFileName = s3Uploader.upload(imagefile, imgUploadLocation);   // S3업로드
+                }
+
+                // 엔티티 셋
+                ImageFileEntity fileEntity = new ImageFileEntity();
+                fileEntity.setName(newFileName);
+                fileEntity.setOriginName(originalFilename);
+
+                // 새로 추가된 이미지 중 대표이미지 여부 확인(repcheck값이 Y 일때)
+                if (repcheck.equals("Y")) {
+                    if (imageFiles.indexOf(imagefile) == 0) {
+                        fileEntity.setRepimageYn("Y");      // 대표이미지 O
+                    } else {
+                        fileEntity.setRepimageYn("N");      // 대표이미지 X
+                    }
+                } else {
+                    fileEntity.setRepimageYn("N");          // 대표이미지 X
+                }
+
+                existingImages.add(fileEntity);
+
+            }
+
+        }
+
+        // 반환
+        return existingImages;
 
     }
 
@@ -84,7 +145,7 @@ public class FileService {
     public void deleteImage(Integer idx) throws Exception {
 
         // idx로 이미지 데이터 조회
-        FileEntity fileEntity = fileRepository.findById(idx)
+        ImageFileEntity fileEntity = fileRepository.findById(idx)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이미지를 찾을 수 없습니다."));
 
         // 레코드 삭제하기 전, 관련 파일 삭제

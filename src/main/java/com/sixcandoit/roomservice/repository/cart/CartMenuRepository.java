@@ -13,11 +13,11 @@ public interface CartMenuRepository extends JpaRepository<CartMenuEntity, Intege
 
     public List<CartMenuEntity> findByCartEntity_Idx(Integer cartIdx);
 
-//    @Query("select new com.sixcandoit.roomservice.dto.cart.CartDetailDTO(cm.idx, m.menuName, m.menuPrice, cm.count, im.menuImg)" +
+//    @Query("select new com.sixcandoit.roomservice.dto.cart.CartDetailDTO(cm.idx, m.menuName, m.menuPrice, cm.count, m.menuImg)" +
 //            " from CartMenuEntity cm" +
 //            " join cm.menuEntity m where cm.cartEntity.idx = :cartIdx" +
-//            " and im.menuEntity.idx = cm.menuEntity.idx" +
-//            " and im.repigYn = 'Y' " +
+//            " and m.menuImg.idx = cm.menuEntity.idx" +
+//            " and if.repigYn = 'Y' " +
 //            " order by cm.idx desc ")
 //    public List<CartDetailDTO> findByCartDetailDTOList(Integer cartIdx);
 

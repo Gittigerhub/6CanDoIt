@@ -42,21 +42,20 @@ public class EventService {
             //변환
             EventEntity eventEntity = modelMapper.map(eventDTO, EventEntity.class);
 
-//            String newTitleImageName = fileService.saveImages(eventDTO.getTitleFile());
-//            String newContentImageName = fileService.saveImages(eventDTO.getContentFile());
-//
-//            eventEntity.setEventTitleImg(newTitleImageName);
-//            eventEntity.setEventImg(newContentImageName);
-
             // 이미지 등록
             List<ImageFileEntity> images = fileService.saveImages(eventDTO.getFiles());
+            System.out.println("S3 이미지 등록 완료");
 
-            // OrganizationEntity에 이미지 정보 추가
-            eventEntity.setImageFileJoin(images);
+            // 이미지 정보 추가
+            // 양방향 연관관계 편의 메서드 사용
+            for (ImageFileEntity image : images) {
+                eventEntity.addImage(image);  // FK 자동 설정
+            }
+            System.out.println("FK 자동 등록");
 
-
+            // 데이터 저장
             eventRepository.save(eventEntity);
-            
+            System.out.println("저장 최최최종");
 
         } catch (Exception e) {
             throw new RuntimeException("이미지 저장 실패 : "+e.getMessage());

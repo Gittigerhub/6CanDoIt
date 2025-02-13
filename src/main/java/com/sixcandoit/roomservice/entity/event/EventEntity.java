@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -62,6 +63,7 @@ public class EventEntity extends BaseEntity {
 
     // 이벤트 생성과 동시에 이미지 추가
     public void addImage(ImageFileEntity image) {
+        this.imageFileJoin = new ArrayList<>(); // null값이면 코드작동 안하기 때문에 초기화 진행
         this.imageFileJoin.add(image);
         image.setEventJoin(this);
     }

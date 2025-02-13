@@ -12,13 +12,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AmazonS3Config {
 
-    @Value("${cloud.aws.credentials.access-Key}")
+    @Value("${aws.accessKey}")
     private String accessKey;
 
-    @Value("${cloud.aws.credentials.secret-Key}")
+    @Value("${aws.secretKey}")
     private String secretKey;
 
-    @Value("${cloud.aws.region.static}")
+    @Value("${aws.region}")
     private String region;
 
     // application.properties에 선언이 안되어 있으면 직접 지정가능

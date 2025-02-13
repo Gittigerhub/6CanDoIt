@@ -1,14 +1,16 @@
 package com.sixcandoit.roomservice.service.event;
 
 import com.sixcandoit.roomservice.dto.event.EventDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.event.EventEntity;
 import com.sixcandoit.roomservice.repository.event.EventRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
+import com.sixcandoit.roomservice.service.FileService;
+import com.sixcandoit.roomservice.service.S3Uploader;
 import com.sixcandoit.roomservice.util.FileUpload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -19,13 +21,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log
 public class EventService {
-    @Value("${dataUploadPath}")
-    private  String imgLocation;
-    
-    private  final MemberRepository memberRepository;
-    private  final ModelMapper modelMapper;
+//    @Value("${dataUploadPath}")
+//    private  String imgLocation;
+//
+    private final MemberRepository memberRepository;
+    private final ModelMapper modelMapper;
     private final FileUpload fileUpload;
-    private  final EventRepository eventRepository;
+    private final EventRepository eventRepository;
+    private final FileService fileService;
+    private final S3Uploader s3Uploader;
 
     /*-------------------------------------------------
     함수명 : register(EventDTO eventDTO)
@@ -37,12 +41,18 @@ public class EventService {
         try {
             //변환
             EventEntity eventEntity = modelMapper.map(eventDTO, EventEntity.class);
-            //이미지 저장
-            String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
-            String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
 
-            eventEntity.setEventTitleImg(newTitleImageName);
-            eventEntity.setEventImg(newContentImageName);
+//            String newTitleImageName = fileService.saveImages(eventDTO.getTitleFile());
+//            String newContentImageName = fileService.saveImages(eventDTO.getContentFile());
+//
+//            eventEntity.setEventTitleImg(newTitleImageName);
+//            eventEntity.setEventImg(newContentImageName);
+
+            // 이미지 등록
+            List<ImageFileEntity> images = fileService.saveImages(eventDTO.getFiles());
+
+            // OrganizationEntity에 이미지 정보 추가
+            eventEntity.setImageFileJoin(images);
 
 
             eventRepository.save(eventEntity);
@@ -88,21 +98,21 @@ public class EventService {
                 throw new RuntimeException("이벤트 조회 실패");
             }
             else{
-                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventTitleImg());
-                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventImg());
+//                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventTitleImg());
+//                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventImg());
+//
+//
+//                String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
+//                String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
+//
+//                EventEntity eventEntity = modelMapper.map(eventDTO,EventEntity.class);
+//
+//                eventEntity.setEventTitleImg(newTitleImageName);
+//                eventEntity.setEventImg(newContentImageName);
 
-
-                String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
-                String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
-
-                EventEntity eventEntity = modelMapper.map(eventDTO,EventEntity.class);
-
-                eventEntity.setEventTitleImg(newTitleImageName);
-                eventEntity.setEventImg(newContentImageName);
-
-
-
-                eventRepository.save(eventEntity);
+//
+//
+//                eventRepository.save(eventEntity);
             }
 
         } catch (Exception e){
@@ -116,16 +126,16 @@ public class EventService {
     출력 : 없음
     설명 : 포인트 정보를 삭제할때 사용
     ---------------------------------------------------*/
-    public void delete(Integer idx){
-        try {
-
-            fileUpload.FileDelete(imgLocation,read(idx).getEventImg());
-            fileUpload.FileDelete(imgLocation,read(idx).getEventTitleImg());
-            eventRepository.deleteById(idx);
-        } catch (Exception e){
-            throw new RuntimeException("포인트 삭제 실패: "+e.getMessage());
-        }
-    }
+//    public void delete(Integer idx){
+//        try {
+//
+//            fileUpload.FileDelete(imgLocation,read(idx).getEventImg());
+//            fileUpload.FileDelete(imgLocation,read(idx).getEventTitleImg());
+//            eventRepository.deleteById(idx);
+//        } catch (Exception e){
+//            throw new RuntimeException("포인트 삭제 실패: "+e.getMessage());
+//        }
+//    }
 
     /*-------------------------------------------------
     함수명 : list(Pageable page)

@@ -1,16 +1,12 @@
 package com.sixcandoit.roomservice.dto.event;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -55,5 +51,7 @@ public class EventDTO {
     private MultipartFile titleFile;
 
     private MultipartFile contentFile;
+
+    private List<MultipartFile> Files;
 
 }

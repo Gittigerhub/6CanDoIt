@@ -142,7 +142,7 @@
                     <!--입력폼-->
                     <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
                     <input type="hidden" name="activeYn" value="Y">  <!-- 조직 활성 유무 기본(Y) -->
-                    <form id="addForm" method="post">
+                    <form id="addForm" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
                             <p>새로운 조직을 등록합니다.</p>
 
@@ -281,7 +281,7 @@
                                 <div class="col-sm-12 mt-2">
                                     <div class="form-group form-group-default">
                                         <label>*이미지 :</label>
-                                        <input id="organTel" name="organTel" type="text" class="form-control mt-2" placeholder="대표 연락처를 입력하세요." required maxlength="100"/>
+                                        <input id="imageFiles" name="imageFiles" type="file" class="form-control mt-2" placeholder="." required maxlength="100"/>
                                     </div>
                                 </div>
 

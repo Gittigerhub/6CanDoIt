@@ -20,18 +20,18 @@
             <div class="card">
                 <div class="card-body">
                     <h2>회원가입</h2>
-                    <form th:action="@{/member/register}" method="post" class="was-validated">
+                    <form th:action="@{/member/register}" method="post" class="was-validated" onsubmit="combineAddress()">
                         <div class="mb-3 mt-3">
                             <label for="memberEmail" class="form-label">이메일:</label>
-                            <input type="email" class="form-control" id="memberEmail" name="memberEmail" placeholder="이메일형식으로 입력하세요.">
+                            <input type="email" class="form-control" id="memberEmail" name="memberEmail" placeholder="이메일형식으로 입력하세요." required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">비밀번호:</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="영문자와 숫자로 구성하세요.">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="영문자와 숫자로 구성하세요." required>
                         </div>
                         <div class="mb-3">
                             <label for="memberBirth" class="form-label">생년월일:</label>
-                            <input type="date" class="form-control" id="memberBirth" name="memberBirth" value="" max="9999-12-31">
+                            <input type="date" class="form-control" id="memberBirth" name="memberBirth" value="" max="9999-12-31" required>
                         </div>
                         <div class="mb-2">성별:</div>
                         <div class="form-check">
@@ -40,11 +40,11 @@
                         </div>
                         <div class="mt-2 mb-3">
                             <label for="memberName" class="form-label">이름:</label>
-                            <input type="text" class="form-control" id="memberName" name="memberName" placeholder="이름을 입력하세요.">
+                            <input type="text" class="form-control" id="memberName" name="memberName" placeholder="이름을 입력하세요." required>
                         </div>
                         <div class="mb-3">
                             <label for="memberPhone" class="form-label">연락처:</label>
-                            <input type="text" class="form-control" id="memberPhone" name="memberPhone" placeholder="'-'없이 숫자만 입력" maxlength="11">
+                            <input type="text" class="form-control" id="memberPhone" name="memberPhone" placeholder="'-'없이 숫자만 입력" maxlength="11" required>
                         </div>
                         <div class="mb-3">
                             <label for="memberAddress" class="form-label">주소:</label>
@@ -54,7 +54,8 @@
                             </div>
                         </div>
                         <div class="signUp-input-area mb-1">
-                            <input type="text" class="form-control" id="memberAddress" name="memberAddress" placeholder="주소" style="height: 40px;">
+                            <input type="text" class="form-control" id="memberAddress" name="memberAddress" placeholder="주소" style="height: 40px;" readonly required>
+                            <input type="text" class="form-control" id="memberExtraAddress" name="memberExtraAddress" placeholder="상세 주소" style="height: 40px;">
                         </div>
                         <div>주문 알람 수신여부:</div>
                         <div class="form-check">
@@ -66,7 +67,7 @@
                             <input type="radio" class="form-check-input" id="alramOrder2" name="alramOrder" value="NO">아니오
                         </div>
                         <div class="mb-3 mt-3">
-                            <label for="activeYn" class="form-label" hidden="hidden">활성화 유무:</label>
+                            <label for="activeYn" class="form-label" hidden="hidden" >활성화 유무:</label>
                             <input type="hidden" id="activeYn" name="activeYn" value="Y">
                         </div>
                         <div class="form-check mt-3 mb-3">
@@ -121,7 +122,16 @@
             }).open();
         }
 
+        // form submit 전에 memberAddress에 상세 주소 추가
+        function combineAddress() {
+            var detailedAddress = document.getElementById("memberExtraAddress").value;
+            var memberAddress = document.getElementById("memberAddress").value;
 
+            // 상세 주소가 있으면 memberAddress에 합침
+            if (detailedAddress) {
+                document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
+            }
+        }
     </script>
 </div>
 </body>

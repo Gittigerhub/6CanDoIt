@@ -32,7 +32,7 @@ public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
 
-    @Value("${cloud.aws.s3.bucket}")
+    @Value("${aws.s3.bucket}")
     public String bucket;
 
     // 서비스에서 Upload요청 메소드

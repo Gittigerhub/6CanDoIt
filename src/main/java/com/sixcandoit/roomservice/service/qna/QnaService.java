@@ -24,8 +24,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log
 public class QnaService {
-    @Value("${imgLocation}") //이미지가 저장될 위치
-    private String imgLocation;
+    @Value("${imgUploadLocation}") //이미지가 저장될 위치
+    private String imgUploadLocation;
 
     // final 선언, 모델 맵퍼 선언
     private final QnaRepository qnaRepository;

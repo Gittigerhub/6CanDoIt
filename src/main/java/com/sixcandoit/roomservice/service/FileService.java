@@ -21,6 +21,12 @@ public class FileService {
     @Value("${imgUploadLocation}")              // 이미지가 저장될 위치
     private String imgUploadLocation;
 
+    @Value("${aws.s3.bucket}")              // 버킷 이름
+    private String bucket;
+
+    @Value("${aws.region}")              // 리전 이름
+    private String region;
+
     private final S3Uploader s3Uploader;        //파일업로드 클래스 상속
     private final FileRepository fileRepository;
 
@@ -57,6 +63,8 @@ public class FileService {
                 ImageFileEntity fileEntity = new ImageFileEntity();
                 fileEntity.setName(newFileName);
                 fileEntity.setOriginName(originalFilename);
+                fileEntity.setUrl("https://" + bucket + ".s3." +
+                        region + ".amazonaws.com/" + imgUploadLocation + "/" + newFileName);
 
                 // 대표이미지 여부 확인
                 if (imageFiles.indexOf(imagefile) == 0) {

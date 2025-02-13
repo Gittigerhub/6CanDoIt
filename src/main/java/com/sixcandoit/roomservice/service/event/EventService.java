@@ -8,6 +8,7 @@ import com.sixcandoit.roomservice.util.FileUpload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -18,9 +19,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log
 public class EventService {
-//    @Value("${dataUploadPath}")
-//    private  String imgLocation;
-//
+    @Value("${dataUploadPath}")
+    private  String imgLocation;
+    
     private  final MemberRepository memberRepository;
     private  final ModelMapper modelMapper;
     private final FileUpload fileUpload;
@@ -36,12 +37,12 @@ public class EventService {
         try {
             //변환
             EventEntity eventEntity = modelMapper.map(eventDTO, EventEntity.class);
-//            //이미지 저장
-//            String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
-//            String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
+            //이미지 저장
+            String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
+            String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
 
-//            eventEntity.setEventTitleImg(newTitleImageName);
-//            eventEntity.setEventImg(newContentImageName);
+            eventEntity.setEventTitleImg(newTitleImageName);
+            eventEntity.setEventImg(newContentImageName);
 
 
             eventRepository.save(eventEntity);
@@ -87,21 +88,21 @@ public class EventService {
                 throw new RuntimeException("이벤트 조회 실패");
             }
             else{
-//                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventTitleImg());
-//                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventImg());
-//
-//
-//                String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
-//                String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
-//
-//                EventEntity eventEntity = modelMapper.map(eventDTO,EventEntity.class);
-//
-//                eventEntity.setEventTitleImg(newTitleImageName);
-//                eventEntity.setEventImg(newContentImageName);
+                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventTitleImg());
+                fileUpload.FileDelete(imgLocation,read(eventDTO.getIdx()).getEventImg());
 
-//
-//
-//                eventRepository.save(eventEntity);
+
+                String newTitleImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getTitleFile());
+                String newContentImageName = fileUpload.ImageUpload(imgLocation,eventDTO.getContentFile());
+
+                EventEntity eventEntity = modelMapper.map(eventDTO,EventEntity.class);
+
+                eventEntity.setEventTitleImg(newTitleImageName);
+                eventEntity.setEventImg(newContentImageName);
+
+
+
+                eventRepository.save(eventEntity);
             }
 
         } catch (Exception e){
@@ -115,16 +116,16 @@ public class EventService {
     출력 : 없음
     설명 : 포인트 정보를 삭제할때 사용
     ---------------------------------------------------*/
-//    public void delete(Integer idx){
-//        try {
-//
-//            fileUpload.FileDelete(imgLocation,read(idx).getEventImg());
-//            fileUpload.FileDelete(imgLocation,read(idx).getEventTitleImg());
-//            eventRepository.deleteById(idx);
-//        } catch (Exception e){
-//            throw new RuntimeException("포인트 삭제 실패: "+e.getMessage());
-//        }
-//    }
+    public void delete(Integer idx){
+        try {
+
+            fileUpload.FileDelete(imgLocation,read(idx).getEventImg());
+            fileUpload.FileDelete(imgLocation,read(idx).getEventTitleImg());
+            eventRepository.deleteById(idx);
+        } catch (Exception e){
+            throw new RuntimeException("포인트 삭제 실패: "+e.getMessage());
+        }
+    }
 
     /*-------------------------------------------------
     함수명 : list(Pageable page)

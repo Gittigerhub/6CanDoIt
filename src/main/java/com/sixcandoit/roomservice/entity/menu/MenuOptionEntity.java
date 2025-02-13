@@ -1,4 +1,4 @@
-package com.sixcandoit.roomservice.entity.orders;
+package com.sixcandoit.roomservice.entity.menu;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;

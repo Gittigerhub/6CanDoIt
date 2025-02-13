@@ -1,6 +1,6 @@
-package com.sixcandoit.roomservice.repository.orders;
+package com.sixcandoit.roomservice.repository.cart;
 
-import com.sixcandoit.roomservice.entity.orders.CartEntity;
+import com.sixcandoit.roomservice.entity.cart.CartEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

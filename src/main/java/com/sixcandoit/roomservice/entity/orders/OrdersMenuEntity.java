@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.entity.orders;
 
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
+import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

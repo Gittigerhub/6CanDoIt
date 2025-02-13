@@ -3,14 +3,13 @@ package com.sixcandoit.roomservice.entity.member;
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.entity.event.MemberPointEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
-import com.sixcandoit.roomservice.entity.orders.CartEntity;
+import com.sixcandoit.roomservice.entity.cart.CartEntity;
 import com.sixcandoit.roomservice.entity.orders.OrdersEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.room.ReservationEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity

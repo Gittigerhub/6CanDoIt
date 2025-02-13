@@ -1,7 +1,7 @@
-package com.sixcandoit.roomservice.controller.orders;
+package com.sixcandoit.roomservice.controller.menu;
 
-import com.sixcandoit.roomservice.dto.orders.MenuDTO;
-import com.sixcandoit.roomservice.service.orders.MenuService;
+import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.service.menu.MenuService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

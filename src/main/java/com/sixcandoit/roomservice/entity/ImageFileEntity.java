@@ -5,7 +5,7 @@ import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.event.EventEntity;
 import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
-import com.sixcandoit.roomservice.entity.orders.MenuEntity;
+import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import jakarta.persistence.*;

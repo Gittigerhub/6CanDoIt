@@ -1,8 +1,9 @@
-package com.sixcandoit.roomservice.entity.orders;
+package com.sixcandoit.roomservice.entity.menu;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
+import com.sixcandoit.roomservice.entity.cart.CartEntity;
 import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

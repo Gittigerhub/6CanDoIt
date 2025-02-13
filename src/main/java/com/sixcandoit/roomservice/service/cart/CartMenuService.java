@@ -1,10 +1,10 @@
-package com.sixcandoit.roomservice.service.orders;
+package com.sixcandoit.roomservice.service.cart;
 
-import com.sixcandoit.roomservice.dto.orders.CartMenuDTO;
+import com.sixcandoit.roomservice.dto.cart.CartMenuDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import com.sixcandoit.roomservice.entity.orders.CartMenuEntity;
+import com.sixcandoit.roomservice.entity.cart.CartMenuEntity;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
-import com.sixcandoit.roomservice.repository.orders.CartMenuRepository;
+import com.sixcandoit.roomservice.repository.cart.CartMenuRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

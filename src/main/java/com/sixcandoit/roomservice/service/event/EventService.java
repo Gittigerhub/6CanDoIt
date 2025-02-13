@@ -23,7 +23,7 @@ import java.util.Optional;
 public class EventService {
 //    @Value("${dataUploadPath}")
 //    private  String imgLocation;
-//
+
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
     private final FileUpload fileUpload;

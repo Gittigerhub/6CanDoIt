@@ -5,7 +5,7 @@ import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
-import com.sixcandoit.roomservice.util.FileUpload;
+import com.sixcandoit.roomservice.service.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
@@ -16,7 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -31,10 +33,18 @@ public class QnaService {
     private final QnaRepository qnaRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
-    private final FileUpload fileUpload;
+    private final S3Uploader s3Uploader;
 
     // Qna의 Q 쓰기
-    public void qnaRegister(QnaDTO qnaDTO){
+    public void qnaRegister(QnaDTO qnaDTO, MultipartFile file) throws IOException {
+        String originalFileName = file.getOriginalFilename(); //파일이름분리
+        String newFileName = ""; //업로드 성공시 생성된 파일이름
+
+        if (originalFileName != null) { //작업할 파일이 존재하면
+            newFileName = s3Uploader.upload(file, imgUploadLocation); //S3 업로드
+        }
+        qnaDTO.setQnaImg(newFileName); //이미지파일에 새이름을저장
+
         // DTO를 Entity로 변환
         QnaEntity qnaEntity =
                 modelMapper.map(qnaDTO, QnaEntity.class);
@@ -46,9 +56,12 @@ public class QnaService {
     }
 
     // Qna의 Q 수정
-    public void qnaUpdate(QnaDTO qnaDTO){
+    public void qnaUpdate(QnaDTO qnaDTO, MultipartFile file) throws IOException {
         // 데이터의 idx를 조회
         Optional<QnaEntity> qnaEntity = qnaRepository.findById(qnaDTO.getIdx());
+        String deleteFile = qnaDTO.getQnaImg(); //이전 이미지파일 읽기
+        String originalFileName = file.getOriginalFilename(); //저장할 파일명
+        String newFileName = ""; //저장후 생성된 새로운 파일명
 
         if (qnaEntity.isPresent()){ // QnaEntity가 존재하면
             //해당 QnaEntity에 관련된 답변이 존재하는지 확인
@@ -59,12 +72,17 @@ public class QnaService {
                 log.info("답변이 존재하면 수정 불가...");
                 throw new IllegalStateException("답변이 완료된 문의사항은 수정이 불가합니다.");
             }
-
+            if (originalFileName.length() != 0){ //작업할 파일이 존재하면
+                if (deleteFile.length() != 0){ //기존파일이 존재하면
+                    s3Uploader.deleteFile(deleteFile, imgUploadLocation); //기존파일 삭제
+                }
+                newFileName = s3Uploader.upload(file, imgUploadLocation); //새로운 파일을 S3에 업로드
+                qnaDTO.setQnaImg(newFileName); //업로드한 새로운 파일명으로 변경
+            }
             // 답변이 없으면 QnaEntity 수정 진행
             log.info("답변이 없으면 QnaEntity 수정 진행...");
             QnaEntity qnaEntitys = modelMapper.map(qnaDTO, QnaEntity.class);
             qnaRepository.save(qnaEntitys);
-
         } else {
             throw new IllegalStateException("수정할 QnA가 존재하지 않습니다.");
         }

@@ -26,6 +26,8 @@
                         <p>번호:<span th:text="${qnaDTO.idx}"></span></p>
                         <p>제목:<span th:text="${qnaDTO.qnaTitle}"></span></p>
                         <p>내용:<span th:text="${qnaDTO.qnaContents}"></span></p>
+                        <img th:src="|https://${bucket}.s3.${region}.amazonaws.com/${folder}/${qnaDTO.qnaImg}|"
+                             class="img-fluid">
                         <p>등록일:
                             <span th:text="${#temporals.format(qnaDTO.insDate, 'yyyy-MM-dd HH:mm')}"></span>
                         </p>

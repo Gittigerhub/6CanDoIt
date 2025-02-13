@@ -6,6 +6,7 @@ import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,12 +19,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
 @Log
 public class QnaController {
+
+    //HTML 전달할 S3정보
+    @Value("${cloud.aws.s3.bucket}")
+    public String bucket;
+    @Value("${cloud.aws.region.static}")
+    public String region;
+    @Value("${imgUploadLocation}")
+    public String folder;
+
     // final 선언
     private final QnaService qnaService;
 
@@ -43,6 +54,9 @@ public class QnaController {
         model.addAllAttributes(pageInfo); // 페이지 정보
         model.addAttribute("type", type); //검색분류
         model.addAttribute("keyword", keyword); // 키워드
+        model.addAttribute("bucket", bucket);
+        model.addAttribute("region", region);
+        model.addAttribute("folder", folder);
 
         return "qna/list";
     }
@@ -60,7 +74,8 @@ public class QnaController {
     // Qna의 Q 등록 저장 처리
     @PostMapping("/qna/register")
     public String registerProc(@Valid @ModelAttribute QnaDTO qnaDTO,
-                               BindingResult bindingResult){
+                               MultipartFile imgFile,
+                               BindingResult bindingResult) throws IOException {
         log.info("질문한 내용을 저장합니다.");
 
         if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
@@ -69,7 +84,7 @@ public class QnaController {
         }
 
         // 유효성 검사 성공 시 등록 처리
-        qnaService.qnaRegister(qnaDTO);
+        qnaService.qnaRegister(qnaDTO, imgFile);
 
         return "redirect:/qna/list";
     }
@@ -83,6 +98,9 @@ public class QnaController {
 
         log.info("개별 데이터를 페이지에 전달하는 중입니다.");
         model.addAttribute("qnaDTO", qnaDTO);
+        model.addAttribute("bucket", bucket);
+        model.addAttribute("region", region);
+        model.addAttribute("folder", folder);
 
         return "qna/read";
     }
@@ -103,7 +121,7 @@ public class QnaController {
     @PostMapping("/qna/update")
     public String updateProc(@Valid @ModelAttribute QnaDTO qnaDTO,
                              MultipartFile imagefile,
-                             BindingResult bindingResult){
+                             BindingResult bindingResult) throws IOException {
         log.info("수정된 데이터를 저장합니다.");
 
         if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
@@ -111,7 +129,7 @@ public class QnaController {
             return "qna/update"; // update로 돌아간다
         }
         // 유효성 검사 성공 시 수정 처리
-        qnaService.qnaUpdate(qnaDTO);
+        qnaService.qnaUpdate(qnaDTO, imagefile);
 
         return "redirect:/qna/list";
     }

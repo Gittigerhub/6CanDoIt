@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +32,7 @@ public class QnaDTO {
     private LocalDateTime insDate;      // 작성 일자
     private LocalDateTime modDate;      // 수정 일자
     private List<ReplyDTO> replyList;    // 댓글 목록
-    private String qnaImg;              // 문의사항 이미지
+    private String qnaImg;              // 문의사항 이미지 URL
     private String favYn;              // 자주 묻는 질문 설정 (Y: 활성, N: 비활성)
 
     private MemberDTO memberDTO;       // Member 참조
@@ -42,4 +43,11 @@ public class QnaDTO {
     }
 
     private String memberIdx;           // 멤버 idx
+
+    private MultipartFile titleFile;
+    private MultipartFile contentFile;
+    private List<MultipartFile> Files;
+    private List<String> imageUrls;  // 이미지 URL 리스트 추가
+    private String repimageYn;      // 대표 이미지 여부
+
 }

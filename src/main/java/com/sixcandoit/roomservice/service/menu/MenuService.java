@@ -26,28 +26,37 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final ModelMapper modelMapper;
 
-    //메뉴 등록
-    public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> multipartFiles) {
+    //이미지 등록할 menuImgService 의존성 추가
+    private final MenuImgService menuImgService;
 
-        //MenuDTO -> Entity로 변환
+
+    //메뉴 등록
+    public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> multipartFiles) throws Exception {
+
+        // MenuDTO -> MenuEntity로 변환
         MenuEntity menuEntity = modelMapper.map(menuDTO, MenuEntity.class);
 
+        // 메뉴 저장 (DB에 메뉴 정보 저장)
         menuEntity = menuRepository.save(menuEntity);
 
-        //이미지 등록은 추후 추가
+        // 이미지 등록
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
+            // 이미지 파일을 서비스로 전달하여 저장
+            menuImgService.registerImg(menuEntity.getIdx(), multipartFiles);
+        }
 
-
-        return menuEntity.getIdx();
-
+        return menuEntity.getIdx(); // 메뉴의 idx 반환
     }
+
 
     //메뉴 읽기
     public MenuDTO menuRead(Integer idx) {
-
+        // 메뉴 정보 조회
         MenuEntity menuEntity
                 = menuRepository.findById(idx).orElseThrow(EntityNotFoundException::new);
 
-        MenuDTO menuDTO = modelMapper.map(menuEntity, MenuDTO.class);   //이미지 등록 추후 추가
+        MenuDTO menuDTO = modelMapper.map(menuEntity, MenuDTO.class)
+                .setMenuImgDTOList(menuEntity.getImageFileJoin());
 
         return menuDTO;
 
@@ -116,7 +125,7 @@ public class MenuService {
         menuEntity.setMenuName(menuDTO.getMenuName());
         menuEntity.setMenuContent(menuDTO.getMenuContent());
         menuEntity.setMenuPrice(menuDTO.getMenuPrice());
-        //menuEntity.setMenuImg(menuDTO.getMenuImg()); //이미지는 추후 추가
+        menuEntity.setMenuImg(menuDTO.getMenuImg());
         menuEntity.setMenuOptionYn(menuDTO.getMenuOptionYn());
         menuEntity.setActiveYn(menuDTO.getActiveYn());
         menuEntity.setMenuSalesYn(menuDTO.getMenuSalesYn());
@@ -130,7 +139,7 @@ public class MenuService {
         menuUpdateDTO.setMenuName(menuEntity.getMenuName());
         menuUpdateDTO.setMenuContent(menuEntity.getMenuContent());
         menuUpdateDTO.setMenuPrice(menuEntity.getMenuPrice());
-        //menuUpdateDTO.setMenuImg(menuEntity.getMenuImg()); //이미지는 추후 추가
+        menuUpdateDTO.setMenuImg(menuEntity.getMenuImg());
         menuUpdateDTO.setMenuOptionYn(menuEntity.getMenuOptionYn());
         menuUpdateDTO.setActiveYn(menuEntity.getActiveYn());
         menuUpdateDTO.setMenuSalesYn(menuEntity.getMenuSalesYn());

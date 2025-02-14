@@ -1,12 +1,16 @@
 package com.sixcandoit.roomservice.dto.Menu;
 
+import com.sixcandoit.roomservice.dto.FileDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -44,22 +48,22 @@ public class MenuDTO {
 
     private List<MenuOptionDTO> menuOptionDTOList;
 
-//    private List<MenuImgDTO> menuImgDTOList;
+    private List<FileDTO> menuImgDTOList;
 
     private LocalDateTime insDate;
 
     //통합 이미지 파일이 나온다면 그거로 설정
-//    public MenuDTO setMenuImgDTOList(List<MenuImg> menuImgList) {
-//        ModelMapper modelMapper = new ModelMapper();
-//
-//        List<MenuImgDTO> menuImgDTOS =
-//                menuImgList.stream().map(
-//                        itemImg -> modelMapper.map(itemImg, MenuImgDTO.class)
-//                ).collect(Collectors.toList();
-//
-//                this.menuImgDTOList = menuImgDTOS;
-//
-//                return this;
-//    }
+    public MenuDTO setMenuImgDTOList(List<ImageFileEntity> imageFileEntities) {
+        ModelMapper modelMapper = new ModelMapper();
+
+        List<FileDTO> fileDTOS =
+                imageFileEntities.stream().map(
+                        menuImg -> modelMapper.map(menuImg, FileDTO.class)
+                ).collect(Collectors.toList());
+
+                this.menuImgDTOList = fileDTOS;
+
+                return this;
+    }
 
 }

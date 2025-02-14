@@ -2,16 +2,21 @@ package com.sixcandoit.roomservice.controller.admin;
 
 import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.entity.member.MemberEntity;
+import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.admin.AdminService;
+import com.sixcandoit.roomservice.service.member.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 
     private final AdminService adminService;
+    private final MemberRepository memberRepository;
 
     @GetMapping("/")
     public String IndexForm(HttpSession session, AdminDTO adminDTO) {
@@ -92,5 +98,17 @@ public class AdminController {
         session.invalidate();
 
         return "redirect:/login";
+    }
+
+    // 회원 목록
+    @GetMapping("/memberlist")
+    public String showMemberList(@PageableDefault(page = 1) Pageable page, // 페이지 정보
+                                 @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
+                                 @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
+                                 Model model){
+        // 작성 필요함
+        List<MemberEntity> memberList = memberRepository.findAll();
+        model.addAttribute("memberList", memberList);
+        return "admin/memberlist";
     }
 }

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -48,7 +48,6 @@ public class FileService {
 
                 // FileEntity에 저장할 오리지널네임
                 String originalFilename = imagefile.getOriginalFilename();
-                System.out.println(originalFilename);
                 // S3 업로드 성공 시, 생성된 파일 이름
                 String newFileName = "";
 
@@ -56,8 +55,6 @@ public class FileService {
                 if (originalFilename != null) { // 작업 할 파일이 존재하면
                     newFileName = s3Uploader.upload(imagefile, imgUploadLocation);   // S3업로드
                 }
-
-                System.out.println(newFileName);
 
                 // 엔티티 셋
                 ImageFileEntity fileEntity = new ImageFileEntity();
@@ -78,7 +75,7 @@ public class FileService {
             }
 
         }
-        System.out.println(images.toString());
+
         // 반환
         return images;
     }

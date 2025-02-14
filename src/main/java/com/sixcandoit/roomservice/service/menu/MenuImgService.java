@@ -1,8 +1,11 @@
 package com.sixcandoit.roomservice.service.menu;
 
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
+import com.sixcandoit.roomservice.repository.FileRepository;
 import com.sixcandoit.roomservice.repository.menu.MenuRepository;
+import com.sixcandoit.roomservice.service.FileService;
 import com.sixcandoit.roomservice.service.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,28 +21,51 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class MenuImgService {
+    private final FileRepository fileRepository;
     @Value("${imgUploadLocation}")
     private String imgUploadLocation;
 
     private final MenuRepository menuRepository;
     private final S3Uploader s3Uploader;
     private final ModelMapper modelMapper;
+    private final FileService fileService;
 
     //삽입(파일업로드-> 생성된 새로운 이름을 가지고 -> DB 저장)
-    public void registerImg(MenuDTO menuDTO, MultipartFile file) throws Exception {
-        String originalFileName = file.getOriginalFilename();   //파일 이름 분리
-        String newFileName = ""; //업로드 성공시 생성된 파일 이름
+    public void registerImg(Integer idx, List<MultipartFile> multipartFiles) throws Exception {
+        if (multipartFiles != null) {
+            // 각 파일을 처리
+            for (MultipartFile menuImg : multipartFiles) {
+                if (!menuImg.isEmpty()) {
 
-        if (originalFileName != null) {    //작업할 파일이 존재하면
-            //System.out.println("작업할 파일이 존재합니다.");
-            newFileName = s3Uploader.upload(file, imgUploadLocation);   //S3 업로드
-            //System.out.println("파일을 업로드합니다.");
+                    // 물리적 저장: S3에 업로드하고 반환된 파일 이름들
+                    List<ImageFileEntity> savedFiles =
+                            fileService.saveImages(Arrays.asList(menuImg));
+
+                    // MenuEntity 불러오기
+                    MenuEntity menuEntity
+                            = menuRepository.findById(idx).orElseThrow(() -> new RuntimeException("Menu not found"));
+
+                    // 대표 이미지 설정
+                    String imgUrl = "/images/menu/" + savedFiles.get(0).getName();  // S3에서 저장된 파일 이름 사용
+
+                    ImageFileEntity imageFileEntity = savedFiles.get(0);  // 첫 번째 이미지 파일을 사용
+                    imageFileEntity.setMenuJoin(menuEntity); // 본문//이미지가 달릴 메뉴
+                    imageFileEntity.setUrl(imgUrl); //경로
+                    imageFileEntity.setOriginName(menuImg.getOriginalFilename());   //원래 이름
+
+                    // 대표 이미지 여부 확인
+                    if (multipartFiles.indexOf(menuImg) == 0) {
+                        imageFileEntity.setRepimageYn("Y"); // 첫 번째 이미지가 대표 이미지
+                    } else {
+                        imageFileEntity.setRepimageYn("N"); // 나머지는 대표 이미지 아님
+                    }
+
+                    // DB에 이미지 정보 저장
+                    fileRepository.save(imageFileEntity);
+                }
+            }
         }
-        menuDTO.setMenuImg(newFileName);    //이미지 파일에 새 이름을 저장
-        //System.out.println("이미지파일에 새 이름 저장중...");
 
-        MenuEntity menuEntity = modelMapper.map(menuDTO, MenuEntity.class);
-        menuRepository.save(menuEntity);    //데이터베이스 저장
     }
     //수정(업로드 파일 존재여부 -> 기존파일 삭제 -> 파일 업로드 -> 생성된 파일명 -> DB저장)
     public void modifyImg(MenuDTO menuDTO, MultipartFile file) throws Exception {

@@ -31,12 +31,14 @@ public class NoticeDTO {
 
     private int noticeHits; //조회수
 
-
     private LocalDateTime insDate;//작성일
-
 
     private LocalDateTime modDate;//수정일
 
     private String noticeImg; //이미지
 
+
+    private String noticeUrl;
+
+    private String noticeImageFile;
 }

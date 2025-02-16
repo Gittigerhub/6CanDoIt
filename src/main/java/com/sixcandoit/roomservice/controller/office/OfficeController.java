@@ -1,7 +1,9 @@
 package com.sixcandoit.roomservice.controller.office;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.service.office.ShopDetailService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -32,6 +34,7 @@ public class OfficeController {
     private final ModelMapper modelMapper;
     private final PageNationUtil pageNationUtil;
     private final ShopDetailService shopDetailService;
+    private final ImageFileService imageFileService;
 
 
     @GetMapping("/list")
@@ -108,12 +111,17 @@ public class OfficeController {
     @GetMapping("/organ")
     public String organDetail(Integer idx, Model model) {
 
-        // 서비스로 조회
+        // 조직 정보 서비스로 조회
         OrganizationDTO organDTO =
             organizationService.organRead(idx);
 
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx);
+
         // view로 전달
         model.addAttribute("organDTO", organDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
 
         return "office/organdetail";
 

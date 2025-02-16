@@ -6,7 +6,7 @@ import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
-import com.sixcandoit.roomservice.service.FileService;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
@@ -30,7 +30,7 @@ public class QnaService {
     private final QnaRepository qnaRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
-    private final FileService fileService;
+    private final ImageFileService fileService;
 
     // Qna의 Q 쓰기
     public void qnaRegister(QnaDTO qnaDTO) {

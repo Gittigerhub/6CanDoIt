@@ -5,7 +5,7 @@ import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.event.EventEntity;
 import com.sixcandoit.roomservice.repository.event.EventRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
-import com.sixcandoit.roomservice.service.FileService;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.S3Uploader;
 import com.sixcandoit.roomservice.util.FileUpload;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class EventService {
     private final ModelMapper modelMapper;
     private final FileUpload fileUpload;
     private final EventRepository eventRepository;
-    private final FileService fileService;
+    private final ImageFileService fileService;
     private final S3Uploader s3Uploader;
 
     /*-------------------------------------------------

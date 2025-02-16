@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FileRepository extends JpaRepository<ImageFileEntity, Integer> {
+public interface ImageFileRepository extends JpaRepository<ImageFileEntity, Integer> {
 
     // 조직의 이미지들을 조회
     @Query("select i from ImageFileEntity i where i.organizationJoin.idx = :idx")

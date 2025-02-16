@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.dto.Menu;
 
-import com.sixcandoit.roomservice.dto.FileDTO;
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,7 +48,7 @@ public class MenuDTO {
 
     private List<MenuOptionDTO> menuOptionDTOList;
 
-    private List<FileDTO> menuImgDTOList;
+    private List<ImageFileDTO> menuImgDTOList;
 
     private LocalDateTime insDate;
 
@@ -56,9 +56,9 @@ public class MenuDTO {
     public MenuDTO setMenuImgDTOList(List<ImageFileEntity> imageFileEntities) {
         ModelMapper modelMapper = new ModelMapper();
 
-        List<FileDTO> fileDTOS =
+        List<ImageFileDTO> fileDTOS =
                 imageFileEntities.stream().map(
-                        menuImg -> modelMapper.map(menuImg, FileDTO.class)
+                        menuImg -> modelMapper.map(menuImg, ImageFileDTO.class)
                 ).collect(Collectors.toList());
 
                 this.menuImgDTOList = fileDTOS;

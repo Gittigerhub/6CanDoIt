@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileDTO {
+public class ImageFileDTO {
 
     private Integer idx;            // 기본키
 

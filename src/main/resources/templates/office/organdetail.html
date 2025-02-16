@@ -56,6 +56,19 @@
                     <th>주소</th>
                     <td colspan="3" style="text-align: left" th:text="${organDTO.organAddress}"></td>
                 </tr>
+                <tr style="height: 50px;">
+                    <th style="vertical-align: middle">이미지</th>
+                    <td colspan="3" style="text-align: left">
+                        <th:block th:each="data:${imageFileDTOS}">
+                            <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                                <img style="width: 300px; height: 300px; object-fit: cover; vertical-align: bottom; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                            </th:block>
+                            <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                <img style="width: 200px; height: 200px; object-fit: cover; vertical-align: bottom; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                            </th:block>
+                        </th:block>
+                    </td>
+                </tr>
                 </tbody>
             </table>
             <!-- 상세 테이블 끝 -->

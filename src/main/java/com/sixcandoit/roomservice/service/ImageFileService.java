@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,24 +118,27 @@ public class ImageFileService {
        2. 대표이미지는 기존 이미지들중에 대표이미지가 없을경우 자동으로 새로등록되는
         이미지들중에 인덱스[0]이 대표이미지가 됩니다.
     -------------------------------------------------------------------- */
-    public List<ImageFileEntity> updateImage(List<MultipartFile> imageFiles, String Join, Integer idx) throws Exception {
+    public List<ImageFileEntity> updateImage(List<MultipartFile> imageFiles, String join, Integer idx) throws Exception {
 
         // 기존에 존재하던 이미지 리스트
         List<ImageFileEntity> existingImages = new ArrayList<>();
 
-        if (Join.equals("organ")) {
+        // 새로 추가된 이미지 리스트
+        List<ImageFileEntity> images = new ArrayList<>();
+
+        if (join.equals("organ")) {
             existingImages = imageFileRepository.organizationJoin(idx);
-        } else if (Join.equals("room")) {
+        } else if (join.equals("room")) {
             existingImages = imageFileRepository.roomJoin(idx);
-        } else if (Join.equals("notice")) {
+        } else if (join.equals("notice")) {
             existingImages = imageFileRepository.noticeJoin(idx);
-        } else if (Join.equals("qna")) {
+        } else if (join.equals("qna")) {
             existingImages = imageFileRepository.qnaJoin(idx);
-        } else if (Join.equals("event")) {
+        } else if (join.equals("event")) {
             existingImages = imageFileRepository.eventJoin(idx);
-        } else if (Join.equals("adver")) {
+        } else if (join.equals("adver")) {
             existingImages = imageFileRepository.advertisementJoin(idx);
-        } else if (Join.equals("menu")) {
+        } else if (join.equals("menu")) {
             existingImages = imageFileRepository.menuJoin(idx);
         }
 
@@ -180,6 +184,20 @@ public class ImageFileService {
                 }
 
                 existingImages.add(fileEntity);
+
+                // 1. 대표 이미지 찾기
+                Optional<ImageFileEntity> repEntity = existingImages.stream()
+                        .filter(image -> "Y".equals(image.getRepimageYn()))
+                        .findFirst();
+
+                // 2. 대표 이미지가 있다면 리스트에서 제거 후 맨 앞으로 추가
+                for (int i = 0; i < existingImages.size(); i++) {
+                    if ("Y".equals(existingImages.get(i).getRepimageYn())) {
+                        ImageFileEntity imageEntity = existingImages.remove(i);   // 리스트에서 제거
+                        existingImages.add(0, imageEntity);                 // 0번 인덱스에 추가
+                        break;                                                    // 첫 번째 대표 이미지만 처리 후 종료
+                    }
+                }
 
             }
 

@@ -91,19 +91,19 @@ public class OfficeController {
     // 모달로 수정 진행
     @PostMapping("/organ/update")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
-    public ResponseEntity<String> update(@ModelAttribute OrganizationDTO organizationDTO) {
+    public ResponseEntity<String> update(@ModelAttribute OrganizationDTO organizationDTO, String join, List<MultipartFile> imageFiles) {
 
         try {
             // 서비스에 등록 요청
-            organizationService.organUpdate(organizationDTO);
+            organizationService.organUpdate(organizationDTO, join, imageFiles);
 
             // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
-            return ResponseEntity.ok("등록 하였습니다.");
+            return ResponseEntity.ok("수정 하였습니다.");
         } catch (Exception e) {
-            log.error("등록 중 오류발생", e);
+            log.error("수정 중 오류발생", e);
 
             // 등록 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장을 실패하였습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패하였습니다.");
         }
 
     }
@@ -119,9 +119,14 @@ public class OfficeController {
         List<ImageFileDTO> imageFileDTOS =
                 imageFileService.readImage(idx);
 
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
         // view로 전달
         model.addAttribute("organDTO", organDTO);
         model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
 
         return "office/organdetail";
 

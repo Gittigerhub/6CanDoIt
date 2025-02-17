@@ -211,13 +211,13 @@
                     data: {"email": $("#memberEmail").val()},
                     success: function (checkMail) {
                         if (parseInt(checkMail) === 1) {
-                            // console.log("ajax 응답된거 있어?", checkMail);
+                            console.log("ajax 응답된거 있어?", checkMail);
                             var myModal = new bootstrap.Modal($("#emailMismatchModal"));
                             myModal.show();
 
                         } else {
-                            // console.log("일로 들어온거구나" + checkMail);
-                            ("#registerForm").submit();
+                            console.log("일로 들어온거구나" + checkMail);
+                            $("#registerForm").off("submit").submit();
                         }
                     },
                     error: function (xhr, errmsg, err) {

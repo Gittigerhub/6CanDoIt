@@ -133,8 +133,8 @@ public class AdminController {
 //        model.addAttribute("keyword", keyword);
 
 
-//        List<MemberEntity> memberList = memberRepository.findAll();
-//        model.addAttribute("memberList", memberList);
+        List<MemberEntity> memberList = memberRepository.findAll();
+        model.addAttribute("memberList", memberList);
         return "admin/member-list";
     }
 }

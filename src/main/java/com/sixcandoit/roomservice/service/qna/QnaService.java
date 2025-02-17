@@ -86,7 +86,7 @@ public class QnaService {
 
             // 이미지 등록 (기존 이미지와 새 이미지 업데이트)
             log.info("이미지를 저장한다...");
-            List<ImageFileEntity> images = fileService.updateImage(qnaDTO.getFiles(), qnaDTO.getRepimageYn(), "qna", qnaDTO.getIdx());
+            List<ImageFileEntity> images = fileService.updateImage(qnaDTO.getFiles(), "qna", qnaDTO.getIdx());
 
             // 기존 이미지에 새 이미지를 추가
             for (ImageFileEntity image : images) {

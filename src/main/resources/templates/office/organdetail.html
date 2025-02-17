@@ -232,6 +232,21 @@
                             </div>
                         </div>
 
+                        <!-- 조직 사진 -->
+                        <div class="col-sm-12 mt-2">
+                            <div class="form-group form-group-default" id="inputImage">
+                                <label>*이미지 :</label>
+                                <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                            </div>
+                        </div>
+
+                        <!-- 조직 사진 추가버튼 -->
+                        <div class="col-sm-12 mt-2">
+                            <div class="form-group form-group-default">
+                                <button type="button" id="addImage">이미지 추가</button>
+                            </div>
+                        </div>
+
                         <!-- Modal footer -->
                         <div class="d-flex justify-content-end mt-3">
                             <button type="button" class="btn btn-success mx-2" id="update">저장</button>
@@ -281,6 +296,29 @@
 
         // 문서가 준비가 되었다면
         $(document).ready(function () {
+
+            // 이미지 추가 버튼 클릭했을 때
+            $("#addImage").on('click', function() {
+
+                // 이미지 추가 함수
+                addImageInput();
+
+            });
+
+            // 이미지 추가
+            function addImageInput() {
+                const container = document.getElementById('inputImage');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                container.appendChild(newInputDiv);
+            }
+
+            // 이미지 추가창 초기화
+            function resetImageInput() {
+                const container = document.getElementById('inputImage');
+                container.innerHTML = '<label>*이미지 :</label>' +
+                    '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            }
 
             // 삭제모달 버튼 클릭 시
             $(".btn-delete").on("click", function () {
@@ -365,6 +403,9 @@
 
             // 수정버튼 클릭시 대화상자 채우기
             $("#btn-update").on("click", function () {
+
+                // 이미지 추가창 리셋 함수
+                resetImageInput();
 
                 var idx = $(this).data("id");
 

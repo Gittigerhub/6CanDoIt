@@ -35,6 +35,33 @@ public class ImageFileService {
     private final ImageFileRepository imageFileRepository;
 
     // 이미지 등록
+    /* --------------------------------------------------------------------
+       1. 이미지 등록시에는 다중 이미지 파일들만 받습니다.
+       2. 각 연관관계 테이블에 이미지 등록시 자동으로 FK값이 들어가도록 메서드를
+            추가하였습니다.
+       3. 각 연관 서비스에서
+            // DTO -> Entity로 변환
+            OrganizationEntity organ = modelMapper.map(organizationDTO, OrganizationEntity.class);
+
+            // ActiveYn의 최초 기본값은 "Y"
+            organ.setActiveYn("Y");
+
+            // 이미지 등록
+            List<ImageFileEntity> images = fileService.saveImages(imageFiles);
+
+            // 이미지 정보 추가
+            // 양방향 연관관계 편의 메서드 사용
+            for (ImageFileEntity image : images) {
+                organ.addImage(image);  // FK 자동 설정
+            }
+            System.out.println("FK 자동 등록");
+
+            // Entity 테이블에 저장
+            organizationRepository.save(organ);
+            System.out.println("저장 최최최종");
+
+            위와 같은 형태로 사용해주시면 됩니다.
+    -------------------------------------------------------------------- */
     public List<ImageFileEntity> saveImages(List<MultipartFile> imageFiles) throws Exception {
 
         // 모아서 반환할 리스트
@@ -85,7 +112,12 @@ public class ImageFileService {
     }
 
     // 이미지 수정
-    public List<ImageFileEntity> updateImage(List<MultipartFile> imageFiles, String repcheck, String Join, Integer idx) throws Exception {
+    /* --------------------------------------------------------------------
+       1. 이미지 수정시에는 join값과 해당 join의 idx값을 받습니다.
+       2. 대표이미지는 기존 이미지들중에 대표이미지가 없을경우 자동으로 새로등록되는
+        이미지들중에 인덱스[0]이 대표이미지가 됩니다.
+    -------------------------------------------------------------------- */
+    public List<ImageFileEntity> updateImage(List<MultipartFile> imageFiles, String Join, Integer idx) throws Exception {
 
         // 기존에 존재하던 이미지 리스트
         List<ImageFileEntity> existingImages = new ArrayList<>();
@@ -131,8 +163,11 @@ public class ImageFileService {
                 fileEntity.setName(newFileName);
                 fileEntity.setOriginName(originalFilename);
 
-                // 새로 추가된 이미지 중 대표이미지 여부 확인(repcheck값이 Y 일때)
-                if (repcheck.equals("Y")) {
+                // 기존 이미지 리스트에 대표이미지가 없을경우 대표이미지 추가
+                // 기존 이미지 리스트중에 repimageYn값이 Y가 없을경우 true 반환
+                boolean hasNoRepImage = existingImages.stream().noneMatch(image -> "Y".equals(image.getRepimageYn()));
+
+                if (hasNoRepImage) {
                     if (imageFiles.indexOf(imagefile) == 0) {
                         fileEntity.setRepimageYn("Y");      // 대표이미지 O
                     } else {
@@ -154,6 +189,9 @@ public class ImageFileService {
     }
 
     // 이미지 삭제
+    /* --------------------------------------------------------------------
+       1. 이미지 삭제시에는 이미지의 idx를 받습니다.
+    -------------------------------------------------------------------- */
     public void deleteImage(Integer idx) throws Exception {
 
         // idx로 이미지 데이터 조회
@@ -168,6 +206,9 @@ public class ImageFileService {
     }
 
     // 이미지 조회
+    /* --------------------------------------------------------------------
+       1. 이미지 조회시에는 연관 테이블의 idx를 받습니다.
+    -------------------------------------------------------------------- */
     public List<ImageFileDTO> readImage(Integer idx) {
 
         try {

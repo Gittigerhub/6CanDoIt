@@ -162,6 +162,8 @@ public class ImageFileService {
                 ImageFileEntity fileEntity = new ImageFileEntity();
                 fileEntity.setName(newFileName);
                 fileEntity.setOriginName(originalFilename);
+                fileEntity.setUrl("https://" + bucket + ".s3." +
+                        region + ".amazonaws.com/" + imgUploadLocation + "/" + newFileName);
 
                 // 기존 이미지 리스트에 대표이미지가 없을경우 대표이미지 추가
                 // 기존 이미지 리스트중에 repimageYn값이 Y가 없을경우 true 반환

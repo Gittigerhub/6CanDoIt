@@ -29,6 +29,7 @@ public class QnaService {
     // final 선언, 모델 맵퍼 선언
     private final QnaRepository qnaRepository;
     private final ReplyRepository replyRepository;
+
     private final ModelMapper modelMapper;
     private final ImageFileService fileService;
 
@@ -84,13 +85,20 @@ public class QnaService {
                 throw new IllegalStateException("답변이 완료된 문의사항은 수정이 불가합니다.");
             }
 
-            // 이미지 등록 (기존 이미지와 새 이미지 업데이트)
+            // 답변이 없으면 이미지 등록 (기존 이미지와 새 이미지 업데이트)
             log.info("이미지를 저장한다...");
             List<ImageFileEntity> images = fileService.updateImage(qnaDTO.getFiles(), "qna", qnaDTO.getIdx());
 
-            // 기존 이미지에 새 이미지를 추가
-            for (ImageFileEntity image : images) {
-                qnaEntity.addImage(image);  // addImage 메서드로 QnaEntity에 이미지 추가
+            // 기존 이미지 업데이트 (새로운 이미지들로 갱신)
+            qnaEntity.updateImages(images);  // 기존 이미지 삭제 후 새 이미지 추가
+
+            //QnaEntity에서 대표 이미지 설정 (첫 번째 이미지를 대표 이미지로 설정)
+            log.info("대표 이미지 설정...");
+            if (qnaEntity.getQnaImg() == null) {
+                // qnaImg가 null이라면 첫 번째 이미지를 대표 이미지로 설정
+                if (!images.isEmpty()) {
+                    qnaEntity.setQnaImg(images.get(0).getUrl());  // 첫 번째 이미지의 파일명을 대표 이미지로 설정
+                }
             }
 
             log.info("자주 묻는 질문 설정");
@@ -99,10 +107,9 @@ public class QnaService {
                 qnaDTO.setFavYn("N");
             }
             qnaDTO.setFavYn(qnaDTO.getFavYn() != null ? qnaDTO.getFavYn() : "N");
-            // 답변이 없으면 QnaEntity 수정 진행
+
             log.info("답변이 없으면 QnaEntity 수정 진행...");
-            QnaEntity updatedQnaEntity = modelMapper.map(qnaDTO, QnaEntity.class);
-            qnaRepository.save(updatedQnaEntity);
+            qnaRepository.save(qnaEntity);
 
         } else {
             throw new IllegalStateException("수정할 QnA가 존재하지 않습니다.");

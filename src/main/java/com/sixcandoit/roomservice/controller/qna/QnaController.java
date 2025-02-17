@@ -5,7 +5,7 @@ import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-@Log
+@Log4j2
 public class QnaController {
 
     // final 선언
@@ -104,11 +104,12 @@ public class QnaController {
     @PostMapping("/qna/update")
     public String updateProc(@Valid @ModelAttribute QnaDTO qnaDTO,
                              BindingResult bindingResult,
-                             Model model) throws Exception {
+                             Model model) {
         log.info("수정된 데이터를 저장합니다.");
 
         if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
             log.info("유효성 검사 오류 발생");
+            bindingResult.getAllErrors().forEach(error -> log.error(error.getDefaultMessage())); // 오류 메시지 로그 출력
             return "qna/update"; // update로 돌아간다
         }
 
@@ -122,7 +123,7 @@ public class QnaController {
         }
 
         // 성공 시 수정 처리
-        qnaService.qnaUpdate(qnaDTO);
+        //qnaService.qnaUpdate(qnaDTO);
 
         return "redirect:/qna/list";
     }

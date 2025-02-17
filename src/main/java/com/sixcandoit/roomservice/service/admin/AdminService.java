@@ -31,6 +31,12 @@ public class AdminService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
+    // 이메일 중복 체크 메서드
+    public boolean checkEmailExistence(String email) {
+        return adminRepository.existsByAdminEmail(email);
+    }
+
+    // 관리자 회원 가입
     public AdminEntity register(AdminDTO adminDTO) {
         Optional<AdminEntity> user = adminRepository.findByAdminEmail(adminDTO.getAdminEmail());
 
@@ -49,6 +55,7 @@ public class AdminService {
         return adminRepository.save(adminEntity);
     }
 
+    // 회원 정보 수정
     public AdminEntity modify(AdminDTO adminDTO) {
         Optional<AdminEntity> user = adminRepository.findByAdminEmail(adminDTO.getAdminEmail());
 
@@ -66,10 +73,12 @@ public class AdminService {
         return null;
     }
 
+    // 회원 탈퇴
     public void delete(String AdminEmail) {
         adminRepository.findByAdminEmail(AdminEmail);
     }
 
+    // 회원 읽기
     public AdminDTO read(String AdminEmail) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

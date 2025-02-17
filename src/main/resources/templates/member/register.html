@@ -20,54 +20,77 @@
             <div class="card">
                 <div class="card-body">
                     <h2>회원가입</h2>
-                    <form th:action="@{/member/register}" method="post" class="was-validated" onsubmit="combineAddress()">
+                    <form id="registerForm" th:action="@{/member/register}" method="post"
+                          onsubmit="return validatePassword() && combineAddress()">
                         <div class="mb-3 mt-3">
-                            <label for="memberEmail" class="form-label">이메일:</label>
-                            <input type="email" class="form-control" id="memberEmail" name="memberEmail" placeholder="이메일형식으로 입력하세요." required>
+                            <label for="memberEmail" class="form-label">이메일</label>
+                            <input type="email" class="form-control" id="memberEmail" name="memberEmail"
+                                   placeholder="이메일형식으로 입력하세요." required>
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label">비밀번호:</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="영문자와 숫자로 구성하세요." required>
+                            <label for="password" class="form-label">비밀번호</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="영문자와 숫자로 구성하세요." required>
                         </div>
                         <div class="mb-3">
-                            <label for="memberBirth" class="form-label">생년월일:</label>
-                            <input type="date" class="form-control" id="memberBirth" name="memberBirth" value="" max="9999-12-31" required>
+                            <label for="confirmPassword" class="form-label">비밀번호 확인</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                   required>
+                            <div id="confirmPasswordFeedback" class="invalid-feedback">
+                                비밀번호가 일치하지 않습니다.
+                            </div>
+                            <div id="confirmPasswordValid" class="valid-feedback">
+                                비밀번호가 일치합니다.
+                            </div>
                         </div>
-                        <div class="mb-2">성별:</div>
+                        <div class="mb-3">
+                            <label for="memberBirth" class="form-label">생년월일</label>
+                            <input type="date" class="form-control" id="memberBirth" name="memberBirth" value=""
+                                   max="9999-12-31" required>
+                        </div>
+                        <div class="mb-2">성별</div>
                         <div class="form-check">
                             <input type="radio" name="memberGender" id="memberGender1" value="male">남성
                             <input type="radio" name="memberGender" id="memberGender2" value="female">여성
                         </div>
                         <div class="mt-2 mb-3">
-                            <label for="memberName" class="form-label">이름:</label>
-                            <input type="text" class="form-control" id="memberName" name="memberName" placeholder="이름을 입력하세요." required>
+                            <label for="memberName" class="form-label">이름</label>
+                            <input type="text" class="form-control" id="memberName" name="memberName"
+                                   placeholder="이름을 입력하세요." required>
                         </div>
                         <div class="mb-3">
-                            <label for="memberPhone" class="form-label">연락처:</label>
-                            <input type="text" class="form-control" id="memberPhone" name="memberPhone" placeholder="'-'없이 숫자만 입력" maxlength="11" required>
+                            <label for="memberPhone" class="form-label">연락처</label>
+                            <input type="text" class="form-control" id="memberPhone" name="memberPhone"
+                                   placeholder="'-'없이 숫자만 입력" maxlength="11" required>
                         </div>
                         <div class="mb-3">
-                            <label for="memberAddress" class="form-label">주소:</label>
+                            <label for="memberAddress" class="form-label">주소</label>
                             <div class="signUp-input-area d-flex mb-1 col-lg-7">
-                                <input type="text" class="form-control input-lg" id="memberPostcode" placeholder="우편번호" style="height: 40px;">
-                                <input type="button" class="btn btn-secondary" style="text-align:center; height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
+                                <input type="text" class="form-control input-lg" id="memberPostcode" placeholder="우편번호"
+                                       style="height: 40px;">
+                                <input type="button" class="btn btn-secondary"
+                                       style="text-align:center; height: 40px; width: 200px;"
+                                       onclick="execDaumPostcode()" value="검색">
                             </div>
                         </div>
                         <div class="signUp-input-area mb-1">
-                            <input type="text" class="form-control" id="memberAddress" name="memberAddress" placeholder="주소" style="height: 40px;" readonly required>
-                            <input type="text" class="form-control" id="memberExtraAddress" name="memberExtraAddress" placeholder="상세 주소" style="height: 40px;">
+                            <input type="text" class="form-control" id="memberAddress" name="memberAddress"
+                                   placeholder="주소" style="height: 40px;" readonly required>
+                            <input type="text" class="form-control" id="memberExtraAddress" name="memberExtraAddress"
+                                   placeholder="상세 주소" style="height: 40px;">
                         </div>
-                        <div>주문 알람 수신여부:</div>
+                        <div>주문 알람 수신여부</div>
                         <div class="form-check">
                             <label class="form-check-label" for="alramOrder1"></label>
-                            <input type="radio" class="form-check-input" id="alramOrder1" name="alramOrder" value="YES" checked>예
+                            <input type="radio" class="form-check-input" id="alramOrder1" name="alramOrder" value="YES"
+                                   checked>예
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="alramOrder2"></label>
                             <input type="radio" class="form-check-input" id="alramOrder2" name="alramOrder" value="NO">아니오
                         </div>
                         <div class="mb-3 mt-3">
-                            <label for="activeYn" class="form-label" hidden="hidden" >활성화 유무:</label>
+                            <label for="activeYn" class="form-label" hidden="hidden">활성화 유무</label>
                             <input type="hidden" id="activeYn" name="activeYn" value="Y">
                         </div>
                         <div class="form-check mt-3 mb-3">
@@ -84,54 +107,179 @@
         </div>
         <div class="col-4"></div>
     </div>
-    <script>
-        function execDaumPostcode() {
-            new daum.Postcode({
-                oncomplete: function(data) {
-                    var fullAddress = '';  // 최종적으로 합칠 주소
-                    var extraAddr = '';    // 참고항목
 
-                    // 도로명 주소 또는 지번 주소 선택
-                    if (data.userSelectedType === 'R') {
-                        fullAddress = data.roadAddress;
-                    } else {
-                        fullAddress = data.jibunAddress;
-                    }
+    <!-- 이메일 중복 시 띄울 모달 -->
+    <div class="modal fade" id="emailMismatchModal" tabindex="-1" aria-labelledby="emailMismatchModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailMismatchModalLabel">이메일 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    이미 가입된 이메일입니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    // 도로명 주소일 경우 추가적인 정보 처리
-                    if (data.userSelectedType === 'R') {
-                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                            extraAddr += data.bname;
-                        }
-                        if (data.buildingName !== '' && data.apartment === 'Y') {
-                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                        }
-                        // 참고항목이 있을 경우 추가
-                        if (extraAddr !== '') {
-                            extraAddr = ' (' + extraAddr + ')';
-                        }
-                    }
+    <!-- 비밀번호 불일치 시 띄울 모달 -->
+    <div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordMismatchModalLabel">비밀번호 불일치</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    비밀번호가 일치하지 않습니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    // 최종 주소에 참고항목 추가
-                    fullAddress += extraAddr;
+    <script th:inline="javascript">
 
-                    // 주소, 우편번호를 입력란에 채우기
-                    document.getElementById('memberPostcode').value = data.zonecode;
-                    document.getElementById("memberAddress").value = fullAddress;  // 주소를 memberAddress 필드에 삽입
-                }
-            }).open();
-        }
 
-        // form submit 전에 memberAddress에 상세 주소 추가
-        function combineAddress() {
-            var detailedAddress = document.getElementById("memberExtraAddress").value;
-            var memberAddress = document.getElementById("memberAddress").value;
 
-            // 상세 주소가 있으면 memberAddress에 합침
-            if (detailedAddress) {
-                document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
+
+
+        // 비밀번호 확인
+        document.getElementById("password").addEventListener("input", checkPasswordMatch);
+        document.getElementById("confirmPassword").addEventListener("input", checkPasswordMatch);
+
+        function checkPasswordMatch() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+            var confirmPasswordInput = document.getElementById("confirmPassword");
+            var confirmPasswordFeedback = document.getElementById("confirmPasswordFeedback");
+            var confirmPasswordValid = document.getElementById("confirmPasswordValid");
+
+            // 비밀번호 입력 필드가 비어있는지 체크
+            if (password === "" || confirmPassword === "") {
+                confirmPasswordInput.classList.remove("is-invalid", "is-valid");
+                confirmPasswordFeedback.style.display = "none";
+                confirmPasswordValid.style.display = "none";
+                return; // 비밀번호가 비어있으면 아무것도 표시하지 않음
+            }
+
+            if (password !== confirmPassword) {
+                confirmPasswordInput.classList.remove("is-valid");
+                confirmPasswordInput.classList.add("is-invalid");
+                confirmPasswordFeedback.style.display = "block";
+                confirmPasswordValid.style.display = "none";
+            } else {
+                confirmPasswordInput.classList.remove("is-invalid");
+                confirmPasswordInput.classList.add("is-valid");
+                confirmPasswordFeedback.style.display = "none";
+                confirmPasswordValid.style.display = "block";
             }
         }
+
+        // 비밀번호 일치 체크 함수 (회원가입 폼 제출 전에 실행)
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+                // 모달 띄우기
+                var myModal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
+                myModal.show();
+                return false; // 폼 제출 막기
+            }
+            return true; // 비밀번호 일치 시 폼 제출
+        }
+
+        // 이메일 중복 체크 함수
+        $(function () {
+            $("#registerForm").on("submit", function (event) {
+                event.preventDefault();
+
+
+                $.ajax({
+                    url: '/member/checkEmail',
+                    method: 'POST',
+                    dataType: 'text',
+                    data: {"email": $("#memberEmail").val()},
+                    success: function (checkMail) {
+                        if (parseInt(checkMail) === 1) {
+                            // console.log("ajax 응답된거 있어?", checkMail);
+                            var myModal = new bootstrap.Modal($("#emailMismatchModal"));
+                            myModal.show();
+
+                        } else {
+                            // console.log("일로 들어온거구나" + checkMail);
+                            ("#registerForm").submit();
+                        }
+                    },
+                    error: function (xhr, errmsg, err) {
+                        console.log("why?" + xhr.status);
+                        return true;
+                    }
+
+                });
+            })
+        })
+
+
+                // 주소 API
+                function execDaumPostcode() {
+                    new daum.Postcode({
+                        oncomplete: function (data) {
+                            var fullAddress = '';  // 최종적으로 합칠 주소
+                            var extraAddr = '';    // 참고항목
+
+                            // 도로명 주소 또는 지번 주소 선택
+                            if (data.userSelectedType === 'R') {
+                                fullAddress = data.roadAddress;
+                            } else {
+                                fullAddress = data.jibunAddress;
+                            }
+
+                            // 도로명 주소일 경우 추가적인 정보 처리
+                            if (data.userSelectedType === 'R') {
+                                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                                    extraAddr += data.bname;
+                                }
+                                if (data.buildingName !== '' && data.apartment === 'Y') {
+                                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                                }
+                                // 참고항목이 있을 경우 추가
+                                if (extraAddr !== '') {
+                                    extraAddr = ' (' + extraAddr + ')';
+                                }
+                            }
+
+                            // 최종 주소에 참고항목 추가
+                            fullAddress += extraAddr;
+
+                            // 주소, 우편번호를 입력란에 채우기
+                            document.getElementById('memberPostcode').value = data.zonecode;
+                            document.getElementById("memberAddress").value = fullAddress;  // 주소를 memberAddress 필드에 삽입
+                        }
+                    }).open();
+                }
+
+                // form submit 전에 memberAddress에 상세 주소 추가
+                function combineAddress() {
+                    var detailedAddress = document.getElementById("memberExtraAddress").value;
+                    var memberAddress = document.getElementById("memberAddress").value;
+
+                    // 상세 주소가 있으면 memberAddress에 합침
+                    if (detailedAddress) {
+                        document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
+                    }
+                }
+
+
     </script>
 </div>
 </body>

@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.service.office;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final ModelMapper modelMapper;
-    private final ImageFileService fileService;
+    private final ImageFileService imageFileService;
 
 
     /* -----------------------------------------------------------------------------
@@ -46,7 +48,7 @@ public class OrganizationService {
             organ.setActiveYn("Y");
 
             // 이미지 등록
-            List<ImageFileEntity> images = fileService.saveImages(imageFiles);
+            List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
 
             // 이미지 정보 추가
             // 양방향 연관관계 편의 메서드 사용
@@ -71,25 +73,40 @@ public class OrganizationService {
         출력 : 없음
         설명 : 전달받은 데이터를 데이터베이스에 저장하여 조직 정보 수정
     ----------------------------------------------------------------------------- */
-    public void organUpdate(OrganizationDTO organizationDTO) {
+    public void organUpdate(OrganizationDTO organizationDTO, String join, List<MultipartFile> imageFiles) {
 
         try {
             // idx로 데이터 조회
             Optional<OrganizationEntity> read =
                     organizationRepository.findById(organizationDTO.getIdx());
+            System.out.println(read.toString());
 
             if(!read.isPresent()){                      // 조회 값이 없다면
-                throw new RuntimeException("조직 조회 실패");
+                throw new RuntimeException("수정할 조직 조회 실패");
             }
             else {                                      // 조회 값이 있다면
                 // DTO -> Entity로 변환
                 OrganizationEntity organ = modelMapper.map(organizationDTO, OrganizationEntity.class);
+                System.out.println(organ.toString());
+                System.out.println("이미지 엔티티로 변환");
+
+                // 이미지 추가 등록
+                List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
+                System.out.println("이미지 추가등록 성공");
+
+                // 이미지 정보 추가
+                // 양방향 연관관계 편의 메서드 사용
+                for (ImageFileEntity image : images) {
+                    organ.addImage(image);  // FK 자동 설정
+                }
+                System.out.println("FK 자동 등록");
 
                 // Entity 테이블에 저장
                 organizationRepository.save(organ);
             }
-        } catch (Exception e){
-            throw new RuntimeException("조직 수정 실패: "+e.getMessage());
+
+        } catch (Exception e) {             // 오류발생시 오류 처리
+            throw new RuntimeException("수정서비스 실패");
         }
 
     }
@@ -188,8 +205,26 @@ public class OrganizationService {
     ----------------------------------------------------------------------------- */
     public void organDelete(Integer idx) {
 
-        // idx로 조회하여 삭제
-        organizationRepository.deleteById(idx);
+        try {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx);
+
+            // dto => entity
+            List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                    .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                    .collect(Collectors.toList());
+
+            // 모든 이미지 삭제
+            for (ImageFileEntity imageFileEntity : imageFileEntities) {
+                imageFileService.deleteImage(imageFileEntity.getIdx());
+            }
+
+            // idx로 조회하여 삭제
+            organizationRepository.deleteById(idx);
+
+        } catch (Exception e) {
+            throw new RuntimeException("삭제를 실패했습니다." + e.getMessage());
+        }
 
     }
 

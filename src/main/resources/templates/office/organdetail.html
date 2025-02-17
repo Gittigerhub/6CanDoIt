@@ -58,15 +58,42 @@
                 </tr>
                 <tr style="height: 50px;">
                     <th style="vertical-align: middle">이미지</th>
-                    <td colspan="3" style="text-align: left">
-                        <th:block th:each="data:${imageFileDTOS}">
-                            <th:block th:if="${data.getRepimageYn()} == 'Y'">
-                                <img style="width: 300px; height: 300px; object-fit: cover; vertical-align: bottom; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                    <td colspan="3">
+                        <div style="display: flex; flex-wrap: wrap; padding: 20px;">
+                            <th:block th:each="data:${imageFileDTOS}">
+                                <th:block th:if="${!hasRepImage}">
+                                    <div style="flex-basis: 100%; text-align: left">
+                                        <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                                    </div>
+                                    <div>
+                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                            <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                            <div>
+                                                <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                </th:block>
+                                <th:block th:unless="${!hasRepImage}">
+                                    <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                                        <div style="flex-basis: 100%; text-align: left">
+                                            <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                            <div>
+                                                <button type="button" class="btn btn-danger deleteBtn mb-4" style="margin-left: 130px" th:value="${data.idx}">삭제</button>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                    <div>
+                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                            <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                            <div>
+                                                <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                </th:block>
                             </th:block>
-                            <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                <img style="width: 200px; height: 200px; object-fit: cover; vertical-align: bottom; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                            </th:block>
-                        </th:block>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
@@ -75,8 +102,9 @@
 
             <!-- 수정/취소 버튼 -->
             <div class="d-flex justify-content-end mt-5">
-                <button type="button" class="btn btn-success mx-4" id="btn-update" th:data-id="${organDTO.idx}">수정</button>
-                <button type="button" class="btn btn-danger btn-delete" th:data-id="${organDTO.idx}">삭제</button>
+                <button type="button" class="btn btn-success" id="btn-update" th:data-id="${organDTO.idx}">수정</button>
+                <button type="button" class="btn btn-danger mx-4 btn-delete" th:data-id="${organDTO.idx}">삭제</button>
+                <button type="button" class="btn btn-secondary"><a th:href="@{/office/list}" style="text-decoration: none; color: white">목록</a></button>
             </div>
         </div>
 
@@ -95,6 +123,7 @@
                 <!-- 폼 시작 -->
                 <form id="updatemodalForm">
                     <input type="hidden" id="idx" name="idx">
+                    <input type="hidden" name="join" value="organ">
                     <!-- Modal body -->
                     <div class="modal-body">
                         <div class="row mt-2">
@@ -232,9 +261,17 @@
                             </div>
                         </div>
 
-                        <!-- 조직 사진 -->
+                        <!-- 조직 대표 사진 -->
                         <div class="col-sm-12 mt-2">
                             <div class="form-group form-group-default" id="inputImage">
+                                <label>*대표 이미지 :</label>
+                                <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                            </div>
+                        </div>
+
+                        <!-- 조직 사진 -->
+                        <div class="col-sm-12 mt-2">
+                            <div class="form-group form-group-default" id="inputImage2">
                                 <label>*이미지 :</label>
                                 <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
                             </div>
@@ -297,6 +334,66 @@
         // 문서가 준비가 되었다면
         $(document).ready(function () {
 
+            // 이미지 삭제버튼을 클릭했을 때
+            $(".deleteBtn").on('click', function () {
+
+                var idx = this.value;
+
+                $.ajax({
+                    url: "/images/delete",
+                    type: 'GET',
+                    data: {
+                        idx: idx                        // 전달값 : 값
+                    },
+                    success: function (response) {      // 작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "이미지를 삭제하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        }).then(() => {
+                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function () {                // 작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "이미지 삭제를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+
+
+            });
+
             // 이미지 추가 버튼 클릭했을 때
             $("#addImage").on('click', function() {
 
@@ -307,7 +404,7 @@
 
             // 이미지 추가
             function addImageInput() {
-                const container = document.getElementById('inputImage');
+                const container = document.getElementById('inputImage2');
                 const newInputDiv = document.createElement('div');
                 newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
                 container.appendChild(newInputDiv);
@@ -315,7 +412,7 @@
 
             // 이미지 추가창 초기화
             function resetImageInput() {
-                const container = document.getElementById('inputImage');
+                const container = document.getElementById('inputImage2');
                 container.innerHTML = '<label>*이미지 :</label>' +
                     '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
             }
@@ -422,6 +519,8 @@
                         $('#organName').val(response.organizationDTO.organName);
                         $('#organAddress').val(response.organizationDTO.organAddress);
                         $('#organTel').val(response.organizationDTO.organTel);
+                        $('#activeYn').val(response.organizationDTO.activeYn);
+                        $('#activeYn').val(response.organizationDTO.activeYn);
                         $('#activeYn').val(response.organizationDTO.activeYn);
 
                         //대화창 출력

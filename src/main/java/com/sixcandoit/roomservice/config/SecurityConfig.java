@@ -70,7 +70,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER");
                     auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
                     // 조직-매장 페이지 접근 권한
-                    auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
+                    auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
                     // 이벤트-멤버포인트 페이지 접근 권한
                     auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
                     // QnA 페이지 접근 권한
@@ -87,6 +87,9 @@ public class SecurityConfig{
                     auth.requestMatchers("/cart/**").permitAll();
                     // 광고 페이지 접근 권한
                     auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
+                    // 이미지 컨트롤러 접근 권한
+                    auth.requestMatchers("/images/**").permitAll();
+
                     });
 
         //관리자회원 로그인
@@ -125,7 +128,7 @@ public class SecurityConfig{
             auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER");
             auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
             // 조직-매장 페이지 접근 권한
-            auth.requestMatchers("/office/**", "/office/shopdetail/**").permitAll();
+            auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
             // 이벤트-멤버포인트 페이지 접근 권한
             auth.requestMatchers("/event/**", "/event/memberpoint/**", "/upload/**","/event/update").permitAll();
             // QnA 페이지 접근 권한
@@ -142,6 +145,9 @@ public class SecurityConfig{
             auth.requestMatchers("/cart/**").permitAll();
             // 광고 페이지 접근 권한
             auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
+            // 이미지 컨트롤러 접근 권한
+            auth.requestMatchers("/images/**").permitAll();
+
             });
 
         //http.exceptionHandling(exceptionHandling ->exceptionHandling

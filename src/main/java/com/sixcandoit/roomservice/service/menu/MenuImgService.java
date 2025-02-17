@@ -3,9 +3,9 @@ package com.sixcandoit.roomservice.service.menu;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
-import com.sixcandoit.roomservice.repository.FileRepository;
+import com.sixcandoit.roomservice.repository.ImageFileRepository;
 import com.sixcandoit.roomservice.repository.menu.MenuRepository;
-import com.sixcandoit.roomservice.service.FileService;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -21,14 +21,14 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class MenuImgService {
-    private final FileRepository fileRepository;
+    private final ImageFileRepository fileRepository;
     @Value("${imgUploadLocation}")
     private String imgUploadLocation;
 
     private final MenuRepository menuRepository;
     private final S3Uploader s3Uploader;
     private final ModelMapper modelMapper;
-    private final FileService fileService;
+    private final ImageFileService fileService;
 
     //삽입(파일업로드-> 생성된 새로운 이름을 가지고 -> DB 저장)
     public void registerImg(Integer idx, List<MultipartFile> multipartFiles) throws Exception {

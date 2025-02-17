@@ -1,23 +1,27 @@
 package com.sixcandoit.roomservice.service;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
-import com.sixcandoit.roomservice.repository.FileRepository;
+import com.sixcandoit.roomservice.repository.ImageFileRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 @Transactional
-public class FileService {
+public class ImageFileService {
 
+    private final ModelMapper modelMapper;
     @Value("${imgUploadLocation}")              // 이미지가 저장될 위치
     private String imgUploadLocation;
 
@@ -28,7 +32,7 @@ public class FileService {
     private String region;
 
     private final S3Uploader s3Uploader;        //파일업로드 클래스 상속
-    private final FileRepository fileRepository;
+    private final ImageFileRepository imageFileRepository;
 
     // 이미지 등록
     public List<ImageFileEntity> saveImages(List<MultipartFile> imageFiles) throws Exception {
@@ -87,19 +91,19 @@ public class FileService {
         List<ImageFileEntity> existingImages = new ArrayList<>();
 
         if (Join.equals("organ")) {
-            existingImages = fileRepository.organizationJoin(idx);
+            existingImages = imageFileRepository.organizationJoin(idx);
         } else if (Join.equals("room")) {
-            existingImages = fileRepository.roomJoin(idx);
+            existingImages = imageFileRepository.roomJoin(idx);
         } else if (Join.equals("notice")) {
-            existingImages = fileRepository.noticeJoin(idx);
+            existingImages = imageFileRepository.noticeJoin(idx);
         } else if (Join.equals("qna")) {
-            existingImages = fileRepository.qnaJoin(idx);
+            existingImages = imageFileRepository.qnaJoin(idx);
         } else if (Join.equals("event")) {
-            existingImages = fileRepository.eventJoin(idx);
+            existingImages = imageFileRepository.eventJoin(idx);
         } else if (Join.equals("adver")) {
-            existingImages = fileRepository.advertisementJoin(idx);
+            existingImages = imageFileRepository.advertisementJoin(idx);
         } else if (Join.equals("menu")) {
-            existingImages = fileRepository.menuJoin(idx);
+            existingImages = imageFileRepository.menuJoin(idx);
         }
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
@@ -153,14 +157,35 @@ public class FileService {
     public void deleteImage(Integer idx) throws Exception {
 
         // idx로 이미지 데이터 조회
-        ImageFileEntity fileEntity = fileRepository.findById(idx)
+        ImageFileEntity fileEntity = imageFileRepository.findById(idx)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이미지를 찾을 수 없습니다."));
 
         // 레코드 삭제하기 전, 관련 파일 삭제
         s3Uploader.deleteFile(fileEntity.getName(), imgUploadLocation);
 
         // DB 정보 삭제
-        fileRepository.deleteById(idx);
+        imageFileRepository.deleteById(idx);
+    }
+
+    // 이미지 조회
+    public List<ImageFileDTO> readImage(Integer idx) {
+
+        try {
+            // 연관관계 idx로 이미 리스트 조회
+            List<ImageFileEntity> imageFileEntitys = imageFileRepository.organizationJoin(idx);
+
+            // DTO로 변환
+            List<ImageFileDTO> imageFileDTOS = imageFileEntitys.stream()
+                    .map(imageFileEntity -> modelMapper.map(imageFileEntity, ImageFileDTO.class))
+                    .collect(Collectors.toList());
+
+            // 반환
+            return imageFileDTOS;
+
+        } catch (Exception e) {
+            throw new RuntimeException("이미지 조회 오류");
+        }
+
     }
 
 }

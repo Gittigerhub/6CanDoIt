@@ -4,7 +4,7 @@ import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
-import com.sixcandoit.roomservice.service.FileService;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,7 +27,7 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final ModelMapper modelMapper;
-    private final FileService fileService;
+    private final ImageFileService fileService;
 
 
     /* -----------------------------------------------------------------------------

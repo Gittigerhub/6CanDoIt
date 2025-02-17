@@ -110,8 +110,17 @@ public class MenuController {
     @GetMapping("/menu/readmenu")
     public String readMenu(Integer menuidx, Model model, RedirectAttributes redirectAttributes) {
 
+        // menuidx가 null인 경우 처리
+        if (menuidx == null) {
+            redirectAttributes.addFlashAttribute("msg", "메뉴 ID가 없습니다.");
+            return "redirect:/menu/listmenu";
+        }
+
         try {
             MenuDTO menuDTO = menuService.menuRead(menuidx);
+            if (menuDTO == null) {  // menuService에서 null이 반환되는 경우 체크
+                throw new EntityNotFoundException("존재하지 않는 메뉴입니다.");
+            }
             log.info("menuDTO: " + menuDTO);
             model.addAttribute("menuDTO", menuDTO);
             model.addAttribute("bucket", bucket);
@@ -121,6 +130,10 @@ public class MenuController {
             return "/menu/readmenu";
         }catch (EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("msg", "존재하지 않는 메뉴입니다.");
+            return "redirect:/menu/readmenu";
+        } catch (Exception e) {
+            // 예기치 않은 예외 처리 (디버깅용 로그 등 추가 가능)
+            redirectAttributes.addFlashAttribute("msg", "알 수 없는 오류가 발생했습니다.");
             return "redirect:/menu/readmenu";
         }
     }

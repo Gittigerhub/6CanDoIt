@@ -6,6 +6,7 @@ import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.admin.AdminService;
 import com.sixcandoit.roomservice.service.member.MemberService;
+import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @GetMapping("/")
     public String IndexForm(HttpSession session, AdminDTO adminDTO) {
@@ -46,6 +49,18 @@ public class AdminController {
         }
 
         return "redirect:/";
+    }
+
+    // 이메일 중복 확인
+    @PostMapping("/checkEmail")
+    @ResponseBody
+    public String checkEmail(@RequestParam("email") String email) {
+        log.info("진입여부");
+        boolean exists = adminService.checkEmailExistence(email);
+        String result = exists? "1" :   "0";
+        log.info("email exists : " + email+exists);
+
+        return result;  // 응답 반환
     }
 
     // 회원 수정
@@ -106,9 +121,20 @@ public class AdminController {
                                  @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
                                  @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
                                  Model model){
-        // 작성 필요함
-        List<MemberEntity> memberList = memberRepository.findAll();
-        model.addAttribute("memberList", memberList);
-        return "admin/memberlist";
+//        // 해당 페이지의 내용을 서비스를 통해 데이터베이스로 부터 조회
+//        Page<MemberDTO> memberDTOS = memberService.memberList(page, type, keyword);
+//
+//        // html에 필요한 페이지 정보를 받는다
+//        Map<String, Integer> pageInfo = PageNationUtil.Pagination(memberDTOS);
+//
+//        model.addAttribute("memberList", memberDTOS); // 데이터 전달
+//        model.addAttribute(pageInfo);
+//        model.addAttribute("type", type);
+//        model.addAttribute("keyword", keyword);
+
+
+//        List<MemberEntity> memberList = memberRepository.findAll();
+//        model.addAttribute("memberList", memberList);
+        return "admin/member-list";
     }
 }

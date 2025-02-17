@@ -7,9 +7,14 @@ import com.sixcandoit.roomservice.service.member.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,6 +36,7 @@ public class MemberController {
         return "member/register";
     }
 
+
     @PostMapping("/register")
     public String registerProc(@ModelAttribute MemberDTO memberDTO){
 
@@ -39,6 +45,18 @@ public class MemberController {
         }
 
         return "redirect:/";
+    }
+
+    // 이메일 중복 확인
+    @PostMapping("/checkEmail")
+    @ResponseBody
+    public String checkEmail(@RequestParam("email") String email) {
+       log.info("진입여부");
+        boolean exists = memberService.checkEmailExistence(email);
+        String result = exists? "1" :   "0";
+        log.info("email exists : " + email+exists);
+
+        return result;  // 응답 반환
     }
 
     // 회원 수정

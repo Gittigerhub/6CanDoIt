@@ -2,13 +2,19 @@ package com.sixcandoit.roomservice.service.member;
 
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
+import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.hibernate.query.Page;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +32,23 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService; //이메일로 임시번호 발급
 
+    // 이메일 중복 체크 메서드
+    public boolean checkEmailExistence(String email) {
+        return memberRepository.existsByMemberEmail(email);
+    }
+
+    // 일반 사용자 회원 가입
     public MemberEntity register(MemberDTO memberDTO) {
-        Optional<MemberEntity> user = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
-        if (user.isPresent()) {
+
+        // 이메일 중복 체크
+        if (checkEmailExistence(memberDTO.getMemberEmail())) {
             throw new IllegalStateException("이미 가입된 회원입니다.");
         }
+
+//        Optional<MemberEntity> user = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
+//        if (user.isPresent()) {
+//            throw new IllegalStateException("이미 가입된 회원입니다.");
+//        }
 
         String password = passwordEncoder.encode(memberDTO.getPassword());
 
@@ -41,7 +59,9 @@ public class MemberService {
         return memberRepository.save(memberEntity);
     }
 
+    // 회원 정보 수정
     public MemberEntity modify(MemberDTO memberDTO) {
+
         Optional<MemberEntity> user = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
 
         if (user.isPresent()) {
@@ -58,10 +78,12 @@ public class MemberService {
         return null;
     }
 
+    // 회원 탈퇴
     public void delete(String memberEmail) {
         memberRepository.deleteByMemberEmail(memberEmail);
     }
 
+    // 회원 읽기
     public MemberDTO read(String memberEmail) {
         Optional<MemberEntity> user = memberRepository.findByMemberEmail(memberEmail);
 
@@ -124,5 +146,51 @@ public class MemberService {
             throw new RuntimeException("임시 비밀번호 생성을 실패하였습니다."); //호출한 메소드에 전달한 오류
         }
     }
+
+//    // 일반 회원 전체 목록, 데이터를 화면에 출력
+//    // 페이지 번호를 받아 테이블의 해당 페이지의 데이터를 읽어와서 컨트롤러에 전달
+//    public Page<MemberDTO> memberList(Pageable page,String type, String keyword){
+//        int currentPage = page.getPageNumber()-1; // 화면의 페이지 번호를 db 페이지 번호로
+//        int pageLimit = 10; // 한 페이지를 구성하는 레코드 수
+//
+//        // 지정된 내용으로 페이지 정보를 재생산, 정렬 내림차순 DESC
+//        Pageable pageable = PageRequest.of(currentPage, pageLimit,
+//                Sort.by(Sort.Direction.DESC, "idx"));
+//
+//        // 조회한 변수를 선언
+//        // type : 제목(1), 내용(2), 제목+내용(2), 답변만(4), 자주 묻는 질문(5), 전체(0)
+//        Page<MemberEntity> memberEntities;
+//        if (keyword != null){ // 검색어가 존재하면
+//            log.info("검색어가 존재하면...");
+//            if (type.equals("1")){ // type 분류 1, 제목으로 검색할 때
+//                log.info("제목으로 검색을 하는 중...");
+//                memberEntities = memberRepository.searchQnaTitle(keyword, pageable);
+//            } else if (type.equals("2")){ // type 분류 2, 내용으로 검색할 때
+//                log.info("내용으로 검색을 하는 중...");
+//                memberEntities = memberRepository.searchQnaContents(keyword, pageable);
+//            } else if (type.equals("3")){ // type 분류 3, 제목+내용으로 검색할 때
+//                log.info("제목+내용으로 검색을 하는 중...");
+//                memberEntities = memberRepository.searchQnaAll(keyword, pageable);
+//            } else if (type.equals("4")){ // type 분류 4, 답변만 검색할 때
+//                log.info("답변만 검색하는 중...");
+//                memberEntities = memberRepository.searchReplyAll(keyword, pageable);
+//            } else if (type.equals("5")) { // type 분류 5, 자주 묻는 질문만 검색할 때
+//                log.info("자주 묻는 질문만 검색 중...");
+//                memberEntities = memberRepository.searchFavYn(pageable);
+//            } else { // 전체 검색 = 0
+//                log.info("전체 조회 검색 중...");
+//                memberEntities = memberRepository.searchQnaAndReply(keyword, pageable);
+//            }
+//        } else { // 검색어가 존재하지 않으면 모두 검색
+//            memberEntities = memberRepository.findAll(pageable);
+//        }
+//
+//        // Entity를 DTO로 변환 후 저장
+//        org.springframework.data.domain.Page<MemberDTO> memberDTOS = memberEntities.map(
+//                data->modelMapper.map(data, MemberDTO.class));
+//
+//        return memberDTOS;
+//    }
+
 }
 

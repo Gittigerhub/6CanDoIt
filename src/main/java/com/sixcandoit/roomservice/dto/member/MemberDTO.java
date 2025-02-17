@@ -18,7 +18,9 @@ public class MemberDTO {
     private String memberGender;           // 성별
     private String memberName;             // 이름
     private String memberPhone;            // 연락처
+    private int memberPostcode;            // 우편번호
     private String memberAddress;          // 주소
+    private String memberExtraAddress;     // 상세 주소
     private String alramOrder;             // 주문 알람 수신여부
     private String activeYn;               // 활성화 유무
 

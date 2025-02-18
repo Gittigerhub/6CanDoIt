@@ -1,12 +1,15 @@
 package com.sixcandoit.roomservice.controller.notice;
 
+
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
 import com.sixcandoit.roomservice.service.notice.NoticeService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.Banner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -26,19 +29,12 @@ import java.util.Map;
 
 @Controller // get, post 매핑만 사용이 가능
 @RequiredArgsConstructor
-@Log
+@Log4j2
 
 public class NoticeController {
 
-    @Value("${aws.s3.bucket}")
-    public String bucket;
-    @Value("${aws.region}")
-    public String region;
-    @Value("images")
-    public String folder;
 
     private final NoticeService noticeService;
-
 
 
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
@@ -62,7 +58,7 @@ public class NoticeController {
         return "notice/list";
     }
 
-    // Qna의 Q 등록
+
     @GetMapping("/notice/register")
     public String register (Model model){
         log.info("질문 페이지로 이동합니다.");
@@ -72,12 +68,11 @@ public class NoticeController {
         return "notice/register";
     }
 
-    // Qna의 Q 등록 저장 처리
+
     @PostMapping("/notice/register")
 
     public String registerProc(@Valid @ModelAttribute NoticeDTO noticeDTO,
-                               MultipartFile imgFile,
-                               BindingResult bindingResult) throws IOException {
+                               BindingResult bindingResult) {
         log.info("질문한 내용을 저장합니다.");
 
         if (bindingResult.hasErrors()) { // 유효성 검사에 실패 시
@@ -86,7 +81,7 @@ public class NoticeController {
         }
 
         // 유효성 검사 성공 시 등록 처리
-        noticeService.noticeRegister(noticeDTO, imgFile);
+        noticeService.noticeRegister(noticeDTO);
 
         return "redirect:/notice/list";
     }
@@ -99,10 +94,8 @@ public class NoticeController {
         NoticeDTO noticeDTO = noticeService.noticeRead(idx);
 
         log.info("개별 데이터를 페이지에 전달하는 중입니다");
-        model.addAttribute("noticeDTO",noticeDTO);
-        model.addAttribute("bucket", bucket);
-        model.addAttribute("region", region);
-        model.addAttribute("folder", folder);
+        model.addAttribute("noticeDTO", noticeDTO);
+
 
         return "notice/read";
     }
@@ -121,17 +114,21 @@ public class NoticeController {
 
     @PostMapping("/notice/update")
     public String updateProc(@Valid @ModelAttribute NoticeDTO noticeDTO,
-                             MultipartFile imagefile,
-                             BindingResult bindingResult) throws IOException {
+                             BindingResult bindingResult, Model model)  {
         log.info("수정된 데이터를 저장합니다.");
 
         if (bindingResult.hasErrors()) { // 유효성 검사에 실패 시
             log.info("유효성 검사 오류 발생");
+            bindingResult.getAllErrors().forEach(error -> log.info(error.getDefaultMessage()));
             return "notice/update"; // update로 돌아간다
         }
-        // 유효성 검사 성공 시 수정 처리
-        noticeService.noticeUpdate(noticeDTO,imagefile);
+       try{
+           noticeService.noticeUpdate(noticeDTO);
+       }catch (Exception e) {
 
+           model.addAttribute("errorMessage", e.getMessage());
+        return "notice/update";
+       }
         return "redirect:/notice/list";
     }
 

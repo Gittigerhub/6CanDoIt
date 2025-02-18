@@ -60,11 +60,15 @@
                     <th style="vertical-align: middle">이미지</th>
                     <td colspan="3">
                         <div style="display: flex; flex-wrap: wrap; padding: 20px;">
-                            <th:block th:each="data:${imageFileDTOS}">
+                            <!-- 대표 이미지가 없을때 나오는 이미지 -->
+                            <div style="flex-basis: 100%; text-align: left">
                                 <th:block th:if="${!hasRepImage}">
-                                    <div style="flex-basis: 100%; text-align: left">
-                                        <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
-                                    </div>
+                                    <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                                </th:block>
+                            </div>
+                            <!-- 이미지 -->
+                            <th:block th:each="data:${imageFileDTOS}" th:if="${!hasRepImage}">
+                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
                                     <div>
                                         <th:block th:unless="${data.getRepimageYn()} == 'Y'">
                                             <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
@@ -74,22 +78,27 @@
                                         </th:block>
                                     </div>
                                 </th:block>
-                                <th:block th:unless="${!hasRepImage}">
-                                    <th:block th:if="${data.getRepimageYn()} == 'Y'">
-                                        <div style="flex-basis: 100%; text-align: left">
-                                            <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                                            <div>
-                                                <button type="button" class="btn btn-danger deleteBtn mb-4" style="margin-left: 130px" th:value="${data.idx}">삭제</button>
-                                            </div>
+                            </th:block>
+
+                            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+                                <!-- 대표 이미지 -->
+                                <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                                    <div style="flex-basis: 100%; text-align: left">
+                                        <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                        <div>
+                                            <button type="button" class="btn btn-danger deleteBtn mb-4" style="margin-left: 130px" th:value="${data.idx}">삭제</button>
                                         </div>
-                                    </th:block>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+                                <!-- 이미지 -->
+                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
                                     <div>
-                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                            <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                                            <div>
-                                                <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
-                                            </div>
-                                        </th:block>
+                                        <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                        <div>
+                                            <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                        </div>
                                     </div>
                                 </th:block>
                             </th:block>

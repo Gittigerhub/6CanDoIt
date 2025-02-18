@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -37,8 +39,11 @@ public class NoticeDTO {
 
     private String noticeImg; //이미지
 
+    private MultipartFile titleFile;
+    private MultipartFile contentFile;
+    private List<MultipartFile> Files;
+    private List<String> imageUrls;
+    private String repimageYn;
 
-    private String noticeUrl;
+    }
 
-    private String noticeImageFile;
-}

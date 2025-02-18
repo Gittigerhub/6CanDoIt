@@ -26,8 +26,14 @@
             <p>번호:<span th:text="${noticeDTO.idx}"></span></p>
             <p>제목:<span th:text="${noticeDTO.noticeTitle}"></span></p>
             <p>내용:<span th:text="${noticeDTO.noticeContents}"></span></p>
-            <img th:src="|https://${bucket}.s3${region}.amazonaws.com/${folder}/${noticeDTO.noticeImg}|"
-                 class="img-fluid">
+
+            <div th:if="${noticeDTO.noticeImg !=null}">
+              <img th:src="${noticeDTO.noticeImg}" alt="Notice Image" class="img-fluid">
+            </div>
+            <div th:each="imageUrl : ${noticeDTO.imageUrls}">
+              <img th:src="${imageUrl}" class="img-fluid">
+            </div>
+
             <p>등록일:
               <span th:text="${#temporals.format(noticeDTO.insDate, 'yyyy-MM-dd HH:mm')}"></span>
             </p>

@@ -1,79 +1,88 @@
 package com.sixcandoit.roomservice.service.notice;
 
+
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
 import com.sixcandoit.roomservice.repository.notice.NoticeRepository;
-import com.sixcandoit.roomservice.service.S3Uploader;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 @Log
-@RequiredArgsConstructor // Lombok을 이용한 생성자 자동 생성
 public class NoticeService {
-    @Value("images")
-    private String imgUploadLocation;
-
-    private final NoticeRepository noticeRepository; // final로 설정 (반드시 주입되어야 함)
-    private final ModelMapper modelMapper;
-    private final S3Uploader s3Uploader;
-
-    public void noticeRegister(NoticeDTO noticeDTO, MultipartFile  file) throws IOException {
-        String originalFilename = file.getOriginalFilename();
-        String newFileName ="";
-
-        if(originalFilename !=null){
-            newFileName = s3Uploader.upload(file,imgUploadLocation);
-        }
-        noticeDTO.setNoticeImg(newFileName);
+    private final NoticeRepository noticeRepository;
+    private ModelMapper modelMapper=new ModelMapper();
+    private final ImageFileService imageFileService;
 
 
-        NoticeEntity noticeEntity =
-                modelMapper.map(noticeDTO, NoticeEntity.class);
-        //저장
-        noticeRepository.save(noticeEntity);
-    }
 
-    public void noticeUpdate(NoticeDTO noticeDTO,MultipartFile  file) throws IOException {
+    public void noticeRegister( NoticeDTO noticeDTO) {
 
-        //데이터의 idx를 조회
-        Optional<NoticeEntity> noticeEntity = noticeRepository.findById(noticeDTO.getIdx());
-        String deleteFile = noticeDTO.getNoticeImg();
-        String originalFilename = file.getOriginalFilename();
-        String newFileName ="";
+        try{
+            NoticeEntity noticeEntity=
+                    modelMapper.map(noticeDTO, NoticeEntity.class);
 
-        if (noticeEntity.isPresent()) {
-            NoticeEntity noticeEntity1 = modelMapper.map(noticeDTO, NoticeEntity.class);
-            noticeRepository.save(noticeEntity1);
-        }
-        if(originalFilename.length()!=0){
-            if(deleteFile.length()!=-0){
-                s3Uploader.deleteFile(deleteFile,imgUploadLocation);
+            //이미지 등록
+            log.info("이미지를 저장한다.");
+            List<ImageFileEntity> images= imageFileService.saveImages(noticeDTO.getFiles());
+
+            //이미지 정보 추가
+            for(ImageFileEntity image:images){
+                noticeEntity.addImage(image);
             }
-            newFileName = s3Uploader.upload(file,imgUploadLocation);
-            noticeDTO.setNoticeTitle(newFileName);
+            log.info("저장을 수행한다");
+            noticeRepository.save(noticeEntity);
+
+            //noticeImg 업데이트(첫 번째 이미지를 대표 이미지로 설정
+            noticeEntity.setNoticeImgFromImageFile();
+
+            //저장된 NoticeEntity에서 이미지 Url을 DTO로 전달
+            noticeDTO.setNoticeImg(noticeEntity.getNoticeImg());
+        }catch (Exception e){
+            throw new RuntimeException("이미지 저장 실패:" +e.getMessage());
         }
     }
 
-    public void noticeDelete(Integer idx) {noticeRepository.deleteById(idx);
+
+    public void noticeUpdate( NoticeDTO noticeDTO)  throws  Exception {
+        Optional<NoticeEntity> noticeEntityOpt= noticeRepository.findById(noticeDTO.getIdx());
+
+        if(noticeEntityOpt.isPresent()){
+            NoticeEntity noticeEntity=noticeEntityOpt.get();
+
+            log.info("이미지를 저장한다");
+            List<ImageFileEntity> images=imageFileService.updateImage(noticeDTO.getFiles(),"notice",noticeDTO.getIdx());
+
+            //기존 이미지 업데이트
+            noticeEntity.updateImages(images);
+
+            log.info("대표 이미지 설정");
+            if(noticeEntity.getNoticeImg()==null){
+                if(!images.isEmpty()){
+                    noticeEntity.setNoticeImg(images.get(0).getUrl());
+                }
+            }
+        }
     }
+
+    public void noticeDelete(Integer idx) {noticeRepository.deleteById(idx);}
+
 
     public Page<NoticeDTO> noticeList(Pageable page, String type, String keyword) {
         Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
-
         Page<NoticeEntity> noticeEntities;
         if (keyword != null) {
             log.info("검색어가 존재하면");
@@ -115,3 +124,4 @@ public class NoticeService {
 
     }
 }
+

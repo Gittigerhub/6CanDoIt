@@ -223,23 +223,13 @@ public class OfficeController {
 
     @GetMapping("/shopdetail/realread")
     public String shopdetailRealread(Integer idx, Model model) {
-//
-//        // 조직 정보 서비스로 조회
-//        OrganizationDTO organDTO =
-//                organizationService.find(idx);
-//
-//        // 이미지 정보 서비스로 조회
-//        List<ImageFileDTO> imageFileDTOS =
-//                imageFileService.readImage(idx);
-//
-//        // 대표이미지 존재여부 확인
-//        boolean hasRepImage = imageFileDTOS.stream()
-//                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
-//
-//        // view로 전달
-//        model.addAttribute("organDTO", organDTO);
-//        model.addAttribute("imageFileDTOS", imageFileDTOS);
-//        model.addAttribute("hasRepImage", hasRepImage);
+
+        // 조직 정보 서비스로 조회
+        OrganizationDTO organDTO =
+                organizationService.organRead(idx);
+
+        // view로 전달
+        model.addAttribute("organDTO", organDTO);
 
         return "office/shopread";
 

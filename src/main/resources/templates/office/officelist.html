@@ -76,8 +76,19 @@
                     <td th:text="${data.idx}"></td>
                     <td th:text="${data.organType}"></td>
                     <td>
+                        <!-- 조직 분류가 매장이 아닐때 -->
                         <a th:href="@{/office/organ(idx=${data.idx})}" th:if="${data.organType != 'SHOP'}" th:text="${data.organName}"></a>
-                        <a th:href="@{/office/shopdetail(idx=${data.idx})}" th:if="${data.organType == 'SHOP'}" th:text="${data.organName}"></a>
+                        <!-- 조직 분류가 매장일때 -->
+                        <th:block th:if="${data.organType == 'SHOP'}">
+                            <!-- 매장 상세내용이 존재한다면 상세내용 보기 진행 -->
+                            <a th:href="@{/office/shopdetail/register}" th:text="${data.organName}"></a>
+                            <!-- 매장 상세내용이 존재하지 않는다면 등록 진행 -->
+                            <!--
+                            <th:block th:if="${data.shopDetailDTO.idx}">
+                                <a th:href="@{/office/shopdetail(idx=${data.getShopDetailDTO().idx})}" th:text="${data.organName}"></a>
+                            </th:block>
+                            -->
+                        </th:block>
                     </td>
                     <td th:text="${data.organAddress}"></td>
                     <td th:text="${data.organTel}"></td>

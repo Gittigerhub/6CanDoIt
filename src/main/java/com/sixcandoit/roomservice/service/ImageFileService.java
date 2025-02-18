@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,9 +122,6 @@ public class ImageFileService {
         // 기존에 존재하던 이미지 리스트
         List<ImageFileEntity> existingImages = new ArrayList<>();
 
-        // 새로 추가된 이미지 리스트
-        List<ImageFileEntity> images = new ArrayList<>();
-
         if (join.equals("organ")) {
             existingImages = imageFileRepository.organizationJoin(idx);
         } else if (join.equals("room")) {
@@ -184,20 +180,6 @@ public class ImageFileService {
                 }
 
                 existingImages.add(fileEntity);
-
-                // 1. 대표 이미지 찾기
-                Optional<ImageFileEntity> repEntity = existingImages.stream()
-                        .filter(image -> "Y".equals(image.getRepimageYn()))
-                        .findFirst();
-
-                // 2. 대표 이미지가 있다면 리스트에서 제거 후 맨 앞으로 추가
-                for (int i = 0; i < existingImages.size(); i++) {
-                    if ("Y".equals(existingImages.get(i).getRepimageYn())) {
-                        ImageFileEntity imageEntity = existingImages.remove(i);   // 리스트에서 제거
-                        existingImages.add(0, imageEntity);                 // 0번 인덱스에 추가
-                        break;                                                    // 첫 번째 대표 이미지만 처리 후 종료
-                    }
-                }
 
             }
 

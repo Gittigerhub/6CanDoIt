@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "shop_detail")
 public class ShopDetailEntity extends BaseEntity {
+
     @Id
     @Column(name = "shop_detail_idx")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +25,10 @@ public class ShopDetailEntity extends BaseEntity {
     private String tel;                   // 매장 연락처
 
     @Column(name = "shop_detail_open_time")
-    private LocalTime openTime;              // 매장 오픈시간
+    private LocalTime openTime;           // 매장 오픈시간
 
     @Column(name = "shop_detail_close_time")
-    private LocalTime closeTime;             // 매장 마감시간
+    private LocalTime closeTime;          // 매장 마감시간
 
     @Column(name = "shop_detail_rest_day")
     private String restDay;               // 매장 휴일
@@ -54,10 +55,10 @@ public class ShopDetailEntity extends BaseEntity {
     private String activeYn;              // 매장 활성화(N:비활성화, Y:활성화)
 
     @Column(name = "day_fee")
-    private float dayFee;                // 매장 일별 수수료
+    private float dayFee;                 // 매장 일별 수수료
 
     @Column(name = "day_fee_percent")
-    private float dayFeePercent;         // 매장 일별 수수료 %
+    private float dayFeePercent;          // 매장 일별 수수료 %
 
     // 조직 테이블과 1:1 매핑
     @OneToOne(mappedBy = "shopDetailJoin")

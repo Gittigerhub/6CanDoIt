@@ -211,11 +211,27 @@ public class ImageFileService {
     /* --------------------------------------------------------------------
        1. 이미지 조회시에는 연관 테이블의 idx를 받습니다.
     -------------------------------------------------------------------- */
-    public List<ImageFileDTO> readImage(Integer idx) {
+    public List<ImageFileDTO> readImage(Integer idx, String join) {
 
         try {
             // 연관관계 idx로 이미 리스트 조회
-            List<ImageFileEntity> imageFileEntitys = imageFileRepository.organizationJoin(idx);
+            List<ImageFileEntity> imageFileEntitys = new ArrayList<>();
+
+            if (join.equals("organ")) {
+                imageFileEntitys = imageFileRepository.organizationJoin(idx);
+            } else if (join.equals("room")) {
+                imageFileEntitys = imageFileRepository.roomJoin(idx);
+            } else if (join.equals("notice")) {
+                imageFileEntitys = imageFileRepository.noticeJoin(idx);
+            } else if (join.equals("qna")) {
+                imageFileEntitys = imageFileRepository.qnaJoin(idx);
+            } else if (join.equals("event")) {
+                imageFileEntitys = imageFileRepository.eventJoin(idx);
+            } else if (join.equals("adver")) {
+                imageFileEntitys = imageFileRepository.advertisementJoin(idx);
+            } else if (join.equals("menu")) {
+                imageFileEntitys = imageFileRepository.menuJoin(idx);
+            }
 
             // DTO로 변환
             List<ImageFileDTO> imageFileDTOS = imageFileEntitys.stream()

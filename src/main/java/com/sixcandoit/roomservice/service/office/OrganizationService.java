@@ -203,11 +203,11 @@ public class OrganizationService {
         출력 : 없음
         설명 : 전달받은 idx의 값으로 데이터베이스를 조회하여 삭제
     ----------------------------------------------------------------------------- */
-    public void organDelete(Integer idx) {
+    public void organDelete(Integer idx, String join) {
 
         try {
             // 이미지 조회
-            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx);
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
 
             // dto => entity
             List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()

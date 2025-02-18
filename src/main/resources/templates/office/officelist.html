@@ -77,7 +77,7 @@
                     <td th:text="${data.organType}"></td>
                     <td>
                         <a th:href="@{/office/organ(idx=${data.idx})}" th:if="${data.organType != 'SHOP'}" th:text="${data.organName}"></a>
-                        <a th:href="@{#}" th:if="${data.organType == 'SHOP'}" th:text="${data.organName}"></a>
+                        <a th:href="@{/office/shopdetail(idx=${data.idx})}" th:if="${data.organType == 'SHOP'}" th:text="${data.organName}"></a>
                     </td>
                     <td th:text="${data.organAddress}"></td>
                     <td th:text="${data.organTel}"></td>

@@ -38,18 +38,22 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Integer> {
     // 일반 회원 목록
     // 이름만
     @Query("SELECT u FROM MemberEntity u WHERE "+
-            " u.memberName like %:keyword%")
+            " u.memberName LIKE %:keyword%")
     Page<MemberEntity> searchMemberName(@Param("keyword") String keyword, Pageable page);
 
     // 이메일만
     @Query("SELECT u FROM MemberEntity u WHERE "+
-            " u.memberEmail like %:keyword%")
+            " u.memberEmail LIKE %:keyword%")
     Page<MemberEntity> searchMemberEmail(@Param("keyword") String keyword, Pageable page);
 
     // 연락처만
     @Query("SELECT u FROM MemberEntity u WHERE "+
-            " u.memberPhone like %:keyword%")
+            " u.memberPhone LIKE %:keyword%")
     Page<MemberEntity> searchMemberPhone(@Param("keyword") String keyword, Pageable page);
 
+    // 모든 항목에서
+    @Query("SELECT u FROM MemberEntity u WHERE "
+            + "( u.memberName LIKE %:keyword% OR u.memberEmail LIKE %:keyword% OR u.memberPhone LIKE %:keyword%)")
+    Page<MemberEntity> searchNameAndEmailAndPhone(@Param("keyword") String keyword, Pageable page);
 
 }

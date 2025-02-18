@@ -97,27 +97,34 @@ public class MemberService {
         try { //서버가 멈추는 것을 예방
             Optional<MemberEntity> read = memberRepository.findByMemberEmail(memberDTO.getMemberEmail()); //조회
             if (!read.isPresent()) { //일치하는 회원이 없으면
+                log.info("에러1");
                 throw new IllegalStateException("일치하는 회원이 존재하지 않습니다.");
             }
             if (!read.get().getMemberName().equals(memberDTO.getMemberName())) { //이름이 일치하지 않으면
+                log.info("dpfj2");
                 throw new IllegalStateException("회원이름이 일치하지 않습니다.");
             }
 //            if (!read.get().getMemberPhone().equals(memberDTO.getMemberPhone())){ //전화번호가 일치하지 않으면
 //                throw new IllegalStateException("전화번호가 일치하지 않습니다.");
 //            }
+            else {
+                String tempPassword = generateTempPassword(8); //임시비밀번호 생성
+                read.get().setPassword(passwordEncoder.encode(tempPassword)); //임시비밀번호를 저장
+                memberRepository.save(read.get()); //데이터베이스에 저장
 
-            String tempPassword = generateTempPassword(8); //임시비밀번호 생성
-            read.get().setPassword(passwordEncoder.encode(tempPassword)); //임시비밀번호를 저장
-            memberRepository.save(read.get()); //데이터베이스에 저장
+                //임시비밀번호를 회원 이메일(아이디)로 전달
+//            String emailSubject = "임시비밀번호 발급"; //메일제목
+//            String emailText = "안녕하세요 " + read.get().getMemberName() + "님.\n" +
+//                    "요청하신 임시 비밀번호는 다음과 같습니다.\n" +
+//                    tempPassword + "\n" +
+//                    "로그인 후 반드시 비밀번호를 변경해 주십시오."; //본문내용
+                String message = emailService.getTempEmailHTML(tempPassword);
+                String to = read.get().getMemberEmail();
+                String subject = "임시 비밀번호 발급";
 
-            //임시비밀번호를 회원 이메일(아이디)로 전달
-            String emailSubject = "임시비밀번호 발급"; //메일제목
-            String emailText = "안녕하세요 " + read.get().getMemberName() + "님.\n" +
-                    "요청하신 임시 비밀번호는 다음과 같습니다.\n" +
-                    tempPassword + "\n" +
-                    "로그인 후 반드시 비밀번호를 변경해 주십시오."; //본문내용
 
-            emailService.sendEmail(read.get().getMemberEmail(), emailSubject, emailText); //메일전송
+                emailService.sendEmail(to, subject, message); //메일전송
+            }
 
         } catch (IllegalStateException e) { //상태오류(데이터베이스 처리 실패시)
             //e.getMessage() 오류메세지
@@ -127,6 +134,7 @@ public class MemberService {
             System.out.println("예기치 않은 문제가 발생하였습니다." + e.getMessage());
             throw new RuntimeException("가입 중 오류가 발생하였습니다."); //사용자가 오류처리
         }
+
     }
 
     //비밀번호 생성기(입력한 자리수만큼 임시비밀번호를 생성)
@@ -172,20 +180,20 @@ public class MemberService {
             } else if (type.equals("3")) { // type 분류 3, 핸드폰 번호로 검색할 때
                 log.info("핸드폰 번호로 검색하는 중...");
                 memberEntities = memberRepository.searchMemberPhone(keyword, pageable);
-            }else { // 전체 검색 = 0
+            } else { // 전체 검색 = 0
                 log.info("전체 조회 검색 중...");
                 memberEntities = memberRepository.searchNameAndEmailAndPhone(keyword, pageable);
             }
         } else { // 검색어가 존재하지 않으면 모두 검색
-                memberEntities = memberRepository.findAll(pageable);
+            memberEntities = memberRepository.findAll(pageable);
         }
 
-            // Entity를 DTO로 변환 후 저장
-            Page<MemberDTO> memberDTOS = memberEntities.map(
-                    data -> modelMapper.map(data, MemberDTO.class));
+        // Entity를 DTO로 변환 후 저장
+        Page<MemberDTO> memberDTOS = memberEntities.map(
+                data -> modelMapper.map(data, MemberDTO.class));
 
-            return memberDTOS;
-        }
+        return memberDTOS;
+    }
 
 //        // 일반 회원 번호의 데이터를 화면에 출력
 //        public MemberDTO memberRead(Integer idx){

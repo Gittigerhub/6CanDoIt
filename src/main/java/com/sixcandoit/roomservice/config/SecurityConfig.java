@@ -66,7 +66,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/admin/login").permitAll();
                     //ajax 허용
                     auth.requestMatchers("/member/checkEmail", "/admin/checkEmail").permitAll();
-                    auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","admin/password").permitAll();
+                    auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
                     auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "MEMBER");
                     auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
                     // 조직-매장 페이지 접근 권한

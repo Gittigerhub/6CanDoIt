@@ -88,10 +88,11 @@ public class MemberController {
 
     @PostMapping("/password")
     public String modifyPassword(@ModelAttribute MemberDTO memberDTO){
+        log.info("패스워드 컨트롤러 진입 여부");
         memberService.passwordSend(memberDTO);
         //스크립트로 출력할 메세지를 전달
 
-        return "redirect:/login";
+        return "redirect:/member/login";
     }
 
     // 로그인

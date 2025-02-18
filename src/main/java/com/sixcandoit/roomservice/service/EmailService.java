@@ -1,34 +1,57 @@
 package com.sixcandoit.roomservice.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 //gmail통해서 메일을 전달하는 서비스
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class EmailService {
     private final JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
 
     //받은사람주소, 제목, 내용
-    public void sendEmail(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        String from = "운영자<himyeongsun@gmail.com>";
+    public void sendEmail(String to, String subject, String message) {
 
-        message.setFrom(from); //보내는 사람
-        message.setTo(to); //받은사람
-        message.setSubject(subject); //제목
-        message.setText(text); //내용
-
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
-            javaMailSender.send(message);  //java에서 메일 전송
-            System.out.println("전송완료");
-        } catch(MailException e) {
-            //메일 보내기 실패시
+            String from = "운영자<himyeongsun@gmail.com>";
+
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(to);
+            mimeMessageHelper.setSubject(subject);
+            mimeMessageHelper.setFrom(from);
+            mimeMessageHelper.setText(message, true);
+
+            javaMailSender.send(mimeMessage);
+
+            log.info("센드이메근일접");
+
+
+        } catch (MessagingException e) {
             System.out.println("전송오류");
-            e.printStackTrace();
+
         }
+
     }
+
+    public String getTempEmailHTML(String password) {
+        Context context = new Context(  );
+        context.setVariable("message", password);
+        log.info("겟접근");
+        return templateEngine.process("admin/TempEmailHTML", context);
+    }
+
 }
+
+

@@ -115,26 +115,26 @@ public class AdminController {
         return "redirect:/login";
     }
 
-    // 회원 목록
+    // 일반 회원 목록
     @GetMapping("/memberlist")
     public String showMemberList(@PageableDefault(page = 1) Pageable page, // 페이지 정보
                                  @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
                                  @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
                                  Model model){
-//        // 해당 페이지의 내용을 서비스를 통해 데이터베이스로 부터 조회
-//        Page<MemberDTO> memberDTOS = memberService.memberList(page, type, keyword);
-//
-//        // html에 필요한 페이지 정보를 받는다
-//        Map<String, Integer> pageInfo = PageNationUtil.Pagination(memberDTOS);
-//
-//        model.addAttribute("memberList", memberDTOS); // 데이터 전달
-//        model.addAttribute(pageInfo);
-//        model.addAttribute("type", type);
-//        model.addAttribute("keyword", keyword);
+        // 해당 페이지의 내용을 서비스를 통해 데이터베이스로 부터 조회
+        Page<MemberDTO> memberDTOS = memberService.memberList(page, type, keyword);
+
+        // html에 필요한 페이지 정보를 받는다
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(memberDTOS); // 내가 알기론 이거 내부 값들을 개별적으로 애드어트리뷰트해서 넘겨줘야하는걸로 기억하는데
+
+        model.addAttribute("member", memberDTOS); // 데이터 전달
+        model.addAttribute(pageInfo); // 페이지 정보
+        model.addAttribute("type", type); // 검색 분류
+        model.addAttribute("keyword", keyword); // 키워드
 
 
-        List<MemberEntity> memberList = memberRepository.findAll();
-        model.addAttribute("memberList", memberList);
-        return "admin/member-list";
+//        List<MemberEntity> memberList = memberRepository.findAll();
+//        model.addAttribute("memberList", memberList);
+        return "admin/memberlist";
     }
 }

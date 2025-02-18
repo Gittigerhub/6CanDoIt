@@ -58,7 +58,7 @@
                 <tr th:each="menu : ${menulist}">
                     <td>
                         <!-- 메뉴명 클릭 시 상세보기로 이동하는 링크 추가 -->
-                        <a th:href="@{/menu/readmenu?menuidx=${menu.menuidx}}" th:text="${menu.menuName}"></a>
+                        <a th:href="@{/menu/readmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
                     </td>
                     <td th:text="${menu.menuContent}"></td>
                     <td th:text="${menu.menuCategory}"></td>

@@ -111,13 +111,16 @@ public class OfficeController {
     @GetMapping("/organ")
     public String organDetail(Integer idx, Model model) {
 
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
         // 조직 정보 서비스로 조회
         OrganizationDTO organDTO =
             organizationService.organRead(idx);
 
         // 이미지 정보 서비스로 조회
         List<ImageFileDTO> imageFileDTOS =
-                imageFileService.readImage(idx);
+                imageFileService.readImage(idx, join);
 
         // 대표이미지 존재여부 확인
         boolean hasRepImage = imageFileDTOS.stream()
@@ -137,9 +140,12 @@ public class OfficeController {
     @ResponseBody
     public ResponseEntity<String> MemberPointDelete(@RequestParam Integer idx){
 
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
         try {
             // idx로 데이터를 조회하여 삭제
-            organizationService.organDelete(idx);
+            organizationService.organDelete(idx, join);
 
             return  ResponseEntity.ok("삭제하였습니다.");
         }catch (Exception e){
@@ -215,6 +221,29 @@ public class OfficeController {
         }
     }
 
+    @GetMapping("/shopdetail/realread")
+    public String shopdetailRealread(Integer idx, Model model) {
+//
+//        // 조직 정보 서비스로 조회
+//        OrganizationDTO organDTO =
+//                organizationService.find(idx);
+//
+//        // 이미지 정보 서비스로 조회
+//        List<ImageFileDTO> imageFileDTOS =
+//                imageFileService.readImage(idx);
+//
+//        // 대표이미지 존재여부 확인
+//        boolean hasRepImage = imageFileDTOS.stream()
+//                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+//
+//        // view로 전달
+//        model.addAttribute("organDTO", organDTO);
+//        model.addAttribute("imageFileDTOS", imageFileDTOS);
+//        model.addAttribute("hasRepImage", hasRepImage);
+
+        return "office/shopread";
+
+    }
 
 }
 

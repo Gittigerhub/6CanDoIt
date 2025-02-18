@@ -46,14 +46,14 @@
                                         <div class="col-12">
                                             <label class="form-label">대표 메뉴 이미지:</label>
                                             <!--이미지 경로 처리-->
-                                            <img class="menuImg" style="max-width:100%;" th:src="@{${img.url}}" alt="대표 이미지">
+                                            <img class="menuImg" style="max-width:100%;" th:src="${img.url}" alt="대표 이미지">
                                         </div>
                                     </th:block>
                                     <!--대표 이미지 외 다른 이미지들 출력-->
                                     <th:block th:if="${img.repimageYn == 'N'}">
                                         <div class="col-12">
                                             <label class="form-label">추가 메뉴 이미지:</label>
-                                            <img class="menuImg" style="max-width:100%; margin-top: 10px;" th:src="@{${img.url}}" alt="추가 이미지">
+                                            <img class="menuImg" style="max-width:100%; margin-top: 10px;" th:src="${img.url}" alt="추가 이미지">
                                         </div>
                                     </th:block>
                                 </th:block>
@@ -105,8 +105,8 @@
 
                         <div class="col-12">
                             <button type="button" class="btn btn-warning"
-                                    th:onclick="|location.href='/menu/updatemenu?menuidx=${menuDTO.idx}'|">수정</button>
-                            <button type="button" class="btn btn-primary updatebtn"
+                                    th:onclick="|location.href='/menu/updatemenu?idx='+ ${menuDTO.idx}|">수정</button>
+                            <button type="button" class="btn btn-primary"
                                     th:onclick="|location.href='/menu/listmenu'|">목록</button>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
 
         $(document).ready(function (){
             $(".updatebtn").on("click", function (){
-                location.href = "/menu/updatemenu?menuidx=" + menuid;
+                location.href = "/menu/updatemenu?idx=" + menuid;
             })
         })
     </script>

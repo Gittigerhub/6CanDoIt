@@ -6,13 +6,10 @@ import com.sixcandoit.roomservice.service.notice.NoticeService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.Banner;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,16 +18,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Map;
-
 
 @Controller // get, post 매핑만 사용이 가능
 @RequiredArgsConstructor
 @Log4j2
-
 public class NoticeController {
 
 
@@ -70,7 +63,6 @@ public class NoticeController {
 
 
     @PostMapping("/notice/register")
-
     public String registerProc(@Valid @ModelAttribute NoticeDTO noticeDTO,
                                BindingResult bindingResult) {
         log.info("질문한 내용을 저장합니다.");
@@ -122,13 +114,13 @@ public class NoticeController {
             bindingResult.getAllErrors().forEach(error -> log.info(error.getDefaultMessage()));
             return "notice/update"; // update로 돌아간다
         }
-       try{
-           noticeService.noticeUpdate(noticeDTO);
-       }catch (Exception e) {
+        try{
+            noticeService.noticeUpdate(noticeDTO);
+        }catch (Exception e) {
 
-           model.addAttribute("errorMessage", e.getMessage());
-        return "notice/update";
-       }
+            model.addAttribute("errorMessage", e.getMessage());
+            return "notice/update";
+        }
         return "redirect:/notice/list";
     }
 

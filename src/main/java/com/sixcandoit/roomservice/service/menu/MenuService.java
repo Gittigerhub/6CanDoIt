@@ -1,8 +1,10 @@
 package com.sixcandoit.roomservice.service.menu;
 
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import com.sixcandoit.roomservice.repository.menu.MenuRepository;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,25 +29,39 @@ public class MenuService {
     private final ModelMapper modelMapper;
 
     //이미지 등록할 menuImgService 의존성 추가
-    private final MenuImgService menuImgService;
+    private final ImageFileService imageFileService;
 
 
     //메뉴 등록
     public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> multipartFiles) throws Exception {
 
-        // MenuDTO -> MenuEntity로 변환
-        MenuEntity menuEntity = modelMapper.map(menuDTO, MenuEntity.class);
+        try {
+            // MenuDTO -> MenuEntity로 변환
+            MenuEntity menuEntity = modelMapper.map(menuDTO, MenuEntity.class);
 
-        // 메뉴 저장 (DB에 메뉴 정보 저장)
-        menuEntity = menuRepository.save(menuEntity);
+            // 이미지 등록
+            List<ImageFileEntity> images = imageFileService.saveImages(multipartFiles);
 
-        // 이미지 등록
-        if (multipartFiles != null && !multipartFiles.isEmpty()) {
-            // 이미지 파일을 서비스로 전달하여 저장
-            menuImgService.registerImg(menuEntity.getIdx(), multipartFiles);
+            //이미지 정보 추가
+            //양방향 연관관계 편의 메서드 사용
+            for (ImageFileEntity image : images) {
+                menuEntity.addImage(image); //FK 자동 설정
+            }
+            System.out.println("FK 자동 등록");
+
+            //Entity 테이블에 저장
+            imageFileService.saveImages(multipartFiles);
+            System.out.println("진짜 저장됨");
+
+            // 메뉴 저장 (DB에 메뉴 정보 저장)
+            menuEntity = menuRepository.save(menuEntity);
+
+            return menuEntity.getIdx(); // 메뉴의 idx 반환
+
+        } catch (Exception e) {   //오류발생시 오류 처리
+            throw new RuntimeException("등록 실패");
         }
 
-        return menuEntity.getIdx(); // 메뉴의 idx 반환
     }
 
 
@@ -155,7 +171,5 @@ public class MenuService {
 
         menuRepository.deleteById(idx);
     }
-
-
 
 }

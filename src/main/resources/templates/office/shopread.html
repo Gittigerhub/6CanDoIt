@@ -36,9 +36,9 @@
             <table class="table table-bordered" style="text-align: center">
                 <tbody> <!--조직 테이블 데이터 출력-->
                 <tr style="height: 50px; vertical-align: middle">
-                    <th style="width: 10%">분류</th>
+                    <th style="width: 10%">매장 상태</th>
                     <td style="width: 40%; text-align: left" th:text="${organDTO.organType}"></td>
-                    <th style="width: 10%">상태</th>
+                    <th style="width: 10%">활성 상태</th>
                     <td style="width: 40%">
                         <div class="d-flex">
                             <button style="font-size: 12px" th:if="${organDTO.activeYn == 'Y'}" th:value="${organDTO.activeYn}" class="btn btn-primary justify-content-start">활성화</button>
@@ -47,63 +47,42 @@
                     </td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
-                    <th>업체명</th>
+                    <th>매장 타입</th>
                     <td style="text-align: left" th:text="${organDTO.organName}"></td>
-                    <th>대표 연락처</th>
+                    <th>제휴 상태</th>
+                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                </tr>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th>매장명</th>
+                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <th>매장 연락처</th>
+                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                </tr>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th>오픈시간</th>
+                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <th>마감시간</th>
                     <td style="text-align: left" th:text="${organDTO.organTel}"></td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
                     <th>주소</th>
                     <td colspan="3" style="text-align: left" th:text="${organDTO.organAddress}"></td>
                 </tr>
-                <tr style="height: 50px;">
-                    <th style="vertical-align: middle">이미지</th>
-                    <td colspan="3">
-                        <div style="display: flex; flex-wrap: wrap; padding: 20px;">
-                            <!-- 대표 이미지가 없을때 나오는 이미지 -->
-                            <div style="flex-basis: 100%; text-align: left">
-                                <th:block th:if="${!hasRepImage}">
-                                    <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
-                                </th:block>
-                            </div>
-                            <!-- 이미지 -->
-                            <th:block th:each="data:${imageFileDTOS}" th:if="${!hasRepImage}">
-                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                    <div>
-                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                            <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                                            <div>
-                                                <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
-                                            </div>
-                                        </th:block>
-                                    </div>
-                                </th:block>
-                            </th:block>
-
-                            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
-                                <!-- 대표 이미지 -->
-                                <th:block th:if="${data.getRepimageYn()} == 'Y'">
-                                    <div style="flex-basis: 100%; text-align: left">
-                                        <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                                        <div>
-                                            <button type="button" class="btn btn-danger deleteBtn mb-4" style="margin-left: 130px" th:value="${data.idx}">삭제</button>
-                                        </div>
-                                    </div>
-                                </th:block>
-                            </th:block>
-                            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
-                                <!-- 이미지 -->
-                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                    <div>
-                                        <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                                        <div>
-                                            <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
-                                        </div>
-                                    </div>
-                                </th:block>
-                            </th:block>
-                        </div>
-                    </td>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th>매장 일별<br>수수료</th>
+                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <th>매장 일별<br>수수료 %</th>
+                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                </tr>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th>계좌 은행명</th>
+                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <th>계좌 소유주</th>
+                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                </tr>
+                <tr style="height: 50px; vertical-align: middle">
+                    <th>계좌번호</th>
+                    <td colspan="3" style="text-align: left" th:text="${organDTO.organAddress}"></td>
                 </tr>
                 </tbody>
             </table>

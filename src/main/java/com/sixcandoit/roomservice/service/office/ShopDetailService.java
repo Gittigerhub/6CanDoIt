@@ -1,8 +1,11 @@
 package com.sixcandoit.roomservice.service.office;
 
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
+import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
+import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import com.sixcandoit.roomservice.repository.office.ShopDetailRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import java.util.Optional;
 public class ShopDetailService {
 
     private  final ShopDetailRepository shopDetailRepository;
+    private  final OrganizationRepository organizationRepository;
     private  final ModelMapper modelMapper;
 
     /*-------------------------------------------------
@@ -24,10 +28,19 @@ public class ShopDetailService {
     출력 : 없음
     설명 : 매장 정보를 등록할때 사용
     ---------------------------------------------------*/
-    public void register(ShopDetailDTO shopDetailDTO){
+    public void register(ShopDetailDTO shopDetailDTO, Integer organIdx) {
         try {
-            //Optional<ShopDetailEntity> read = shopDetailRepository.findById(shopDTO.getIdx());
+            // DTO => Entity 변환
             ShopDetailEntity shopEntity = modelMapper.map(shopDetailDTO, ShopDetailEntity.class);
+
+            // 조직정보 조회
+            OrganizationEntity organEntity = organizationRepository.findById(organIdx)
+                    .orElseThrow(() -> new EntityNotFoundException("해당 조직을 찾을 수 없습니다: " + organIdx));;
+
+            // 연관관계 데이터 추가
+            shopEntity.setOrganizationJoin(organEntity);
+
+            // DB에 저장
             shopDetailRepository.save(shopEntity);
         } catch (Exception e) {
             throw new RuntimeException("상점 저장 실패 : "+e.getMessage());

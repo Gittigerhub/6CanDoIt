@@ -22,14 +22,14 @@
                         <h2 style="text-align: center;">회원 정보 수정</h2>
                         <form th:action="@{/member/modify}" method="post" class="was-validated" onsubmit="combineAddress()">
                             <div class="mb-3 mt-3">
-                                <label for="memberEmail" class="form-label">이메일:</label>
+                                <label for="memberEmail" class="form-label">이메일</label>
                                 <input type="email" class="form-control" id="memberEmail" th:name="memberEmail" th:value="${memberDTO.memberEmail}" >
                             </div>
                             <div class="mb-3">
-                                <label for="memberBirth" class="form-label">생년월일:</label>
+                                <label for="memberBirth" class="form-label">생년월일</label>
                                 <input type="date" class="form-control" id="memberBirth" th:name="memberBirth" th:value="${memberDTO.memberBirth}" max="9999-12-31">
                             </div>
-                            <div class="mb-2">성별:</div>
+                            <div class="mb-2">성별</div>
                             <div class="form-check">
                                 <input type="radio" name="memberGender" id="male" th:value="male" th:checked="${memberDTO.memberGender == 'male'}">
                                 <label for="male">남성</label>
@@ -38,15 +38,15 @@
                             </div>
 
                             <div class="mt-2 mb-3">
-                                <label for="memberName" class="form-label">이름:</label>
+                                <label for="memberName" class="form-label">이름</label>
                                 <input type="text" class="form-control" id="memberName" th:name="memberName" th:value="${memberDTO.memberName}">
                             </div>
                             <div class="mb-3">
-                                <label for="memberPhone" class="form-label">연락처:</label>
+                                <label for="memberPhone" class="form-label">연락처</label>
                                 <input type="text" class="form-control" id="memberPhone" th:name="memberPhone" th:value="${memberDTO.memberPhone}" maxlength="11">
                             </div>
                             <div class="mb-3">
-                                <label for="memberAddress" class="form-label">주소:</label>
+                                <label for="memberAddress" class="form-label">주소</label>
                                 <div class="signUp-input-area d-flex mb-1 col-lg-7">
                                     <input type="text" class="form-control input-lg" id="memberPostcode" th:value="${memberDTO.memberPostcode}" placeholder="우편번호" style="height: 40px;" readonly>
                                     <input type="button" class="btn btn-secondary" style="text-align:center; height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
@@ -56,7 +56,7 @@
                                 <input type="text" class="form-control" id="memberAddress" th:value="${memberDTO.memberAddress}" name="memberAddress" placeholder="주소" style="height: 40px;" readonly>
                                 <input type="text" class="form-control" id="memberExtraAddress" th:value="${memberDTO.memberExtraAddress}" name="memberExtraAddress" placeholder="상세 주소" style="height: 40px;">
                             </div>
-                            <div>주문 알람 수신여부:</div>
+                            <div>주문 알람 수신여부</div>
                             <div class="form-check">
                                 <label class="form-check-label" for="alramOrder1"></label>
                                 <input type="radio" class="form-check-input" id="alramOrder1" name="optradio" value="alramOrder1" checked>예

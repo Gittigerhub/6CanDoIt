@@ -35,7 +35,7 @@ public class EmailService {
 
             javaMailSender.send(mimeMessage);
 
-            log.info("센드이메근일접");
+            log.info("send email 접근");
 
 
         } catch (MessagingException e) {

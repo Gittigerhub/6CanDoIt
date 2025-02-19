@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.entity.office;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.AdvertisementEntity;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
@@ -49,9 +48,7 @@ public class OrganizationEntity extends BaseEntity {
     private List<AdminEntity> adminJoin;
 
     // 매장 상세 테이블과 1:1 매핑
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_detail_idx")
-    @JsonBackReference
+    @OneToOne(mappedBy = "organizationJoin")
     private ShopDetailEntity shopDetailJoin;
 
     // 룸 테이블과 1:N 매핑

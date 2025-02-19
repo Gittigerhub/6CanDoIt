@@ -3,10 +3,7 @@ package com.sixcandoit.roomservice.dto.qna;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class QnaDTO {
 
     private Integer idx;                // 기본 키
@@ -46,7 +44,7 @@ public class QnaDTO {
 
     private MultipartFile titleFile;
     private MultipartFile contentFile;
-    private List<MultipartFile> Files;
+    private List<MultipartFile> imageFiles;
     private List<String> imageUrls;  // 이미지 URL 리스트 추가
     private String repimageYn;      // 대표 이미지 여부
 

@@ -30,8 +30,8 @@
                         <div th:if="${qnaDTO.qnaImg != null}">
                             <img th:src="${qnaDTO.qnaImg}" alt="Qna Image" class="img-fluid">
                         </div>
-                        <div th:each="imageUrl : ${qnaDTO.imageUrls}">
-                            <img th:src="${imageUrl}" class="img-fluid">
+                        <div th:each="data : ${imageFileDTOS}">
+                            <img th:src="${data.getUrl()}" class="img-fluid">
                         </div>
                         <p>등록일:
                             <span th:text="${#temporals.format(qnaDTO.insDate, 'yyyy-MM-dd HH:mm')}"></span>

@@ -14,7 +14,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -63,17 +66,18 @@ public class QnaController {
     // Qna의 Q 등록 저장 처리
     @PostMapping("/qna/register")
     public String registerProc(@Valid @ModelAttribute QnaDTO qnaDTO,
-                               List<MultipartFile> imageFiles,
                                BindingResult bindingResult) {
         log.info("질문한 내용을 저장합니다.");
-
+        System.out.println(qnaDTO);
+        System.out.println(qnaDTO.getImageFiles());
         if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
             log.info("유효성 검사 오류 발생");
             return "qna/register"; // register로 돌아간다
         }
 
         // 유효성 검사 성공 시 등록 처리
-        qnaService.qnaRegister(qnaDTO, imageFiles);
+        qnaService.qnaRegister(qnaDTO, qnaDTO.getImageFiles());
+        System.out.println(qnaDTO.getImageFiles());
 
         return "redirect:/qna/list";
     }

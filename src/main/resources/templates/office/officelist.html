@@ -81,13 +81,13 @@
                         <!-- 조직 분류가 매장일때 -->
                         <th:block th:if="${data.organType == 'SHOP'}">
                             <!-- 매장 상세내용이 존재한다면 상세내용 보기 진행 -->
-                            <a th:href="@{/office/shopdetail/register}" th:text="${data.organName}"></a>
-                            <!-- 매장 상세내용이 존재하지 않는다면 등록 진행 -->
-                            <!--
-                            <th:block th:if="${data.shopDetailDTO.idx}">
-                                <a th:href="@{/office/shopdetail(idx=${data.getShopDetailDTO().idx})}" th:text="${data.organName}"></a>
+                            <th:block th:if="${data.shopDetailDTO != null and data.shopDetailDTO.idx != null}">
+                                <a th:href="@{/office/shopdetail(idx=${data.shopDetailDTO.idx})}" th:text="${data.organName}"></a>
                             </th:block>
-                            -->
+                            <!-- 매장 상세내용이 존재하지 않는다면 등록 진행 -->
+                            <th:block th:unless="${data.shopDetailDTO != null and data.shopDetailDTO.idx != null}">
+                                <a th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" data-id="${data.idx}"></a>
+                            </th:block>
                         </th:block>
                     </td>
                     <td th:text="${data.organAddress}"></td>
@@ -156,7 +156,6 @@
                     <form id="addForm" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
                             <p>새로운 조직을 등록합니다.</p>
-
                             <div class="row">
                                 <!-- 분류 -->
                                 <div class="col-sm-6 pe-0">
@@ -320,10 +319,250 @@
         </div>
         <!--조직 등록 모달 끝-->
 
+        <!-- 매장 등록 모달 시작 -->
+        <div class="modal fade" id="shopDetailModal" tabindex="-1" role="modal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span id="title2" class="fw-light">신규 매장 등록</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                    </div>
+                    <!--입력폼-->
+                    <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                    <input type="hidden" name="activeYn" value="Y">  <!-- 조직 활성 유무 기본(Y) -->
+                    <form id="shopDetailForm" method="post">
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <p>새로운 매장을 등록합니다.</p>
+                            <!-- 조직 idx -->
+                            <input type="hidden" id="idx" name="idx">
+
+                            <div class="row">
+                                <!-- 매장 명 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*매장명 :</label>
+                                        <input id="organName" name="organName" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 매장 전화번호 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*전화번호 :</label>
+                                        <input id="tel" name="tel" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 매장 시작 시간 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*오픈시간 :</label>
+                                        <input id="openTime" name="openTime" type="time" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 매장 끝나는 시간 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*닫는시간 :</label>
+                                        <input id="closeTime" name="closeTime" type="time" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 휴무일 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*휴무일:</label>
+                                        <input id="restDay" name="restDay" type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <!-- 오픈 상태, 제휴 상태 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*영업 상태:</label>
+                                        <select id="openState" name="openState" class="form-select">
+                                            <option value="0">영업중</option>
+                                            <option value="1">종료</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*제휴 상태:</label>
+                                        <select id="partnerState" name="partnerState" class="form-select">
+                                            <option value="0">제휴중</option>
+                                            <option value="1">제휴종료</option>
+                                            <option value="2">제휴준비중</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 매장 상태 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*직영/가맹점:</label>
+                                        <select id="type" name="type" class="form-select">
+                                            <option value="0">직영</option>
+                                            <option value="1">가맹</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 활성화 유무 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*활성화 유무:</label>
+                                        <select id="activeYn" name="activeYn" class="form-select">
+                                            <option value="0">활성화</option>
+                                            <option value="1">비활성화</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 은행명, 계좌주 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*은행명:</label>
+                                        <input id="bankName" name="bankName" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*계좌주:</label>
+                                        <input id="bankOwner" name="bankOwner" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 계좌 번호 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*계좌번호:</label>
+                                        <input id="bankNum" name="bankNum" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 일별 수수료 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*일별 수수료:</label>
+                                        <input id="dayFee" name="dayFee" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 일별 % 수수료 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*일별 수수료 률:</label>
+                                        <input id="dayFeePercent" name="dayFeePercent" type="text" class="form-control"
+                                               required/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal body 끝 -->
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- 매장 등록 모달 끝-->
     </div>
 
     <script th:inline="javascript">
         $(document).ready(function () {
+
+            // shopdetailDTO가 없는 매장명을 클릭 시
+            $(document).on('click', '.open-modal', function () {
+                // 입력폼 초기화
+                var form = $('#shopDetailForm')[0];
+                form.reset();
+
+                // 제목 변경
+                $('#title2').text("신규 상점 등록");
+
+                // 선택한 매장명 가져오기 (필요하면 사용)
+                var shopIdx = $(this).data('id');
+                console.log("선택한 매장: " + shopIdx);
+
+                // 모달창 출력
+                $('#shopDetailModal').modal('show');
+            });
+
+            // 매장 등록버튼을 클릭했을 때 Controller 처리
+            $('#register').on('click', function () {
+                var form = $('#shopDetailForm')[0];
+                var formData = new FormData(form);          //form내의 데이터 읽기
+
+                //폼 검증 수행
+                if (form.checkValidity() === false) {
+                    form.reportValidity();                  //폼 검증
+                    return;
+                }
+
+                // 모달창 닫기
+                $('#shopDetailModal').modal('hide');
+
+                $.ajax({
+                    url: '/office/shopdetail/register',     //맵핑
+                    type: 'POST',                           //전달 방식
+                    data: formData,                         //데이터값
+                    processData: false,                     //현재상태 그대로 유지하면서 전달
+                    contentType: false,
+
+                    success: function (response) {          //작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "저장하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                        location.reload();                  //새로 페이지 읽기
+                    },
+                    error: function () {                    //작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "저장을 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+
+            });
+            // 매장 등록버튼을 클릭했을 때 Controller 처리 끝
 
             // 이미지 추가 버튼 클릭했을 때
             $("#addImage").on('click', function() {

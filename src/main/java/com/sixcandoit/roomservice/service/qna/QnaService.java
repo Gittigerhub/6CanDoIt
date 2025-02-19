@@ -33,10 +33,12 @@ public class QnaService {
     private final QnaRepository qnaRepository;
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
-    private final ImageFileService fileService;
+    private final ImageFileService imageFileService;
 
     // Qna의 Q 쓰기
     public void qnaRegister(QnaDTO qnaDTO, List<MultipartFile> imageFiles) {
+
+        System.out.println(imageFiles);
         try {
             // DTO를 Entity로 변환
             QnaEntity qna =
@@ -45,16 +47,16 @@ public class QnaService {
             // FavYn의 기본값 N(1:1 질문)으로 설정
             log.info("favYn의 기본값을 N으로 설정...");
             qna.setFavYn("N");
-
+            System.out.println(imageFiles);
             // 이미지 등록
             log.info("이미지를 저장한다...");
-            List<ImageFileEntity> images = fileService.saveImages(imageFiles);
-
+            List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
+            System.out.println(imageFiles);
             // 이미지 정보 추가
             for (ImageFileEntity image : images) {
                 qna.addImage(image);
             }
-
+            System.out.println(imageFiles);
             // 저장
             log.info("저장을 수행한다...");
             qnaRepository.save(qna);
@@ -95,7 +97,7 @@ public class QnaService {
 //                if (qnaDTO.getFiles() != null && !qnaDTO.getFiles().isEmpty()) {
                     // 답변이 없으면 이미지 등록 (기존 이미지와 새 이미지 업데이트)
                     log.info("이미지를 저장한다...");
-                    List<ImageFileEntity> images = fileService.updateImage(imageFiles, join, qnaDTO.getIdx());
+                    List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, qnaDTO.getIdx());
 
                     // 이미지 정보 추가
                     for (ImageFileEntity image : images) {
@@ -123,13 +125,13 @@ public class QnaService {
     // Qna의 Q 삭제
     public void qnaDelete(Integer idx, String join){
         try {
-            List<ImageFileDTO> imageFileDTOS = fileService.readImage(idx, join);List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
                     .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
                     .collect(Collectors.toList());
 
             // 모든 이미지 삭제
             for (ImageFileEntity imageFileEntity : imageFileEntities) {
-                fileService.deleteImage(imageFileEntity.getIdx());
+                imageFileService.deleteImage(imageFileEntity.getIdx());
             }
 
             // idx로 조회하여 삭제
@@ -226,4 +228,3 @@ public class QnaService {
         }
     }
 }
-

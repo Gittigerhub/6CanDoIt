@@ -16,7 +16,7 @@
         </div>
         <div class="col-lg-6">
             <div class="card">
-                <div class="card-header">방명록 상세보기</div>
+                <div class="card-header">예약 내역</div>
                 <div class="card-body">
                     <p>번호 : <span th:text="${data.idx}"></span></p>
 <!--                    <p>제목 : <span th:text="${data.subject}"></span></p>-->
@@ -27,7 +27,7 @@
                     'yyyy-MM-dd')}"></span></p>
                 </div>
                 <div class="card-footer">
-                    <a th:href="@{/list}">이전</a>
+                    <a th:href="@{/res/list}">이전</a>
                 </div>
             </div>
         </div>

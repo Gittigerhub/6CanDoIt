@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Integer> {
@@ -26,4 +27,6 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     //JPQL 쿼리
     @Query("SELECT r FROM ReservationEntity r WHERE r.startDate >= :startDate AND r.endDate <= :endDate")
     List<ReservationEntity> findByStartDateAfterAndEndDateBefore(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    Optional<ReservationEntity> findByIdx(Integer idx);
 }

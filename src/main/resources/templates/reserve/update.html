@@ -15,9 +15,9 @@
         <div class="col-lg-3">
         </div>
         <div class="col-lg-6">
-            <h3>방명록 수정</h3>
-            <form th:action="@{/update}" method="post">
-                <input type="hidden" name="id" th:value="${data.idx}">
+            <h3>예약 수정</h3>
+            <form th:action="@{/res/update}" method="post">
+                <input type="hidden" name="idx" th:value="${data.idx}">
 <!--                <div class="mb-3 mt-3">-->
 <!--                    <label class="form-label">제목:</label>-->
 <!--                    <input type="text" class="form-control" name="subject" th:value="${data.subject}">-->
@@ -36,7 +36,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary">수정</button>
                 <button type="button" class="btn btn-secondary"
-                        th:onclick="|location.href=@{/list}|">이전</button>
+                        th:onclick="|location.href='@{/res/list}'|">이전</button>
             </form>
         </div>
         <div class="col-lg-3">

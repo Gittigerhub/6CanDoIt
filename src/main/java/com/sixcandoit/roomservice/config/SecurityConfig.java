@@ -75,8 +75,8 @@ public class SecurityConfig{
                     auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
                     // QnA 페이지 접근 권한
                     auth.requestMatchers("/qna/**", "/reply/**").permitAll();
-                    // 룸 관리 페이지 접근 권한
-                    auth.requestMatchers("/room/**").permitAll();
+                    // 룸 관리, 룸 예약 페이지 접근 권한
+                    auth.requestMatchers("/room/**", "/res/**").permitAll();
                     // 공지사항 페이지 접근 권한
                     auth.requestMatchers("/notice/**").permitAll();
                     // 오더 페이지 접근 권한
@@ -133,8 +133,8 @@ public class SecurityConfig{
             auth.requestMatchers("/event/**", "/event/memberpoint/**", "/upload/**","/event/update").permitAll();
             // QnA 페이지 접근 권한
             auth.requestMatchers("/qna/**", "/reply/**").permitAll();
-            // 룸 관리 페이지 접근 권한
-            auth.requestMatchers("/room/**").permitAll();
+            // 룸 관리, 룸 예약 페이지 접근 권한
+            auth.requestMatchers("/room/**", "/res/**").permitAll();
             // 공지사항 페이지 접근 권한
             auth.requestMatchers("/notice/**").permitAll();
             // 오더 페이지 접근 권한

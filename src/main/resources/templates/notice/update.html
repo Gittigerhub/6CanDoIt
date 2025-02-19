@@ -27,6 +27,8 @@
             <div class="card-body">
               <!--번호 숨김 처리-->
               <input type="hidden" name="id" th:value="${noticeDTO.idx}">
+              <input type="hidden" name="join" value="notice">
+
               <div class="mb-3 mt-3">
                 <label for="idx" class="form-label">번호:</label>
                 <input type="text"  class="form-control" id="idx" name="idx"
@@ -47,9 +49,9 @@
                       style="color: red;"
                       th:errors="*{noticeContents}"></span> <!-- 오류 메시지 출력 -->
               </div>
-              <div class="mb-3">
-                <label for="Files" class="form-label">참고이미지</label>
-                <input type="file" class="form-control" id="Files" name="Files" multiple>
+              <div class="mb-3" id="inputImage">
+                <label>참고이미지</label>
+                <input name="imageFiles imgInput" type="file" class="form-control mt-2 imageInput" accept="image/*">
               </div>
             </div>
             <div class="card-footer">

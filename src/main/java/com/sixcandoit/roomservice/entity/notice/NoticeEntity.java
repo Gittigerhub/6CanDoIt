@@ -74,3 +74,6 @@ public class NoticeEntity extends BaseEntity {
         private void deleteImage(Integer idx){this.imageFileJoin.remove(idx);}
 
 }
+//public void deleteImage(ImageFileEntity image){
+//    this.imageFileJoin.remove(image);
+//    image.setNoticeJoin(null);

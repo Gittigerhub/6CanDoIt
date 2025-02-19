@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.entity.room;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "res")
-public class ReservationEntity{
+public class ReservationEntity extends BaseEntity {
 
     @Id
     @Column(name = "res_idx")

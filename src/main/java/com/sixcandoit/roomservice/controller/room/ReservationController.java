@@ -57,19 +57,19 @@ public class ReservationController {
         return "reserve/list"; // page-list.html 뷰 템플릿을 찾아서 렌더링합니다.
     }
 
-    @GetMapping("/{Idx}")
-    public String getPageById(@PathVariable Integer Idx, Model model) {
+    @GetMapping("/detail")
+    public String getPageById(@RequestParam("idx") Integer idx, Model model) {
         log.info("데이터 조회 후 상세페이지로 이동....");
-        ReservationDTO reserveDTO = reservationService.reserveRead(Idx);
+        ReservationDTO reserveDTO = reservationService.reserveRead(idx);
 
         model.addAttribute("data", reserveDTO);
         return "reserve/detail"; // page-details.html 뷰 템플릿을 찾아서 렌더링합니다.
     }
 
-    @GetMapping("/update/{Idx}")
-    public String updateForm(@PathVariable Integer Idx, Model model) {
+    @GetMapping("/update/{idx}")
+    public String updateForm(@PathVariable Integer idx, Model model) {
         log.info("데이터 조회 후 수정페이지로 이동....");
-        ReservationDTO reserveDTO = reservationService.reserveRead(Idx);
+        ReservationDTO reserveDTO = reservationService.reserveRead(idx);
 
         model.addAttribute("data", reserveDTO);
         return "reserve/update"; // update-form.html 뷰 템플릿을 찾아서 렌더링합니다.
@@ -86,15 +86,15 @@ public class ReservationController {
 
         redirectAttributes.addFlashAttribute("successMessage",
                 "수정하였습니다.");
-        return "redirect:/list";
+        return "redirect:/res/list";
     }
 
     //특정 CRUD 데이터를 삭제하고, 삭제가 성공하면 "/getAll"로 리다이렉트합니다. 이때, 성공 메시지인
     //"삭제하였습니다."를 Flash Attribute로 추가하여 다음 페이지에 전달합니다.
-    @GetMapping("/delete/{Idx}")
-    public String deletePage(@PathVariable Integer Idx) {
+    @GetMapping("/delete/{idx}")
+    public String deletePage(@PathVariable Integer idx) {
         log.info("삭제 처리 후 목록페이지로 이동....");
-        reservationService.reserveDelete(Idx);
+        reservationService.reserveDelete(idx);
 
         //redirectAttributes.addFlashAttribute("successMessage",
         //        "삭제하였습니다.");

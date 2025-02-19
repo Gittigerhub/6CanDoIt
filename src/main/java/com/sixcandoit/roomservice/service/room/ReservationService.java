@@ -21,15 +21,16 @@ public class ReservationService {
     private final ModelMapper modelMapper;
 
     //주어진 ID에 해당하는 데이터를 삭제
-    public void reserveDelete(Integer id) {
+    public void reserveDelete(Integer idx) {
         //작업은 Repository
-        reservationRepository.deleteById(id);
+        reservationRepository.deleteById(idx);
     }
 
     //주어진 DTO를 Entity로 변환한 후, 데이터베이스에 저장하고 저장된 결과를 다시 DTO로 변환하여 반환
     public ReservationDTO reserveInsert(ReservationDTO reservationDTO) {
         ReservationEntity reserveEntity = modelMapper
                 .map(reservationDTO, ReservationEntity.class);
+        reserveEntity.setResStatus("2"); // 예약중으로 상태 변경
         ReservationEntity result = reservationRepository.save(reserveEntity); //필요한 값은 Entity
 
         ReservationDTO resultDTO = modelMapper.map(result, ReservationDTO.class);
@@ -40,7 +41,7 @@ public class ReservationService {
     //주어진 DTO의 ID로 데이터베이스에서 해당 데이터를 찾아 수정
     public ReservationDTO reserveUpdate(ReservationDTO reservationDTO) {
         Optional<ReservationEntity> findData =
-                reservationRepository.findById(reservationDTO.getIdx());
+                reservationRepository.findByIdx(reservationDTO.getIdx());
 
         if(findData.isPresent()) {
             ReservationEntity reserveEntity = modelMapper.map(reservationDTO, ReservationEntity.class);
@@ -54,8 +55,8 @@ public class ReservationService {
     }
 
     //주어진 ID에 해당하는 개별 데이터를 조회하여 DTO로 반환
-    public ReservationDTO reserveRead(Integer id) {
-        Optional<ReservationEntity> reserveEntity = reservationRepository.findById(id);
+    public ReservationDTO reserveRead(Integer idx) {
+        Optional<ReservationEntity> reserveEntity = reservationRepository.findByIdx(idx);
 
         ReservationDTO reservationDTO = modelMapper.map(reserveEntity, ReservationDTO.class);
         return reservationDTO;

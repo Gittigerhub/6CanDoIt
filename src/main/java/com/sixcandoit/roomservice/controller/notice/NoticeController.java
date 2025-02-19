@@ -101,7 +101,7 @@ public class NoticeController {
                 imageFileService.readImage(idx,join);
 
         boolean hasRepImage = imageFileDTOS.stream()
-                        .anyMatch(imageFileDTO->"Y".equals(imageFileDTO.getRepimageYn()));
+                .anyMatch(imageFileDTO->"Y".equals(imageFileDTO.getRepimageYn()));
 
         log.info("개별 데이터를 페이지에 전달하는 중입니다");
         model.addAttribute("noticeDTO", noticeDTO);
@@ -126,7 +126,7 @@ public class NoticeController {
 
     @PostMapping("/notice/update")
     public String updateProc(@Valid @ModelAttribute NoticeDTO noticeDTO,
-                            String join, List<MultipartFile> imageFiles) {
+                             String join, List<MultipartFile> imageFiles) {
 
         log.info("수정된 데이터를 저장합니다.");
 

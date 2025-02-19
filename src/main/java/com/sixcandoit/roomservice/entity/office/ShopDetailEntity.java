@@ -72,4 +72,6 @@ public class ShopDetailEntity extends BaseEntity {
     @OneToMany(mappedBy = "shopDetailJoin")
     private List<MenuEntity> menuJoin;
 
+
+
 }

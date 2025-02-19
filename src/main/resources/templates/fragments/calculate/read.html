@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/superlayout}"
->
+      layout:decorate="~{layouts/superlayout}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +23,7 @@
         .filter-container {
             margin-bottom: 20px;
             display: flex;
-            flex-direction: column; /* 세로로 정렬 */
+            flex-direction: column;
             gap: 10px;
         }
         .filter-container label, .filter-container select, .filter-container input {
@@ -31,7 +31,7 @@
             font-size: 14px;
         }
         .filter-container div {
-            margin-bottom: 15px; /* 항목 간의 간격을 좀 더 늘리기 위해 여백 추가 */
+            margin-bottom: 15px;
         }
         table {
             width: 100%;
@@ -81,6 +81,7 @@
         }
     </style>
 </head>
+
 <body>
 <div layout:fragment="content" class="p-5">
     <h1>정산조회</h1>
@@ -100,7 +101,7 @@
         </thead>
         <tbody id="settlementTable">
         <tr>
-            <td></td>
+            <td>이용자 1</td>
             <td>500,000원</td>
             <td>450,000원</td>
             <td>
@@ -114,7 +115,7 @@
             <td>50,000원</td>
         </tr>
         <tr>
-            <td></td>
+            <td>이용자 2</td>
             <td>300,000원</td>
             <td>280,000원</td>
             <td>
@@ -128,7 +129,7 @@
             <td>20,000원</td>
         </tr>
         <tr>
-            <td></td>
+            <td>이용자 3</td>
             <td>700,000원</td>
             <td>630,000원</td>
             <td>
@@ -144,55 +145,60 @@
         </tbody>
     </table>
     <br>
+
     <div class="filter-container">
         <div>
             <label for="sales">매출:</label>
             <input type="date" id="sales" name="sales">
         </div>
-        <br>
         <div>
             <label for="amount">정산:</label>
             <input type="date" id="amount" name="amount">
-
-
         </div>
-        <div class="button-container" style="text-align: center;">
+        <div class="button-container">
             <button class="btn btn-primary" onclick="search()">조회</button>
         </div>
     </div>
+
     <!-- 차트 표시 영역 -->
     <div class="chart-container">
         <canvas id="salesChart"></canvas>
     </div>
 
-
     <script>
         // 조회 버튼 클릭 시 동작하는 함수
-        function search() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const status = document.getElementById('status').value;
+        async function search() {
+            const startDate = document.getElementById('sales').value;
+            const endDate = document.getElementById('amount').value;
 
-            console.log('검색 조건:', { startDate, endDate, status });
+            console.log('검색 조건:', { startDate, endDate });
 
+            // 예시: 서버에서 데이터를 가져오는 방법
+            const response = await fetch(`/api/getData?startDate=${startDate}&endDate=${endDate}`);
+            const data = await response.json();
+
+            // 차트 데이터 업데이트
+            salesChart.data.labels = data.users;  // 사용자 목록으로 업데이트
+            salesChart.data.datasets[0].data = data.salesAmounts;  // 매출 금액 업데이트
+            salesChart.data.datasets[1].data = data.settlementAmounts;  // 정산 금액 업데이트
+            salesChart.update();
         }
-
 
         // 차트 생성
         const ctx = document.getElementById('salesChart').getContext('2d');
         const salesChart = new Chart(ctx, {
             type: 'bar',  // 차트 타입: 막대그래프
             data: {
-                labels: ['', '', ''],  // x축 데이터 (이용자)
+                labels: ['이용자 1', '이용자 2', '이용자 3'],  // x축 데이터 (이용자)
                 datasets: [{
                     label: '매출 금액',
-                    data: [500000, 300000, 700000],  // 매출 금액
+                    data: [500000, 300000, 700000],  // 매출 금액 (기본값)
                     backgroundColor: 'rgba(0, 123, 255, 0.5)',
                     borderColor: 'rgba(0, 123, 255, 1)',
                     borderWidth: 1
                 }, {
                     label: '정산 금액',
-                    data: [450000, 280000, 630000],  // 정산 금액
+                    data: [450000, 280000, 630000],  // 정산 금액 (기본값)
                     backgroundColor: 'rgba(40, 167, 69, 0.5)',
                     borderColor: 'rgba(40, 167, 69, 1)',
                     borderWidth: 1
@@ -207,7 +213,32 @@
                 }
             }
         });
+
+        // 정산 상태 변경 시 호출되는 함수
+        function updateStatus(selectElement) {
+            const status = selectElement.value;
+            console.log("정산 상태 변경됨:", status);
+
+            // 예를 들어, 서버로 상태를 전송
+            const row = selectElement.closest('tr');
+            const userId = row.querySelector('td:first-child').textContent;
+
+            fetch(`/api/updateStatus`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    status: status
+                })
+            })
+                .then(response => response.json())
+                .then(data => console.log('정산 상태 업데이트:', data))
+                .catch(error => console.error('에러 발생:', error));
+        }
     </script>
 </div>
+
 </body>
 </html>

@@ -12,7 +12,7 @@
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
-  <h2>회원 목록</h2>
+<!--  <h2>회원 목록</h2>-->
 
     <div class="container">
       <!--검색 기능-->
@@ -21,7 +21,7 @@
               <div class="mb-3">
                 <h3>회원 조회</h3>
               </div>
-              <div class="col-6">
+              <div class="col-8">
                 <div class="input-group mb-3">
                   <select class="form-select" id="type">
                     <option th:selected="${type == null}">선택 안함</option>
@@ -38,11 +38,11 @@
           </form>  <!--검색 기능(keyword) 끝-->
       <div class="row mt-5 p-5 bg-white">
         <div class="mb-3">
-          <h3>게시글 목록</h3>
+          <h3>회원 목록</h3>
         </div>
-        <div class="col"></div>
-        <div class="col-10">
-              <table class="table table-hover">
+<!--        <div class="col"></div>-->
+        <div class="col-18">
+              <table class="table">
                 <thead>
                 <tr>
                   <th>회원번호</th>

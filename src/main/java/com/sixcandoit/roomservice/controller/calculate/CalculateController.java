@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 public class CalculateController {
 
-    @GetMapping("/calculate/read")
+    @GetMapping("/office/calculateread")
     public String read(Model model){
         log.info("데이터를 읽어온다");
 
-        return "calculate/read";
+        return "/office/calculateread";
     }
 
 }

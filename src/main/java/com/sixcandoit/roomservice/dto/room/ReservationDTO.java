@@ -21,4 +21,6 @@ public class ReservationDTO {
     private String roomName;        // 룸 이름
     private String roomPrice;       // 룸 가격
     private String memberName;      // 멤버 이름
+    private String username;
+
 }

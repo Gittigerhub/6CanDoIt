@@ -76,16 +76,17 @@ public class QnaEntity extends BaseEntity {
     }
 
     // 기존 이미지 업데이트
-    public void updateImages(List<ImageFileEntity> existingImages) {
+    public void updateImages(List<ImageFileEntity> images) {
         this.imageFileJoin.clear();
-        for (ImageFileEntity existingImage : existingImages) {
-            deleteImage(existingImage.getIdx());  // 기존 이미지 삭제
+        for (ImageFileEntity image : images) {
+            this.addImage(image);
         }
         setQnaImgFromImageFile(); // 이미지가 갱신되면 qnaImg를 업데이트
     }
 
-    private void deleteImage(Integer idx) {
-        this.imageFileJoin.remove(idx);
+    public void deleteImage(ImageFileEntity image) {
+        this.imageFileJoin.remove(image);
+        image.setQnaJoin(null);
     }
 
 

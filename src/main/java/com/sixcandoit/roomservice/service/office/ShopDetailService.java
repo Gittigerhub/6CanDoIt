@@ -42,8 +42,69 @@ public class ShopDetailService {
 
             // DB에 저장
             shopDetailRepository.save(shopEntity);
+
         } catch (Exception e) {
             throw new RuntimeException("상점 저장 실패 : "+e.getMessage());
+        }
+    }
+
+    /*-------------------------------------------------
+    함수명 : findOrgan(Integer idx)
+    인수 : Integer idx
+    출력 : 매장 데이터
+    설명 : 조직 idx로 매장 정보 조회할때 사용
+    ---------------------------------------------------*/
+    public ShopDetailDTO findOrgan(Integer idx) {
+        try {
+            // idx로 데이터 조회
+            Optional<ShopDetailEntity> read = shopDetailRepository.findOrgan(idx);
+
+            if(!read.isPresent()){                              // 데이터가 없으면
+                throw new RuntimeException("조회 실패");
+            }
+            else {                                              // 데이터가 있으면
+                // Entity => DTO 변환
+                ShopDetailDTO shopDetailDTO = modelMapper.map(read ,ShopDetailDTO.class);
+
+                // 반환
+                return  shopDetailDTO;
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("상점 저장 실패 : "+e.getMessage());
+        }
+    }
+
+    /*-------------------------------------------------
+    함수명 : shopCheck(Integer idx)
+    인수 : Integer idx
+    출력 : boolean
+    설명 : 매장 데이터가 있는지 확인하는 메서드
+    ---------------------------------------------------*/
+    public boolean shopCheck(Integer idx) {
+        System.out.println(idx);
+        System.out.println(idx);
+        System.out.println(idx);
+        try {
+            // idx로 데이터 조회
+            Optional<ShopDetailEntity> read = shopDetailRepository.findOrgan(idx);
+
+            if (!read.isPresent()) {
+                // 데이터가 없을 경우 처리
+                System.out.println("No data found for idx: " + idx);
+                System.out.println("N");
+                System.out.println("N");
+                System.out.println("N");
+                return false;
+            }
+
+            System.out.println("Y");
+            System.out.println("Y");
+            System.out.println("Y");
+            return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException("데이터 존재여부 확인 실패 : "+e.getMessage());
         }
     }
 
@@ -55,12 +116,17 @@ public class ShopDetailService {
   ---------------------------------------------------*/
     public ShopDetailDTO read(Integer idx){
         try {
+            // idx로 데이터 조회
             Optional<ShopDetailEntity> read = shopDetailRepository.findById(idx);
-            if(!read.isPresent()){
+
+            if(!read.isPresent()){                              // 데이터가 없으면
                 throw new RuntimeException("상점 개별 조회 실패");
             }
-            else {
-                ShopDetailDTO   shopDetailDTO = modelMapper.map(read,ShopDetailDTO.class);
+            else {                                              // 데이터가 있으면
+                // Entity => DTO 변환
+                ShopDetailDTO shopDetailDTO = modelMapper.map(read ,ShopDetailDTO.class);
+
+                // 반환
                 return  shopDetailDTO;
             }
          } catch (Exception e){

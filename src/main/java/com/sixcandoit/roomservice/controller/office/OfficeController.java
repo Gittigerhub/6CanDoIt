@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +49,23 @@ public class OfficeController {
         // 조회결과를 이용한 페이지 처리
         Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
 
+        // 매장 상세정보 서비스로 조회
+        // 각 OrganizationDTO에 대해 exists 값을 계산하여 리스트에 추가
+        List<Boolean> existsList = new ArrayList<>();
+
+        for (OrganizationDTO organization : organDTO) {
+
+            // shopCheck 메소드 호출하여 exists 값을 확인
+            boolean exists = shopDetailService.shopCheck(organization.getIdx()); // 조직의 idx를 사용
+            existsList.add(exists);
+        }
+
         // 페이지 정보, 조회내용, 검색어, 조직 타입을 전달
         model.addAllAttributes(pageInfo);
         model.addAttribute("organDTO", organDTO);
         model.addAttribute("keyword", keyword);
         model.addAttribute("type", type);
+        model.addAttribute("existsList", existsList); // exists 값 리스트를 모델에 추가
 
         return "office/officelist";
 
@@ -224,12 +237,31 @@ public class OfficeController {
     @GetMapping("/shopdetail/realread")
     public String shopdetailRealread(Integer idx, Model model) {
 
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
         // 조직 정보 서비스로 조회
         OrganizationDTO organDTO =
                 organizationService.organRead(idx);
 
+        // 매장 상세 정보 서비스로 조회
+        ShopDetailDTO shopDTO =
+                shopDetailService.findOrgan(idx);
+
+
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
         // view로 전달
         model.addAttribute("organDTO", organDTO);
+        model.addAttribute("shopDTO", shopDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
 
         return "office/shopread";
 

@@ -38,8 +38,6 @@ public class NoticeEntity extends BaseEntity {
     @Column(name = "notice_hits")
     private int noticeHits;               // 조회 수
 
-    @Column(name = "notice_img")
-    private String noticeImg;
 
     // 관리자 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,22 +54,14 @@ public class NoticeEntity extends BaseEntity {
         this.imageFileJoin.add(image);
         image.setNoticeJoin(this);
     }
-    //이미지 URL을 noticeImg필드에 설정하는 메소드
-    public void setNoticeImgFromImageFile(){
-        if(imageFileJoin !=null && !imageFileJoin.isEmpty()){
-            this.noticeImg = imageFileJoin.get(0).getUrl(); //첫번째 이미지를 대표 이미지로 설정
+
+    //기존 이미지 업데이트
+    public void updateImages(List<ImageFileEntity> newImages) {
+        this.imageFileJoin.clear();
+        for (ImageFileEntity image : newImages) {
+            this.addImage(image);
         }
     }
-    //기존 이미지 업데이트
-    public void updateImages(List<ImageFileEntity> existingImages){
-        this.imageFileJoin.clear();
-        for (ImageFileEntity existingImage : existingImages) {
-            deleteImage(existingImage.getIdx());
-
-            }
-            setNoticeImgFromImageFile();
-        }
-        private void deleteImage(Integer idx){this.imageFileJoin.remove(idx);}
 
 }
 //public void deleteImage(ImageFileEntity image){

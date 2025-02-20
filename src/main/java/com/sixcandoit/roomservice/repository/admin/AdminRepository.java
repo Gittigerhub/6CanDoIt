@@ -1,10 +1,12 @@
 package com.sixcandoit.roomservice.repository.admin;
 
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
+import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -30,4 +32,26 @@ public interface AdminRepository extends JpaRepository<AdminEntity, Integer> {
     @Query("SELECT a FROM AdminEntity a WHERE a.adminEmail like %:keyword% or a.adminName like %:keyword%")
     Page<AdminEntity> search(String keyword, Pageable pageable);
 
+    // 관리자 회원 목록
+    // 이름만
+    @Query("SELECT u FROM AdminEntity u WHERE "+
+            " u.adminName LIKE %:keyword%")
+    Page<AdminEntity> searchAdminName(@Param("keyword") String keyword, Pageable page);
+
+    // 이메일만
+    @Query("SELECT u FROM AdminEntity u WHERE "+
+            " u.adminEmail LIKE %:keyword%")
+    Page<AdminEntity> searchAdminEmail(@Param("keyword") String keyword, Pageable page);
+
+    // 연락처만
+    @Query("SELECT u FROM AdminEntity u WHERE "+
+            " u.adminPhone LIKE %:keyword%")
+    Page<AdminEntity> searchAdminPhone(@Param("keyword") String keyword, Pageable page);
+
+    // 모든 항목에서
+    @Query("SELECT u FROM AdminEntity u WHERE "
+            + "( u.adminName LIKE %:keyword% OR u.adminEmail LIKE %:keyword% OR u.adminPhone LIKE %:keyword%)")
+    Page<AdminEntity> searchAdminNameAndEmailAndPhone(@Param("keyword") String keyword, Pageable page);
+
+    Optional<Object> findByIdx(Integer idx);
 }

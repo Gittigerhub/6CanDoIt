@@ -32,7 +32,6 @@
             </div>
 
             <!-- 상세 테이블 시작 -->
-            <input type="hidden" name="idx" id="organDTOidx" th:data-id="${organDTO.idx}">
             <table class="table table-bordered" style="text-align: center">
                 <tbody> <!--조직 테이블 데이터 출력-->
                 <tr style="height: 50px; vertical-align: middle">
@@ -48,21 +47,21 @@
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
                     <th>매장 타입</th>
-                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.openState}"></td>
                     <th>제휴 상태</th>
-                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.partnerState}"></td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
                     <th>매장명</th>
                     <td style="text-align: left" th:text="${organDTO.organName}"></td>
                     <th>매장 연락처</th>
-                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.tel}"></td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
                     <th>오픈시간</th>
-                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.openTime}"></td>
                     <th>마감시간</th>
-                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.closeTime}"></td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
                     <th>주소</th>
@@ -70,19 +69,68 @@
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
                     <th>매장 일별<br>수수료</th>
-                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.dayFee}"></td>
                     <th>매장 일별<br>수수료 %</th>
-                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.dayFeePercent}"></td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
                     <th>계좌 은행명</th>
-                    <td style="text-align: left" th:text="${organDTO.organName}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.bankName}"></td>
                     <th>계좌 소유주</th>
-                    <td style="text-align: left" th:text="${organDTO.organTel}"></td>
+                    <td style="text-align: left" th:text="${shopDTO.bankOwner}"></td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
                     <th>계좌번호</th>
-                    <td colspan="3" style="text-align: left" th:text="${organDTO.organAddress}"></td>
+                    <td colspan="3" style="text-align: left" th:text="${shopDTO.bankNum}"></td>
+                </tr>
+                <tr style="height: 50px;">
+                    <th style="vertical-align: middle">이미지</th>
+                    <td colspan="3">
+                        <div style="display: flex; flex-wrap: wrap; padding: 20px;">
+                            <!-- 대표 이미지가 없을때 나오는 이미지 -->
+                            <div style="flex-basis: 100%; text-align: left">
+                                <th:block th:if="${!hasRepImage}">
+                                    <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                                </th:block>
+                            </div>
+                            <!-- 이미지 -->
+                            <th:block th:each="data:${imageFileDTOS}" th:if="${!hasRepImage}">
+                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                    <div>
+                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                            <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                            <div>
+                                                <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                </th:block>
+                            </th:block>
+
+                            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+                                <!-- 대표 이미지 -->
+                                <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                                    <div style="flex-basis: 100%; text-align: left">
+                                        <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                        <div>
+                                            <button type="button" class="btn btn-danger deleteBtn mb-4" style="margin-left: 130px" th:value="${data.idx}">삭제</button>
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+                                <!-- 이미지 -->
+                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                    <div>
+                                        <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                        <div>
+                                            <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -98,6 +146,585 @@
         </div>
     </div>
     <!-- 페이지 끝 -->
+
+    <!-- 매장 수정 모달 시작 -->
+    <div class="modal fade" id="shopDetailModal" tabindex="-1" role="modal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="title2" class="fw-light">신규 매장 등록</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                </div>
+                <!--입력폼-->
+                <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                <input type="hidden" name="activeYn" value="Y">  <!-- 조직 활성 유무 기본(Y) -->
+                <form id="shopDetailForm" method="post">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <p>새로운 매장을 등록합니다.</p>
+                        <!-- 조직 idx -->
+                        <input type="hidden" id="idx" name="idx">
+
+                        <div class="row">
+                            <!-- 매장 명 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*매장명 :</label>
+                                    <input id="organName" name="organName" type="text" class="form-control" required readonly/>
+                                </div>
+                            </div>
+
+                            <!-- 매장 주소 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*주소 :</label>
+                                    <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
+                                    <input id="organAddress" name="organAddress" type="text" class="form-control mt-2" placeholder="주소를 입력하세요." readonly required maxlength="100"/>
+
+                                    <!-- 주소입력 기능 -->
+                                    <input type="hidden" id="sample4_postcode" placeholder="우편번호" readonly>
+                                    <input type="hidden" id="sample4_roadAddress" placeholder="도로명주소" readonly>
+                                    <input type="hidden" id="sample4_jibunAddress" placeholder="지번주소" readonly>
+                                    <span id="guide" style="color:#999;display:none"></span>
+                                    <input type="hidden" id="sample4_detailAddress" placeholder="상세주소">
+                                    <input type="hidden" id="sample4_extraAddress" placeholder="참고항목" readonly>
+
+                                    <!-- 가려줄 값들 -->
+                                    <input type="hidden" name="postcode" id="postcode">
+
+                                    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+                                    <script>
+
+                                        // 숨길 주소 모은값 (추가한 내용)
+                                        $("#sample4_detailAddress").on("change", function () {
+                                            let dtl = document.getElementById('sample4_detailAddress').value
+                                            let sample4_extraAddress = document.getElementById('sample4_extraAddress').value
+                                            let sample4_roadAddress = document.getElementById('sample4_roadAddress').value
+
+                                            document.getElementById('organAddress').value = sample4_roadAddress + " " + dtl + sample4_extraAddress;
+
+                                        })
+
+
+                                        //본 예제에서는 도로명 주소 표기 방식에 대한 법령에 따라, 내려오는 데이터를 조합하여 올바른 주소를 구성하는 방법을 설명합니다.
+                                        function sample4_execDaumPostcode() {
+                                            new daum.Postcode({
+                                                oncomplete: function(data) {
+                                                    // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                                                    // 도로명 주소의 노출 규칙에 따라 주소를 표시한다.
+                                                    // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                                                    var roadAddr = data.roadAddress; // 도로명 주소 변수
+                                                    var extraRoadAddr = ''; // 참고 항목 변수
+
+                                                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                                                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                                                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                                                        extraRoadAddr += data.bname;
+                                                    }
+                                                    // 건물명이 있고, 공동주택일 경우 추가한다.
+                                                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                                                        extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                                                    }
+                                                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                                                    if(extraRoadAddr !== ''){
+                                                        extraRoadAddr = ' (' + extraRoadAddr + ')';
+                                                    }
+
+                                                    // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                                                    document.getElementById('sample4_postcode').value = data.zonecode;
+                                                    document.getElementById("sample4_roadAddress").value = roadAddr;
+                                                    document.getElementById("sample4_jibunAddress").value = data.jibunAddress;
+
+                                                    // 참고항목 문자열이 있을 경우 해당 필드에 넣는다.
+                                                    if(roadAddr !== ''){
+                                                        document.getElementById("sample4_extraAddress").value = extraRoadAddr;
+                                                    } else {
+                                                        document.getElementById("sample4_extraAddress").value = '';
+                                                    }
+
+                                                    // 추가한 코드
+
+                                                    // 나눠진 주소정보를 주소필드에 합쳐넣는다.
+                                                    document.getElementById('postcode').value = data.zonecode;
+                                                    document.getElementById('organAddress').value = roadAddr + extraRoadAddr;
+
+                                                    // 다시 재검색시, 상세주소값이 빠지도록 설정한다.
+                                                    document.getElementById('sample4_detailAddress').value = "";
+
+
+
+                                                    var guideTextBox = document.getElementById("guide");
+                                                    // 사용자가 '선택 안함'을 클릭한 경우, 예상 주소라는 표시를 해준다.
+                                                    if(data.autoRoadAddress) {
+                                                        var expRoadAddr = data.autoRoadAddress + extraRoadAddr;
+                                                        guideTextBox.innerHTML = '(예상 도로명 주소 : ' + expRoadAddr + ')';
+                                                        guideTextBox.style.display = 'block';
+
+                                                    } else if(data.autoJibunAddress) {
+                                                        var expJibunAddr = data.autoJibunAddress;
+                                                        guideTextBox.innerHTML = '(예상 지번 주소 : ' + expJibunAddr + ')';
+                                                        guideTextBox.style.display = 'block';
+                                                    } else {
+                                                        guideTextBox.innerHTML = '';
+                                                        guideTextBox.style.display = 'none';
+                                                    }
+                                                }
+                                            }).open();
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+
+                            <!-- 매장 전화번호 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*전화번호 :</label>
+                                    <input id="organTel" name="organTel" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+
+                            <!-- 매장 시작 시간 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*오픈시간 :</label>
+                                    <input id="openTime" name="openTime" type="time" class="form-control" required/>
+                                </div>
+                            </div>
+
+                            <!-- 매장 끝나는 시간 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*닫는시간 :</label>
+                                    <input id="closeTime" name="closeTime" type="time" class="form-control" required/>
+                                </div>
+                            </div>
+
+                            <!-- 휴무일 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*휴무일:</label>
+                                    <input id="restDay" name="restDay" type="text" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- 오픈 상태, 제휴 상태 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*영업 상태:</label>
+                                    <select id="openState" name="openState" class="form-select">
+                                        <option value="0">영업중</option>
+                                        <option value="1">종료</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*제휴 상태:</label>
+                                    <select id="partnerState" name="partnerState" class="form-select">
+                                        <option value="0">제휴중</option>
+                                        <option value="1">제휴종료</option>
+                                        <option value="2">제휴준비중</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 매장 상태 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*직영/가맹점:</label>
+                                    <select id="type" name="type" class="form-select">
+                                        <option value="0">직영</option>
+                                        <option value="1">가맹</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 활성화 유무 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*활성화 유무:</label>
+                                    <select id="activeYn" name="activeYn" class="form-select">
+                                        <option value="0">활성화</option>
+                                        <option value="1">비활성화</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 은행명, 계좌주 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*은행명:</label>
+                                    <input id="bankName" name="bankName" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*계좌주:</label>
+                                    <input id="bankOwner" name="bankOwner" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+
+                            <!-- 계좌 번호 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*계좌번호:</label>
+                                    <input id="bankNum" name="bankNum" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+
+                            <!-- 일별 수수료 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*일별 수수료:</label>
+                                    <input id="dayFee" name="dayFee" type="text" class="form-control" required/>
+                                </div>
+                            </div>
+
+                            <!-- 일별 % 수수료 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*일별 수수료 률:</label>
+                                    <input id="dayFeePercent" name="dayFeePercent" type="text" class="form-control"
+                                           required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal body 끝 -->
+                    <div class="modal-footer border-0">
+                        <button type="button" id="updateBtn" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;수정</button> <!--신규등록 저장버튼-->
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- 매장 수정 모달 끝-->
+
+    <!-- 삭제 모달 시작 -->
+    <div class="modal" id="deletemodal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">조직 삭제</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div class="form-group form-group-default">
+                                <p>삭제버튼을 클릭하면 정보가 삭제됩니다. 삭제하시겠습니까?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button" class="btn btn-danger mx-2" id="delete">삭제</button>
+                        <button type="button" class="btn btn-secondary" id="cancel2">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 삭제 모달 끝 -->
+
+
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            $(document).ready(function () { //문서가 준비가 되었다면
+
+                // 이미지 삭제버튼을 클릭했을 때
+                $(".deleteBtn").on('click', function () {
+
+                    var idx = this.value;
+
+                    $.ajax({
+                        url: "/images/delete",
+                        type: 'GET',
+                        data: {
+                            idx: idx                        // 전달값 : 값
+                        },
+                        success: function (response) {      // 작업 성공시
+                            Swal.fire({
+                                icon: null,
+                                text: "이미지를 삭제하였습니다",
+                                customClass: {
+                                    container: 'bootstrap-swal-container',
+                                    popup: 'card shadow-sm',
+                                    title: 'h4 text-success',
+                                    content: 'text-dark',
+                                },
+                                showConfirmButton: false,
+                                timer: 2000,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                },
+                                buttonsStyling: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false
+                            }).then(() => {
+                                location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                            });
+                        },
+                        error: function () {                // 작업 실패시
+                            Swal.fire({
+                                icon: null,
+                                text: "이미지 삭제를 실패하였습니다",
+                                customClass: {
+                                    container: 'bootstrap-swal-container',
+                                    popup: 'card shadow-sm',
+                                    title: 'h4 text-success',
+                                    content: 'text-dark',
+                                },
+                                showConfirmButton: false,
+                                timer: 2000,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                },
+                                buttonsStyling: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false
+                            });
+                        }
+                    });
+
+
+                });
+
+                // 이미지 추가 버튼 클릭했을 때
+                $("#addImage").on('click', function() {
+
+                    // 이미지 추가 함수
+                    addImageInput();
+
+                });
+
+                // 이미지 추가
+                function addImageInput() {
+                    const container = document.getElementById('inputImage2');
+                    const newInputDiv = document.createElement('div');
+                    newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                    container.appendChild(newInputDiv);
+                }
+
+                // 이미지 추가창 초기화
+                function resetImageInput() {
+                    const container = document.getElementById('inputImage2');
+                    container.innerHTML = '<label>*이미지 :</label>' +
+                        '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                }
+
+                // 삭제모달 버튼 클릭 시
+                $(".btn-delete").on("click", function () {
+
+                    $("#deletemodal").modal('show')
+
+                });
+
+                // 삭제모달 취소버튼 클릭 시
+                $("#cancel2").on("click", function () {
+
+                    $("#deletemodal").modal('hide')
+
+                });
+
+                // 삭제버튼 클릭
+                $("#delete").on("click", function () {
+
+                    // 조직 idx
+                    var idx = $(this).data("id");
+
+                    $.ajax({
+                        url: "/office/organ/delete",
+                        type: 'GET',
+                        data: {
+                            idx: idx//전달값:값
+                        },
+                        success: function (response) {      // 작업 성공시
+                            Swal.fire({
+                                icon: null,
+                                text: "매장을 삭제하였습니다",
+                                customClass: {
+                                    container: 'bootstrap-swal-container',
+                                    popup: 'card shadow-sm',
+                                    title: 'h4 text-success',
+                                    content: 'text-dark',
+                                },
+                                showConfirmButton: false,
+                                timer: 2000,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                },
+                                buttonsStyling: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false
+                            }).then(() => {
+                                // 삭제 완료 후 '/office/list'로 리디렉션
+                                location.href = "/office/list";  // 페이지 이동
+                            });
+                        },
+                        error: function () {                // 작업 실패시
+                            Swal.fire({
+                                icon: null,
+                                text: "매장 삭제를 실패하였습니다",
+                                customClass: {
+                                    container: 'bootstrap-swal-container',
+                                    popup: 'card shadow-sm',
+                                    title: 'h4 text-success',
+                                    content: 'text-dark',
+                                },
+                                showConfirmButton: false,
+                                timer: 2000,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                },
+                                buttonsStyling: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false
+                            });
+                        }
+                    });
+                });
+                // 삭제버튼 끝
+
+                // 수정버튼클릭시 대화상자 채우기
+                $("#btn-update").on("click", function () {
+
+                    // 조직 idx
+                    var idx = $(this).data("id");
+
+                    $.ajax({
+                        url: "/office/shopdetail/realread",
+                        type: 'GET',
+                        data: {
+                            idx: idx                                //전달값:값
+                        },
+                        success: function (response) {              //작업 성공시
+                            $('#title').text("매장 상세 수정");
+
+                            $('#idx').val(response.shopDTO.idx);
+                            $('#organTel').val(response.organDTO.organTel);
+                            $('#openTime').val(response.shopDTO.openTime);
+                            $('#closeTime').val(response.shopDTO.closeTime);
+                            $('#restDay').val(response.shopDTO.restDay);
+                            $('#openState').val(response.shopDTO.openState);
+                            $('#partnerState').val(response.shopDTO.partnerState);
+                            $('#type').val(response.shopDTO.type);
+                            $('#bankNum').val(response.shopDTO.bankNum);
+                            $('#bankName').val(response.shopDTO.bankName);
+                            $('#bankOwner').val(response.shopDTO.bankOwner);
+                            $('#activeYn').val(response.organDTO.activeYn);
+                            $('#dayFee').val(response.shopDTO.dayFee);
+                            $('#dayFeePercent').val(response.shopDTO.dayFeePercent);
+                            $('#organAddress').val(response.organDTO.organAddress);
+
+                            //대화창 출력
+                            $('#shopDetailModal').modal('show');
+                        },
+                        error: function () {                        //작업 실패시
+                            Swal.fire({
+                                icon: null,
+                                text: "조회를 실패하였습니다",
+                                customClass: {
+                                    container: 'bootstrap-swal-container',
+                                    popup: 'card shadow-sm',
+                                    title: 'h4 text-success',
+                                    content: 'text-dark',
+                                },
+                                showConfirmButton: false,
+                                timer: 2000,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                },
+                                buttonsStyling: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false
+                            });
+                        }
+                    });
+                });
+                // 수정버튼 클릭시 대화상자 채우기 끝
+
+                // 대화상자에서 수정버튼 클릭시 Controller 처리
+                $('#updateBtn').on('click', function () {
+                    var form = $('#shopDetailForm')[0];
+                    var formData = new FormData(form);          //form내의 데이터 읽기
+
+                    //폼 검증 수행
+                    if (form.checkValidity() === false) {
+                        form.reportValidity();                  //폼 검증
+                        return;
+                    }
+                    $('#shopDetailModal').modal('hide');
+
+                    $.ajax({
+                        url: '/office/shopdetail/update',       //맵핑
+                        type: 'POST',                           //전달 방식
+                        data: formData,                         //데이터값
+                        processData: false,                     //현재상태 그대로 유지하면서 전달
+                        contentType: false,
+
+                        success: function (response) {          //작업 성공시
+                            Swal.fire({
+                                icon: null,
+                                text: "수정하였습니다",
+                                customClass: {
+                                    container: 'bootstrap-swal-container',
+                                    popup: 'card shadow-sm',
+                                    title: 'h4 text-success',
+                                    content: 'text-dark',
+                                },
+                                showConfirmButton: false,
+                                timer: 2000,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                },
+                                buttonsStyling: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false
+                            });
+                            location.reload();                  //새로 페이지 읽기
+                        },
+                        error: function () {                    //작업 실패시
+                            Swal.fire({
+                                icon: null,
+                                text: "수정을 실패하였습니다",
+                                customClass: {
+                                    container: 'bootstrap-swal-container',
+                                    popup: 'card shadow-sm',
+                                    title: 'h4 text-success',
+                                    content: 'text-dark',
+                                },
+                                showConfirmButton: false,
+                                timer: 2000,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                },
+                                buttonsStyling: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false
+                            });
+                        }
+                    });
+
+                });
+                // 대화상자에서 수정버튼 클릭시 Controller 처리 끝
+            });
+            // document 끝
+        </script>
+    </th:block>
 
 </div>
 </body>

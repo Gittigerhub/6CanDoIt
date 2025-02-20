@@ -48,7 +48,7 @@ public class OrganizationEntity extends BaseEntity {
     private List<AdminEntity> adminJoin;
 
     // 매장 상세 테이블과 1:1 매핑
-    @OneToOne(mappedBy = "organizationJoin")
+    @OneToOne(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private ShopDetailEntity shopDetailJoin;
 
     // 룸 테이블과 1:N 매핑

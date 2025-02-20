@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -21,9 +24,6 @@ public class ShopDetailEntity extends BaseEntity {
     @Column(name = "shop_detail_idx")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;                  // 기본 키
-
-    @Column(name = "shop_detail_tel")
-    private String tel;                   // 매장 연락처
 
     @Column(name = "shop_detail_open_time")
     private LocalTime openTime;           // 매장 오픈시간
@@ -51,9 +51,6 @@ public class ShopDetailEntity extends BaseEntity {
 
     @Column(name = "bank_owner")
     private String bankOwner;             // 매장 계좌 소유주
-
-    @Column(name = "active_yn")
-    private String activeYn;              // 매장 활성화(N:비활성화, Y:활성화)
 
     @Column(name = "day_fee")
     private float dayFee;                 // 매장 일별 수수료

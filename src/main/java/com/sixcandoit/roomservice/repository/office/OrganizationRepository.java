@@ -47,6 +47,4 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     List<OrganizationEntity> findByOrganTypeAndOrganNameLikeIgnoreCase(String searchType, String searchWord);
     // 본사 + 조직명
 
-
-
 }

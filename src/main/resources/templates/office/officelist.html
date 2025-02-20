@@ -36,6 +36,7 @@
             <div class="row p-5 bg-white">
                 <div class="mb-3">
                     <h3>조직 검색</h3>
+                    <h2 th:text="${exists}"></h2>
                 </div>
                 <div class="col-3">
                     <input type="radio" class="form-check-input" id="HO" name="type" th:value="${'HO'}" checked>본사
@@ -87,11 +88,13 @@
                         <!-- 조직 분류가 매장일때 -->
                         <th:block th:if="${data.organType == 'SHOP'}">
                             <!-- 매장 상세내용이 존재한다면 상세내용 보기 진행 -->
-                            <a th:href="@{/office/shopdetail(idx=${data.idx})}" th:text="${data.organName}"></a>
-<!--                            &lt;!&ndash; 매장 상세내용이 존재하지 않는다면 등록 진행 &ndash;&gt;-->
-<!--                            <th:block th:unless="${data.shopDetailDTO != null and data.shopDetailDTO.idx != null}">-->
-<!--                                <a th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}"></a>-->
-<!--                            </th:block>-->
+                            <th:block th:if="${existsList[dataStat.index]}">
+                                <a th:href="@{/office/shopdetail/realread(idx=${data.idx})}" th:text="${data.organName}"></a>
+                            </th:block>
+                            <!-- 매장 상세내용이 존재하지 않는다면 등록 진행 -->
+                            <th:block th:unless="${existsList[dataStat.index]}">
+                                <a th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}"></a>
+                            </th:block>
                         </th:block>
                     </td>
                     <td th:text="${data.organAddress}"></td>

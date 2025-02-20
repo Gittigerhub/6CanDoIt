@@ -1,12 +1,180 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="html://www.thymelaf.org"
-      xmlns:sec="http:///www.thymelteaf.org/extras/spring-security">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/superlayout}"
+>
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>메뉴 수정</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+<div layout:fragment="content" class="container-fluid">
+    <div class="row mt-5">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <form th:action="@{/menu/updatemenu}" th:object="${menuDTO}" method="post" enctype="multipart/form-data">
+               <div class="card">
+                   <div class="card-body">
+                       <h2>메뉴 수정</h2>
+                   </div>
+                   <div class="card-body">
+                    <input name="idx" type="hidden" th:field="*{idx}">
+                    <label for="menuCategory" class="form-label">카테고리:</label>
+                    <input type=text class="form-control" id="menuCategory" name="menuCategory" th:field="*{menuCategory}" disabled>
+                    <div class="mb-3">
+                        <label for="menuName" class="form-label">메뉴명:</label>
+                        <input type="text" class="form-control" id="menuName" name="menuName" th:field="*{menuName}" required disabled>
+                        <p th:if="${#fields.hasErrors('menuName')}" th:errors="*{menuName}" class="fieldError"></p>
+                    </div>
+                    <div class="mb-3"><!--메뉴설명-->
+                        <label for="menuContent" class="form-label">설명:</label>
+                        <textarea class="form-control" th:field="*{menuContent}" rows="3" id="menuContent" name="menuContent"></textarea>
+                        <span th:if="${#fields.hasErrors('menuContent')}"
+                              style="color: red;"
+                              th:errors="*{menuContent}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                    <!--이미지 미리보기-->
+                    <div class="mb-3">
+                        <div class="imgA">
+                            <label for="menuImg" class="form-label">메뉴 이미지</label>
+                            <input type="file" class="form-control imgInput mainimg"
+                                   id="menuImg" accept="image/*" name="multipartFile" multiple onchange="previewImage(event)" required>
+                        </div>
+                        <div class="row main imagePreviewContainer" id="imagePreviewContainer"></div>
+                    </div>
+                    <div class="mb-3"><!--메뉴 옵션-->
+                        <label for="menuOptionYn" class="form-label">메뉴 옵션</label>
+                        <select class="form-select" th:field="*{menuOptionYn}" id="menuOptionYn" name="menuOptionYn">
+                            <option value="N">없음</option>
+                            <option value="Y">있음</option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('menuOptionYn')}"
+                              style="color: red;"
+                              th:errors="*{menuOptionYn}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                    <div class="mb-3"><!--메뉴가격-->
+                        <label for="menuPrice" class="form-label">가격:</label>
+                        <input type="number" min="0" th:field="*{menuPrice}" class="form-control" id="menuPrice" name="menuPrice">
+                        <span th:if="${#fields.hasErrors('menuPrice')}"
+                              style="color: red;"
+                              th:errors="*{menuPrice}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                    <div class="mb-3"><!--활성화 유무-->
+                        <label for="activeYn" class="form-label">판매 상태</label>
+                        <select class="form-select" th:field="*{activeYn}" id="activeYn" name="activeYn">
+                            <option value="N">비활성</option>
+                            <option value="Y">활성</option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('activeYn')}"
+                              style="color: red;"
+                              th:errors="*{activeYn}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                    <div class="mb-3"><!--세일 여부-->
+                        <label for="menuSalesYn" class="form-label">세일</label>
+                        <select class="form-select" th:field="*{menuSalesYn}" id="menuSalesYn" name="menuSalesYn">
+                            <option value="N">안함</option>
+                            <option value="Y">적용</option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('menuSalesYn')}"
+                              style="color: red;"
+                              th:errors="*{menuSalesYn}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                    <div class="mb-3"><!--할인구분-->
+                        <label for="menuSaleType" class="form-label">할인구분</label>
+                        <select class="form-select" th:field="*{menuSaleType}" id="menuSaleType" name="menuSaleType">
+                            <option value="NONE">없음</option>
+                            <option value="AMOUNT">할인액</option>
+                            <option value="PERSENT">할인율</option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('menuSaleType')}"
+                              style="color: red;"
+                              th:errors="*{menuSaleType}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                    <div class="mb-3"><!--원가-->
+                        <label for="originPrice" class="form-label">원가:</label>
+                        <input type="number" min="0" th:field="*{originPrice}" class="form-control" id="originPrice" name="originPrice">
+                        <span th:if="${#fields.hasErrors('originPrice')}"
+                              style="color: red;"
+                              th:errors="*{originPrice}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                    <div class="mb-3"><!--할인액-->
+                        <label for="menuSaleAmount" class="form-label">할인액:</label>
+                        <input type="number" min="0" th:field="*{menuSaleAmount}" class="form-control" id="menuSaleAmount" name="menuSaleAmount">
+                        <span th:if="${#fields.hasErrors('menuSaleAmount')}"
+                              style="color: red;"
+                              th:errors="*{menuSaleAmount}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                    <div class="mb-3"><!--할인율-->
+                        <label for="menuSalePercent" class="form-label">할인율:</label>
+                        <input type="number" min="0" th:field="*{menuSalePercent}" class="form-control" id="menuSalePercent" name="menuSalePercent">
+                        <span th:if="${#fields.hasErrors('menuSalePercent')}"
+                              style="color: red;"
+                              th:errors="*{menuSalePercent}">
+                                </span> <!-- 오류 메시지 출력 -->
+                    </div>
+                   </div>
+               </div>
+            </form>
+            <!--이미지 미리보기를 위한 함수-->
+            <script th:inline="javascript">
+                // 이미지 미리보기 함수
+                function previewImage(event) {
+                    console.log("수정 진입");
 
+                    const previewContainer = document.getElementById('imagePreviewContainer');
+                    previewContainer.innerHTML = '';  // 기존 미리보기 이미지 제거
+
+                    const files = event.target.files;
+
+                    if (files.length > 0) {
+                        Array.from(files).forEach(file => {
+                            const reader = new FileReader();
+
+                            reader.onload = function(e) {
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.alt = 'Image Preview';
+                                img.style.maxWidth = '200px';  // 미리보기 이미지 크기 조정
+                                img.style.marginTop = '10px';
+                                previewContainer.appendChild(img);
+                            }
+
+                            reader.readAsDataURL(file);  // 이미지 파일을 읽어서 미리보기
+                        });
+                    }
+                }
+
+                // 폼 제출 전 이미지 첨부 확인 함수
+                function validateForm(event) {
+                    const imageFiles = document.getElementById('menuImg').files;
+
+                    // 이미지 파일이 첨부되지 않으면 제출을 막고 메시지를 띄운다
+                    if (imageFiles.length === 0) {
+                        event.preventDefault();  // 폼 제출을 막는다
+                        alert('이미지를 첨부해 주세요!');
+                    }
+                }
+                // 폼 초기화 시 미리보기도 초기화
+                function resetForm() {
+                    document.getElementById('imagePreviewContainer').innerHTML = '';  // 미리보기 초기화
+                    document.getElementById('menuImg').value = '';  // 파일 입력 초기화
+                }
+
+            </script>
+        </div>
+        <div class="col-2"></div>
+    </div>
+</div>
 </body>
 </html>

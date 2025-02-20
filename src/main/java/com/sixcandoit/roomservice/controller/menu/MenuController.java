@@ -2,6 +2,7 @@ package com.sixcandoit.roomservice.controller.menu;
 
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.menu.MenuService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -65,7 +66,7 @@ public class MenuController {
 
         if (multipartFile.get(0).isEmpty()){
             model.addAttribute("msg", "대표이미지 등록은 필수입니다.");
-            return "/menu/listmenu";
+            return "/menu/registermenu";
         }
 
         // 파일 형식 검증 : 모든 파일이 이미지 파일인지에 대해 확인
@@ -100,7 +101,8 @@ public class MenuController {
 
             log.info("상품 등록 완료!");
 
-            return "redirect:/menu/registermenu?idx=" + savedMenuidx;
+            return "redirect:/menu/listmenu";
+
         }catch (Exception e) {
             e.printStackTrace();
             log.info("파일 등록시 문제가 발생했습니다.");
@@ -171,57 +173,62 @@ public class MenuController {
     }
 
     @GetMapping("/menu/updatemenu")
-    public String updateMenu(Integer menuidx, Model model, Principal principal ) {
+    public String updateMenu(@RequestParam("idx") Integer menuidx, Model model, Principal principal ) {
+
+        // menuidx가 null인 경우 처리
+        if (menuidx == null) {
+            return "redirect:/menu/listmenu";
+        }
 
         MenuDTO menuDTO = menuService.menuRead(menuidx);
 
         if (menuDTO != null) {
             model.addAttribute("menuDTO", menuDTO);
-            return "/menu/updatemenu";
+            return "/menu/updatemenu";//수정페이지로 이동
         }else {
             return "redirect:/menu/listmenu";
         }
     }
 
-//    @PostMapping("/menu/updatemenu")
-//    public String updateMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult, List<MultipartFile> multipartFile,
-//                                 Integer[] delino, Integer menuidx, Model model) {
-//
-//        if (bindingResult.hasErrors()) {
-//            log.info("유효성 검사 에러");
-//            log.info(bindingResult.getAllErrors()); //확인된 모든 에러 콘솔창 출력
-//
-//            return "/menu/updatemenu";  //다시 이전페이지로
-//        }
-//
-//        try {
-//            // 새로운 이미지들 저장 처리
-//            if (multipartFile != null && !multipartFile.isEmpty()) {
-//                List<ImageFileEntity> newImageFiles = imageFileService.saveImages(multipartFile);  // S3에 업로드 후 ImageFileEntity 리스트 반환
-//                menuDTO.setMenuImgDTOList(newImageFiles); // menuDTO에 이미지 DTO 리스트 세팅
-//            }
-//
-//            // 삭제된 이미지 처리
-//            if (delino != null && delino.length > 0) {
-//                for (Integer imageIdx : delino) {
-//                    imageFileService.deleteImage(imageIdx);  // 해당 이미지 삭제
-//                }
-//            }
-//
-//        //메뉴 정보 업데이트
-//        menuService.menuUpdate(menuDTO, menuDTO.getIdx(), multipartFile, delino, menuidx);
-//
-//        } catch (Exception e) {
-//            log.error("메뉴 업데이트 오류: ", e);
-//            // 오류 발생 시 모델에 에러 메시지를 추가하거나 다시 페이지로 이동
-//            model.addAttribute("msg", "메뉴 업데이트 중 오류가 발생했습니다.");
-//            return "/menu/updatemenu";
-//        }
-//
-//
-//        return "redirect:/menu/listmenu";
-//
-//    }
+    @PostMapping("/menu/updatemenu")
+    public String updateMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult, List<MultipartFile> multipartFile,
+                                 Integer[] delino, Integer menuidx, Model model) {
+
+        if (bindingResult.hasErrors()) {
+            log.info("유효성 검사 에러");
+            log.info(bindingResult.getAllErrors()); //확인된 모든 에러 콘솔창 출력
+
+            return "/menu/updatemenu";  //다시 이전페이지로
+        }
+
+        try {
+            // 새로운 이미지들 저장 처리
+            if (multipartFile != null && !multipartFile.isEmpty()) {
+                List<ImageFileEntity> newImageFiles = imageFileService.saveImages(multipartFile);  // S3에 업로드 후 ImageFileEntity 리스트 반환
+                menuDTO.setMenuImgDTOList(newImageFiles); // menuDTO에 이미지 DTO 리스트 세팅
+            }
+
+            // 삭제된 이미지 처리
+            if (delino != null && delino.length > 0) {
+                for (Integer imageIdx : delino) {
+                    imageFileService.deleteImage(imageIdx);  // 해당 이미지 삭제(S3에서도 삭제될수 있도록)
+                }
+            }
+
+        //메뉴 정보 업데이트
+        menuService.menuUpdate(menuDTO, menuDTO.getIdx(), multipartFile, delino, menuidx);
+
+        } catch (Exception e) {
+            log.error("메뉴 업데이트 오류: ", e);
+            // 오류 발생 시 모델에 에러 메시지를 추가하거나 다시 페이지로 이동
+            model.addAttribute("msg", "메뉴 업데이트 중 오류가 발생했습니다.");
+            return "/menu/updatemenu";
+        }
+
+
+        return "redirect:/menu/listmenu";
+
+    }
 
 
 }

@@ -67,6 +67,10 @@ public class MenuService {
 
     //메뉴 읽기
     public MenuDTO menuRead(Integer idx) {
+
+        if (idx == null) {
+            throw new RuntimeException("menuID가 없습니다.");
+        }
         // 메뉴 정보 조회
         MenuEntity menuEntity
                 = menuRepository.findById(idx).orElseThrow(EntityNotFoundException::new);
@@ -131,11 +135,22 @@ public class MenuService {
     }
 
     //메뉴 수정
-    public MenuDTO menuUpdate(MenuDTO menuDTO, Integer idx, List<MultipartFile> multipartFiles, Integer[] delidx, Long mainidx) {
+    public MenuDTO menuUpdate(MenuDTO menuDTO, Integer idx, List<MultipartFile> multipartFiles, Integer[] delidx, Integer mainidx) throws Exception {
         //menuDTO 수정
         MenuEntity menuEntity =
                 menuRepository.findById(menuDTO.getIdx())
                         .orElseThrow(EntityNotFoundException::new);
+
+        // 기존 이미지 삭제 처리 (delidx로 받은 이미지들 삭제)
+        if (delidx != null && delidx.length > 0) {
+            for (Integer imageIdx : delidx) {
+                imageFileService.deleteImage(imageIdx);  // 삭제된 이미지 S3에서 삭제
+            }
+        }
+
+        // 기존 이미지들 업데이트 (새로운 이미지들 추가)
+        List<ImageFileEntity> updatedImageList = imageFileService.updateImage(multipartFiles, "menu", menuDTO.getIdx());
+
 
         //set 수정된 값을 Menu 객체에 반영
         menuEntity.setMenuName(menuDTO.getMenuName());

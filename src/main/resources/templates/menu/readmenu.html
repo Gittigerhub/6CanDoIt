@@ -25,7 +25,7 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="menuCategory" class="form-label">카테고리:</label>
-                            <input type="text" class="form-control" id="menuCategory" name="menuCategory" th:field="*{menuCategory}" disabled>
+                            <input type="text" class="form-control" id="menuCategory" name="menuCategory" th:field="*{menuCategory}" readonly>
                             <p th:if="${#fields.hasErrors('menuCategory')}" th:errors="*{menuCategory}" class="fieldError"></p>
                         </div>
                         <div class="mb-3">
@@ -113,14 +113,18 @@
                 </div>
             </form>
         </div>
+        <div class="col-2"></div>
     </div>
 </th:block>
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         let menuid = [[${menuDTO.idx}]];
+        console.log(menuid);  // 이 값이 잘 들어오는지
+
 
         $(document).ready(function (){
             $(".updatebtn").on("click", function (){
+                console.log("클릭됨, menuid: " + menuid);  // 클릭 시 이 값이 잘 들어오는지
                 location.href = "/menu/updatemenu?idx=" + menuid;
             })
         })

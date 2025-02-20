@@ -12,6 +12,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -163,4 +167,48 @@ public class AdminService {
             throw new RuntimeException("임시 비밀번호 생성을 실패하였습니다."); //호출한 메소드에 전달한 오류
         }
     }
+
+    // 일반 회원 전체 목록, 데이터를 화면에 출력
+    // 페이지 번호를 받아 테이블의 해당 페이지의 데이터를 읽어와서 컨트롤러에 전달
+    public Page<AdminDTO> adminList(Pageable page, String type, String keyword) {
+
+        int currentPage = page.getPageNumber() - 1; // 화면의 페이지 번호를 db 페이지 번호로
+        int pageLimit = 10; // 한 페이지를 구성하는 레코드 수
+
+        // 지정된 내용으로 페이지 정보를 재생산, 정렬 내림차순 DESC
+        Pageable pageable = PageRequest.of(currentPage, pageLimit,
+                Sort.by(Sort.Direction.DESC, "idx"));
+
+        // 조회한 변수를 선언
+        // type : 제목(1), 내용(2), 제목+내용(2), 답변만(4), 자주 묻는 질문(5), 전체(0)
+        Page<AdminEntity> adminEntities;
+        if (keyword != null) { // 검색어가 존재하면
+            log.info("검색어가 존재하면...");
+            if (type.equals("1")) { // type 분류 1, 이름으로 검색할 때
+                log.info("이름으로 검색하는 중...");
+                adminEntities = adminRepository.searchAdminName(keyword, pageable);
+            } else if (type.equals("2")) { // type 분류 2, 이메일로 검색할 때
+                log.info("이메일로 검색하는 중...");
+                adminEntities = adminRepository.searchAdminEmail(keyword, pageable);
+            } else if (type.equals("3")) { // type 분류 3, 핸드폰 번호로 검색할 때
+                log.info("핸드폰 번호로 검색하는 중...");
+                adminEntities = adminRepository.searchAdminPhone(keyword, pageable);
+            } else { // 전체 검색 = 0
+                log.info("전체 조회 검색 중...");
+                adminEntities = adminRepository.searchAdminNameAndEmailAndPhone(keyword, pageable);
+            }
+        } else { // 검색어가 존재하지 않으면 모두 검색
+            adminEntities = adminRepository.findAll(pageable);
+        }
+
+        // Entity를 DTO로 변환 후 저장
+        Page<AdminDTO> adminDTOS = adminEntities.map(
+                data -> modelMapper.map(data, AdminDTO.class));
+
+        return adminDTOS;
+    }
+
+
+
+
 }

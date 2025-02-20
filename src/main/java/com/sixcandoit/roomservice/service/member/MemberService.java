@@ -182,7 +182,7 @@ public class MemberService {
                 memberEntities = memberRepository.searchMemberPhone(keyword, pageable);
             } else { // 전체 검색 = 0
                 log.info("전체 조회 검색 중...");
-                memberEntities = memberRepository.searchNameAndEmailAndPhone(keyword, pageable);
+                memberEntities = memberRepository.searchMemberNameAndEmailAndPhone(keyword, pageable);
             }
         } else { // 검색어가 존재하지 않으면 모두 검색
             memberEntities = memberRepository.findAll(pageable);

@@ -48,13 +48,13 @@
                             <div class="mb-3">
                                 <label for="memberAddress" class="form-label">주소</label>
                                 <div class="signUp-input-area d-flex mb-1 col-lg-7">
-                                    <input type="text" class="form-control input-lg" id="memberPostcode" th:value="${memberDTO.memberPostcode}" placeholder="우편번호" style="height: 40px;" readonly>
+                                    <input type="text" class="form-control input-lg" id="memberPostcode" placeholder="우편번호" style="height: 40px;" readonly>
                                     <input type="button" class="btn btn-secondary" style="text-align:center; height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
                                 </div>
                             </div>
                             <div class="signUp-input-area mb-1">
                                 <input type="text" class="form-control" id="memberAddress" th:value="${memberDTO.memberAddress}" name="memberAddress" placeholder="주소" style="height: 40px;" readonly>
-                                <input type="text" class="form-control" id="memberExtraAddress" th:value="${memberDTO.memberExtraAddress}" name="memberExtraAddress" placeholder="상세 주소" style="height: 40px;">
+                                <input type="text" class="form-control" id="memberExtraAddress" name="memberExtraAddress" placeholder="상세 주소" style="height: 40px;">
                             </div>
                             <div>주문 알람 수신여부</div>
                             <div class="form-check">

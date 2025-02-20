@@ -27,12 +27,15 @@
             <p>제목:<span th:text="${noticeDTO.noticeTitle}"></span></p>
             <p>내용:<span th:text="${noticeDTO.noticeContents}"></span></p>
 
-            <div th:if="${noticeDTO.noticeImg !=null}">
-              <img th:src="${noticeDTO.noticeImg}" alt="Notice Image" class="img-fluid">
-            </div>
-            <div th:each="imageUrl : ${noticeDTO.imageUrls}">
-              <img th:src="${imageUrl}" class="img-fluid">
-            </div>
+            <th:block th:each="data : ${imageFileDTOS}">
+              <div th:if="${data != null}">
+                <img th:src="${data.url}" style="width: 400px; height: auto" alt="Notice Image" class="img-fluid">
+              </div>
+            </th:block>
+              <div th:if="${!hasRepImage}">
+                <img src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" style="width: 400px; height: auto" alt="noimage" class="img-fluid">
+              </div>
+
 
             <p>등록일:
               <span th:text="${#temporals.format(noticeDTO.insDate, 'yyyy-MM-dd HH:mm')}"></span>

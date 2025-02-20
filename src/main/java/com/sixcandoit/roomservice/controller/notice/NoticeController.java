@@ -72,13 +72,14 @@ public class NoticeController {
     @PostMapping("/notice/register")
 
     public String registerProc(@Valid @ModelAttribute NoticeDTO noticeDTO,
-                               List<MultipartFile> imageFiles,
-                               BindingResult bindingResult ) {
+                               BindingResult bindingResult,
+                               List<MultipartFile> imageFiles) {
+
         log.info("질문한 내용을 저장합니다.");
 
-        if (bindingResult.hasErrors()) { // 유효성 검사에 실패 시
+        if (bindingResult.hasErrors()) {        // 유효성 검사에 실패 시
             log.info("유효성 검사 오류 발생");
-            return "notice/register"; // register로 돌아간다
+            return "notice/register";           // register로 돌아간다
         }
 
         // 유효성 검사 성공 시 등록 처리
@@ -94,11 +95,13 @@ public class NoticeController {
         String join="notice";
 
         noticeService.count(idx);
+
         log.info("개별 데이터를 읽는 중입니다");
         NoticeDTO noticeDTO = noticeService.noticeRead(idx);
 
+        // 이미지 조회
         List<ImageFileDTO> imageFileDTOS=
-                imageFileService.readImage(idx,join);
+                imageFileService.readImage(idx ,join);
 
         boolean hasRepImage = imageFileDTOS.stream()
                 .anyMatch(imageFileDTO->"Y".equals(imageFileDTO.getRepimageYn()));
@@ -143,6 +146,7 @@ public class NoticeController {
     // Qna의 Q 삭제
     @GetMapping("/notice/delete")
     public String delete(@RequestParam("idx") Integer idx) {
+
         String join="notice";
 
         log.info("데이터를 삭제합니다.");
@@ -150,7 +154,5 @@ public class NoticeController {
 
         return "redirect:/notice/list";
     }
-
-
 
 }

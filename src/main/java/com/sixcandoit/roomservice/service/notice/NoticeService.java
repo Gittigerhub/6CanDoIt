@@ -29,24 +29,27 @@ import java.util.stream.Collectors;
 public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final ModelMapper modelMapper;
-    private final ImageFileService fileService;
+    private final ImageFileService imageFileService;
 
 
 
     public void noticeRegister(NoticeDTO noticeDTO, List<MultipartFile> imageFiles) {
 
         try{
+            // DTO => Entity 변환
             NoticeEntity notice=
                     modelMapper.map(noticeDTO, NoticeEntity.class);
 
             //이미지 등록
             log.info("이미지를 저장한다.");
-            List<ImageFileEntity> images= fileService.saveImages(imageFiles);
+            List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
 
             //이미지 정보 추가
-            for(ImageFileEntity image:images){
+            for(ImageFileEntity image : images){
                 notice.addImage(image);
             }
+
+            // DB에 저장
             log.info("저장을 수행한다");
             noticeRepository.save(notice);
 
@@ -74,7 +77,7 @@ public class NoticeService {
                 System.out.println(notice.toString());
 
                 log.info("이미지를 저장한다");
-                List<ImageFileEntity> images = fileService.updateImage(imageFiles, join, noticeDTO.getIdx());
+                List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, noticeDTO.getIdx());
 
                 //이미지 정보 추가
                 for (ImageFileEntity image : images) {
@@ -89,25 +92,30 @@ public class NoticeService {
             throw new RuntimeException("수정 오류 발생");
         }
     }
+
     public void noticeDelete(Integer idx,String join){
         try {
-            List<ImageFileDTO>imageFileDTOS=fileService.readImage(idx,join);List<ImageFileEntity> imageFileEntities=imageFileDTOS.stream()
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx,join);
+
+            // dto = > entity 변환
+            List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
                     .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
                     .collect(Collectors.toList());
 
-            for(ImageFileEntity imageFileEntity:imageFileEntities){
-                fileService.deleteImage(imageFileEntity.getIdx());
+            // DB, 저장소에서 모든 이미지 삭제
+            for(ImageFileEntity imageFileEntity : imageFileEntities){
+                imageFileService.deleteImage(imageFileEntity.getIdx());
             }
+
+            // idx로 공지사항 조회하여 삭제
             noticeRepository.deleteById(idx);
 
         }catch (Exception e) {
             throw new RuntimeException("삭제를 실패했습니다." + e.getMessage());
         }
+
     }
-
-
-    public void noticeDelete(Integer idx) {noticeRepository.deleteById(idx);}
-
 
     public Page<NoticeDTO> noticeList(Pageable page, String type, String keyword) {
         Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);

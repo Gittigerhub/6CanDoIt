@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.office;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import jakarta.persistence.*;
@@ -61,7 +62,9 @@ public class ShopDetailEntity extends BaseEntity {
     private float dayFeePercent;          // 매장 일별 수수료 %
 
     // 조직 테이블과 1:1 매핑
-    @OneToOne(mappedBy = "shopDetailJoin")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organ_idx")
+    @JsonBackReference
     private OrganizationEntity organizationJoin;
 
     // 정산내역 테이블과 1:N 매칭
@@ -71,5 +74,7 @@ public class ShopDetailEntity extends BaseEntity {
     // 메뉴 테이블과 1:N 매칭
     @OneToMany(mappedBy = "shopDetailJoin")
     private List<MenuEntity> menuJoin;
+
+
 
 }

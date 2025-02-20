@@ -171,9 +171,9 @@ public class OfficeController {
     //상점 등록
     @PostMapping("/shopdetail/register")
     @ResponseBody
-    public ResponseEntity<String> ShopDetailRegister(@ModelAttribute ShopDetailDTO shopDetailDTO){
+    public ResponseEntity<String> ShopDetailRegister(@ModelAttribute ShopDetailDTO shopDetailDTO, Integer organIdx){
         try {
-            shopDetailService.register(shopDetailDTO);
+            shopDetailService.register(shopDetailDTO, organIdx);
             System.out.println("저장성공");
             return  ResponseEntity.ok("등록하였습니다.");
         }catch (Exception e){

@@ -45,7 +45,7 @@ public class NoticeService {
 
             //이미지 정보 추가
             for(ImageFileEntity image:images){
-               notice.addImage(image);
+                notice.addImage(image);
             }
             log.info("저장을 수행한다");
             noticeRepository.save(notice);
@@ -60,7 +60,7 @@ public class NoticeService {
         }
     }
 
-        //수정
+    //수정
     public void noticeUpdate( NoticeDTO noticeDTO,String join,List<MultipartFile> imageFiles) {
         try {
 
@@ -103,7 +103,7 @@ public class NoticeService {
         }catch (Exception e) {
             throw new RuntimeException("삭제를 실패했습니다." + e.getMessage());
         }
-        }
+    }
 
 
     public void noticeDelete(Integer idx) {noticeRepository.deleteById(idx);}

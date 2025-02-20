@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.dto.notice;
 
 
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -45,5 +46,9 @@ public class NoticeDTO {
     private List<String> imageUrls;
     private String repimageYn;
 
+    public NoticeDTO setNoticeDTOList(List<ImageFileEntity> imageFileJoin) {
+
+        return null;
     }
+}
 

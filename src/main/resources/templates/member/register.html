@@ -271,14 +271,15 @@
 
                 // form submit 전에 memberAddress에 상세 주소 추가
                 function combineAddress() {
-                    var detailedAddress = document.getElementById("memberExtraAddress").value;
-                    var memberAddress = document.getElementById("memberAddress").value;
+                    var detailedAddress = document.getElementById("memberExtraAddress").value.trim();
+                    var memberAddress = document.getElementById("memberAddress").value.trim();
 
-                    // 상세 주소가 있으면 memberAddress에 합침
-                    if (detailedAddress) {
+                    // 상세 주소가 존재하고, memberAddress에 이미 상세주소가 포함되지 않으면 합침
+                    if (detailedAddress && !memberAddress.endsWith(detailedAddress)) {
                         document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
                     }
                 }
+
 
 
     </script>

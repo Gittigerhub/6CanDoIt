@@ -27,22 +27,45 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="events:${eventDTOS}">
+                    <tr th:each="events:${eventDTO}">
                         <td th:text="${events.eventTitle}">John</td>
-                        <td th:text="${events.eventStartDate}">Doe</td>
-                        <td th:text="${events.eventEndDate}">john@example.com</td>
+                        <td th:text="${#temporals.format(events.eventStartDate,'yy-MM-dd')}">Doe</td>
+                        <td th:text="${#temporals.format(events.eventEndDate,'yy-MM-dd')}">john@example.com</td>
                         <td class="button_and_image">
                             <button type="button" class="btn btn-primary eventEdit" th:data-id="${events.idx}">상세보기
                             </button>
                             <button type="button" class="btn btn-secondary eventDelete" th:data-id="${events.idx}">삭제
                             </button>
-                            <input type="hidden" th:class="event_Title_Img" th:value="${events.eventTitleImg}">
-                            <input type="hidden" th:class="event_Img" th:value="${events.eventImg}">
+                            <input type="hidden" id="event_title_img" class="event_Title_Img" name="eventTitleImg"
+                                   th:value="${events.eventTitleImg}">
+                            <input type="hidden" id="event_img" class="event_Img" name="eventImg" th:value="${events.eventImg}">
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
+            <!--<div class="container mt-3">
+                <ul class="pagination">
+                    <li class="page-item" th:unless="${startPage>1}">
+                        <a class="page-link" th:href="@{/event/list(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                    </li>
+                    <li class="page-item" th:unless="${currentPage==1}">
+                        <a class="page-link" th:href="@{/event/list(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                    </li>
+                    <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}">
+                        <li class="page-item">
+                            <a class="page-link" th:href="@{/event/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                        </li>
+                    </span>
+
+                    <li class="page-item" th:unless="${currentPage>=endPage}">
+                        <a class="page-link" th:href="@{/event/list(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                    </li>
+                    <li class="page-item" th:unless="${currentPage>endPage}">
+                        <a class="page-link" th:href="@{/event/list(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                    </li>
+                </ul>
+            </div>-->
 
             <div class="modal" id="eventModal">
                 <div class="modal-dialog">
@@ -117,43 +140,47 @@
 
                                 <div class="row mt-2">
                                     <div class="col-sm-6">
-                                        <div class="form-group form-group-default " id="titleImg">
-                                            <label>*배너 이미지 등록:</label>
-                                            <input type="file" class="event_title_img" id="event_title_file"
-                                                   name="Files" onchange="previewImage(this,'View_area_tilte')"><br>
-                                            <span id='View_area_tilte'
+                                        <div class="form-group form-group-default">
+                                            <label>*타이틀 이미지 등록:</label>
+                                            <input type="file" class="Files" id="Files"
+                                                   name="Files" onchange="previewImage(this,'View_title_image')"><br>
+                                            <span id='View_title_image'
                                                   style='position:relative; color: black; border: 0px solid black;'></span>
+                                            <ul id="fileList"></ul>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <div class="form-group form-group-default " id="mainImg">
-                                            <label>*메인 이미지 등록:</label>
-                                            <input type="file" class="event_img" id="event_img_file" name="Files"
-                                                   onchange="previewImage(this,'View_area_main')"><br>
-                                            <span id='View_area_main'
+                                        <div class="form-group form-group-default">
+                                            <label>*컨텐츠 이미지 등록:</label>
+                                            <input type="file" class="Files" id="Files2"
+                                                   name="Files" onchange="previewImage(this,'View_image')"><br>
+                                            <span id='View_image'
                                                   style='position:relative; color: black; border: 0px solid black;'></span>
                                         </div>
                                     </div>
                                 </div>
-                                <!--<th:block class="ImgBlock" th:if="">
+
+                                <th:block class="ImgBlock">
                                     <div class="row">
                                         <div class="col-sm-6">
 
                                             <div>
+                                                <label>*타이틀 이미지</label>
                                                 <img class="imgTitleInput" th:src="0" width="150" height="150">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
+                                            <label>*메인 이미지</label>
                                             <img class="imgContentInput" th:src="0" width="150" height="150">
                                         </div>
                                     </div>
-                                </th:block>-->
+                                </th:block>
 
 
                                 <!-- Modal footer -->
                                 <div class="modal-footer">
                                     <button id="register" class="btn btn-primary" type="button">이벤트등록</button>
-                                    <button id="update" class="btn btn-primary" type="submit">이벤트수정</button>
+                                    <button id="update" class="btn btn-secondary" type="button">이벤트수정</button>
                                 </div>
                             </div>
                         </form>
@@ -171,6 +198,8 @@
 <th:block layout:fragment="script">
     <script src="/js/preview.js"></script>
     <script th:inline="javascript">
+
+
         $(document).ready(function () { //문서가
 
 
@@ -185,6 +214,7 @@
                 $('#register').show()
                 $('#update').hide()
 
+                $('#idx').val("");
                 //대화창 출력
                 $('#eventModal').modal('show')
 
@@ -193,7 +223,13 @@
 
             $("#register").on("click", function () {
                 var form = $("#eventForm")[0]
-                var formdata = new FormData(form);
+                var formData = new FormData(form);
+
+                //파일 다중 저장
+                /*var files = $("#Files")[0].files;
+                for (let i = 0; i < files.length; i++) {
+                    formData.append("files", files[i]);
+                }*/
 
                 //폼 검증 수행
                 if (form.checkValidity() === false) {
@@ -204,10 +240,11 @@
 
                 $("#eventModal").modal("hide")
 
+                console.log("등록 버튼 누름")
                 $.ajax({
                     url: '/event/event/register',
                     type: 'POST',
-                    data: formdata,
+                    data: formData,
                     processData: false,
                     contentType: false,
 
@@ -262,32 +299,17 @@
             $(".eventEdit").on("click", function () {
                 //alert("삭제")
                 let idx = $(this).data("id")
-                console.log(idx)
-
-                var row = $(this).closest("tr");
-
-                // Retrieve the values from the hidden input fields within that row
-                var eventTitleImg = row.find(".event_Title_Img").val(); // 이벤트 제목 이미지 경로
-                var eventImg = row.find(".event_Img").val(); // 이벤트 이미지 경로
-
-                // Construct the image URLs
-                var imageUrlTitle = "/upload/" + eventTitleImg;
-                var imageUrl = "/upload/" + eventImg;
-
-
-                console.log("이미지 경로:" + imageUrlTitle);
-                console.log("이미지 경로:" + imageUrl);
-
+                //console.log(idx)
 
                 $.ajax({
                     url: "/event/event/read",
-                    type: 'POSt',
+                    type: 'POST',
                     data: {
                         idx: idx//전달값:값
                     },
                     success: function (response) {//작업 성공시
 
-                        console.log("응답 데이터:", response);
+                        //console.log("응답 데이터:", response);
 
                         if (!response.eventDTO) {
                             alert("서버에서 올바른 데이터를 받지 못했습니다.");
@@ -304,15 +326,21 @@
                         $('#eventEndDate').val(response.eventDTO.eventEndDate);
                         $('#activeYn').val(response.eventDTO.activeYn);
                         $('#eventState').val(response.eventDTO.eventState);
-                        $('#event_title_file').val(response.eventDTO.titleFile);
-                        $('#event_file').val(response.eventDTO.contentFile);
+                        $('#event_title_img').val(response.eventDTO.eventTitleImg);
+                        $('#event_img').val(response.eventDTO.eventImg);
 
 
-                        console.log("이미지 경로:" + imageUrlTitle);
-                        console.log("이미지 경로:" + imageUrl);
+                        // Retrieve the values from the hidden input fields within that row
+                        var eventTitleImg = $(".event_Title_Img").val(); // 이벤트 제목 이미지 경로
+                        var eventImg = $(".event_Img").val(); // 이벤트 이미지 경로
 
-                        $(".imgTitleInput").attr("src", imageUrlTitle);
-                        $(".imgContentInput").attr("src", imageUrl);
+
+                        //console.log("이미지 경로:" + eventTitleImg);
+                        //console.log("이미지 경로:" + eventImg);
+
+
+                        $(".imgTitleInput").attr("src", eventTitleImg);
+                        $(".imgContentInput").attr("src", eventImg);
 
 
                         $('#register').hide()
@@ -432,11 +460,12 @@
             //삭제버튼 클릭
             $(".eventDelete").on("click", function () {
                 //alert("삭제")
-                var idx = $(this).data("id");
+                var idx = Number($(this).data("id"));
+                console.log("idx 값:", $(this).data("id"));
 
                 $.ajax({
                     url: "/event/event/delete",
-                    type: 'GET',
+                    type: 'POST',
                     data: {
                         idx: idx//전달값:값
                     },
@@ -487,6 +516,11 @@
             });//삭제버튼 끝
 
             //사진 숨기기
+
+            $("#eventModal").on('hidden.bs.modal', function (e) {
+                $(this).find('form')[0].reset();
+                //console.log("모달 정보:" + $(this).find('form')[0])
+            });//모달 정보 초기화
 
 
         });

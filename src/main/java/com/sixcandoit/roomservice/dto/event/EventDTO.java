@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.dto.event;
 
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -48,9 +50,8 @@ public class EventDTO {
     // 관리자 회원 테이블과 N:1 매핑
     private OrganizationEntity organizationJoin;
 
-    private MultipartFile titleFile;
-
-    private MultipartFile contentFile;
+    //이미지 관리자 테이블과 1:매칭
+    private List<ImageFileEntity> imageFileJoin = new ArrayList<>();
 
     private List<MultipartFile> Files;
 

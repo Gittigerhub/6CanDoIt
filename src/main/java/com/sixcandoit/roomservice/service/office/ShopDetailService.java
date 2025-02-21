@@ -139,11 +139,11 @@ public class ShopDetailService {
     출력 : 없음
     설명 : 매장 정보를 수정할때 사용;
   ---------------------------------------------------*/
-    public void update(ShopDetailDTO shopDetailDTO, OrganizationDTO organizationDTO, String join, List<MultipartFile> imageFiles){
+    public void update(ShopDetailDTO shopDetailDTO, OrganizationDTO organizationDTO, String join, List<MultipartFile> imageFiles, Integer organIdx){
 
         try {
             // organizationDTO.getIdx()로 조직 데이터 조회
-            OrganizationEntity organ = organizationRepository.findById(organizationDTO.getIdx())
+            OrganizationEntity organ = organizationRepository.findById(organIdx)
                     .orElseThrow(() -> new RuntimeException("수정할 조직 조회 실패"));
 
             // shopDetailDTO.getIdx()로 매장 데이터 조회
@@ -154,6 +154,9 @@ public class ShopDetailService {
             // 기존 엔티티 객체의 필드만 업데이트
             modelMapper.map(organizationDTO, organ);
             modelMapper.map(shopDetailDTO, shopEntity);
+
+            // 빠진 idx값 주입
+            organ.setIdx(organIdx);
 
             // 이미지 추가 등록
             List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
@@ -166,11 +169,13 @@ public class ShopDetailService {
                 }
             }
 
+            // Entity 테이블에 저장
+            organizationRepository.save(organ);
+
             // 연관 관계 설정 (필요 시)
             shopEntity.setOrganizationJoin(organ);
 
             // Entity 테이블에 저장
-            organizationRepository.save(organ);
             shopDetailRepository.save(shopEntity);
 
         } catch (Exception e) {

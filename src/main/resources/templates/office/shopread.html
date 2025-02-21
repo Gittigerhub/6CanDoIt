@@ -95,16 +95,14 @@
                             </div>
                             <!-- 이미지 -->
                             <th:block th:each="data:${imageFileDTOS}" th:if="${!hasRepImage}">
-                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                    <div>
-                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                            <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                                            <div>
-                                                <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
-                                            </div>
-                                        </th:block>
-                                    </div>
-                                </th:block>
+                                <div>
+                                    <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                        <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                        <div>
+                                            <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                        </div>
+                                    </th:block>
+                                </div>
                             </th:block>
 
                             <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
@@ -166,6 +164,7 @@
                         <!-- 조직 idx -->
                         <input type="hidden" id="idx" name="idx">
                         <input type="hidden" id="organIdx" name="organIdx">
+                        <input type="hidden" id="organType" name="organType">
 
                         <div class="row">
                             <!-- 매장 명 -->
@@ -659,6 +658,7 @@
                             $('#dayFee').val(response.shopDTO.dayFee);
                             $('#dayFeePercent').val(response.shopDTO.dayFeePercent);
                             $('#organAddress').val(response.organDTO.organAddress);
+                            $('#organType').val(response.organDTO.organType);
 
                             //대화창 출력
                             $('#shopDetailModal').modal('show');

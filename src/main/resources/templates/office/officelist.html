@@ -93,7 +93,7 @@
                             </th:block>
                             <!-- 매장 상세내용이 존재하지 않는다면 등록 진행 -->
                             <th:block th:unless="${existsList[dataStat.index]}">
-                                <a th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}"></a>
+                                <a th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}" th:data-tel="${data.organTel}"></a>
                             </th:block>
                         </th:block>
                     </td>
@@ -357,7 +357,7 @@
                                 <div class="col-sm-12 mt-2">
                                     <div class="form-group form-group-default">
                                         <label>*전화번호 :</label>
-                                        <input id="tel" name="tel" type="text" class="form-control" required/>
+                                        <input id="organTel2" name="organTel" type="text" class="form-control" required readonly/>
                                     </div>
                                 </div>
 
@@ -495,9 +495,11 @@
                 // 선택한 매장명 가져오기 (필요하면 사용)
                 var organIdx = $(this).data('id');
                 var organName = $(this).data('name');
+                var organTel = $(this).data('tel');
                 console.log("선택한 매장: " + organIdx);
                 $("#organIdx").val(organIdx);
                 $("#organName2").val(organName);
+                $("#organTel2").val(organTel);
 
                 // 모달창 출력
                 $('#shopDetailModal').modal('show');

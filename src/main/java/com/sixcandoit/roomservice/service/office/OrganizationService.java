@@ -79,7 +79,6 @@ public class OrganizationService {
             // idx로 데이터 조회
             Optional<OrganizationEntity> read =
                     organizationRepository.findById(organizationDTO.getIdx());
-            System.out.println(read.toString());
 
             if(!read.isPresent()){                      // 조회 값이 없다면
                 throw new RuntimeException("수정할 조직 조회 실패");
@@ -87,26 +86,22 @@ public class OrganizationService {
             else {                                      // 조회 값이 있다면
                 // DTO -> Entity로 변환
                 OrganizationEntity organ = modelMapper.map(organizationDTO, OrganizationEntity.class);
-                System.out.println(organ.toString());
-                System.out.println("이미지 엔티티로 변환");
 
                 // 이미지 추가 등록
                 List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
-                System.out.println("이미지 추가등록 성공");
 
                 // 이미지 정보 추가
                 // 양방향 연관관계 편의 메서드 사용
                 for (ImageFileEntity image : images) {
                     organ.addImage(image);  // FK 자동 설정
                 }
-                System.out.println("FK 자동 등록");
 
                 // Entity 테이블에 저장
                 organizationRepository.save(organ);
             }
 
         } catch (Exception e) {             // 오류발생시 오류 처리
-            throw new RuntimeException("수정서비스 실패");
+            throw new RuntimeException("수정서비스 실패" + e.getMessage());
         }
 
     }

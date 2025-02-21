@@ -162,7 +162,7 @@ public class OfficeController {
 
             return  ResponseEntity.ok("삭제하였습니다.");
         }catch (Exception e){
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제를 실패 하였습니다.");
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제를 실패하였습니다.");
         }
     }
 
@@ -195,43 +195,56 @@ public class OfficeController {
         }
     }
 
-    //상점 삭제
-    @GetMapping("/shopdetail/delete")
+    //상점 수정
+    @PostMapping("/shopdetail/update")
     @ResponseBody
-    public ResponseEntity<String> ShopDetailDelete(@RequestParam Integer idx){
+    public ResponseEntity<String> ShopDetailUpdate(@ModelAttribute ShopDetailDTO shopDetailDTO,OrganizationDTO organizationDTO,
+                                                   List<MultipartFile> imageFiles){
+        // 이미지 조회할 join
+        String join = "organ";
 
         try {
-            shopDetailService.delete(idx);
+            shopDetailService.update(shopDetailDTO, organizationDTO, join, imageFiles);
 
-            return  ResponseEntity.ok("삭제하였습니다.");
+            return  ResponseEntity.ok("수정하였습니다.");
         }catch (Exception e){
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제를 실패 하였습니다.");
+
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패 하였습니다.");
         }
     }
 
-    //상점 수정
+    //상점 ajax읽기
     @GetMapping("/shopdetail/read")
     @ResponseBody
     public Map<String, Object> ShopDetailRead(@RequestParam Integer idx, Map map){
-        ShopDetailDTO shopDetailDTO = shopDetailService.read(idx);
+
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
+        // 조직 정보 서비스로 조회
+        OrganizationDTO organDTO =
+                organizationService.organRead(idx);
+
+        // 매장 상세 정보 서비스로 조회
+        ShopDetailDTO shopDTO =
+                shopDetailService.findOrgan(idx);
+
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
         Map<String,Object> response = new HashMap<>();
-        response.put("shopDetailDTO",shopDetailDTO);
+        response.put("organDTO",organDTO);
+        response.put("shopDTO",shopDTO);
+        response.put("imageFileDTOS",imageFileDTOS);
+        response.put("hasRepImage",hasRepImage);
 
         return response;
-    }
 
-    @PostMapping("/shopdetail/update")
-    @ResponseBody
-    public ResponseEntity<String> ShopDetailUpdate(@ModelAttribute ShopDetailDTO shopDetailDTO){
-        //System.out.println(shopDetailDTO.toString());
-        try {
-            shopDetailService.update(shopDetailDTO);
-            //System.out.println("수정성5공!!!");
-            return  ResponseEntity.ok("수정하였습니다.");
-        }catch (Exception e){
-            //System.out.println("수정실패!!!");
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패 하였습니다.");
-        }
     }
 
     @GetMapping("/shopdetail/realread")
@@ -247,7 +260,6 @@ public class OfficeController {
         // 매장 상세 정보 서비스로 조회
         ShopDetailDTO shopDTO =
                 shopDetailService.findOrgan(idx);
-
 
         // 이미지 정보 서비스로 조회
         List<ImageFileDTO> imageFileDTOS =

@@ -34,6 +34,8 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Integer> {
     // 이메일 중복 확인 메서드 추가
     boolean existsByMemberEmail(String memberEmail);  // 이메일이 존재하면 true 반환
 
+    // 연락처 중복 확인 메서드 추가
+    boolean existsByMemberPhone(String memberPhone);  // 연락처가 존재하면 true 반환
 
     // 일반 회원 목록
     // 이름만

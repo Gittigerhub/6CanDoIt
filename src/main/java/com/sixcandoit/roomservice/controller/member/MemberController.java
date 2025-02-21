@@ -51,13 +51,27 @@ public class MemberController {
     @PostMapping("/checkEmail")
     @ResponseBody
     public String checkEmail(@RequestParam("email") String email) {
-       log.info("진입여부");
+       log.info("진입여부 헤이명선");
         boolean exists = memberService.checkEmailExistence(email);
         String result = exists? "1" :   "0";
         log.info("email exists : " + email+exists);
 
         return result;  // 응답 반환
     }
+
+    // 연락처 중복 확인
+    @PostMapping("/checkPhone")
+    @ResponseBody
+    public String checkPhone(@RequestParam("phone") String phone) {
+        log.info("진입여부 헤이명선2");
+        boolean exists = memberService.checkPhoneExistence(phone); // 연락처 중복 여부 확인
+        String result = exists ? "1" : "0"; // 중복되면 "1", 아니면 "0" 반환
+        log.info("phone exists : " + phone + exists);
+
+        return result;  // 응답 반환
+    }
+
+
 
     // 회원 수정
     @GetMapping("/modify")

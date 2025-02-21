@@ -135,7 +135,7 @@ public class MenuService {
     }
 
     //메뉴 수정
-    public MenuDTO menuUpdate(MenuDTO menuDTO, Integer idx, List<MultipartFile> multipartFiles, Integer[] delidx, Integer mainidx) throws Exception {
+    public void menuUpdate(MenuDTO menuDTO, Integer idx, List<MultipartFile> multipartFiles, Integer[] delidx, Integer mainidx) throws Exception {
         //menuDTO 수정
         MenuEntity menuEntity =
                 menuRepository.findById(menuDTO.getIdx())
@@ -149,36 +149,18 @@ public class MenuService {
         }
 
         // 기존 이미지들 업데이트 (새로운 이미지들 추가)
-        List<ImageFileEntity> updatedImageList = imageFileService.updateImage(multipartFiles, "menu", menuDTO.getIdx());
+        List<ImageFileEntity> updateImages
+                = imageFileService.updateImage(multipartFiles, "menu", menuDTO.getIdx());
 
+        // 이미지 정보 추가
+        // 양방향 연관관계 편의 메서드 사용
+        for (ImageFileEntity image : updateImages) {
+            menuEntity.addImage(image);  // FK 자동 설정
+        }
 
-        //set 수정된 값을 Menu 객체에 반영
-        menuEntity.setMenuName(menuDTO.getMenuName());
-        menuEntity.setMenuContent(menuDTO.getMenuContent());
-        menuEntity.setMenuPrice(menuDTO.getMenuPrice());
-        menuEntity.setMenuImg(menuDTO.getMenuImg());
-        menuEntity.setMenuOptionYn(menuDTO.getMenuOptionYn());
-        menuEntity.setActiveYn(menuDTO.getActiveYn());
-        menuEntity.setMenuSalesYn(menuDTO.getMenuSalesYn());
-        menuEntity.setMenuSaleType(menuDTO.getMenuSaleType());
-        menuEntity.setMenuSaleAmount(menuDTO.getMenuSaleAmount());
-        menuEntity.setMenuSalePercent(menuDTO.getMenuSalePercent());
+        //menu Entity 업데이트
+        menuRepository.save(menuEntity);    //엔티티를 DB에 저장
 
-        //수정된 Menu객체를 DTO로 변환하여 반환
-        MenuDTO menuUpdateDTO = new MenuDTO();
-        menuUpdateDTO.setIdx(menuEntity.getIdx());
-        menuUpdateDTO.setMenuName(menuEntity.getMenuName());
-        menuUpdateDTO.setMenuContent(menuEntity.getMenuContent());
-        menuUpdateDTO.setMenuPrice(menuEntity.getMenuPrice());
-        menuUpdateDTO.setMenuImg(menuEntity.getMenuImg());
-        menuUpdateDTO.setMenuOptionYn(menuEntity.getMenuOptionYn());
-        menuUpdateDTO.setActiveYn(menuEntity.getActiveYn());
-        menuUpdateDTO.setMenuSalesYn(menuEntity.getMenuSalesYn());
-        menuUpdateDTO.setMenuSaleType(menuEntity.getMenuSaleType());
-        menuUpdateDTO.setMenuSaleAmount(menuEntity.getMenuSaleAmount());
-        menuUpdateDTO.setMenuSalePercent(menuEntity.getMenuSalePercent());
-
-        return menuUpdateDTO;   //수정된 MenuDTO 반환
     }
 
     public void menuRemove(Integer idx) {

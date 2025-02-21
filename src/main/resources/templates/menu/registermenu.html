@@ -61,7 +61,7 @@
                                 <input type="file" class="form-control imgInput mainimg"
                                        id="menuImg" accept="image/*" name="multipartFile" multiple onchange="previewImage(event)">
                             </div>
-                            <div class="row main imagePreviewContainer" id="imagePreviewContainer"></div>
+                            <div class="row" id="imagePreviewContainer"></div>
                         </div>
                         <div class="mb-3"><!--메뉴 옵션-->
                             <label for="menuOptionYn" class="form-label">메뉴 옵션</label>
@@ -146,7 +146,7 @@
                             <button type="submit" class="btn btn-primary">등록</button>
                             <button type="reset" class="btn btn-secondary">초기화</button>
                             <button type="button" class="btn btn-danger"
-                                    th:onclick="|location.href='@{/menu/listmenu}'|">취소</button>
+                                    th:onclick="|location.href='@{/menu/listmenu}'|">목록으로</button>
                         </div>
                     </div>
                 </div>

@@ -180,8 +180,10 @@ public class MenuController {
             return "redirect:/menu/listmenu";
         }
 
+        //메뉴 정보 조회
         MenuDTO menuDTO = menuService.menuRead(menuidx);
 
+        //메뉴 정보가 있다면 수정페이지로 이동
         if (menuDTO != null) {
             model.addAttribute("menuDTO", menuDTO);
             return "/menu/updatemenu";//수정페이지로 이동
@@ -203,8 +205,10 @@ public class MenuController {
 
         try {
             // 새로운 이미지들 저장 처리
+            String join = "menu";
+
             if (multipartFile != null && !multipartFile.isEmpty()) {
-                List<ImageFileEntity> newImageFiles = imageFileService.saveImages(multipartFile);  // S3에 업로드 후 ImageFileEntity 리스트 반환
+                List<ImageFileEntity> newImageFiles = imageFileService.updateImage(multipartFile, "menu", menuDTO.getIdx());  // S3에 업로드 후 ImageFileEntity 리스트 반환
                 menuDTO.setMenuImgDTOList(newImageFiles); // menuDTO에 이미지 DTO 리스트 세팅
             }
 
@@ -216,7 +220,7 @@ public class MenuController {
             }
 
         //메뉴 정보 업데이트
-        menuService.menuUpdate(menuDTO, menuDTO.getIdx(), multipartFile, delino, menuidx);
+        menuService.menuUpdate(menuDTO, menuidx, multipartFile, delino, menuidx);
 
         } catch (Exception e) {
             log.error("메뉴 업데이트 오류: ", e);

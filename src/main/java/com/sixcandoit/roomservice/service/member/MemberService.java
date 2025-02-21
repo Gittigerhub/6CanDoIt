@@ -37,6 +37,12 @@ public class MemberService {
         return memberRepository.existsByMemberEmail(email);
     }
 
+    // 연락처 중복 체크 메서드
+    public boolean checkPhoneExistence(String phone) {
+        return memberRepository.existsByMemberPhone(phone); // 연락처 중복 여부 확인
+    }
+
+
     // 일반 사용자 회원 가입
     public MemberEntity register(MemberDTO memberDTO) {
 

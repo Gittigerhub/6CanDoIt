@@ -147,10 +147,27 @@
         </div>
     </div>
 
+    <!-- 연락처 중복 시 띄울 모달 -->
+    <div class="modal fade" id="phoneMismatchModal" tabindex="-1" aria-labelledby="phoneMismatchModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="phoneMismatchModalLabel">연락처 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    이미 가입된 연락처입니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script th:inline="javascript">
-
-
-
 
 
         // 비밀번호 확인
@@ -199,39 +216,120 @@
             return true; // 비밀번호 일치 시 폼 제출
         }
 
-        // 이메일 중복 체크 함수
-        $(function () {
+            // 이메일 중복 체크 함수
+            $(function () {
             $("#registerForm").on("submit", function (event) {
-                event.preventDefault();
+                event.preventDefault();  // 폼 제출을 막고 Ajax로 처리
 
+                var email = $("#memberEmail").val();
+                var phone = $("#memberPhone").val();
 
+                // 이메일 중복 체크
                 $.ajax({
                     url: '/member/checkEmail',
                     method: 'POST',
                     dataType: 'text',
-                    data: {"email": $("#memberEmail").val()},
+                    data: {"email": email},
                     success: function (checkMail) {
+                        console.log("이메일 중복 확인 응답:", checkMail); // 로그 추가
                         if (parseInt(checkMail) === 1) {
-                            console.log("ajax 응답된거 있어?", checkMail);
+                            // 이메일 중복 모달 띄우기
                             var myModal = new bootstrap.Modal($("#emailMismatchModal"));
                             myModal.show();
-
                         } else {
-                            console.log("일로 들어온거구나" + checkMail);
-                            $("#registerForm").off("submit").submit();
+                            // 이메일 중복이 없으면 연락처 중복 확인
+                            $.ajax({
+                                url: '/member/checkPhone',
+                                method: 'POST',
+                                dataType: 'text',
+                                data: {"phone": phone},
+                                success: function (checkPhone) {
+                                    console.log("연락처 중복 확인 응답:", checkPhone); // 로그 추가
+                                    if (parseInt(checkPhone) === 1) {
+                                        // 연락처 중복 모달 띄우기
+                                        var myModal = new bootstrap.Modal($("#phoneMismatchModal"));
+                                        myModal.show();
+                                    } else {
+                                        console.log(checkPhone)
+                                        // 이메일과 연락처 둘 다 중복되지 않으면 폼 제출
+                                        $("#registerForm").off("submit").submit();
+                                    }
+                                },
+                                error: function () {
+                                    console.error("연락처 중복 확인 실패");
+                                }
+                            });
                         }
                     },
-                    error: function (xhr, errmsg, err) {
-                        console.log("why?" + xhr.status);
-                        return true;
+                    error: function () {
+                        console.error("이메일 중복 확인 실패");
                     }
-
                 });
-            })
-        })
+            });
+        });
 
 
-                // 주소 API
+
+    // // 이메일 중복 체크 함수
+        // $(function () {
+        //     $("#registerForm").on("submit", function (event) {
+        //         event.preventDefault();
+        //
+        //
+        //         $.ajax({
+        //             url: '/member/checkEmail',
+        //             method: 'POST',
+        //             dataType: 'text',
+        //             data: {"email": $("#memberEmail").val()},
+        //             success: function (checkMail) {
+        //                 if (parseInt(checkMail) === 1) {
+        //                     console.log("ajax 응답된거 있어?", checkMail);
+        //                     var myModal = new bootstrap.Modal($("#emailMismatchModal"));
+        //                     myModal.show();
+        //
+        //                 } else {
+        //                     console.log("일로 들어온거구나" + checkMail);
+        //                     $("#registerForm").off("submit").submit();
+        //                 }
+        //             },
+        //             error: function (xhr, errmsg, err) {
+        //                 console.log("why?" + xhr.status);
+        //                 return true;
+        //             }
+        //
+        //         });
+        //     })
+        // })
+        //
+        // // 연락처 중복 체크 함수
+        // $(function () {
+        //     $("#registerForm").on("submit", function (event) {
+        //         event.preventDefault();
+        //
+        //         $.ajax({
+        //             url: '/member/checkPhone', // 연락처 중복 체크 URL로 수정
+        //             method: 'POST',
+        //             dataType: 'text',
+        //             data: {"phone": $("#memberPhone").val()}, // 이메일 대신 연락처로 수정
+        //             success: function (checkPhone) {
+        //                 if (parseInt(checkPhone) === 1) {
+        //                     var myModal = new bootstrap.Modal($("#phoneMismatchModal")); // 모달 ID 변경
+        //                     myModal.show();
+        //                 } else {
+        //                     $("#registerForm").off("submit").submit(); // 중복이 없으면 폼 제출
+        //                 }
+        //             },
+        //             error: function (xhr, errmsg, err) {
+        //                 console.log("error: " + xhr.status);
+        //                 return true;
+        //             }
+        //         });
+        //     });
+        // });
+
+
+
+        // 주소 API
                 function execDaumPostcode() {
                     new daum.Postcode({
                         oncomplete: function (data) {

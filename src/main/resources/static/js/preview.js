@@ -67,15 +67,7 @@ function previewImage(targetObj, View_area) {
             img.style.height = 'inherit';
             img.style.cursor = 'pointer';
             const idx = i;
-            //img.onclick = () => fileRemove(idx) //이미지를 클릭했을 때.
-            $('#event_title_file').on("click",function (){
-                fileRemove(idx);
-                console.log("input들어옴");
-            })
-            $('#event_img_file').on("click",function (){
-                fileRemove(idx);
-                console.log("input들어옴");
-            })
+            img.onclick = () => fileRemove(idx) //이미지를 클릭했을 때.
 
             span.appendChild(img);
 

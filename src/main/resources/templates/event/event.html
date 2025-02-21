@@ -160,18 +160,17 @@
                                     </div>
                                 </div>
 
-                                <th:block class="ImgBlock">
+                                <th:block class="ImgBlock" >
                                     <div class="row">
                                         <div class="col-sm-6">
-
                                             <div>
                                                 <label>*타이틀 이미지</label>
-                                                <img class="imgTitleInput" th:src="0" width="150" height="150">
+                                                <img class="form-control imgTitleInput" id="titleImage" th:src="a" width="150" height="150" >
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <label>*메인 이미지</label>
-                                            <img class="imgContentInput" th:src="0" width="150" height="150">
+                                            <img class="form-control imgContentInput" id="ContentImage" th:src="a" width="150" height="150">
                                         </div>
                                     </div>
                                 </th:block>
@@ -210,13 +209,28 @@
                 form.reset();
                 $('#title').text("이벤트 등록");
 
+                //사진 출력폼 등록
+
+
+
+
 
                 $('#register').show()
                 $('#update').hide()
 
                 $('#idx').val("");
+
+
+
+               $("#titleImage").css("display", "none");
+               $("#ContentImage").css("display", "none");
+
+
+
+
                 //대화창 출력
                 $('#eventModal').modal('show')
+
 
 
             });
@@ -338,10 +352,22 @@
                         //console.log("이미지 경로:" + eventTitleImg);
                         //console.log("이미지 경로:" + eventImg);
 
-
                         $(".imgTitleInput").attr("src", eventTitleImg);
                         $(".imgContentInput").attr("src", eventImg);
 
+
+                        if($("#titleImage").attr("src")==='a'||$("#ContentImage").attr("src")==='a'){
+                            console.log("사라짐");
+                            $(".imgTitleInput").css("display", "none");
+                            $(".imgContentInput").css("display", "none");
+
+
+                        }
+                        else {
+                            $(".imgTitleInput").css("display", "block");
+                            $(".imgContentInput").css("display", "block");
+
+                        }
 
                         $('#register').hide()
                         $('#update').show()

@@ -8,18 +8,55 @@ function fileRemove(index) {
 
     var imgId = "#img_id_" + index;
     $(imgId).remove();
-    console.log(fileInfoArr);
+    //console.log(fileInfoArr);
+
+    $("#Files").val("");  // 첫 번째 파일 입력 필드 초기화
+    $("#Files2").val(""); // 두 번째 파일 입력 필드 초기화
+
+    console.log("파일 목록:", fileInfoArr);
 }
 
 // 썸네일 미리보기.
 function previewImage(targetObj, View_area) {
-    var files = targetObj.files;
+    var files = targetObj.files[0];
     var preview = document.getElementById(View_area); // div id
     var ua = window.navigator.userAgent;
     console.log("파일 유무:" + files)
     console.log("보이는곳 유무:" + preview)
 
-    // IE일 때 (IE8 이하에서만 작동)
+
+    // 기존 미리보기 이미지 제거 (새 이미지로 대체)
+    preview.innerHTML = "";
+
+    if (!files) {
+        return; // 파일이 없으면 함수 종료
+    }
+
+    var imageType = /image.*/;
+    if (!files.type.match(imageType)) {
+        alert("이미지 파일만 업로드 가능합니다.");
+        return;
+    }
+
+    var img = document.createElement("img");
+    img.className = "addImg";
+    img.style.width = '100px';
+    img.style.height = '100px';
+    img.style.cursor = 'pointer';
+
+    preview.appendChild(img);
+
+    if (window.FileReader) {
+        var reader = new FileReader();
+        reader.onloadend = function (e) {
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(files);
+    }
+
+
+
+    /*// IE일 때 (IE8 이하에서만 작동)
     if (ua.indexOf("MSIE") > -1) {
         targetObj.select();
         try {
@@ -47,7 +84,7 @@ function previewImage(targetObj, View_area) {
         for (var i = 0; i < files.length; i++) {
             var file = files[i];
             var imageType = /image.*/; // 이미지 파일일 경우만 뿌려준다.
-            if (!file.type.match(imageType))
+            /*if (!file.type.match(imageType))
                 continue;
 
             var span = document.createElement('span');
@@ -88,5 +125,5 @@ function previewImage(targetObj, View_area) {
                 }
             }
         }
-    }
+    }*/
 }

@@ -199,12 +199,12 @@ public class OfficeController {
     @PostMapping("/shopdetail/update")
     @ResponseBody
     public ResponseEntity<String> ShopDetailUpdate(@ModelAttribute ShopDetailDTO shopDetailDTO,OrganizationDTO organizationDTO,
-                                                   List<MultipartFile> imageFiles){
+                                                   List<MultipartFile> imageFiles, Integer organIdx){
         // 이미지 조회할 join
         String join = "organ";
 
         try {
-            shopDetailService.update(shopDetailDTO, organizationDTO, join, imageFiles);
+            shopDetailService.update(shopDetailDTO, organizationDTO, join, imageFiles, organIdx);
 
             return  ResponseEntity.ok("수정하였습니다.");
         }catch (Exception e){

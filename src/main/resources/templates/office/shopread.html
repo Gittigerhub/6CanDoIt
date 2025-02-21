@@ -138,7 +138,7 @@
 
             <!-- 수정/취소 버튼 시작 -->
             <div class="d-flex justify-content-end mt-5">
-                <button type="button" class="btn btn-success" id="btn-update" th:data-id="${organDTO.idx}">수정</button>
+                <button type="button" class="btn btn-success btn-update" th:data-id="${organDTO.idx}">수정</button>
                 <button type="button" class="btn btn-danger mx-4 btn-delete" th:data-id="${organDTO.idx}">삭제</button>
                 <button type="button" class="btn btn-secondary"><a th:href="@{/office/list}" style="text-decoration: none; color: white">목록</a></button>
             </div>
@@ -159,20 +159,20 @@
                 </div>
                 <!--입력폼-->
                 <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
-                <input type="hidden" name="activeYn" value="Y">  <!-- 조직 활성 유무 기본(Y) -->
-                <form id="shopDetailForm" method="post">
+                <form id="shopDetailForm" method="post" enctype="multipart/form-data">
                     <!-- Modal body -->
                     <div class="modal-body">
                         <p>새로운 매장을 등록합니다.</p>
                         <!-- 조직 idx -->
                         <input type="hidden" id="idx" name="idx">
+                        <input type="hidden" id="organIdx" name="organIdx">
 
                         <div class="row">
                             <!-- 매장 명 -->
                             <div class="col-sm-12 mt-2">
                                 <div class="form-group form-group-default">
                                     <label>*매장명 :</label>
-                                    <input id="organName" name="organName" type="text" class="form-control" required readonly/>
+                                    <input id="organName" name="organName" type="text" class="form-control" required/>
                                 </div>
                             </div>
 
@@ -346,9 +346,9 @@
                             <div class="col-sm-6 mt-2">
                                 <div class="form-group form-group-default">
                                     <label>*활성화 유무:</label>
-                                    <select id="activeYn" name="activeYn" class="form-select">
-                                        <option value="0">활성화</option>
-                                        <option value="1">비활성화</option>
+                                    <select id="activeYn" name="activeYn" class="form-select mt-2" required>
+                                        <option value="Y" th:selected="${organDTO.activeYn == 'Y'}">활성화</option>
+                                        <option value="N" th:selected="${organDTO.activeYn == 'N'}">비활성화</option>
                                     </select>
                                 </div>
                             </div>
@@ -391,11 +391,34 @@
                                            required/>
                                 </div>
                             </div>
+
+                            <!-- 조직 대표 사진 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default" id="inputImage">
+                                    <label>*대표 이미지 :</label>
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                                </div>
+                            </div>
+
+                            <!-- 조직 사진 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default" id="inputImage2">
+                                    <label>*이미지 :</label>
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                                </div>
+                            </div>
+
+                            <!-- 조직 사진 추가버튼 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <input type="button" id="addImage" value="이미지 추가">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!-- Modal body 끝 -->
                     <div class="modal-footer border-0">
-                        <button type="button" id="updateBtn" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;수정</button> <!--신규등록 저장버튼-->
+                        <button type="button" id="updateBtn" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;수정</button>
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
                     </div>
                 </form>
@@ -514,10 +537,15 @@
                     container.appendChild(newInputDiv);
                 }
 
-                // 이미지 추가창 초기화
+                // 이미지 input 초기화
                 function resetImageInput() {
-                    const container = document.getElementById('inputImage2');
-                    container.innerHTML = '<label>*이미지 :</label>' +
+                    const container = document.getElementById('inputImage');
+                    const container2 = document.getElementById('inputImage2');
+
+                    container.innerHTML = '<label>*대표 이미지 :</label>' +
+                        '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+
+                    container2.innerHTML = '<label>*이미지 :</label>' +
                         '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
                 }
 
@@ -597,13 +625,16 @@
                 // 삭제버튼 끝
 
                 // 수정버튼클릭시 대화상자 채우기
-                $("#btn-update").on("click", function () {
+                $(".btn-update").on("click", function () {
+
+                    // 이미지 추가창 리셋 함수
+                    resetImageInput();
 
                     // 조직 idx
                     var idx = $(this).data("id");
 
                     $.ajax({
-                        url: "/office/shopdetail/realread",
+                        url: "/office/shopdetail/read",
                         type: 'GET',
                         data: {
                             idx: idx                                //전달값:값
@@ -612,6 +643,8 @@
                             $('#title').text("매장 상세 수정");
 
                             $('#idx').val(response.shopDTO.idx);
+                            $('#organIdx').val(response.organDTO.idx);
+                            $('#organName').val(response.organDTO.organName);
                             $('#organTel').val(response.organDTO.organTel);
                             $('#openTime').val(response.shopDTO.openTime);
                             $('#closeTime').val(response.shopDTO.closeTime);
@@ -693,8 +726,9 @@
                                 allowOutsideClick: false,
                                 allowEscapeKey: false,
                                 allowEnterKey: false
+                            }).then(() => {
+                                location.reload();              // 현재 목록페이지를 다시 읽어온다.
                             });
-                            location.reload();                  //새로 페이지 읽기
                         },
                         error: function () {                    //작업 실패시
                             Swal.fire({

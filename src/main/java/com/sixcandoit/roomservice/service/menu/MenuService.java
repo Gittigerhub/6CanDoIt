@@ -135,31 +135,30 @@ public class MenuService {
     }
 
     //메뉴 수정
-    public void menuUpdate(MenuDTO menuDTO, Integer idx, List<MultipartFile> multipartFiles, Integer[] delidx, Integer mainidx) throws Exception {
-        //menuDTO 수정
-        MenuEntity menuEntity =
-                menuRepository.findById(menuDTO.getIdx())
-                        .orElseThrow(EntityNotFoundException::new);
+    public void menuUpdate(MenuDTO menuDTO, String join, List<MultipartFile> multipartFiles) {
 
-        // 기존 이미지 삭제 처리 (delidx로 받은 이미지들 삭제)
-        if (delidx != null && delidx.length > 0) {
-            for (Integer imageIdx : delidx) {
-                imageFileService.deleteImage(imageIdx);  // 삭제된 이미지 S3에서 삭제
+        try {
+            // DTO => Entity 변환
+            MenuEntity menuEntity =
+                    menuRepository.findById(menuDTO.getIdx())
+                            .orElseThrow(EntityNotFoundException::new);
+
+            // 기존 이미지들 업데이트 (새로운 이미지들 추가)
+            List<ImageFileEntity> updateImages
+                    = imageFileService.updateImage(multipartFiles, join, menuDTO.getIdx());
+
+            // 이미지 정보 추가
+            // 양방향 연관관계 편의 메서드 사용
+            for (ImageFileEntity image : updateImages) {
+                menuEntity.addImage(image);  // FK 자동 설정
             }
+
+            //menu Entity 업데이트
+            menuRepository.save(menuEntity);    //엔티티를 DB에 저장
+
+        } catch (Exception e) {
+            throw new RuntimeException("수정서비스 실패" + e.getMessage());
         }
-
-        // 기존 이미지들 업데이트 (새로운 이미지들 추가)
-        List<ImageFileEntity> updateImages
-                = imageFileService.updateImage(multipartFiles, "menu", menuDTO.getIdx());
-
-        // 이미지 정보 추가
-        // 양방향 연관관계 편의 메서드 사용
-        for (ImageFileEntity image : updateImages) {
-            menuEntity.addImage(image);  // FK 자동 설정
-        }
-
-        //menu Entity 업데이트
-        menuRepository.save(menuEntity);    //엔티티를 DB에 저장
 
     }
 

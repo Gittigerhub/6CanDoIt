@@ -1,14 +1,18 @@
 package com.sixcandoit.roomservice.service.office;
 
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import com.sixcandoit.roomservice.repository.office.ShopDetailRepository;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,9 +22,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ShopDetailService {
 
-    private  final ShopDetailRepository shopDetailRepository;
-    private  final OrganizationRepository organizationRepository;
-    private  final ModelMapper modelMapper;
+    private final ShopDetailRepository shopDetailRepository;
+    private final OrganizationRepository organizationRepository;
+    private final ModelMapper modelMapper;
+    private final ImageFileService imageFileService;
 
     /*-------------------------------------------------
     함수명 : register(ShopDetailDTO shopDetailDTO)
@@ -91,16 +96,10 @@ public class ShopDetailService {
 
             if (!read.isPresent()) {
                 // 데이터가 없을 경우 처리
-                System.out.println("No data found for idx: " + idx);
-                System.out.println("N");
-                System.out.println("N");
-                System.out.println("N");
+
                 return false;
             }
 
-            System.out.println("Y");
-            System.out.println("Y");
-            System.out.println("Y");
             return true;
 
         } catch (Exception e) {
@@ -140,33 +139,44 @@ public class ShopDetailService {
     출력 : 없음
     설명 : 매장 정보를 수정할때 사용;
   ---------------------------------------------------*/
-    public void update(ShopDetailDTO shopDetailDTO){
-        try {
-            Optional<ShopDetailEntity> read = shopDetailRepository.findById(shopDetailDTO.getIdx());
-            if(!read.isPresent()){
-                throw new RuntimeException("상점 조회 실패");
-            }
-            else {
-                ShopDetailEntity shopEntity =modelMapper.map(shopDetailDTO,ShopDetailEntity.class);
-                shopDetailRepository.save(shopEntity);
-            }
-        } catch (Exception e){
-            throw new RuntimeException("상점 수정 실패: "+e.getMessage());
-        }
-    }
+    public void update(ShopDetailDTO shopDetailDTO, OrganizationDTO organizationDTO, String join, List<MultipartFile> imageFiles){
 
-    /*-------------------------------------------------
-    함수명 : delete(ShopDetailDTO shopDetail)
-    인수 : shopDetailDTO
-    출력 : 없음
-    설명 : 매장 정보를 수정할때 사용
-    ---------------------------------------------------*/
-    public void delete(Integer idx){
         try {
-            shopDetailRepository.deleteById(idx);
-        } catch (Exception e){
-            throw new RuntimeException("상점 삭제 실패: "+e.getMessage());
+            // organizationDTO.getIdx()로 조직 데이터 조회
+            OrganizationEntity organ = organizationRepository.findById(organizationDTO.getIdx())
+                    .orElseThrow(() -> new RuntimeException("수정할 조직 조회 실패"));
+
+            // shopDetailDTO.getIdx()로 매장 데이터 조회
+            ShopDetailEntity shopEntity = shopDetailRepository.findById(shopDetailDTO.getIdx())
+                    .orElseThrow(() -> new RuntimeException("상점 조회 실패"));
+
+            // DTO -> Entity로 변환
+            // 기존 엔티티 객체의 필드만 업데이트
+            modelMapper.map(organizationDTO, organ);
+            modelMapper.map(shopDetailDTO, shopEntity);
+
+            // 이미지 추가 등록
+            List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
+
+            // 이미지 정보 추가
+            // 양방향 연관관계 편의 메서드 사용
+            if (images != null && !images.isEmpty()) {
+                for (ImageFileEntity image : images) {
+                    organ.addImage(image);  // FK 자동 설정
+                }
+            }
+
+            // 연관 관계 설정 (필요 시)
+            shopEntity.setOrganizationJoin(organ);
+
+            // Entity 테이블에 저장
+            organizationRepository.save(organ);
+            shopDetailRepository.save(shopEntity);
+
+        } catch (Exception e) {
+            throw new RuntimeException("수정서비스 실패: " + e.getMessage());
         }
+
     }
 
     /*-------------------------------------------------

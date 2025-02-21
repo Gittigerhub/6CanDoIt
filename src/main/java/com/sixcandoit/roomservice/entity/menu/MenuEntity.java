@@ -39,9 +39,6 @@ public class MenuEntity extends BaseEntity {
     @Column(name = "menu_price")
     private int menuPrice;               // 메뉴 가격
 
-    @Column(name = "menu_img")
-    private String menuImg;              // 메뉴 이미지 경로
-
     @Column(name = "menu_option_yn")
     private String menuOptionYn;         // 옵션 존재여부(N:없음, Y:있음)
 

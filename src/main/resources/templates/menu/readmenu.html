@@ -40,23 +40,47 @@
                         </div>
                         <div class="mb-3">
                             <div class="imgA">
-                                <th:block th:each="img: ${imageFileDTOList}">
-                                    <!--대표 이미지 표시-->
-                                    <th:block th:if="${img.repimageYn == 'Y'}">
-                                        <div class="col-12">
-                                            <label class="form-label">대표 메뉴 이미지:</label>
-                                            <!--이미지 경로 처리-->
-                                            <img class="menuImg" style="max-width:100%;" th:src="${img.url}" alt="대표 이미지">
-                                        </div>
+                                <div style="display: flex; flex-wrap: wrap; padding: 20px;">
+                                    <!-- 대표 이미지가 없을때 나오는 이미지 -->
+                                    <div style="flex-basis: 100%; text-align: left">
+                                        <th:block th:if="${!hasRepImage}">
+                                            <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                                        </th:block>
+                                    </div>
+                                    <!-- 이미지 -->
+                                    <th:block th:each="data:${imageFileDTOList}" th:if="${!hasRepImage}">
+                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                            <div>
+                                                <label class="form-label">대표 메뉴 이미지:</label>
+                                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                                    <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" alt="대표 이미지">
+                                                    <div>
+                                                        <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                                    </div>
+                                                </th:block>
+                                            </div>
+                                        </th:block>
                                     </th:block>
-                                    <!--대표 이미지 외 다른 이미지들 출력-->
-                                    <th:block th:if="${img.repimageYn == 'N'}">
-                                        <div class="col-12">
-                                            <label class="form-label">추가 메뉴 이미지:</label>
-                                            <img class="menuImg" style="max-width:100%; margin-top: 10px;" th:src="${img.url}" alt="추가 이미지">
-                                        </div>
+
+                                    <!-- 대표 이미지가 있을때 나오는 이미지 -->
+                                    <th:block th:each="data:${imageFileDTOList}" th:if="${hasRepImage}">
+                                        <!-- 대표 이미지 -->
+                                        <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                                            <div style="flex-basis: 100%; text-align: left">
+                                                <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                            </div>
+                                        </th:block>
                                     </th:block>
-                                </th:block>
+                                    <th:block th:each="data:${imageFileDTOList}" th:if="${hasRepImage}">
+                                        <!-- 이미지 -->
+                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                            <div>
+                                                <label class="form-label">추가 메뉴 이미지:</label>
+                                                <img class="menuImg" style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" alt="추가 이미지">
+                                            </div>
+                                        </th:block>
+                                    </th:block>
+                                </div>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -118,16 +142,17 @@
 </th:block>
 <th:block layout:fragment="script">
     <script th:inline="javascript">
-        let menuid = [[${menuDTO.idx}]];
-        console.log(menuid);  // 이 값이 잘 들어오는지
 
-
-        $(document).ready(function (){
-            $(".updatebtn").on("click", function (){
-                console.log("클릭됨, menuid: " + menuid);  // 클릭 시 이 값이 잘 들어오는지
-                location.href = "/menu/updatemenu?idx=" + menuid;
-            })
-        })
+        // let menuid = [[${menuDTO.idx}]];
+        // console.log(menuid);  // 이 값이 잘 들어오는지
+        //
+        //
+        // $(document).ready(function (){
+        //     $(".updatebtn").on("click", function (){
+        //         console.log("클릭됨, menuid: " + menuid);  // 클릭 시 이 값이 잘 들어오는지
+        //         location.href = "/menu/updatemenu?idx=" + menuid;
+        //     })
+        // })
     </script>
 </th:block>
 </body>

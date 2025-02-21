@@ -2,7 +2,6 @@ package com.sixcandoit.roomservice.controller.menu;
 
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
-import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.menu.MenuService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -123,13 +122,19 @@ public class MenuController {
         String join = "menu";
 
         try {
-            //메뉴 정보를 읽어온다.
+            // 메뉴 정보를 읽어온다.
             MenuDTO menuDTO = menuService.menuRead(menuidx);
+
+            // 이미지 정보를 읽어온다.
             List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(menuidx, join);
 
             if (menuDTO == null) {  // menuService에서 null이 반환되는 경우 체크
                 throw new EntityNotFoundException("존재하지 않는 메뉴입니다.");
             }
+
+            // 대표이미지 존재여부 확인
+            boolean hasRepImage = imageFileDTOList.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
 
             //메뉴 불러오기
             log.info("menuDTO: " + menuDTO);
@@ -138,6 +143,7 @@ public class MenuController {
             model.addAttribute("region", region);
             model.addAttribute("folder", folder);
             model.addAttribute("imageFileDTOList", imageFileDTOList);
+            model.addAttribute("hasRepImage", hasRepImage);
 
             return "/menu/readmenu";
         }catch (EntityNotFoundException e) {
@@ -175,6 +181,8 @@ public class MenuController {
     @GetMapping("/menu/updatemenu")
     public String updateMenu(@RequestParam("idx") Integer menuidx, Model model, Principal principal ) {
 
+        String join = "menu";
+
         // menuidx가 null인 경우 처리
         if (menuidx == null) {
             return "redirect:/menu/listmenu";
@@ -183,9 +191,18 @@ public class MenuController {
         //메뉴 정보 조회
         MenuDTO menuDTO = menuService.menuRead(menuidx);
 
+        // 이미지 정보를 읽어온다.
+        List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(menuidx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOList.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
         //메뉴 정보가 있다면 수정페이지로 이동
         if (menuDTO != null) {
             model.addAttribute("menuDTO", menuDTO);
+            model.addAttribute("imageFileDTOList", imageFileDTOList);
+            model.addAttribute("hasRepImage", hasRepImage);
             return "/menu/updatemenu";//수정페이지로 이동
         }else {
             return "redirect:/menu/listmenu";
@@ -193,8 +210,8 @@ public class MenuController {
     }
 
     @PostMapping("/menu/updatemenu")
-    public String updateMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult, List<MultipartFile> multipartFile,
-                                 Integer[] delino, Integer menuidx, Model model) {
+    public String updateMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult,
+                                 List<MultipartFile> multipartFile, Model model) {
 
         if (bindingResult.hasErrors()) {
             log.info("유효성 검사 에러");
@@ -207,20 +224,8 @@ public class MenuController {
             // 새로운 이미지들 저장 처리
             String join = "menu";
 
-            if (multipartFile != null && !multipartFile.isEmpty()) {
-                List<ImageFileEntity> newImageFiles = imageFileService.updateImage(multipartFile, "menu", menuDTO.getIdx());  // S3에 업로드 후 ImageFileEntity 리스트 반환
-                menuDTO.setMenuImgDTOList(newImageFiles); // menuDTO에 이미지 DTO 리스트 세팅
-            }
-
-            // 삭제된 이미지 처리
-            if (delino != null && delino.length > 0) {
-                for (Integer imageIdx : delino) {
-                    imageFileService.deleteImage(imageIdx);  // 해당 이미지 삭제(S3에서도 삭제될수 있도록)
-                }
-            }
-
-        //메뉴 정보 업데이트
-        menuService.menuUpdate(menuDTO, menuidx, multipartFile, delino, menuidx);
+            // 업데이트 서비스
+            menuService.menuUpdate(menuDTO, join, multipartFile);
 
         } catch (Exception e) {
             log.error("메뉴 업데이트 오류: ", e);
@@ -229,10 +234,8 @@ public class MenuController {
             return "/menu/updatemenu";
         }
 
-
         return "redirect:/menu/listmenu";
 
     }
-
 
 }

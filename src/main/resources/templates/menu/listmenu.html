@@ -46,9 +46,10 @@
             <table class="table table-bordered table-striped mt-4">
                 <thead>
                 <tr>
-                    <th>메뉴명</th>
-                    <th>메뉴설명</th>
                     <th>카테고리</th>
+                    <th>메뉴명</th>
+                    <th>메뉴사진</th>
+                    <th>메뉴설명</th>
                     <th>가격</th>
                     <th>등록일</th>
                 </tr>
@@ -56,12 +57,16 @@
                 <tbody>
                 <!-- 메뉴 항목 반복 출력 -->
                 <tr th:each="menu : ${menulist}">
+                    <td th:text="${menu.menuCategory}"></td>
                     <td>
                         <!-- 메뉴명 클릭 시 상세보기로 이동하는 링크 추가 -->
                         <a th:href="@{/menu/readmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
                     </td>
+                    <td>
+                    <!-- 이미지 출력 (이미지가 있는 경우에만 보여주기) -->
+                    <img th:if="${menu.menuImg != null}" th:src="@{${menu.menuImg}}" style="max-width: 100px; max-height: 100px;" alt="Menu Image">
+                    </td>
                     <td th:text="${menu.menuContent}"></td>
-                    <td th:text="${menu.menuCategory}"></td>
                     <td th:text="${menu.menuPrice}"></td>
                     <td th:text="${menu.insDate}"></td>
                 </tr>

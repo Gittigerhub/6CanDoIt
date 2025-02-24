@@ -51,13 +51,12 @@
               </div>
               <div class="mb-3">
                 <label>참고이미지</label>
-                <input name="imageFiles " type="file" class="form-control mt-2" accept="image/*">
+                <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
               </div>
             </div>
             <div class="card-footer">
-              <a th:href="@{/notice/list}" class="btn btn-secondary">목록</a>
               <button type="submit" class="btn btn-primary">수정 완료</button>
-              <a th:href="@{/notice/list}" class="btn btn-danger">취소</a>
+              <a th:href="@{/notice/read(idx=${noticeDTO.idx})}" class="btn btn-danger">취소</a>
             </div>
           </div>
         </form>

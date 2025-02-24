@@ -32,9 +32,33 @@
                 <img th:src="${data.url}" style="width: 400px; height: auto" alt="Notice Image" class="img-fluid">
               </div>
             </th:block>
+            <!--대표 이미지가 없을때 나오는 이미지-->
               <div th:if="${!hasRepImage}">
                 <img src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" style="width: 400px; height: auto" alt="noimage" class="img-fluid">
               </div>
+
+            <!--이미지-->
+            <th:block th:each="data:${imageFileDTOS}" th:if="${!hasRepImage}">
+              <div>
+                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                  <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+
+                </th:block>
+
+              </div>
+            </th:block>
+
+            <th:block th:each="data:${imageFileDTOS}"th:if="${hasRepImage}">
+              <!--대표 이미지-->
+              <th:block th:if="${data.getRepimageYn()} =='Y'">
+                <div style="flex-basis:100%; text-align: left">
+                  <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                </div>
+
+
+              </th:block>
+            </th:block>
+
 
 
             <p>등록일:
@@ -47,7 +71,7 @@
           </div>
           <div class="card-footer">
             <a th:href="@{/notice/update(idx=${noticeDTO.idx})}" class="btn btn-primary">수정</a>
-            <a th:href="@{/notice/delete(idx=${noticeDTO.idx})}" class="btn btn-danger">삭제</a>
+            <a th:href="@{/notice/list(idx=${noticeDTO.idx})}" class="btn btn-danger">삭제</a>
 
           </div>
 

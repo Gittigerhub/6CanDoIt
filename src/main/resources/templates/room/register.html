@@ -37,11 +37,25 @@
                                     <option value="STE">스위트</option>
                                     <option value="PH">팬트하우스</option>
                                 </select>
+                            </div>
+                            <div class="mb-3 mt-3"><!--객실 전망-->
+                                <label for="roomView" class="form-label">객실 전망:</label>
+                                <select id="roomView" th:field="*{roomView}" class="form-select" aria-label="Default select example">
+                                    <option value="N" selected>창문 없음</option>
+                                    <option value="O">오션뷰</option>
+                                    <option value="C">시티뷰</option>
+                                    <option value="M">마운틴뷰</option>
+                                    <option value="G">가든뷰</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 mt-3"><!--객실 이름-->
                                 <label for="roomName" class="form-label">객실 이름:</label>
                                 <input type="text" th:field="*{roomName}" class="form-control" id="roomName" name="roomName">
                                 <span th:if="${#fields.hasErrors('roomName')}"
                                       style="color: red;"
                                       th:errors="*{roomName}"></span> <!-- 오류 메시지 출력 -->
+                            </div>
+                            <div class="mb-3 mt-3"><!--침대 유형-->
                                 <label for="roomBed" class="form-label">침대 유형:</label>
                                 <select id="roomBed" th:field="*{roomBed}" class="form-select" aria-label="Default select example">
                                     <option value="0" selected>싱글 사이즈</option>
@@ -49,6 +63,8 @@
                                     <option value="2">퀸 사이즈</option>
                                     <option value="3">킹 사이즈</option>
                                 </select>
+                            </div>
+                            <div>
                                 <label for="roomSize" class="form-label">객실 크기:</label>
                                 <input type="number" th:field="*{roomSize}" class="form-control" id="roomSize" name="roomSize">
                                 <label for="roomNum" class="form-label">투숙객 수:</label>
@@ -58,7 +74,7 @@
                             </div>
                             <div class="mb-3 mt-3"><!--객실 정보-->
                                 <label for="roomInfo">객실 정보:</label>
-                                <textarea th:field="*{roomInfo}" class="form-control" rows="5" id="roomInfo" name="roomInfo" placeholder="객실 정보를 입력하세요."></textarea>
+                                <textarea th:field="*{roomInfo}" class="form-control" id="roomInfo" name="roomInfo" placeholder="객실 정보를 입력하세요."></textarea>
                                 <span th:if="${#fields.hasErrors('roomInfo')}"
                                       style="color: red;"
                                       th:errors="*{roomInfo}"></span> <!-- 오류 메시지 출력 -->

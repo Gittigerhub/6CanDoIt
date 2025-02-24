@@ -44,6 +44,14 @@
                                     <option value="STE">스위트</option>
                                     <option value="PH">팬트하우스</option>
                                 </select>
+                                <label for="roomView" class="form-label">객실 전망:</label>
+                                <select id="roomView" th:field="*{roomView}" class="form-select" aria-label="Default select example">
+                                    <option value="N" selected>창문 없음</option>
+                                    <option value="O">오션뷰</option>
+                                    <option value="C">시티뷰</option>
+                                    <option value="M">마운틴뷰</option>
+                                    <option value="G">가든뷰</option>
+                                </select>
                                 <label for="roomName" class="form-label">객실 이름:</label>
                                 <input type="text" th:field="*{roomName}" class="form-control" id="roomName" name="roomName">
                                 <span th:if="${#fields.hasErrors('roomName')}"

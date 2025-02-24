@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/memberlayout}">
 <head>
-    <title>게시판</title>
+    <title>예약 수정</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -10,18 +12,30 @@
     .min.js"></script>
 </head>
 <body>
-<div class="container mt-5">
+<div layout:fragment="content" class="container mt-5 p-5 bg-white">
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6 d-flex justify-content-center">
+            <h3>예약 수정</h3>
+        </div>
+        <div class="col-3"></div>
+    </div>
+    <form th:action="@{/res/update}" method="post">
     <div class="row">
         <div class="col-lg-3">
         </div>
         <div class="col-lg-6">
-            <h3>예약 수정</h3>
-            <form th:action="@{/res/update}" method="post">
                 <input type="hidden" name="idx" th:value="${data.idx}">
-<!--                <div class="mb-3 mt-3">-->
-<!--                    <label class="form-label">제목:</label>-->
-<!--                    <input type="text" class="form-control" name="subject" th:value="${data.subject}">-->
-<!--                </div>-->
+                <input type="hidden" name="roomIdx" th:value="${data.roomIdx}">
+                <div class="mb-3">
+                    <!-- roomIdx를 숨겨서 전달 -->
+                    <label for="roomIdx" class="form-label">객실 선택:</label>
+                    <select id="roomIdx" name="roomIdx" class="form-select">
+                        <option th:each="room : ${roomDTOList}"
+                                th:value="${room.idx}"
+                                th:text="${room.roomName}"></option>
+                    </select>
+                </div>
                 <div class="mb-3">
                     <label class="form-label">작성자:</label>
                     <input type="text" class="form-control" name="username" th:value="${data.username}">
@@ -34,14 +48,20 @@
                     <label class="form-label">에약종료일:</label>
                     <input type="date" class="form-control" name="endDate" th:value="${data.endDate}">
                 </div>
-                <button type="submit" class="btn btn-primary">수정</button>
-                <button type="button" class="btn btn-secondary"
-                        th:onclick="|location.href='@{/res/list}'|">이전</button>
-            </form>
         </div>
         <div class="col-lg-3">
         </div>
     </div>
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6 d-flex justify-content-center">
+            <button type="submit" class="btn btn-outline-primary btn-sm mx-2">등록</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm mx-2"
+                    th:onclick="|location.href='@{/res/list}'|">이전</button>
+        </div>
+        <div class="col-3"></div>
+    </div>
+    </form>
 </div>
 </body>
 </html>

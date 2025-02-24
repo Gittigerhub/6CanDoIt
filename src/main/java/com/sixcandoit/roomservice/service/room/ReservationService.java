@@ -2,7 +2,9 @@ package com.sixcandoit.roomservice.service.room;
 
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.entity.room.ReservationEntity;
+import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.room.ReservationRepository;
+import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReservationService {
     private final ReservationRepository reservationRepository;
+    private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
 
     //주어진 ID에 해당하는 데이터를 삭제
@@ -28,14 +31,31 @@ public class ReservationService {
 
     //주어진 DTO를 Entity로 변환한 후, 데이터베이스에 저장하고 저장된 결과를 다시 DTO로 변환하여 반환
     public ReservationDTO reserveInsert(ReservationDTO reservationDTO) {
-        ReservationEntity reserveEntity = modelMapper
-                .map(reservationDTO, ReservationEntity.class);
-        reserveEntity.setResStatus("2"); // 예약중으로 상태 변경
-        ReservationEntity result = reservationRepository.save(reserveEntity); //필요한 값은 Entity
+        // RoomEntity를 roomIdx로 조회
+        Optional<RoomEntity> roomEntityOpt = roomRepository.findByIdx(reservationDTO.getRoomIdx());
 
-        ReservationDTO resultDTO = modelMapper.map(result, ReservationDTO.class);
+        if (roomEntityOpt.isPresent()) {
+            ReservationEntity reserveEntity = modelMapper
+                    .map(reservationDTO, ReservationEntity.class);
 
-        return resultDTO;
+            // RoomEntity 설정
+            RoomEntity roomEntity = roomEntityOpt.get();
+            reserveEntity.setRoomJoin(roomEntity);  // ReservationEntity에 RoomEntity 설정
+
+            // 예약 상태 변경
+            roomEntity.setResStatus("2");  // 예약 중으로 상태 변경
+
+            // 변경된 RoomEntity 저장
+            roomRepository.save(roomEntity);  // RoomEntity 저장 (필요하다면)
+
+            // ReservationEntity 저장
+            ReservationEntity result = reservationRepository.save(reserveEntity);
+            ReservationDTO resultDTO = modelMapper.map(result, ReservationDTO.class);
+
+            return resultDTO;
+        }
+        // 방 정보가 없으면 null 반환
+        return null;
     }
 
     //주어진 DTO의 ID로 데이터베이스에서 해당 데이터를 찾아 수정
@@ -44,7 +64,24 @@ public class ReservationService {
                 reservationRepository.findByIdx(reservationDTO.getIdx());
 
         if(findData.isPresent()) {
+            // 기존 ReservationEntity를 업데이트할 때, RoomEntity 상태도 고려
             ReservationEntity reserveEntity = modelMapper.map(reservationDTO, ReservationEntity.class);
+
+            // RoomEntity를 roomIdx로 조회
+            Optional<RoomEntity> roomEntityOpt = roomRepository.findByIdx(reservationDTO.getRoomIdx());
+
+            if (roomEntityOpt.isPresent()) {
+                RoomEntity roomEntity = roomEntityOpt.get();
+                reserveEntity.setRoomJoin(roomEntity);  // ReservationEntity에 RoomEntity 설정
+
+                // 예약 상태 변경 (예: 예약 중으로 상태 변경)
+                roomEntity.setResStatus("2");  // 예약 중으로 상태 변경
+
+                // 변경된 RoomEntity 저장
+                roomRepository.save(roomEntity);  // RoomEntity 저장
+            }
+
+            // ReservationEntity 저장
             ReservationEntity result = reservationRepository.save(reserveEntity);
             ReservationDTO resultDTO = modelMapper.map(result, ReservationDTO.class);
 

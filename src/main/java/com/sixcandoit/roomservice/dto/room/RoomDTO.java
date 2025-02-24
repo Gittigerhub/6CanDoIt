@@ -26,7 +26,7 @@ public class RoomDTO {
     private String roomInfo;                // 객실 정보
 
     private String roomType;                // 객실 타입(STD:스탠다드, ROH:런 오브 하우스, MOD:모더레이트, SUP:슈페리어, DLX:디럭스, STU:스튜디오, JRSTE:쥬니어 스위트, STE:스위트, PH:팬트하우스)
-    private String roomView;                // 객실 뷰 종류(O:오션뷰, C:시티뷰, M:마운틴뷰, G:가든뷰)
+    private String roomView;                // 객실 뷰 종류(O:오션뷰, C:시티뷰, M:마운틴뷰, G:가든뷰, N:창문 없음)
     private int roomNum = 2;                // 투숙객 수
     private int roomBed = 0;                // 침대 타입(3: 킹, 2: 퀸, 1: 더블, 0: 싱글)
     private int roomPrice = 0;                  // 객실 가격
@@ -42,7 +42,8 @@ public class RoomDTO {
     private LocalTime roomCheckIn;      // 체크인 가능 시간
     private LocalTime roomCheckOut;     // 체크 아웃 시간
     private float roomCancelPee;            // 취소 수수료
-    private int roomReservation  = 0;            // 객실 예약 상태(0:빈 방, 1:예약, 2:체크인, 3:체크 아웃)
     private LocalDateTime insDate;      // 작성 일자
     private LocalDateTime modDate;      // 수정 일자
+    private String resStatus;          // 예약 상태(1:빈 방, 2:예약, 3:체크인, 4:체크 아웃)
+
 }

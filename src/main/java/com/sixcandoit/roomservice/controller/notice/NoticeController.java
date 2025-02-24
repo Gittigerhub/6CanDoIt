@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import java.util.List;
 import java.util.Map;
@@ -117,6 +115,9 @@ public class NoticeController {
 
     @GetMapping("/notice/update")
     public String update(@RequestParam("idx") Integer idx, Model model) {
+
+        String join="notice";
+
         log.info("수정할 데이터를 읽는 중입니다.");
         NoticeDTO noticeDTO = noticeService.noticeRead(idx);
 
@@ -134,8 +135,14 @@ public class NoticeController {
         log.info("수정된 데이터를 저장합니다.");
 
         try {
+            if (imageFiles != null && !imageFiles.isEmpty()) {
+                MultipartFile firstFile = imageFiles.get(0);  // 첫 번째 파일 가져오기
+                log.info("0번 인덱스 파일 이름: {}", firstFile.getOriginalFilename());  // 파일 이름 출력
+            } else {
+                log.info("imageFiles 리스트가 비어 있습니다.");
+            }
             noticeService.noticeUpdate(noticeDTO, join, imageFiles);
-            return "redirect:/notice/list";
+            return "redirect:/notice/read?idx=" + noticeDTO.getIdx();
 
         } catch (Exception e) {
             log.info(e.getMessage());

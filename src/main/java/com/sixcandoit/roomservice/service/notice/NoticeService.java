@@ -64,33 +64,52 @@ public class NoticeService {
     }
 
     //수정
-    public void noticeUpdate( NoticeDTO noticeDTO,String join,List<MultipartFile> imageFiles) {
+    public void noticeUpdate( NoticeDTO noticeDTO, String join, List<MultipartFile> imageFiles) {
         try {
 
-            Optional<NoticeEntity> noticeEntitys = noticeRepository.findById(noticeDTO.getIdx());
+            // 기존의 공지사항 조회
+            NoticeEntity notice =
+                    noticeRepository.findById(noticeDTO.getIdx()).orElseThrow(() -> new IllegalArgumentException("해당 공지사항을 찾을 수 없습니다."));
 
-            if (!noticeEntitys.isPresent()) {
-                throw new RuntimeException("수정글 게시글 조회 실패");
+            // 기존 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(noticeDTO.getIdx(), join);
 
-            } else {
-                NoticeEntity notice = modelMapper.map(noticeDTO, NoticeEntity.class);
-                System.out.println(notice.toString());
+            // 이미지 들어오면
+            // imageFiles.size() > 1 HTML에서 넘어올때 빈값이 0번 인덱스를 차지하고 있어 1보다 클경우로 변경
+            if (imageFiles != null && !imageFiles.isEmpty() && imageFiles.size() > 1) {
 
-                log.info("이미지를 저장한다");
-                List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, noticeDTO.getIdx());
+                // 기존 이미지 삭제
+                // dto = > entity 변환
+                log.info("이미지를 삭제한다");
+                List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                        .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                        .collect(Collectors.toList());
 
-                //이미지 정보 추가
-                for (ImageFileEntity image : images) {
-                    notice.addImage(image);
-
+                // DB, 저장소에서 모든 이미지 삭제
+                for(ImageFileEntity imageFileEntity : imageFileEntities){
+                    imageFileService.deleteImage(imageFileEntity.getIdx());
                 }
-                log.info("NoticeEntity 수정 진행");
-                noticeRepository.save(notice);
-                log.info("NoticeEntity 수정완료");
+
             }
+
+            // 새로운 이미지 등록
+            log.info("이미지를 저장한다");
+            List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
+
+            // 자동 FK 생성
+            for (ImageFileEntity image : images) {
+                notice.addImage(image);
+
+            }
+
+            log.info("NoticeEntity 수정 진행");
+            noticeRepository.save(notice);
+            log.info("NoticeEntity 수정완료");
+
         } catch (Exception e) {
             throw new RuntimeException("수정 오류 발생");
         }
+
     }
 
     public void noticeDelete(Integer idx,String join){

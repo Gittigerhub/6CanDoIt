@@ -59,9 +59,13 @@
                             <div class="imgA">
                                 <label for="menuImg" class="form-label">메뉴 이미지</label>
                                 <input type="file" class="form-control imgInput mainimg"
-                                       id="menuImg" accept="image/*" name="multipartFile" multiple onchange="previewImage(event)">
+                                       id="menuImg" accept="image/*" name="multipartFile" multiple onchange="previewImage(event, 'menuImg')">
+                                <div class="row main imagePreviewContainer" id="menuImagePreviewContainer"></div>
+
+                                <label for=subImg class="form-label">상세 이미지</label>
+                                <input class="form-control imgInput subimg "  id="subImg" accept="image/*" name="multipartFile" type="file" onchange="previewImage(event, 'subImg')">
                             </div>
-                            <div class="row" id="imagePreviewContainer"></div>
+                            <div class="row main imagePreviewContainer" id="subImagePreviewContainer"></div>
                         </div>
                         <div class="mb-3"><!--메뉴 옵션-->
                             <label for="menuOptionYn" class="form-label">메뉴 옵션</label>
@@ -154,11 +158,14 @@
             <!--이미지 미리보기를 위한 함수-->
             <script th:inline="javascript">
                 // 이미지 미리보기 함수
-                function previewImage(event) {
+                function previewImage(event, inputId) {
                     console.log("수정 진입");
 
-                    const previewContainer = document.getElementById('imagePreviewContainer');
-                    previewContainer.innerHTML = '';  // 기존 미리보기 이미지 제거
+                    const previewContainer = (inputId === 'menuImg')
+                        ? document.getElementById('menuImagePreviewContainer')
+                        : document.getElementById('subImagePreviewContainer');  // 각 이미지 미리보기 컨테이너 선택
+
+                    previewContainer.innerHTML = ''; // 기존 미리보기 이미지 제거
 
                     const files = event.target.files;
 
@@ -170,8 +177,15 @@
                                 const img = document.createElement('img');
                                 img.src = e.target.result;
                                 img.alt = 'Image Preview';
-                                img.style.maxWidth = '200px';  // 미리보기 이미지 크기 조정
-                                img.style.marginTop = '10px';
+
+                                // inputId에 따라 스타일을 다르게 적용
+                                if (inputId === 'menuImg') {
+                                    img.style.maxWidth = '150px';  // 메뉴 이미지 크기
+                                    img.style.marginTop = '10px';
+                                } else if (inputId === 'subImg') {
+                                    img.style.maxWidth = '150px';  // 상세 이미지 크기
+                                    img.style.marginTop = '10px';
+                                }
                                 previewContainer.appendChild(img);
                             }
 
@@ -192,8 +206,10 @@
                 }
                 // 폼 초기화 시 미리보기도 초기화
                 function resetForm() {
-                    document.getElementById('imagePreviewContainer').innerHTML = '';  // 미리보기 초기화
+                    document.getElementById('menuImagePreviewContainer').innerHTML = '';  // 메뉴 이미지 미리보기 초기화
+                    document.getElementById('subImagePreviewContainer').innerHTML = '';  // 상세 이미지 미리보기 초기화
                     document.getElementById('menuImg').value = '';  // 파일 입력 초기화
+                    document.getElementById('subImg').value = '';  // 파일 입력 초기화
                 }
 
             </script>

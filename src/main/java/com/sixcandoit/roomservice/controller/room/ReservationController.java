@@ -2,6 +2,7 @@ package com.sixcandoit.roomservice.controller.room;
 
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.service.room.ReservationService;
+import com.sixcandoit.roomservice.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final RoomService roomService;
 
     //등록폼으로 이동
     @GetMapping("/create")
@@ -100,4 +102,5 @@ public class ReservationController {
         //        "삭제하였습니다.");
         return "redirect:/res/list";
     }
+
 }

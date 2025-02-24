@@ -24,12 +24,22 @@
                     <input type="text" class="form-control" name="username">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">예약시작일:</label>
+                    <label class="form-label">체크인 날짜:</label>
                     <input type="date" class="form-control" name="startDate">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">에약종료일:</label>
+                    <label class="form-label">체크아웃 날짜:</label>
                     <input type="date" class="form-control" name="endDate">
+                </div>
+                <!-- 객실 선택 (드롭다운) -->
+                <div class="mb-3">
+                    <label for="roomId" class="form-label">객실 선택:</label>
+                    <select id="roomId" name="roomId" class="form-select">
+                        <!-- roomDTOList는 모델로 전달된 객실 목록 -->
+                        <option th:each="room : ${roomDTOList}"
+                                th:value="${room.idx}"
+                                th:text="${room.roomName}"></option> <!-- room.idx를 roomId로 사용 -->
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary">등록</button>
                 <button type="button" class="btn btn-secondary"

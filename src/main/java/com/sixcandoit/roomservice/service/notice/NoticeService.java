@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,45 +65,77 @@ public class NoticeService {
     //수정
     public void noticeUpdate( NoticeDTO noticeDTO, String join, List<MultipartFile> imageFiles) {
         try {
-
             // 기존의 공지사항 조회
-            NoticeEntity notice =
-                    noticeRepository.findById(noticeDTO.getIdx()).orElseThrow(() -> new IllegalArgumentException("해당 공지사항을 찾을 수 없습니다."));
+            Optional<NoticeEntity> noticeEntity = noticeRepository.findById(noticeDTO.getIdx());
 
-            // 기존 이미지 조회
-            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(noticeDTO.getIdx(), join);
+            if (noticeEntity.isEmpty()) { // QnaEntity가 존재하지 않으면
+                throw new RuntimeException("수정할 게시글 조회 실패");
 
-            // 이미지 들어오면
-            // imageFiles.size() > 1 HTML에서 넘어올때 빈값이 0번 인덱스를 차지하고 있어 1보다 클경우로 변경
-            if (imageFiles != null && !imageFiles.isEmpty() && imageFiles.size() > 1) {
+            } else {
+                // 받은 DTO를 Entity로 변환
+                NoticeEntity notice = modelMapper.map(noticeDTO, NoticeEntity.class);
 
-                // 기존 이미지 삭제
-                // dto = > entity 변환
-                log.info("이미지를 삭제한다");
-                List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
-                        .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                // 빈 파일 제거 후 유효한 파일 리스트만 남김
+                // 자꾸 빈파일이 넘겨져 파일을 넘길때와 같이 길이가 1이되어 오류가 생김으로 유효리스트 생성
+                List<MultipartFile> validImageFiles = imageFiles.stream()
+                        .filter(file -> file != null && !file.isEmpty()) // 비어 있지 않은 파일만 필터링
                         .collect(Collectors.toList());
 
-                // DB, 저장소에서 모든 이미지 삭제
-                for(ImageFileEntity imageFileEntity : imageFileEntities){
-                    imageFileService.deleteImage(imageFileEntity.getIdx());
+                System.out.println("유효한 이미지 파일 개수: " + validImageFiles.size());
+
+                // 이미지 들어오면
+                if (!validImageFiles.isEmpty()) {
+                    System.out.println("이미지 작업 시작!!!!");
+                    // 기존 이미지 조회
+                    List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(noticeDTO.getIdx(), join);
+
+                    // 기존 이미지 삭제
+                    // dto = > entity 변환
+                    log.info("이미지를 삭제한다");
+                    List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                            .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                            .collect(Collectors.toList());
+
+                    // DB, 저장소에서 모든 이미지 삭제
+                    for(ImageFileEntity imageFileEntity : imageFileEntities){
+                        imageFileService.deleteImage(imageFileEntity.getIdx());
+                    }
+
+                    // 새로운 이미지 등록
+                    log.info("이미지를 저장한다");
+                    List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
+
+                    // 자동 FK 생성
+                    for (ImageFileEntity image : images) {
+                        notice.addImage(image);
+
+                    }
+
+                } else {
+                    // modelmapper를 이용하면 새로운 객체가 되어 기존 이미지 연관관계가 사라져 버리기 때문에
+                    // 새로 설정해야함
+                    System.out.println("이미지 작업2 시작!!!!");
+                    // 기존 이미지 조회
+                    List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(noticeDTO.getIdx(), join);
+
+                    // dto = > entity 변환
+                    List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                            .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                            .collect(Collectors.toList());
+
+                    // 자동 FK 생성
+                    for (ImageFileEntity image : imageFileEntities) {
+                        notice.addImage(image);
+
+                    }
+
                 }
 
-            }
-
-            // 새로운 이미지 등록
-            log.info("이미지를 저장한다");
-            List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
-
-            // 자동 FK 생성
-            for (ImageFileEntity image : images) {
-                notice.addImage(image);
+                log.info("NoticeEntity 수정 진행");
+                noticeRepository.save(notice);
+                log.info("NoticeEntity 수정완료");
 
             }
-
-            log.info("NoticeEntity 수정 진행");
-            noticeRepository.save(notice);
-            log.info("NoticeEntity 수정완료");
 
         } catch (Exception e) {
             throw new RuntimeException("수정 오류 발생");

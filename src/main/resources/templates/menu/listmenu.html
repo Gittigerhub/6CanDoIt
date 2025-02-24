@@ -64,7 +64,7 @@
                     </td>
                     <td>
                     <!-- 이미지 출력 (이미지가 있는 경우에만 보여주기) -->
-                    <img th:if="${menu.menuImg != null}" th:src="@{${menu.menuImg}}" style="max-width: 100px; max-height: 100px;" alt="Menu Image">
+                    <img th:if="${menu.menuImg != null}" th:src="${menu.menuImg}" style="max-width: 100px; max-height: 100px;" alt="Menu Image">
                     </td>
                     <td th:text="${menu.menuContent}"></td>
                     <td th:text="${menu.menuPrice}"></td>
@@ -72,6 +72,34 @@
                 </tr>
                 </tbody>
             </table>
+            <!-- 페이징 처리 시작 -->
+            <div class="d-flex justify-content-center" th:if="${menulist.isEmpty()}">조회된 내역이 없습니다.</div>
+                <ul class="pagination">
+                    <li class="page-item" th:if="${currentPage>1}">
+                        <a class="page-link" th:href="@{/menu/listmenu(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage>1}">
+                        <a class="page-link" th:href="@{/menu/listmenu(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                    </li>
+
+                    <li class="page-item" th:each="page:${#numbers.sequence(startPage, endPage, 1)}" th:class="${page == currentPage} ? 'active' : ''">
+                        <a class="page-link" th:if="${page != currentPage}"
+                           th:href="@{/menu/listmenu(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                        <!-- 현재 페이지일 때는 링크 없이 텍스트만 표시 -->
+                        <span th:if="${page == currentPage}" class="page-link" th:text="${page}"></span>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage<endPage}">
+                        <a class="page-link" th:href="@{/menu/listmenu(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage<endPage}">
+                        <a class="page-link" th:href="@{/menu/listmenu(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- 페이징 처리 끝 -->
         </div>
         <div class="col-2"></div>
     </div>

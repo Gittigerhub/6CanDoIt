@@ -107,11 +107,11 @@ public class QnaService {
                     }
                 //}
 
-//                log.info("자주 묻는 질문 설정");
-//                // 자주 묻는 질문 설정
-//                if (qnaDTO.getFavYn() == null) { // FavYn이 null인 경우 기본값 "N" 설정
-//                    qnaDTO.setFavYn("N");
-//                }
+                log.info("자주 묻는 질문 설정");
+                // 자주 묻는 질문 설정
+                if (qnaDTO.getFavYn() == null) { // FavYn이 null인 경우 기본값 "N" 설정
+                    qnaDTO.setFavYn("N");
+                }
 
                 log.info("QnaEntity 수정 진행...");
                 qnaRepository.save(qna);

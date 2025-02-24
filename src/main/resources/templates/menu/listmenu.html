@@ -62,8 +62,21 @@
                         <a th:href="@{/menu/readmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
                     </td>
                     <td>
-                    <!-- 이미지 출력 (이미지가 있는 경우에만 보여주기) -->
-                    <img th:if="${menu.menuImg != null}" th:src="${menu.menuImg}" style="max-width: 100px; max-height: 100px;" alt="Menu Image">
+                        <!-- 대표 이미지가 없을때 나오는 이미지 -->
+                        <div style="flex-basis: 100%; text-align: left">
+                            <th:block th:if="${!repImageMap[menu.idx]}">
+                                <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                            </th:block>
+                        </div>
+
+                        <th:block th:each="data:${imageFileMap[menu.idx]}" th:if="${repImageMap[menu.idx]}">
+                            <!-- 대표 이미지 -->
+                            <th:block th:if="${data.repimageYn == 'Y'}">
+                                <div style="flex-basis: 100%; text-align: left">
+                                    <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                </div>
+                            </th:block>
+                        </th:block>
                     </td>
                     <td th:text="${menu.menuContent}"></td>
                     <td th:text="${menu.menuPrice}"></td>

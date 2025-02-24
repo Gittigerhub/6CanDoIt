@@ -91,6 +91,7 @@ public class RoomController {
     // 룸 상세보기
     @GetMapping("/room/detail")
     public String detail(@RequestParam Integer idx, Model model){
+
         log.info("개별 데이터를 읽는 중입니다.");
         RoomDTO roomDTO = roomService.roomDetail(idx);
 
@@ -118,17 +119,36 @@ public class RoomController {
                              BindingResult bindingResult){
         log.info("수정된 데이터를 저장합니다.");
 
-        if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
-            log.info("유효성 검사 오류 발생");
-            return "room/update"; // update로 돌아간다
+        // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
+        if (roomDTO.getRoomWifi() == null) {
+            roomDTO.setRoomWifi("N");
         }
-
+        if (roomDTO.getRoomTv() == null) {
+            roomDTO.setRoomTv("N");
+        }
+        if (roomDTO.getRoomAir() == null) {
+            roomDTO.setRoomAir("N");
+        }
+        if (roomDTO.getRoomBath() == null) {
+            roomDTO.setRoomBath("N");
+        }
+        if (roomDTO.getRoomBreakfast() == null) {
+            roomDTO.setRoomBreakfast("N");
+        }
+        if (roomDTO.getRoomSmokingYn() == null) {
+            roomDTO.setRoomSmokingYn("N");
+        }
         // 체크인, 체크아웃 값이 없으면 기본값을 설정
         if (roomDTO.getRoomCheckIn() == null) {
             roomDTO.setRoomCheckIn(LocalTime.of(14, 0)); // 기본 체크인 시간 (14:00)
         }
         if (roomDTO.getRoomCheckOut() == null) {
             roomDTO.setRoomCheckOut(LocalTime.of(11, 0)); // 기본 체크아웃 시간 (11:00)
+        }
+
+        if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
+            log.info("유효성 검사 오류 발생");
+            return "room/update"; // update로 돌아간다
         }
         // 유효성 검사 성공 시 수정 처리
         roomService.roomUpdate(roomDTO);

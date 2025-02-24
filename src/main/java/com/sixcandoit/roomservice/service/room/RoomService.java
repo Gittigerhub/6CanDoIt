@@ -32,6 +32,7 @@ public class RoomService {
         roomEntity.setRoomView("N"); // 창문 없음
         roomEntity.setRoomSeason("off"); // 비성수기
         roomEntity.setRoomCondition("Y"); // 청소 완료
+        roomEntity.setResStatus("1"); // 예약 상태(1:빈 방, 2:예약, 3:체크인, 4:체크 아웃)
 
         // 저장
         roomRepository.save(roomEntity);
@@ -41,16 +42,33 @@ public class RoomService {
     public void roomUpdate(RoomDTO roomDTO){
         // 룸 데이터의 idx를 조회
         log.info("룸 데이터의 idx를 조회한다...");
-        Optional<RoomEntity> roomEntity = roomRepository.findById(roomDTO.getIdx());
+        Optional<RoomEntity> roomEntityOpt = roomRepository.findById(roomDTO.getIdx());
 
-        if (roomEntity.isPresent()){ // RoomEntity가 존재하면
-            // DTO로 Entity 변환
-            RoomEntity roomEntitys = modelMapper.map(roomDTO, RoomEntity.class);
+        if (roomEntityOpt.isPresent()) { // RoomEntity가 존재하면
+            RoomEntity roomEntity = roomEntityOpt.get();
 
-            log.info("저장을 수행한다...");
+            // 기존 RoomEntity에서 ResStatus를 그대로 유지
+            roomEntity.setRoomName(roomDTO.getRoomName());
+            roomEntity.setRoomInfo(roomDTO.getRoomInfo());
+            roomEntity.setRoomType(roomDTO.getRoomType());
+            roomEntity.setRoomView(roomDTO.getRoomView());
+            roomEntity.setRoomNum(roomDTO.getRoomNum());
+            roomEntity.setRoomBed(roomDTO.getRoomBed());
+            roomEntity.setRoomPrice(roomDTO.getRoomPrice());
+            roomEntity.setRoomSize(roomDTO.getRoomSize());
+            roomEntity.setRoomBreakfast(roomDTO.getRoomBreakfast());
+            roomEntity.setRoomSmokingYn(roomDTO.getRoomSmokingYn());
+            roomEntity.setRoomWifi(roomDTO.getRoomWifi());
+            roomEntity.setRoomTv(roomDTO.getRoomTv());
+            roomEntity.setRoomAir(roomDTO.getRoomAir());
+            roomEntity.setRoomBath(roomDTO.getRoomBath());
+            roomEntity.setRoomCheckIn(roomDTO.getRoomCheckIn());
+            roomEntity.setRoomCheckOut(roomDTO.getRoomCheckOut());
+
             // 저장
-            roomRepository.save(roomEntitys);
+            roomRepository.save(roomEntity);
 
+            log.info("룸 데이터가 업데이트되었습니다.");
         } else {
             throw new IllegalStateException("수정할 Room이 존재하지 않습니다.");
         }
@@ -82,7 +100,7 @@ public class RoomService {
         return roomDTO;
     }
 
-    // 자주 묻는 질문 설정 (favYn) 업데이트
+    // 성수기 업데이트
     public void updateSeason(Integer idx, String roomSeason) {
         // Room 엔티티 조회
         Optional<RoomEntity> roomEntity = roomRepository.findById(idx);

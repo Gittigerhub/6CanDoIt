@@ -1,10 +1,14 @@
 package com.sixcandoit.roomservice.controller.room;
 
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
+import com.sixcandoit.roomservice.dto.room.RoomDTO;
+import com.sixcandoit.roomservice.entity.room.RoomEntity;
+import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import com.sixcandoit.roomservice.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,11 +27,22 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final RoomService roomService;
+    private final RoomRepository roomRepository;
+    private final ModelMapper modelMapper;
 
     //등록폼으로 이동
     @GetMapping("/create")
     public String createForm(Model model) {
         log.info("등록 페이지로 이동....");
+
+        // 룸 데이터 조회
+        List<RoomEntity> roomEntities  = roomRepository.findAll(); // RoomEntity 리스트
+        List<RoomDTO> roomDTOList = roomEntities.stream()
+                .map(room -> modelMapper.map(room, RoomDTO.class))  // ModelMapper를 이용해 변환
+                .collect(Collectors.toList());
+
+        // 조회된 룸 데이터와 멤버 데이터를 모델에 추가
+        model.addAttribute("roomDTOList", roomDTOList);
 
         return "reserve/insert"; // pageInsert.html 뷰 템플릿을 찾아서 렌더링합니다.
     }
@@ -73,7 +89,14 @@ public class ReservationController {
         log.info("데이터 조회 후 수정페이지로 이동....");
         ReservationDTO reserveDTO = reservationService.reserveRead(idx);
 
+        // 룸 데이터 조회
+        List<RoomEntity> roomEntities  = roomRepository.findAll(); // RoomEntity 리스트
+        List<RoomDTO> roomDTOList = roomEntities.stream()
+                .map(room -> modelMapper.map(room, RoomDTO.class))  // ModelMapper를 이용해 변환
+                .collect(Collectors.toList());
+
         model.addAttribute("data", reserveDTO);
+        model.addAttribute("roomDTOList", roomDTOList);
         return "reserve/update"; // update-form.html 뷰 템플릿을 찾아서 렌더링합니다.
     }
 

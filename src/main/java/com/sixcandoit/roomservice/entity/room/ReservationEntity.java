@@ -27,9 +27,6 @@ public class ReservationEntity extends BaseEntity {
     @Column(name="username", length = 20) //예약자
     private String username;
 
-    @Column(name = "res_status")
-    private String resStatus;          // 예약 상태(1:취소, 2:예약, 3:체크인, 4:체크 아웃)
-
     @Column(name = "startdate")
     private LocalDate startDate;       // 예약 시작 일자
 
@@ -42,4 +39,9 @@ public class ReservationEntity extends BaseEntity {
     @JsonBackReference
     private MemberEntity memberJoin;
 
+    // 룸 테이블과 N:1 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_idx")
+    @JsonBackReference
+    private RoomEntity roomJoin;
 }

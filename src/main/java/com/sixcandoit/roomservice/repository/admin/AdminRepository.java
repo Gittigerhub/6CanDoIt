@@ -28,6 +28,9 @@ public interface AdminRepository extends JpaRepository<AdminEntity, Integer> {
     // 이메일 중복 확인 메서드 추가
     boolean existsByAdminEmail(String adminEmail);  // 이메일이 존재하면 true 반환
 
+    // 연락처 중복 확인 메서드 추가
+    boolean existsByAdminPhone(String adminPhone);
+
     //회원목록 조회(다중조회)-입력받는 변수가 많은 경우 쿼리로 작성해서 변수의 수를 줄여서 사용
     @Query("SELECT a FROM AdminEntity a WHERE a.adminEmail like %:keyword% or a.adminName like %:keyword%")
     Page<AdminEntity> search(String keyword, Pageable pageable);

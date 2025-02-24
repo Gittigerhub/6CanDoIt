@@ -66,18 +66,18 @@ public class QnaController {
     // Qna의 Q 등록 저장 처리
     @PostMapping("/qna/register")
     public String registerProc(@Valid @ModelAttribute QnaDTO qnaDTO,
-                               BindingResult bindingResult) {
+                               BindingResult bindingResult, List<MultipartFile> imageFiles) {
         log.info("질문한 내용을 저장합니다.");
         System.out.println(qnaDTO);
-        System.out.println(qnaDTO.getImageFiles());
+        System.out.println(imageFiles);
         if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
             log.info("유효성 검사 오류 발생");
             return "qna/register"; // register로 돌아간다
         }
 
         // 유효성 검사 성공 시 등록 처리
-        qnaService.qnaRegister(qnaDTO, qnaDTO.getImageFiles());
-        System.out.println(qnaDTO.getImageFiles());
+        qnaService.qnaRegister(qnaDTO, imageFiles);
+        System.out.println(imageFiles);
 
         return "redirect:/qna/list";
     }
@@ -123,11 +123,11 @@ public class QnaController {
     public String updateProc(@ModelAttribute QnaDTO qnaDTO,
                              String join, List<MultipartFile> imageFiles) {
         log.info("수정된 데이터를 저장합니다.");
-
+        System.out.println("이미지 파일즈 길이 : " + imageFiles.size());
         try {
             // 서비스 메서드 호출 (수정 처리)
             qnaService.qnaUpdate(qnaDTO, join, imageFiles);
-            return "redirect:/qna/list";
+            return "redirect:/qna/read?idx=" + qnaDTO.getIdx();
 
         } catch (Exception e) {
             // 예외가 발생했을 경우 사용자에게 오류 메시지 전달

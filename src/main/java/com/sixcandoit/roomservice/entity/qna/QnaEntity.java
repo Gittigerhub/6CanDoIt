@@ -55,9 +55,6 @@ public class QnaEntity extends BaseEntity {
     @OneToMany(mappedBy = "qnaJoin")
     private List<ReplyEntity> replyJoin;
 
-    @Column(name = "qna_img")            // 추가된 필드: 이미지 URL을 저장
-    private String qnaImg;              // 문의사항 이미지 URL
-
     // 이미지 파일 테이블과 1:N 매핑
     @OneToMany(mappedBy = "qnaJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageFileEntity> imageFileJoin  = new ArrayList<>(); // null값이면 코드작동 안하기 때문에 초기화 진행
@@ -68,26 +65,12 @@ public class QnaEntity extends BaseEntity {
         image.setQnaJoin(this);
     }
 
-    // 이미지 URL을 qnaImg 필드에 설정하는 메소드
-    public void setQnaImgFromImageFile() {
-        if (imageFileJoin != null && !imageFileJoin.isEmpty()) {
-            this.qnaImg = imageFileJoin.get(0).getUrl(); // 첫 번째 이미지를 대표 이미지로 설정
-        }
-    }
-
     // 기존 이미지 업데이트
     public void updateImages(List<ImageFileEntity> images) {
         this.imageFileJoin.clear();
         for (ImageFileEntity image : images) {
             this.addImage(image);
         }
-        setQnaImgFromImageFile(); // 이미지가 갱신되면 qnaImg를 업데이트
     }
-
-    public void deleteImage(ImageFileEntity image) {
-        this.imageFileJoin.remove(image);
-        image.setQnaJoin(null);
-    }
-
 
 }

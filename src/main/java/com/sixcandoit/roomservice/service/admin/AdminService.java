@@ -40,6 +40,11 @@ public class AdminService {
         return adminRepository.existsByAdminEmail(email);
     }
 
+    // 연락처 중복 체크 메서드
+    public boolean checkPhoneExistence(String phone) {
+        return adminRepository.existsByAdminPhone(phone); // 연락처 중복 여부 확인
+    }
+
     // 관리자 회원 가입
     public AdminEntity register(AdminDTO adminDTO) {
         Optional<AdminEntity> user = adminRepository.findByAdminEmail(adminDTO.getAdminEmail());

@@ -24,12 +24,11 @@
                     <div class="col-6">
                         <div class="input-group mb-3">
                             <select class="form-select" name="type"><!--type-->
-                                <option th:selected="${type=='null'}"></option>
-                                <option value="0" th:selected="${type=='1'}">메뉴명</option><!--검색 후 선택값으로 설정-->
-                                <option value="1" th:selected="${type=='2'}">메뉴설명</option>
-                                <option value="2" th:selected="${type=='3'}">메뉴명+설명</option>
-                                <option value="3" th:selected="${type=='4'}">카테고리</option>
-                                <option value="4" th:selected="${type=='0'}">전체</option>
+                                <option value="1" th:selected="${type=='1'}">메뉴명</option><!--검색 후 선택값으로 설정-->
+                                <option value="2" th:selected="${type=='2'}">메뉴설명</option>
+                                <option value="3" th:selected="${type=='3'}">메뉴명+설명</option>
+                                <option value="4" th:selected="${type=='4'}">카테고리</option>
+                                <option value="0" th:selected="${type=='0'}">전체</option>
                             </select>
                             <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
                             <button class="btn btn-success" type="submit">검색</button>
@@ -72,34 +71,29 @@
                 </tr>
                 </tbody>
             </table>
-            <!-- 페이징 처리 시작 -->
-            <div class="d-flex justify-content-center" th:if="${menulist.isEmpty()}">조회된 내역이 없습니다.</div>
+            <!--페이징 시작-->
+            <div class="mt-3 d-flex justify-content-center">
                 <ul class="pagination">
-                    <li class="page-item" th:if="${currentPage>1}">
+                    <li class="page-item" th:unless="${startPage>1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
                         <a class="page-link" th:href="@{/menu/listmenu(page=1, type=${type}, keyword=${keyword})}">≪</a>
                     </li>
-
-                    <li class="page-item" th:if="${currentPage>1}">
+                    <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
                         <a class="page-link" th:href="@{/menu/listmenu(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
                     </li>
-
-                    <li class="page-item" th:each="page:${#numbers.sequence(startPage, endPage, 1)}" th:class="${page == currentPage} ? 'active' : ''">
-                        <a class="page-link" th:if="${page != currentPage}"
-                           th:href="@{/menu/listmenu(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
-                        <!-- 현재 페이지일 때는 링크 없이 텍스트만 표시 -->
-                        <span th:if="${page == currentPage}" class="page-link" th:text="${page}"></span>
-                    </li>
-
-                    <li class="page-item" th:if="${currentPage<endPage}">
+                    <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}"><!--숫자 카운터-->
+                        <li class="page-item">
+                            <a class="page-link" th:href="@{/menu/listmenu(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                        </li>
+                    </span>
+                    <!--11,12,13,14,15 다음 마지막(15)-->
+                    <li class="page-item" th:unless="${currentPage>=endPage}">
                         <a class="page-link" th:href="@{/menu/listmenu(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
                     </li>
-
-                    <li class="page-item" th:if="${currentPage<endPage}">
+                    <li class="page-item" th:unless="${currentPage>endPage}">
                         <a class="page-link" th:href="@{/menu/listmenu(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
                     </li>
                 </ul>
-            </div>
-            <!-- 페이징 처리 끝 -->
+            </div><!--페이징 끝-->
         </div>
         <div class="col-2"></div>
     </div>

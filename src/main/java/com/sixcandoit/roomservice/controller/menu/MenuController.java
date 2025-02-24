@@ -157,17 +157,17 @@ public class MenuController {
     }
 
     @GetMapping("/menu/listmenu")
-    public String listMenu(@PageableDefault(page = 1) Pageable pagea, //페이지 정보
+    public String listMenu(@PageableDefault(page = 1) Pageable page, //페이지 정보
                            @RequestParam(value = "type", defaultValue = "") String type, //검색 대상
                            @RequestParam(value = "keyword", defaultValue = "") String keyword, //키워드
                            Model model){
         //해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<MenuDTO> menuDTOS = menuService.menuList(pagea, type, keyword);
+        Page<MenuDTO> menuDTOS = menuService.menuList(page, type, keyword);
         //html에 필요한 페이지 정보를 받기
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(menuDTOS);
 
         model.addAttribute("menulist", menuDTOS); //데이터 전달
-        model.addAttribute("pageInfo", pageInfo);   //페이지 정보
+        model.addAllAttributes(pageInfo);   //페이지 정보
         model.addAttribute("type", type);   //검색 분류
         model.addAttribute("keyword", keyword); //키워드
         model.addAttribute("bucket", bucket);

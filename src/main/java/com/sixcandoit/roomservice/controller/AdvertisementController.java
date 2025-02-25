@@ -1,8 +1,10 @@
 package com.sixcandoit.roomservice.controller;
 
 import com.sixcandoit.roomservice.dto.AdvertisementDTO;
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.service.AdvertisementService;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,12 +29,8 @@ import java.util.Map;
 public class AdvertisementController {
 
     private final AdvertisementService advertisementService;
-
-    @GetMapping("/test")
-    public String aaa(){
-
-        return "advertisement/list";
-    }
+    private final PageNationUtil pageNationUtil;
+    private final ImageFileService imageFileService;
 
     // 목록
     @GetMapping("/list")
@@ -45,7 +44,7 @@ public class AdvertisementController {
                 advertisementService.adList(page, type, keyword);
 
         // 조회결과를 이용한 페이지 처리
-        Map<String, Integer> pageInfo = PageNationUtil.Pagination(advertisementDTOS);
+        Map<String, Integer> pageInfo = pageNationUtil.Pagination(advertisementDTOS);
 
         model.addAllAttributes(pageInfo);                                        // 페이지 정보
         model.addAttribute("advertisementDTOS", advertisementDTOS);  // 데이터 전달
@@ -59,11 +58,12 @@ public class AdvertisementController {
     // 모달 광고 등록하기
     @PostMapping("/register")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
-    public ResponseEntity<String> register(@ModelAttribute AdvertisementDTO advertisementDTO, Integer organidx) {
+    public ResponseEntity<String> register(@ModelAttribute AdvertisementDTO advertisementDTO, Integer organidx,
+                                           List<MultipartFile> imageFiles) {
 
         try {
             // 서비스에 등록 요청
-            advertisementService.adRegister(advertisementDTO, organidx);
+            advertisementService.adRegister(advertisementDTO, organidx, imageFiles);
 
             // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
             return ResponseEntity.ok("광고 등록이 성공적으로 되었습니다.");
@@ -100,22 +100,25 @@ public class AdvertisementController {
     }
 
     // 광고 수정하기
-    @PostMapping("/update/update")
+    @PostMapping("/update")
     @ResponseBody
-    public ResponseEntity<String> qweUpdate(@ModelAttribute AdvertisementDTO advertisementDTO) throws Exception {
+    public ResponseEntity<String> Update(@ModelAttribute AdvertisementDTO advertisementDTO,
+                                         List<MultipartFile> imageFiles) {
 
-        log.info("업데이트 진행");
+        // 이미지 조회전 join값 생성
+        String join = "adver";
+
         try {
-            // 서비스에 수정 요청
-            advertisementService.adUpdate(advertisementDTO);
+            // 서비스에 등록 요청
+            advertisementService.adUpdate(advertisementDTO, join, imageFiles);
 
             // 수정 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
-            return  ResponseEntity.ok("수정하였습니다.");
+            return ResponseEntity.ok("수정 하였습니다.");
 
         }catch (Exception e){
 
             // 수정 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패 하였습니다.");
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패하였습니다.");
         }
     }
 
@@ -134,14 +137,29 @@ public class AdvertisementController {
     @GetMapping("/read")
     public String read(@RequestParam Integer idx, Model model){
 
-        // idx로 데이터 조회
-        log.info("개별 데이터를 읽는 중입니다.");
-        AdvertisementDTO advertisementDTO = advertisementService.adRead(idx);
+        // 이미지 조회전 join값 생성
+        String join = "adver";
 
-        log.info("개별 데이터를 페이지에 전달하는 중입니다.");
+        // 광고 정보 서비스로 조회
+        AdvertisementDTO advertisementDTO =
+                advertisementService.adRead(idx);
+
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+
+        // view로 전달
         model.addAttribute("advertisementDTO", advertisementDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
 
         return "advertisement/read";
+
     }
 
     // 광고 삭제하기
@@ -149,9 +167,12 @@ public class AdvertisementController {
     @ResponseBody
     public ResponseEntity<String> MemberPointDelete(@RequestParam Integer idx){
 
+        // 이미지 조회전 join값 생성
+        String join = "adver";
+
         try {
             // idx로 데이터를 조회하여 삭제
-            advertisementService.adDelete(idx);
+            advertisementService.adDelete(idx, join);
 
             return  ResponseEntity.ok("삭제하였습니다.");
         }catch (Exception e){

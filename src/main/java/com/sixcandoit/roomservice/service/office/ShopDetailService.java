@@ -150,13 +150,13 @@ public class ShopDetailService {
             ShopDetailEntity shopEntity = shopDetailRepository.findById(shopDetailDTO.getIdx())
                     .orElseThrow(() -> new RuntimeException("상점 조회 실패"));
 
+            // 빠진 idx값 주입
+            organizationDTO.setIdx(organIdx);
+
             // DTO -> Entity로 변환
             // 기존 엔티티 객체의 필드만 업데이트
             modelMapper.map(organizationDTO, organ);
             modelMapper.map(shopDetailDTO, shopEntity);
-
-            // 빠진 idx값 주입
-            organ.setIdx(organIdx);
 
             // 이미지 추가 등록
             List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
@@ -169,14 +169,14 @@ public class ShopDetailService {
                 }
             }
 
-            // Entity 테이블에 저장
-            organizationRepository.save(organ);
-
             // 연관 관계 설정 (필요 시)
             shopEntity.setOrganizationJoin(organ);
 
             // Entity 테이블에 저장
             shopDetailRepository.save(shopEntity);
+
+            // Entity 테이블에 저장
+            organizationRepository.save(organ);
 
         } catch (Exception e) {
             throw new RuntimeException("수정서비스 실패: " + e.getMessage());
@@ -197,4 +197,5 @@ public class ShopDetailService {
 
         return shopDTOlist;
     }
+
 }

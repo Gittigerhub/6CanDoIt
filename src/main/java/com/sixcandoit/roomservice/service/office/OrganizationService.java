@@ -85,10 +85,12 @@ public class OrganizationService {
             }
             else {                                      // 조회 값이 있다면
                 // DTO -> Entity로 변환
-                OrganizationEntity organ = modelMapper.map(organizationDTO, OrganizationEntity.class);
+                OrganizationEntity organ =
+                        modelMapper.map(organizationDTO, OrganizationEntity.class);
 
                 // 이미지 추가 등록
-                List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
+                List<ImageFileEntity> images =
+                        imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
 
                 // 이미지 정보 추가
                 // 양방향 연관관계 편의 메서드 사용

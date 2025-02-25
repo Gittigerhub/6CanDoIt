@@ -24,7 +24,7 @@
 
     <!-- 페이지 시작 -->
     <div class="container">
-        <h2>조직 관리</h2>
+        <h2>조직 관리 > 조직 상세정보</h2>
 
         <div class="row p-5 bg-white">
             <div class="mb-3">
@@ -274,7 +274,12 @@
                         <div class="col-sm-12 mt-2">
                             <div class="form-group form-group-default" id="inputImage">
                                 <label>*대표 이미지 :</label>
-                                <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                                <th:block th:if="${hasRepImage}">
+                                    <input disabled name="imageFiles" type="file" class="form-control mt-2" accept="image/*"/>
+                                </th:block>
+                                <th:block th:unless="${hasRepImage}">
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*"/>
+                                </th:block>
                             </div>
                         </div>
 
@@ -421,12 +426,15 @@
 
             // 이미지 input 초기화
             function resetImageInput() {
-                const container = document.getElementById('inputImage');
+                const input = document.querySelector('input[name="imageFiles"]');
                 const container2 = document.getElementById('inputImage2');
 
-                container.innerHTML = '<label>*대표 이미지 :</label>' +
-                    '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                // 파일 선택 초기화
+                if (input) {
+                    input.value = '';
+                }
 
+                // 이미지 추가창 제거
                 container2.innerHTML = '<label>*이미지 :</label>' +
                     '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
             }

@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.service.menu;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -162,10 +164,29 @@ public class MenuService {
 
     }
 
-    public void menuRemove(Integer idx) {
+    public void menuRemove(Integer idx, String join) {
         log.info("서비스로 들어온 삭제할 메뉴 번호 : " + idx);
 
-        menuRepository.deleteById(idx);
+        try {
+            //이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
+
+            //dto -> Entity 변환
+            List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                            .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                            .collect(Collectors.toList());
+            //모든 이미지 삭제
+            for (ImageFileEntity imageFileEntity : imageFileEntities) {
+                imageFileService.deleteImage(imageFileEntity.getIdx());
+            }
+
+            //idx로 조회해서 삭제
+            menuRepository.deleteById(idx);
+
+        } catch (Exception e) {
+            throw new RuntimeException("삭제에 실패했습니다." + e.getMessage());
+        }
+
     }
 
 }

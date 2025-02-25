@@ -13,12 +13,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -266,6 +269,23 @@ public class MenuController {
 
         return "redirect:/menu/listmenu";
 
+    }
+
+    @GetMapping("/menu/removemenu")
+    @ResponseBody
+    public ResponseEntity<String> removeMenu(@RequestParam Integer idx) {
+
+        // 이미지 조회전 join값 생성
+        String join = "menu";
+
+        try {
+            // idx로 데이터를 조회하여 삭제
+            menuService.menuRemove(idx, join);
+
+            return ResponseEntity.ok("삭제하였습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제를 실패하였습니다.");
+        }
     }
 
 }

@@ -110,12 +110,12 @@ public class OfficeController {
             // 서비스에 등록 요청
             organizationService.organUpdate(organizationDTO, join, imageFiles);
 
-            // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
+            // 수정 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
             return ResponseEntity.ok("수정 하였습니다.");
         } catch (Exception e) {
             log.error("수정 중 오류발생", e);
 
-            // 등록 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
+            // 수정 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패하였습니다.");
         }
 

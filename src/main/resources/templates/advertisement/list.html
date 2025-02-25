@@ -63,7 +63,7 @@
                 <tbody> <!--조직 테이블 데이터 출력-->
                 <tr style="height: 50px; vertical-align: middle" th:each="data:${advertisementDTOS}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
                     <td th:text="${data.idx}"></td>
-                    <td th:text="${data.organization.organName}"></td>
+                    <td th:text="${data.organizationJoin.organName}"></td>
                     <td>
                         <a th:href="@{/advertisement/read(idx=${data.idx})}" th:text="${data.adTitle}"></a>
                     </td>
@@ -81,13 +81,13 @@
             <div class="d-flex justify-content-center" th:if="${advertisementDTOS.isEmpty()}">조회된 내역이 없습니다.</div>
 
             <!-- 페이징 처리 시작 -->
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center" th:if="${advertisementDTOS.totalElements > 0}">
                 <ul class="pagination">
-                    <li class="page-item" th:if="${currentPage>1}">
+                    <li class="page-item" th:if="${currentPage > 1 and currentPage != null}">
                         <a class="page-link" th:href="@{/advertisement/list(page=1, type=${type}, keyword=${keyword})}">≪</a>
                     </li>
 
-                    <li class="page-item" th:if="${currentPage>1}">
+                    <li class="page-item" th:if="${currentPage > 1 and currentPage != null}">
                         <a class="page-link" th:href="@{/advertisement/list(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
                     </li>
 
@@ -132,7 +132,7 @@
                 </div>
                 <!--입력폼-->
                 <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
-                <form id="addForm" method="post">
+                <form id="addForm" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
                         <p>새로운 광고를 등록합니다.</p>
 
@@ -187,19 +187,34 @@
                                 </div>
                             </div>
 
-                            <!-- 광고 이미지 -->
-                            <div class="col-sm-12">
+                            <!-- 조직 대표 사진 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default" id="inputImage">
+                                    <label>*대표 이미지 :</label>
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*" required/>
+                                </div>
+                            </div>
+
+                            <!-- 조직 사진 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default" id="inputImage2">
+                                    <label>*이미지 :</label>
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                                </div>
+                            </div>
+
+                            <!-- 조직 사진 추가버튼 -->
+                            <div class="col-sm-12 mt-2">
                                 <div class="form-group form-group-default">
-                                    <label>*이미지 첨부 :</label>
-                                    <input id="adImgUrl" name="adImgUrl" type="file" class="form-control"/>
+                                    <input type="button" id="addImage" value="이미지 추가">
                                 </div>
                             </div>
 
                         </div>
                     </div>
                     <div class="modal-footer border-0">
-                        <button type="button" id="addButton" class="btn btn-success">저장</button> <!--신규등록 저장버튼-->
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
                     </div>
                 </form>
             </div>
@@ -352,12 +367,46 @@
 
             });
 
+            // 이미지 추가 버튼 클릭했을 때
+            $("#addImage").on('click', function() {
+
+                // 이미지 추가 함수
+                addImageInput();
+
+            });
+
+            // 이미지 추가
+            function addImageInput() {
+                const container = document.getElementById('inputImage2');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                container.appendChild(newInputDiv);
+            }
+
+            // 이미지 input 초기화
+            function resetImageInput() {
+                const input = document.querySelector('input[name="imageFiles"]');
+                const container2 = document.getElementById('inputImage2');
+
+                // 파일 선택 초기화
+                if (input) {
+                    input.value = '';
+                }
+
+                // 이미지 추가창 제거
+                container2.innerHTML = '<label>*이미지 :</label>' +
+                    '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            }
+
             // 광고 목록에서 추가를 클릭했을 때
             $("#btn-add").on('click', function() {
 
                 // 폼 리셋
                 var form = $("#addForm")[0];
                 form.reset();
+
+                // 이미지 추가창 리셋 함수
+                resetImageInput();
 
                 // 모달창을 화면에 띄운다.
                 $("#addModal").modal('show');

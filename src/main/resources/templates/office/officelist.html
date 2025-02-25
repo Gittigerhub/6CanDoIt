@@ -88,6 +88,10 @@
                         <!-- 조직 분류가 매장일때 -->
                         <th:block th:if="${data.organType == 'SHOP'}">
                             <!-- 매장 상세내용이 존재한다면 상세내용 보기 진행 -->
+                            <!--
+                            dataStat.index는 Thymeleaf 템플릿 엔진에서 제공하는 dataStat 변수에 포함된 속성으로, 반복되는 항목의 현재 인덱스를 추적하는 데 사용됩니다.
+                            dataStat.index는 th:each="data:${organDTO}" 구문에서 반복되는 각 항목의 현재 인덱스를 제공합니다.
+                             -->
                             <th:block th:if="${existsList[dataStat.index]}">
                                 <a th:href="@{/office/shopdetail/realread(idx=${data.idx})}" th:text="${data.organName}"></a>
                             </th:block>
@@ -189,7 +193,7 @@
                                     <div class="form-group form-group-default">
                                         <label>*주소 :</label>
                                         <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
-                                        <input id="organAddress" name="organAddress" type="text" class="form-control mt-2" placeholder="주소를 입력하세요." readonly required maxlength="100"/>
+                                        <input id="organAddress" name="organAddress" type="text" class="form-control mt-2" placeholder="주소를 입력하세요." readonly required minlength="10" maxlength="100"/>
 
                                         <!-- 주소입력 기능 -->
                                         <input type="hidden" id="sample4_postcode" placeholder="우편번호" readonly>
@@ -294,11 +298,19 @@
                                     </div>
                                 </div>
 
-                                <!-- 조직 사진 -->
+                                <!-- 조직 대표 사진 -->
                                 <div class="col-sm-12 mt-2">
                                     <div class="form-group form-group-default" id="inputImage">
+                                        <label>*대표 이미지 :</label>
+                                        <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 조직 사진 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default" id="inputImage2">
                                         <label>*이미지 :</label>
-                                        <input name="imageFiles imgInput" type="file" class="form-control mt-2 imageInput" accept="image/*">
+                                        <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
                                     </div>
                                 </div>
 
@@ -560,16 +572,24 @@
 
             // 이미지 추가
             function addImageInput() {
-                const container = document.getElementById('inputImage');
+                const container = document.getElementById('inputImage2');
                 const newInputDiv = document.createElement('div');
                 newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
                 container.appendChild(newInputDiv);
             }
 
-            // 이미지 추가창 초기화
+            // 이미지 input 초기화
             function resetImageInput() {
-                const container = document.getElementById('inputImage');
-                container.innerHTML = '<label>*이미지 :</label>' +
+                const input = document.querySelector('input[name="imageFiles"]');
+                const container2 = document.getElementById('inputImage2');
+
+                // 파일 선택 초기화
+                if (input) {
+                    input.value = '';
+                }
+
+                // 이미지 추가창 제거
+                container2.innerHTML = '<label>*이미지 :</label>' +
                     '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
             }
 

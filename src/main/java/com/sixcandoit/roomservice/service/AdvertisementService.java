@@ -1,8 +1,10 @@
 package com.sixcandoit.roomservice.service;
 
 import com.sixcandoit.roomservice.dto.AdvertisementDTO;
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.AdvertisementEntity;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.repository.AdvertisementRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +33,7 @@ public class AdvertisementService {
     private final AdvertisementRepository advertisementRepository;
     private final OrganizationRepository organizationRepository;
     private final ModelMapper modelMapper;
+    private final ImageFileService imageFileService;
 
     /* -----------------------------------------------------------------------------
         함수명 : void adRegister(AdvertisementDTO advertisementDTO, Integer idx)
@@ -37,7 +41,7 @@ public class AdvertisementService {
         출력 : 없음
         설명 : 전달받은 데이터를 데이터베이스에 저장하여 광고 등록
     ----------------------------------------------------------------------------- */
-    public void adRegister(AdvertisementDTO advertisementDTO, Integer organidx) {
+    public void adRegister(AdvertisementDTO advertisementDTO, Integer organidx, List<MultipartFile> imageFiles) {
 
         try {
             // DTO -> Entity로 변환
@@ -47,12 +51,22 @@ public class AdvertisementService {
             OrganizationEntity organization = organizationRepository.findById(organidx)
                     .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
 
-            System.out.println(organization);
             // 광고테이블에 연관관계 조직테이블 추가
             advertisementEntity.setOrganizationJoin(organization);
 
+            // 이미지 등록
+            List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
+
+            // 이미지 정보 추가
+            // 양방향 연관관계 편의 메서드 사용
+            for (ImageFileEntity image : images) {
+                advertisementEntity.addImage(image);  // FK 자동 설정
+            }
+            System.out.println("FK 자동 등록");
+
             // Entity 테이블에 저장
             advertisementRepository.save(advertisementEntity);
+
         } catch (Exception e) {     // 오류발생시 오류 처리
             throw new RuntimeException("등록 실패" + e.getMessage());
         }
@@ -60,53 +74,81 @@ public class AdvertisementService {
     }
 
     /* -----------------------------------------------------------------------------
-        함수명 : void adUpdate(AdvertisementDTO advertisementDTO)
-        인수 : AdvertisementDTO advertisementDTO
+        함수명 : void adUpdate(AdvertisementDTO advertisementDTO, String join, List<MultipartFile> imageFiles)
+        인수 : (AdvertisementDTO advertisementDTO, String join, List<MultipartFile> imageFiles
         출력 : 없음
         설명 : 전달받은 데이터를 데이터베이스에서 조회하여 수정
     ----------------------------------------------------------------------------- */
-    public void adUpdate(AdvertisementDTO advertisementDTO) {
+    public void adUpdate(AdvertisementDTO advertisementDTO, String join, List<MultipartFile> imageFiles) {
 
         try {
             // idx로 수정할 데이터 조회
-            Optional<AdvertisementEntity> advertisementEntity = advertisementRepository.findById(advertisementDTO.getIdx());
+            Optional<AdvertisementEntity> advertisementEntity =
+                    advertisementRepository.findById(advertisementDTO.getIdx());
 
-            if (advertisementEntity.isPresent()){               // advertisementEntity가 존재하면
-
-                log.info("수정 진행");
+            if(!advertisementEntity.isPresent()){       // 조회 값이 없다면
+                throw new RuntimeException("수정할 광고 조회 실패");
+            }
+            else {                                      // advertisementEntity가 존재하면
                 // DTO -> Entity로 변환
-                AdvertisementEntity advertisement = modelMapper.map(advertisementDTO, AdvertisementEntity.class);
-                log.info(advertisement);
+                AdvertisementEntity advertisement =
+                        modelMapper.map(advertisementDTO, AdvertisementEntity.class);
+
                 // 조직 ID로 조회하여 데이터 가져오기
-                OrganizationEntity organization = organizationRepository.findById(advertisementDTO.getOrganization().getIdx())
+                OrganizationEntity organization = organizationRepository.findById(advertisementDTO.getOrganizationJoin().getIdx())
                         .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
 
-                log.info(organization);
                 // 광고테이블에 연관관계 조직테이블 데이터 추가
                 advertisement.setOrganizationJoin(organization);
-                log.info(advertisement);
+
+                // 이미지 추가 등록
+                List<ImageFileEntity> images =
+                        imageFileService.updateImage(imageFiles, join, advertisementDTO.getIdx());
+
+                // 이미지 정보 추가
+                // 양방향 연관관계 편의 메서드 사용
+                for (ImageFileEntity image : images) {
+                    advertisement.addImage(image);  // FK 자동 설정
+                }
+
                 // Entity 테이블에 저장
                 advertisementRepository.save(advertisement);
-
-            } else {                                            // advertisementEntity가 존재하지 않으면
-                throw new IllegalStateException("수정할 데이터가 존재하지 않습니다.");
             }
-        } catch (Exception e) {
-            throw new RuntimeException("조직 수정 실패: "+e.getMessage());
+
+        } catch (Exception e) {             // 오류발생시 오류 처리
+            throw new RuntimeException("수정서비스 실패" + e.getMessage());
         }
 
     }
 
     /* -----------------------------------------------------------------------------
-        함수명 : void adDelete(Integer idx)
-        인수 : Integer idx
+        함수명 : void adDelete(Integer idx, String join)
+        인수 : Integer idx, String join
         출력 : 없음
         설명 : 전달받은 데이터를 데이터베이스에서 조회하여 삭제
     ----------------------------------------------------------------------------- */
-    public void adDelete(Integer idx) {
+    public void adDelete(Integer idx, String join) {
 
-        // idx로 조회하여 삭제
-        advertisementRepository.deleteById(idx);
+        try {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
+
+            // dto => entity
+            List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                    .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                    .collect(Collectors.toList());
+
+            // 모든 이미지 삭제
+            for (ImageFileEntity imageFileEntity : imageFileEntities) {
+                imageFileService.deleteImage(imageFileEntity.getIdx());
+            }
+
+            // idx로 조회하여 삭제
+            advertisementRepository.deleteById(idx);
+
+        } catch (Exception e) {
+            throw new RuntimeException("삭제를 실패했습니다." + e.getMessage());
+        }
 
     }
 

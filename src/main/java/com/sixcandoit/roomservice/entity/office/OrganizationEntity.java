@@ -52,15 +52,15 @@ public class OrganizationEntity extends BaseEntity {
     private ShopDetailEntity shopDetailJoin;
 
     // 룸 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationJoin")
+    @OneToMany(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomEntity> roomJoin;
 
     // 광고 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationJoin")
+    @OneToMany(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AdvertisementEntity> advertisementJoin;
 
     // 이벤트 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationJoin")
+    @OneToMany(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventEntity> eventJoin;
 
     // 이미지 파일 테이블과 1:N 매핑

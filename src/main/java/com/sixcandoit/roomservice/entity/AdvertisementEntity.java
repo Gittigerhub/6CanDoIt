@@ -38,9 +38,6 @@ public class AdvertisementEntity extends BaseEntity {
     @Column(name = "ad_e_date")
     private LocalDateTime adEndDate;     // 광고 종료일
 
-    @Column(name = "ad_img_url")
-    private String adImgUrl;             // 광고 이미지 경로
-
     @Column(name = "ad_state")
     private String adState;              // 상태(N:안함, Y:진행중)
 

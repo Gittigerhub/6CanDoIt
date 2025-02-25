@@ -3,6 +3,7 @@ package com.sixcandoit.roomservice.service.member;
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
+import com.sixcandoit.roomservice.entity.event.MemberPointEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
@@ -63,6 +64,27 @@ public class MemberService {
         memberEntity.setLevel(Level.MEMBER);
 
         return memberRepository.save(memberEntity);
+    }
+
+    // 비밀번호 확인
+    public boolean verifyPassword(String inputPassword, String memberEmail) {
+        // DB에서 회원 정보를 조회 (Optional<MemberEntity> 반환)
+        Optional<MemberEntity> optionalMember = memberRepository.findByMemberEmail(memberEmail);
+
+        if (optionalMember.isPresent()) {
+            // 회원이 존재하면, 비밀번호 비교
+            MemberEntity memberEntity = optionalMember.get(); // MemberEntity 객체 추출
+            boolean isMatch = passwordEncoder.matches(inputPassword, memberEntity.getPassword());
+
+            // 로그 추가
+            System.out.println("비밀번호 검증 결과: " + isMatch); // 비밀번호 일치 여부 확인
+
+            return isMatch;
+        } else {
+            // 회원이 없으면 false 반환
+            return false;
+        }
+
     }
 
     // 회원 정보 수정

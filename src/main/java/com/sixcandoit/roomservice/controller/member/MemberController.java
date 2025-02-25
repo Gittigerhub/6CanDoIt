@@ -71,7 +71,34 @@ public class MemberController {
         return result;  // 응답 반환
     }
 
+    // 회원 수정 전 비밀번호 확인 페이지
+    @GetMapping("/verify")
+    public String ShowPasswordVerificationPage(HttpSession session, Model model){
+        String memberEmail = (String) session.getAttribute("memberEmail");
+        model.addAttribute("memberEmail",memberEmail );
+        return "/member/verify";
+    }
 
+    // 비밀번호 검증 처리
+    @PostMapping("/verify")
+    public String verifyPassword(@RequestParam String password,
+                                 @RequestParam String memberEmail,
+                                 HttpSession session){
+
+        // 비밀번호를 DB에서 조회하여 비교
+        boolean isPasswordValid = memberService.verifyPassword(password, memberEmail);
+
+        if (isPasswordValid) {
+            // 비밀번호가 맞으면 회원 정보 수정 페이지로 리디렉션
+            session.setAttribute("email", memberEmail);  // 이메일을 세션에 저장
+            System.out.println("비밀번호가 맞습니다.");
+            return "redirect:/member/modify";  // 수정 페이지로 이동
+        } else {
+            // 비밀번호가 틀리면 다시 비밀번호 확인 페이지로 돌아가기
+            System.out.println("비밀번호가 틀렸습니다.");
+            return "redirect:/member/verify";  // 비밀번호 페이지로 리디렉션
+        }
+    }
 
     // 회원 수정
     @GetMapping("/modify")
@@ -91,7 +118,7 @@ public class MemberController {
     public String modifyMember(@ModelAttribute MemberDTO memberDTO){
         memberService.modify(memberDTO);
 
-        return "redirect:/logout";
+        return "redirect:/member/";
     }
 
     // 임시비밀번호 발급
@@ -123,7 +150,7 @@ public class MemberController {
 
         session.invalidate();
 
-        return "redirect:/login";
+        return "redirect:/member/login";
     }
 
 

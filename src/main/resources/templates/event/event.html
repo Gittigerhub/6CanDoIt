@@ -38,7 +38,8 @@
                             </button>
                             <input type="hidden" id="event_title_img" class="event_Title_Img" name="eventTitleImg"
                                    th:value="${events.eventTitleImg}">
-                            <input type="hidden" id="event_img" class="event_Img" name="eventImg" th:value="${events.eventImg}">
+                            <input type="hidden" id="event_img" class="event_Img" name="eventImg"
+                                   th:value="${events.eventImg}">
                         </td>
                     </tr>
                     </tbody>
@@ -160,17 +161,19 @@
                                     </div>
                                 </div>
 
-                                <th:block class="ImgBlock" >
+                                <th:block class="ImgBlock">
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div>
                                                 <label>*타이틀 이미지</label>
-                                                <img class="form-control imgTitleInput" id="titleImage" th:src="a" width="150" height="150" >
+                                                <img class="form-control imgTitleInput" id="titleImage" th:src="a"
+                                                     width="150" height="150">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <label>*메인 이미지</label>
-                                            <img class="form-control imgContentInput" id="ContentImage" th:src="a" width="150" height="150">
+                                            <img class="form-control imgContentInput" id="ContentImage" th:src="a"
+                                                 width="150" height="150">
                                         </div>
                                     </div>
                                 </th:block>
@@ -212,25 +215,18 @@
                 //사진 출력폼 등록
 
 
-
-
-
                 $('#register').show()
                 $('#update').hide()
 
                 $('#idx').val("");
 
 
-
-               $("#titleImage").css("display", "none");
-               $("#ContentImage").css("display", "none");
-
-
+                $("#titleImage").css("display", "none");
+                $("#ContentImage").css("display", "none");
 
 
                 //대화창 출력
                 $('#eventModal').modal('show')
-
 
 
             });
@@ -356,14 +352,13 @@
                         $(".imgContentInput").attr("src", eventImg);
 
 
-                        if($("#titleImage").attr("src")==='a'||$("#ContentImage").attr("src")==='a'){
+                        if ($("#titleImage").attr("src") === 'a' && $("#ContentImage").attr("src") === 'a') {
                             console.log("사라짐");
                             $(".imgTitleInput").css("display", "none");
                             $(".imgContentInput").css("display", "none");
 
 
-                        }
-                        else {
+                        } else {
                             $(".imgTitleInput").css("display", "block");
                             $(".imgContentInput").css("display", "block");
 

@@ -17,11 +17,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +64,6 @@ public class EventService {
             // 이미지 정보 추가
             // 양방향 연관관계 편의 메서드 사용
             for (ImageFileEntity image : images) {
-
 
 
                 System.out.println("이미지 주소:" + image.getUrl());
@@ -140,37 +141,86 @@ public class EventService {
     설명 : 이벤트 정보를 수정할때 사용;
   ---------------------------------------------------*/
     public void update(EventDTO eventDTO) {
+
+
         try {
             Optional<EventEntity> read = eventRepository.findById(eventDTO.getIdx());
             List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(eventDTO.getIdx(), "event");
+            List<MultipartFile> imgFile = eventDTO.getFiles();
 
-            if (!read.isPresent()) {
+            // 빈 파일 제거 후 유효한 파일 리스트만 남김
+            // 자꾸 빈파일이 넘겨져 파일을 넘길때와 같이 길이가 1이되어 오류가 생김으로 유효리스트 생성
+            List<MultipartFile> validImageFiles = imgFile.stream()
+                    .filter(file -> file != null && !file.isEmpty()) // 비어 있지 않은 파일만 필터링
+                    .collect(Collectors.toList());
+            System.out.println("유효한 이미지 파일 개수: " + validImageFiles.size());
+
+
+
+
+
+            if (read.isEmpty()) {
                 throw new RuntimeException("이벤트 조회 실패");
             } else {
 
-
-
                 EventEntity eventEntity = modelMapper.map(eventDTO, EventEntity.class);
+                System.out.println("변환까지");
 
-                imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
-                imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
-
-                List<ImageFileEntity> images = imageFileService.updateImage(eventDTO.getFiles(), "event", eventDTO.getIdx());
+                System.out.println("이벤트 사진:" + imageFileDTOList);
 
 
+                if (eventDTO.getFiles().isEmpty()) {
+                    System.out.println("둘다 없을때");
+                    List<ImageFileEntity> images = imageFileService.saveImages(eventDTO.getFiles());
+                    for (ImageFileEntity image : images) {
+                        eventEntity.addImage(image);
+                    }
 
-                eventEntity.updateImages(images);  // FK 자동 설정
+                } else if (eventDTO.getFiles().getFirst().isEmpty()) {
+                    System.out.println("타이틀 이미지 보존");
+                    imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
+                    validImageFiles.add(eventDTO.getFiles().getFirst());
+                    System.out.println("이미지 삭제까지 완료");
+                    List<ImageFileEntity> images = imageFileService.updateImage(validImageFiles, "event", eventDTO.getIdx());
+                    for (ImageFileEntity image : images) {
+                        eventEntity.addImage(image);
+                    }
+                    eventEntity.updateImages(images);
+
+                } else if (eventDTO.getFiles().getLast().isEmpty()) {
+                    System.out.println("메인 이미지 보존");
+                    imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
+                    validImageFiles.add(eventDTO.getFiles().getLast());
+                    System.out.println("이미지 삭제까지 완료");
+                    List<ImageFileEntity> images = imageFileService.updateImage(validImageFiles, "event", eventDTO.getIdx());
+                    for (ImageFileEntity image : images) {
+                        eventEntity.addImage(image);
+                    }
+                    eventEntity.updateImages(images);
 
 
+                } else {
+                    System.out.println("그냥 저장됨");
+                    imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
+                    imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
+                    List<ImageFileEntity> images = imageFileService.updateImage(eventDTO.getFiles(), "event", eventDTO.getIdx());
+                    eventEntity.updateImages(images);
+                }
+                System.out.println("게시글 저장중1");
 
-
+                // FK 자동 설정
                 eventRepository.save(eventEntity);
+
+                System.out.println("게시글 저장 완료");
             }
 
         } catch (Exception e) {
             throw new RuntimeException("이벤트 수정 실패: " + e.getMessage());
         }
+
+
     }
+
 
     /*-------------------------------------------------
     함수명 : delete(MemberDTO member)
@@ -183,9 +233,26 @@ public class EventService {
 
             List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(idx, "event");
 
-            imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
-            imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
-            eventRepository.deleteById(idx);
+            if (!imageFileDTOList.isEmpty()) {
+                imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
+                imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
+                eventRepository.deleteById(idx);
+                System.out.println("게시글삭제");
+            } else if (imageFileDTOList.isEmpty()) {
+                System.out.println("사진없는게시글삭제");
+                eventRepository.deleteById(idx);
+
+            } else if (!imageFileDTOList.getFirst().getUrl().isEmpty()) {
+                imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
+                System.out.println("사진삭제1");
+                eventRepository.deleteById(idx);
+                System.out.println("게시글삭제");
+            } else if (!imageFileDTOList.getLast().getUrl().isEmpty()) {
+                imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
+                System.out.println("사진삭제2");
+                eventRepository.deleteById(idx);
+                System.out.println("게시글삭제");
+            }
 
 
         } catch (Exception e) {

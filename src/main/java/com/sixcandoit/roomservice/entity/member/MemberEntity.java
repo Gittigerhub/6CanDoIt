@@ -59,6 +59,13 @@ public class MemberEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Level level;                  // 유저 권한
 
+    // 기본값 설정
+    @PrePersist
+    public void prePersist() {
+        if (this.level == null) {
+            this.level = Level.MEMBER; // 기본값 설정
+        }
+    }
 
     // 예약 테이블과 1:N 매핑
     @OneToMany(mappedBy = "memberJoin")

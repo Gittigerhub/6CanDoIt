@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/superlayout}">
+      layout:decorate="~{layouts/memberlayout}">
 <head>
     <meta charset="UTF-8">
     <title>문의 사항</title>
@@ -11,8 +11,8 @@
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
-
-    <h3>문의 사항</h3>
+    <div class="container">
+    <h3>문의사항</h3>
     <div class="container p-5 bg-white">
         <div id="row" class="row">
             <div class="col"></div>
@@ -63,7 +63,7 @@
             <div class="col"></div>
         </div><!--row끝-->
     </div>
-
+    </div>
 </div>
 </body>
 </html>

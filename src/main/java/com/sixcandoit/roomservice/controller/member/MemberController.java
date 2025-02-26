@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +101,7 @@ public class MemberController {
         }
     }
 
-    // 회원 수정
+    // 회원 정보 수정
     @GetMapping("/modify")
     public String showModifyPage(HttpSession session, Model model){
         String memberEmail = (String) session.getAttribute("memberEmail");
@@ -122,6 +123,35 @@ public class MemberController {
 
         return "redirect:/member/";
     }
+
+    // 비밀번호 수정
+    @GetMapping("/modifypw")
+    public String showModifyPWPage(HttpSession session, Model model){
+        log.info("비밀번호 변경을 해요");
+        return "member/modifypw";
+    }
+
+    @PostMapping("/modifypw")
+    public String modifyPW(@RequestParam String currentPassword,
+                           @RequestParam String newPassword,
+                           HttpSession session, RedirectAttributes redirectAttributes){
+        String memberEmail = (String) session.getAttribute("memberEmail");
+
+        if (memberEmail == null) {
+            return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로 이동
+        }
+
+        boolean isUpdated = memberService.changePassword(memberEmail, currentPassword, newPassword);
+
+        if (!isUpdated) {
+            redirectAttributes.addFlashAttribute("error", "현재 비밀번호가 일치하지 않습니다.");
+            return "redirect:/member/modifypw";
+        }
+
+        redirectAttributes.addFlashAttribute("success", "비밀번호가 변경되었습니다.");
+        return "redirect:/member/";
+    }
+
 
     // 임시비밀번호 발급
     @GetMapping("/password")

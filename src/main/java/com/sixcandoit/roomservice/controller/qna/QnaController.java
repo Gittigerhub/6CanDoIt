@@ -55,6 +55,26 @@ public class QnaController {
         return "qna/list";
     }
 
+    // 관리자용 QnA 전체 목록 페이지
+    @GetMapping("/qna/qnalist")
+    public String qnalist(@PageableDefault(page = 1) Pageable page, // 페이지 정보
+                       @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
+                       @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
+                       Model model){
+
+        // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
+        Page<QnaDTO> qnaDTOS = qnaService.qnaList(page, type, keyword);
+        // html에 필요한 페이지 정보를 받는다.
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(qnaDTOS);
+
+        model.addAttribute("qnalist", qnaDTOS); // 데이터 전달
+        model.addAllAttributes(pageInfo); // 페이지 정보
+        model.addAttribute("type", type); //검색분류
+        model.addAttribute("keyword", keyword); // 키워드
+
+        return "qna/qnalist";
+    }
+
     // Qna의 Q 등록
     @GetMapping("/qna/register")
     public String register(Model model){

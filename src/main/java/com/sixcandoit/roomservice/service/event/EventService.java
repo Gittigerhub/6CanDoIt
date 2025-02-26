@@ -156,9 +156,6 @@ public class EventService {
             System.out.println("유효한 이미지 파일 개수: " + validImageFiles.size());
 
 
-
-
-
             if (read.isEmpty()) {
                 throw new RuntimeException("이벤트 조회 실패");
             } else {
@@ -169,28 +166,44 @@ public class EventService {
                 System.out.println("이벤트 사진:" + imageFileDTOList);
 
 
-                if (eventDTO.getFiles().isEmpty()) {
-                    System.out.println("둘다 없을때");
-                    List<ImageFileEntity> images = imageFileService.saveImages(eventDTO.getFiles());
-                    for (ImageFileEntity image : images) {
-                        eventEntity.addImage(image);
+                if (!eventDTO.getFiles().getFirst().isEmpty() && !eventDTO.getFiles().getLast().isEmpty()) {
+                    if (imageFileDTOList.isEmpty()) {
+                        System.out.println("둘다 없을때");
+                        List<ImageFileEntity> images = imageFileService.saveImages(eventDTO.getFiles());
+                        for (ImageFileEntity image : images) {
+                            eventEntity.addImage(image);
+                        }
+                    }else {
+                        System.out.println("그냥 저장됨");
+                        imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
+                        imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
+                        List<ImageFileEntity> images = imageFileService.updateImage(eventDTO.getFiles(), "event", eventDTO.getIdx());
+                        eventEntity.updateImages(images);
                     }
 
-                } else if (eventDTO.getFiles().getFirst().isEmpty()) {
-                    System.out.println("타이틀 이미지 보존");
-                    imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
-                    validImageFiles.add(eventDTO.getFiles().getFirst());
-                    System.out.println("이미지 삭제까지 완료");
-                    List<ImageFileEntity> images = imageFileService.updateImage(validImageFiles, "event", eventDTO.getIdx());
-                    for (ImageFileEntity image : images) {
-                        eventEntity.addImage(image);
-                    }
-                    eventEntity.updateImages(images);
-
-                } else if (eventDTO.getFiles().getLast().isEmpty()) {
+                } else if (!eventDTO.getFiles().getFirst().isEmpty() && eventDTO.getFiles().getLast().isEmpty()) {
                     System.out.println("메인 이미지 보존");
-                    imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
-                    validImageFiles.add(eventDTO.getFiles().getLast());
+                    if(imageFileDTOList.getFirst().getRepimageYn().equals("Y")) {
+                        imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
+                    }
+                    else {
+                        imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
+                    }
+                    System.out.println("이미지 삭제까지 완료");
+                    List<ImageFileEntity> images = imageFileService.updateImage(validImageFiles, "event", eventDTO.getIdx());
+                    for (ImageFileEntity image : images) {
+                        eventEntity.addImage(image);
+                    }
+                    eventEntity.updateImages(images);
+
+                } else if (!eventDTO.getFiles().getLast().isEmpty() && eventDTO.getFiles().getFirst().isEmpty()) {
+                    System.out.println("타이틀 이미지 보존");
+                    if(imageFileDTOList.getFirst().getRepimageYn().equals("N")) {
+                        imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
+                    }
+                    else {
+                        imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
+                    }
                     System.out.println("이미지 삭제까지 완료");
                     List<ImageFileEntity> images = imageFileService.updateImage(validImageFiles, "event", eventDTO.getIdx());
                     for (ImageFileEntity image : images) {
@@ -199,14 +212,9 @@ public class EventService {
                     eventEntity.updateImages(images);
 
 
-                } else {
-                    System.out.println("그냥 저장됨");
-                    imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
-                    imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
-                    List<ImageFileEntity> images = imageFileService.updateImage(eventDTO.getFiles(), "event", eventDTO.getIdx());
-                    eventEntity.updateImages(images);
                 }
                 System.out.println("게시글 저장중1");
+
 
                 // FK 자동 설정
                 eventRepository.save(eventEntity);
@@ -242,12 +250,12 @@ public class EventService {
                 System.out.println("사진없는게시글삭제");
                 eventRepository.deleteById(idx);
 
-            } else if (!imageFileDTOList.getFirst().getUrl().isEmpty()) {
+            } else if (!imageFileDTOList.getFirst().getUrl().isEmpty() && imageFileDTOList.getLast().getUrl().isEmpty()) {
                 imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
                 System.out.println("사진삭제1");
                 eventRepository.deleteById(idx);
                 System.out.println("게시글삭제");
-            } else if (!imageFileDTOList.getLast().getUrl().isEmpty()) {
+            } else if (!imageFileDTOList.getLast().getUrl().isEmpty() && imageFileDTOList.getFirst().getUrl().isEmpty()) {
                 imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
                 System.out.println("사진삭제2");
                 eventRepository.deleteById(idx);

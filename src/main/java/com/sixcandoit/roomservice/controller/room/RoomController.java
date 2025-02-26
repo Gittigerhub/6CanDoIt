@@ -28,6 +28,12 @@ public class RoomController {
     // final 선언
     private final RoomService roomService;
 
+    // 룸 관리 메인 페이지
+    @GetMapping("/room/main")
+    public String main() {
+        return "room/main";
+    }
+
     // 룸 전체 목록
     @GetMapping("/room/list")
     private String list(@PageableDefault(page = 1) Pageable page, // 페이지 정보

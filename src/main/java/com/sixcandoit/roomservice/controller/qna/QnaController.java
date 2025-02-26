@@ -4,6 +4,7 @@ import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.qna.QnaService;
+import com.sixcandoit.roomservice.service.qna.ReplyService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class QnaController {
     // final 선언
     private final QnaService qnaService;
     private final ImageFileService imageFileService;
+    private final ReplyService replyService;
 
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
     // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
@@ -140,6 +142,9 @@ public class QnaController {
     @GetMapping("/qna/delete")
     public String delete(@RequestParam Integer idx){
         String join = "qna";
+
+        // 해당 질문에 달린 답변을 먼저 삭제
+        replyService.deleteRepliesByQnaIdx(idx);
 
         log.info("데이터를 삭제합니다.");
         qnaService.qnaDelete(idx, join);

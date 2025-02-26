@@ -11,9 +11,7 @@ import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.webjars.NotFoundException;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -80,5 +78,15 @@ public class ReplyService {
     // Qna의 A 삭제
     public void replyDelete(Integer idx){
         replyRepository.deleteById(idx);
+    }
+
+    // 질문에 달린 모든 답변을 삭제
+    public void deleteRepliesByQnaIdx(Integer qnaIdx) {
+        // QnaEntity를 조회
+        QnaEntity qnaEntity = qnaRepository.findById(qnaIdx)
+                .orElseThrow(() -> new RuntimeException("Qna not found"));
+
+        // 해당 QnaEntity에 달린 모든 답변 삭제
+        replyRepository.deleteByQnaJoin(qnaEntity);
     }
 }

@@ -22,6 +22,39 @@
     <h2>룸 관리</h2>
 
     <div class="container">
+        <!--검색 기능(keyword) 시작-->
+        <form th:action="@{/room/list}" method="get">
+            <div class="row p-5 bg-white"><!--틀-->
+                <div class="mb-3">
+                    <h3>객실 검색</h3>
+                </div>
+                <div class="col-6">
+                    <div class="input-group mb-3">
+                        <select class="form-select" name="order"><!--order-->
+                            <option value="DESC" th:selected="${order == 'DESC'}">높은 가격순</option>
+                            <option value="ASC" th:selected="${order == 'ASC'}">낮은 가격순</option>
+                        </select>
+                        <select class="form-select" name="type"><!--type-->
+                            <option th:selected="${type==null}"></option>
+                            <option value="0" th:selected="${type=='0'}">전체</option><!--검색 후 선택값으로 설정-->
+                            <option value="1" th:selected="${type=='1'}">객실 타입</option>
+                            <option value="2" th:selected="${type=='2'}">객실 이름</option>
+                            <option value="3" th:selected="${type=='3'}">무료 조식</option>
+                            <option value="4" th:selected="${type=='4'}">빈 방</option>
+                            <option value="5" th:selected="${type=='5'}">예약중</option>
+                            <option value="6" th:selected="${type=='6'}">체크인</option>
+                            <option value="7" th:selected="${type=='7'}">체크아웃</option>
+                        </select>
+                        <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
+                        <button class="btn btn-success" type="submit">검색</button>
+                    </div>
+                </div><!--검색-->
+                <div class="col-5"></div>
+                <div class="col-1">
+                    <a th:href="@{/room/register}" class="btn btn-primary">등록</a>
+                </div><!--추가버튼-->
+            </div>
+        </form>  <!--검색 기능(keyword) 끝-->
         <div class="row mt-5 p-5 bg-white">
             <div class="mb-3">
                 <h3>객실 목록</h3>
@@ -109,11 +142,31 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--페이징 시작-->
+                <div class="mt-3 d-flex justify-content-center">
+                    <ul class="pagination">
+                        <li class="page-item" th:unless="${startPage>1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
+                            <a class="page-link" th:href="@{/room/list(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                        </li>
+                        <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
+                            <a class="page-link" th:href="@{/room/list(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                        </li>
+                        <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}"><!--숫자 카운터-->
+                        <li class="page-item">
+                            <a class="page-link" th:href="@{/room/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                        </li>
+                    </span>
+                        <!--11,12,13,14,15 다음 마지막(15)-->
+                        <li class="page-item" th:unless="${currentPage>=endPage}">
+                            <a class="page-link" th:href="@{/room/list(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                        </li>
+                        <li class="page-item" th:unless="${currentPage>endPage}">
+                            <a class="page-link" th:href="@{/room/list(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                        </li>
+                    </ul>
+                </div><!--페이징 끝-->
             </div>
             <div class="col-1"></div>
-            <div class="mt-3 d-flex justify-content-end">
-                <a th:href="@{/room/register}" class="btn btn-outline-primary">등록</a>
-            </div>
         </div>
     </div>
 </div>

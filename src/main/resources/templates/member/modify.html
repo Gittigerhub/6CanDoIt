@@ -20,28 +20,28 @@
                 <div class="card">
                     <div class="card-body">
                         <h2 style="text-align: center;">회원 정보 수정</h2>
-                        <form th:action="@{/member/modify}" method="post" onsubmit="return validatePassword() && combineAddress()">
+                        <form th:action="@{/member/modify}" method="post" onsubmit="combineAddress()">
                             <div class="mb-3 mt-3">
                                 <label for="memberEmail" class="form-label">이메일</label>
                                 <input type="email" class="form-control" id="memberEmail" th:name="memberEmail" th:value="${memberDTO.memberEmail}" readonly>
                                 <small class="text-muted">이메일은 변경할 수 없습니다.</small>
                             </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">비밀번호</label>
-                                <input type="password" class="form-control" id="password" name="password"
-                                       placeholder="영문자와 숫자로 구성하세요." required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirmPassword" class="form-label">비밀번호 확인</label>
-                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
-                                       placeholder="비밀번호를 다시 입력해주세요." required>
-                                <div id="confirmPasswordFeedback" class="invalid-feedback">
-                                    비밀번호가 일치하지 않습니다.
-                                </div>
-                                <div id="confirmPasswordValid" class="valid-feedback">
-                                    비밀번호가 일치합니다.
-                                </div>
-                            </div>
+<!--                            <div class="mb-3">-->
+<!--                                <label for="password" class="form-label">비밀번호</label>-->
+<!--                                <input type="password" class="form-control" id="password" name="password"-->
+<!--                                       placeholder="영문자와 숫자로 구성하세요." required>-->
+<!--                            </div>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label for="confirmPassword" class="form-label">비밀번호 확인</label>-->
+<!--                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"-->
+<!--                                       placeholder="비밀번호를 다시 입력해주세요." required>-->
+<!--                                <div id="confirmPasswordFeedback" class="invalid-feedback">-->
+<!--                                    비밀번호가 일치하지 않습니다.-->
+<!--                                </div>-->
+<!--                                <div id="confirmPasswordValid" class="valid-feedback">-->
+<!--                                    비밀번호가 일치합니다.-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div class="mb-3">
                                 <label for="memberBirth" class="form-label">생년월일</label>
                                 <input type="date" class="form-control" id="memberBirth" th:name="memberBirth" th:value="${memberDTO.memberBirth}" max="9999-12-31">
@@ -64,14 +64,16 @@
                             </div>
                             <div class="mb-3">
                                 <label for="memberAddress" class="form-label">주소</label>
-                                <div class="signUp-input-area d-flex mb-1 col-lg-7">
+                                <div class="signUp-input-area d-flex gap-2 mb-2 col-lg-7">
                                     <input type="text" class="form-control input-lg" id="memberPostcode" placeholder="우편번호" style="height: 40px;" readonly>
-                                    <input type="button" class="btn btn-secondary" style="text-align:center; height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
+                                    <input type="button" class="btn btn-outline-secondary" style="height: 40px; width: 200px;" onclick="execDaumPostcode()" value="검색">
                                 </div>
-                            </div>
-                            <div class="signUp-input-area mb-1">
-                                <input type="text" class="form-control" id="memberAddress" th:value="${memberDTO.memberAddress}" name="memberAddress" placeholder="주소" style="height: 40px;" readonly>
-                                <input type="text" class="form-control" id="memberExtraAddress" name="memberExtraAddress" placeholder="상세 주소" style="height: 40px;">
+                                <div class="signUp-input-area mb-2">
+                                    <input type="text" class="form-control" id="memberAddress" th:value="${memberDTO.memberAddress}" name="memberAddress" placeholder="주소" style="height: 40px;" readonly>
+                                </div>
+                                <div class="signUp-input-area">
+                                    <input type="text" class="form-control mb-2" id="memberExtraAddress" name="memberExtraAddress" placeholder="상세 주소" style="height: 40px;">
+                                </div>
                             </div>
                             <div>주문 알람 수신여부</div>
                             <div class="form-check">
@@ -83,8 +85,10 @@
                                 <input type="radio" class="form-check-input" id="alramOrder2" name="optradio" value="alramOrder2">아니오
                             </div>
                             <div class="mb-3 text-center">
+                                <a href="/member/modifypw" class="btn btn-secondary mb-2">비밀번호 변경</a>
+                                <br>
                                 <button type="submit" class="btn btn-primary" value="수정">수정 완료</button>
-                                <button type="button" class="btn btn-secondary" onclick="window.history.back();">취소</button>
+                                <button type="button" class="btn btn-light" onclick="window.history.back();">취소</button>
                             </div>
                         </form>
                     </div>
@@ -94,70 +98,70 @@
         </div>
 
         <!-- 비밀번호 불일치 시 띄울 모달 -->
-        <div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel"
-             aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="passwordMismatchModalLabel">비밀번호 불일치</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        비밀번호가 일치하지 않습니다.
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--        <div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel"-->
+<!--             aria-hidden="true">-->
+<!--            <div class="modal-dialog">-->
+<!--                <div class="modal-content">-->
+<!--                    <div class="modal-header">-->
+<!--                        <h5 class="modal-title" id="passwordMismatchModalLabel">비밀번호 불일치</h5>-->
+<!--                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--                    </div>-->
+<!--                    <div class="modal-body">-->
+<!--                        비밀번호가 일치하지 않습니다.-->
+<!--                    </div>-->
+<!--                    <div class="modal-footer">-->
+<!--                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
 
         <script th:inline="javascript">
-            // 비밀번호 확인
-            document.getElementById("password").addEventListener("input", checkPasswordMatch);
-            document.getElementById("confirmPassword").addEventListener("input", checkPasswordMatch);
-
-            function checkPasswordMatch() {
-                var password = document.getElementById("password").value;
-                var confirmPassword = document.getElementById("confirmPassword").value;
-                var confirmPasswordInput = document.getElementById("confirmPassword");
-                var confirmPasswordFeedback = document.getElementById("confirmPasswordFeedback");
-                var confirmPasswordValid = document.getElementById("confirmPasswordValid");
-
-                // 비밀번호 입력 필드가 비어있는지 체크
-                if (password === "" || confirmPassword === "") {
-                    confirmPasswordInput.classList.remove("is-invalid", "is-valid");
-                    confirmPasswordFeedback.style.display = "none";
-                    confirmPasswordValid.style.display = "none";
-                    return; // 비밀번호가 비어있으면 아무것도 표시하지 않음
-                }
-
-                if (password !== confirmPassword) {
-                    confirmPasswordInput.classList.remove("is-valid");
-                    confirmPasswordInput.classList.add("is-invalid");
-                    confirmPasswordFeedback.style.display = "block";
-                    confirmPasswordValid.style.display = "none";
-                } else {
-                    confirmPasswordInput.classList.remove("is-invalid");
-                    confirmPasswordInput.classList.add("is-valid");
-                    confirmPasswordFeedback.style.display = "none";
-                    confirmPasswordValid.style.display = "block";
-                }
-            }
-
-            // 비밀번호 일치 체크 함수 (회원가입 폼 제출 전에 실행)
-            function validatePassword() {
-                var password = document.getElementById("password").value;
-                var confirmPassword = document.getElementById("confirmPassword").value;
-
-                if (password !== confirmPassword) {
-                    // 모달 띄우기
-                    var myModal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
-                    myModal.show();
-                    return false; // 폼 제출 막기
-                }
-                return true; // 비밀번호 일치 시 폼 제출
-            }
+            // // 비밀번호 확인
+            // document.getElementById("password").addEventListener("input", checkPasswordMatch);
+            // document.getElementById("confirmPassword").addEventListener("input", checkPasswordMatch);
+            //
+            // function checkPasswordMatch() {
+            //     var password = document.getElementById("password").value;
+            //     var confirmPassword = document.getElementById("confirmPassword").value;
+            //     var confirmPasswordInput = document.getElementById("confirmPassword");
+            //     var confirmPasswordFeedback = document.getElementById("confirmPasswordFeedback");
+            //     var confirmPasswordValid = document.getElementById("confirmPasswordValid");
+            //
+            //     // 비밀번호 입력 필드가 비어있는지 체크
+            //     if (password === "" || confirmPassword === "") {
+            //         confirmPasswordInput.classList.remove("is-invalid", "is-valid");
+            //         confirmPasswordFeedback.style.display = "none";
+            //         confirmPasswordValid.style.display = "none";
+            //         return; // 비밀번호가 비어있으면 아무것도 표시하지 않음
+            //     }
+            //
+            //     if (password !== confirmPassword) {
+            //         confirmPasswordInput.classList.remove("is-valid");
+            //         confirmPasswordInput.classList.add("is-invalid");
+            //         confirmPasswordFeedback.style.display = "block";
+            //         confirmPasswordValid.style.display = "none";
+            //     } else {
+            //         confirmPasswordInput.classList.remove("is-invalid");
+            //         confirmPasswordInput.classList.add("is-valid");
+            //         confirmPasswordFeedback.style.display = "none";
+            //         confirmPasswordValid.style.display = "block";
+            //     }
+            // }
+            //
+            // // 비밀번호 일치 체크 함수 (회원가입 폼 제출 전에 실행)
+            // function validatePassword() {
+            //     var password = document.getElementById("password").value;
+            //     var confirmPassword = document.getElementById("confirmPassword").value;
+            //
+            //     if (password !== confirmPassword) {
+            //         // 모달 띄우기
+            //         var myModal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
+            //         myModal.show();
+            //         return false; // 폼 제출 막기
+            //     }
+            //     return true; // 비밀번호 일치 시 폼 제출
+            // }
 
             // 주소
             function execDaumPostcode() {

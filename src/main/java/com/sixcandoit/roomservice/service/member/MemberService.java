@@ -100,9 +100,9 @@ public class MemberService {
             // 기존 회원 정보 가져오기
             MemberEntity memberEntity = member.get();
 
-            // 비밀번호 인코딩 후 변경
-            String password = passwordEncoder.encode(memberDTO.getPassword());
-            memberEntity.setPassword(password);
+//            // 비밀번호 인코딩 후 변경
+//            String password = passwordEncoder.encode(memberDTO.getPassword());
+//            memberEntity.setPassword(password);
 
             // 다른 필드 업데이트
             memberEntity.setLevel(memberDTO.getLevel());
@@ -123,6 +123,28 @@ public class MemberService {
 
         return null;
     }
+
+    // 비밀번호 변경
+    public boolean changePassword(String memberEmail, String currentPassword, String newPassword) {
+        Optional<MemberEntity> memberOpt = memberRepository.findByMemberEmail(memberEmail);
+
+        if (memberOpt.isPresent()) {
+            MemberEntity member = memberOpt.get();
+
+            // 현재 비밀번호 확인
+            if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+                return false; // 현재 비밀번호가 틀림
+            }
+
+            // 새 비밀번호 암호화 후 저장
+            member.setPassword(passwordEncoder.encode(newPassword));
+            memberRepository.save(member);
+            return true;
+        }
+
+        return false;
+    }
+
 
     // 회원 탈퇴
     public void delete(String memberEmail) {

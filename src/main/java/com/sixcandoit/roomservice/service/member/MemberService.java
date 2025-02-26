@@ -90,15 +90,33 @@ public class MemberService {
     // 회원 정보 수정
     public MemberEntity modify(MemberDTO memberDTO) {
 
-        Optional<MemberEntity> user = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
+        log.info("멤버 이메일은?"+memberDTO.getMemberEmail());
+        Optional<MemberEntity> member = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
+        log.info("가지고 왔나요 ? "+member);
 
-        if (user.isPresent()) {
+        if (member.isPresent()) {
+            log.info("회원 정보를 수정하자");
+
+            // 기존 회원 정보 가져오기
+            MemberEntity memberEntity = member.get();
+
+            // 비밀번호 인코딩 후 변경
             String password = passwordEncoder.encode(memberDTO.getPassword());
-            MemberEntity memberEntity = modelMapper.map(memberDTO, MemberEntity.class);
-
-            memberEntity.setMemberEmail(user.get().getMemberEmail());
             memberEntity.setPassword(password);
-            memberEntity.setLevel(user.get().getLevel());
+
+            // 다른 필드 업데이트
+            memberEntity.setLevel(memberDTO.getLevel());
+            memberEntity.setMemberName(memberDTO.getMemberName());
+            memberEntity.setMemberAddress(memberDTO.getMemberAddress());
+            memberEntity.setMemberPhone(memberDTO.getMemberPhone());
+
+
+//            String password = passwordEncoder.encode(memberDTO.getPassword());
+//            MemberEntity memberEntity = modelMapper.map(memberDTO, MemberEntity.class);
+//
+//            memberEntity.setMemberEmail(memberDTO.getMemberEmail());
+//            memberEntity.setPassword(password);
+//            memberEntity.setLevel(memberDTO.getLevel());
 
             return memberRepository.save(memberEntity);
         }

@@ -58,4 +58,5 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Integer> {
             + "( u.memberName LIKE %:keyword% OR u.memberEmail LIKE %:keyword% OR u.memberPhone LIKE %:keyword%)")
     Page<MemberEntity> searchMemberNameAndEmailAndPhone(@Param("keyword") String keyword, Pageable page);
 
+    Optional<MemberEntity> findByidx(Integer idx);
 }

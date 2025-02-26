@@ -2,9 +2,13 @@ package com.sixcandoit.roomservice.controller.room;
 
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.service.room.RoomService;
+import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalTime;
-import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,11 +30,22 @@ public class RoomController {
 
     // 룸 전체 목록
     @GetMapping("/room/list")
-    private String list(Model model){
-        log.info("모든 객실 정보를 읽어온다...");
-        List<RoomDTO> roomDTOList = roomService.roomList();
+    private String list(@PageableDefault(page = 1) Pageable page, // 페이지 정보
+                        @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
+                        @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
+                        @RequestParam(value = "order", defaultValue = "") String order, // 가격순
+                        Model model){
+        // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
+        Page<RoomDTO> roomDTOList = roomService.roomList(page, type, keyword, order);
+        // html에 필요한 페이지 정보를 받는다.
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(roomDTOList);
 
-        model.addAttribute("roomDTOList", roomDTOList);
+        model.addAttribute("roomDTOList", roomDTOList); // 데이터 전달
+        model.addAllAttributes(pageInfo); // 페이지 정보
+        model.addAttribute("type", type); //검색분류
+        model.addAttribute("keyword", keyword); // 키워드
+        model.addAttribute("order", order); // 가격순
+
         return "room/list";
     }
 

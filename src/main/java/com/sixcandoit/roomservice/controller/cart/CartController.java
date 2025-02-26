@@ -21,7 +21,6 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/orders")
 @Log4j2
 public class CartController {
 
@@ -30,14 +29,14 @@ public class CartController {
 
     //등록
     @PostMapping("/cart")
-    public ResponseEntity orderCart(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult, Principal principal) {
+    public ResponseEntity orderCart(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
+                                    Principal principal) {
 
         //유효성 검사
         if (bindingResult.hasErrors()) {
             StringBuffer sb = new StringBuffer();
 
-            List<FieldError> fieldErrorList
-                    = bindingResult.getFieldErrors();
+            List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
 
             for (FieldError fieldError : fieldErrorList) {
                 sb.append(fieldError.getDefaultMessage());
@@ -59,7 +58,7 @@ public class CartController {
     }
 
 
-    @GetMapping("/cart")
+    @GetMapping("/cart/cartlist")
     public String getCart(Principal principal, Model model) {
         //사용자에게 보여줄 장바구니 목록
         List<CartDetailDTO> cartDetailDTOList =
@@ -68,20 +67,20 @@ public class CartController {
         //사용자에게 보여줄 장바구니 목록 중에 CartDetailDTO(꼭 필요한 정보만 가공한 DTO)로 담은 List
         model.addAttribute("cartDetailDTOList", cartDetailDTOList);
 
-        return "orders/cartlist";
+        return "cart/cartlist";
     }
 
     //변경
     @PostMapping("/cartmenu")
-    public ResponseEntity updateCartMenu(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult, Principal principal) {
+    public ResponseEntity updateCartMenu(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
+                                         Principal principal) {
         String memberEmail = principal.getName();
 
         log.info("수량 변경을 위해 넘어온 값 : " + cartMenuDTO);
         if (bindingResult.hasErrors()) {
             StringBuffer sb = new StringBuffer();
 
-            List<FieldError> fieldErrorList
-                    = bindingResult.getFieldErrors();
+            List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
 
             for (FieldError fieldError : fieldErrorList) {
                 sb.append(fieldError.getDefaultMessage());
@@ -111,7 +110,7 @@ public class CartController {
         return new ResponseEntity<Integer>(cartmenuidx, HttpStatus.OK);
     }
 
-    @PostMapping("/cart/orders")
+    @PostMapping("/cart/cartlist")
     public ResponseEntity orderCartMenu(@RequestBody CartOrdersDTO cartOrdersDTO, Principal principal) {
         log.info(cartOrdersDTO);
         List<CartOrdersDTO> cartOrdersDTOList = cartOrdersDTO.getOrdersDTOList();

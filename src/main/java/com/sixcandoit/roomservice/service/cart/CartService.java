@@ -92,6 +92,10 @@ public class CartService {
 
         Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
 
+        if (memberEntity.isEmpty()) {
+            // 만약 회원이 없다면 빈 리스트 반환 (혹은 적절한 예외 처리)
+            return cartDetailDTOList;
+        }
         CartEntity cartEntity = cartRepository.findByMemberJoin_memberEmail(memberEntity.get().getMemberEmail());
 
         //카트가 존재하지 않는다면

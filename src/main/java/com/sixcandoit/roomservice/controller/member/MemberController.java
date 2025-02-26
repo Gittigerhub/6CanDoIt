@@ -107,6 +107,7 @@ public class MemberController {
         MemberDTO memberDTO = new MemberDTO();
 
         if (memberEmail != null){
+            log.info("멤버 이메일 ? " + memberEmail);
             memberDTO = memberService.read(memberEmail);
         }
 
@@ -117,6 +118,7 @@ public class MemberController {
     @PostMapping("/modify")
     public String modifyMember(@ModelAttribute MemberDTO memberDTO){
         memberService.modify(memberDTO);
+        log.info("회원 정보를 수정해요~");
 
         return "redirect:/member/";
     }

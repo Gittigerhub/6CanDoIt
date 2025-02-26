@@ -23,7 +23,7 @@
                         <form th:action="@{/member/modify}" method="post" onsubmit="combineAddress()">
                             <div class="mb-3 mt-3">
                                 <label for="memberEmail" class="form-label">이메일</label>
-                                <input type="email" class="form-control" id="memberEmail" th:name="memberEmail" th:value="${memberDTO.memberEmail}" readonly>
+                                <input type="email" class="form-control" id="memberEmail" th:name="memberEmail" th:value="${memberDTO.memberEmail}" readonly >
                                 <small class="text-muted">이메일은 변경할 수 없습니다.</small>
                             </div>
 <!--                            <div class="mb-3">-->
@@ -42,6 +42,10 @@
 <!--                                    비밀번호가 일치합니다.-->
 <!--                                </div>-->
 <!--                            </div>-->
+                            <div class="mt-2 mb-3">
+                                <label for="memberName" class="form-label">이름</label>
+                                <input type="text" class="form-control" id="memberName" th:name="memberName" th:value="${memberDTO.memberName}">
+                            </div>
                             <div class="mb-3">
                                 <label for="memberBirth" class="form-label">생년월일</label>
                                 <input type="date" class="form-control" id="memberBirth" th:name="memberBirth" th:value="${memberDTO.memberBirth}" max="9999-12-31">
@@ -54,10 +58,6 @@
                                 <label for="female">여성</label>
                             </div>
 
-                            <div class="mt-2 mb-3">
-                                <label for="memberName" class="form-label">이름</label>
-                                <input type="text" class="form-control" id="memberName" th:name="memberName" th:value="${memberDTO.memberName}">
-                            </div>
                             <div class="mb-3">
                                 <label for="memberPhone" class="form-label">연락처</label>
                                 <input type="text" class="form-control" id="memberPhone" th:name="memberPhone" th:value="${memberDTO.memberPhone}" maxlength="11">

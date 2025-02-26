@@ -119,7 +119,7 @@ public class MemberController {
     @PostMapping("/modify")
     public String modifyMember(@ModelAttribute MemberDTO memberDTO){
         memberService.modify(memberDTO);
-        log.info("회원 정보를 수정해요~");
+        log.info("회원 정보를 수정해요!!");
 
         return "redirect:/member/";
     }
@@ -127,7 +127,7 @@ public class MemberController {
     // 비밀번호 수정
     @GetMapping("/modifypw")
     public String showModifyPWPage(HttpSession session, Model model){
-        log.info("비밀번호 변경을 해요");
+        log.info("비밀번호 변경을 해요!!");
         return "member/modifypw";
     }
 

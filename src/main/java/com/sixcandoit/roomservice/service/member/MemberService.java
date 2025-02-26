@@ -105,10 +105,13 @@ public class MemberService {
 //            memberEntity.setPassword(password);
 
             // 다른 필드 업데이트
-            memberEntity.setLevel(memberDTO.getLevel());
+//            memberEntity.setLevel(memberDTO.getLevel());
             memberEntity.setMemberName(memberDTO.getMemberName());
-            memberEntity.setMemberAddress(memberDTO.getMemberAddress());
+            memberEntity.setMemberBirth(memberDTO.getMemberBirth());
+            memberEntity.setMemberGender(memberDTO.getMemberGender());
             memberEntity.setMemberPhone(memberDTO.getMemberPhone());
+            memberEntity.setMemberAddress(memberDTO.getMemberAddress());
+            memberEntity.setAlramOrder(memberDTO.getAlramOrder());
 
 
 //            String password = passwordEncoder.encode(memberDTO.getPassword());

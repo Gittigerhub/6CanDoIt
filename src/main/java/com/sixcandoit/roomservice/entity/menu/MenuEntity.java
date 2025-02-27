@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.entity.menu;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.cart.CartEntity;
@@ -27,8 +28,9 @@ public class MenuEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;                 // 기본 키
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "menu_category")
-    private String menuCategory;        // 메뉴 카테고리(KF:한식, CF:중식, WF:양식, JF:일식, Dr:음료, Si:사이드)
+    private MenuCategory menuCategory;        // 메뉴 카테고리(KF:한식, CF:중식, WF:양식, JF:일식, Dr:음료)
 
     @Column(name = "menu_name")
     private String menuName;             // 메뉴 이름

@@ -25,7 +25,8 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="menuCategory" class="form-label">카테고리:</label>
-                            <input type="text" class="form-control" id="menuCategory" name="menuCategory" th:field="*{menuCategory}" readonly>
+                            <input type="text" class="form-control" id="menuCategory" name="menuCategory"
+                                   th:value="${T(com.sixcandoit.roomservice.constant.MenuCategory).valueOf(menuDTO.menuCategory).name()}" readonly>
                             <p th:if="${#fields.hasErrors('menuCategory')}" th:errors="*{menuCategory}" class="fieldError"></p>
                         </div>
                         <div class="mb-3">

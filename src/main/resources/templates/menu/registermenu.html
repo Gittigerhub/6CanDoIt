@@ -26,12 +26,8 @@
                         <div class="mb-3 mt-3"><!--카테고리-->
                             <label for="menuCategory" class="form-label">카테고리</label>
                             <select class="form-select" th:field="*{menuCategory}" id="menuCategory" name="menuCategory">
-                                <option value="KF">한식</option>
-                                <option value="CF">중식</option>
-                                <option value="WF">양식</option>
-                                <option value="JF">일식</option>
-                                <option value="Dr">음료</option>
-                                <option value="Si">사이드</option>
+                                <option th:each="category : ${T(com.sixcandoit.roomservice.constant.MenuCategory).values()}"
+                                th:value="${category.name()}" th:text="${category.name()}">/option>
                             </select>
                             <span th:if="${#fields.hasErrors('menuCategory')}"
                                   style="color: red;"

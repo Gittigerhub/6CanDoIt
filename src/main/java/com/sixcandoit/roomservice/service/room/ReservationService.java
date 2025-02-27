@@ -26,9 +26,15 @@ public class ReservationService {
     private final ModelMapper modelMapper;
 
     // 예약이 가능한지 확인
-    private boolean checkAvailability(LocalDate startDate, LocalDate endDate) {
-        List<ReservationEntity> overlappingReservations = reservationRepository.findOverlappingReservations(startDate, endDate);
+    private boolean checkAvailability(Integer roomIdx, LocalDate startDate, LocalDate endDate) {
+        List<ReservationEntity> overlappingReservations = reservationRepository.findOverlappingReservations(roomIdx, startDate, endDate);
         return overlappingReservations.isEmpty();
+    }
+
+    // 빈 객실 조회
+    public List<RoomEntity> getAvailableRooms(LocalDate startDate, LocalDate endDate) {
+        // 예약 날짜와 겹치지 않는 객실 조회
+        return reservationRepository.findAvailableRooms(startDate, endDate);
     }
 
     //주어진 ID에 해당하는 데이터를 삭제
@@ -49,7 +55,7 @@ public class ReservationService {
 
             log.info("예약 기간이 겹치면...");
             // 예약 기간이 겹치는지 확인
-            if (!checkAvailability(reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
+            if (!checkAvailability(reservationDTO.getRoomIdx(), reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
                 log.info("예약 기간 겹침......저장x");
                 throw new RuntimeException("선택한 기간에 이미 예약이 존재합니다.");
             }
@@ -84,7 +90,7 @@ public class ReservationService {
             ReservationEntity reserveEntity = modelMapper.map(reservationDTO, ReservationEntity.class);
 
             // 예약 기간이 겹치는지 확인
-            if (!checkAvailability(reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
+            if (!checkAvailability(reservationDTO.getRoomIdx(), reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
                 throw new RuntimeException("선택한 기간에 이미 예약이 존재합니다.");
             }
 

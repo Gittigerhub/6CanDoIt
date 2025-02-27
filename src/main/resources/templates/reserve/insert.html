@@ -102,6 +102,19 @@
                 myModal.show();
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작
+            var yyyy = today.getFullYear();
+
+            today = yyyy + '-' + mm + '-' + dd;  // YYYY-MM-DD 형식으로 변환
+
+            // 체크인 날짜와 체크아웃 날짜의 최소값 설정
+            document.querySelector("input[name='startDate']").setAttribute("min", today);
+            document.querySelector("input[name='endDate']").setAttribute("min", today);
+        });
     </script>
 </th:block>
 <!--<th:block layout:fragment="script">-->

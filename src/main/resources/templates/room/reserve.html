@@ -47,23 +47,7 @@
             <div class="col-sm-6 mt-4 col-md-4 col-lg-3 mb-4" th:each="data : ${List}">
                 <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;">
                     <div class="card-body text-center">
-                        <a th:href="@{detail(idx=${data.idx})}">
-                            <p class="card-text" style="font-size: 12px">
-                                <strong>번호:</strong> <span th:text="${data.idx}">1</span>
-                            </p>
-                            <p class="card-title" th:text="${data.roomName}">방 이름</p>
-                            <p>
-                                <strong>예약자:</strong> <span th:text="${data.username}"></span>
-                            </p>
-                            <p style="font-size: 12px">
-                                <span th:text="${#temporals.format(data.startDate, 'yyyy-MM-dd')}">2024-01-21</span> ~
-                                <span th:text="${#temporals.format(data.endDate, 'yyyy-MM-dd')}">2024-01-21</span>
-                            </p>
-                            <div class="d-flex justify-content-center">
-                                <a th:href="@{'/res/update/' + ${data.idx}}" class="btn btn-outline-primary btn-sm mx-2">수정</a>
-                                <a th:href="@{'/res/delete/' + ${data.idx}}" class="btn btn-outline-danger btn-sm mx-2">예약 취소</a>
-                            </div>
-                        </a>
+                        여기에 체크인 체크아웃 객실 띄울 거임
                     </div>
                 </div>
             </div>
@@ -76,7 +60,7 @@
             <div class="col-lg-8">
                 <h2 class="text-center">객실 예약 조회</h2>
                 <!-- 검색 영역 -->
-                <form th:action="@{/res/list}" method="get">
+                <form th:action="@{/res/reserve}" method="get">
                     <div class="input-group mb-3 mt-3">
                         <input type="date" class="form-control" name="sdate"
                                th:value="${sdate}"> <!--예약시작일-->

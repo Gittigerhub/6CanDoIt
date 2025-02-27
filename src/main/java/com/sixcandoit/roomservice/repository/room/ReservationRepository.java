@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.repository.room;
 
 import com.sixcandoit.roomservice.entity.room.ReservationEntity;
+import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,9 +29,22 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     @Query("SELECT r FROM ReservationEntity r WHERE r.startDate >= :startDate AND r.endDate <= :endDate")
     List<ReservationEntity> findByStartDateAfterAndEndDateBefore(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    // JPQL 쿼리: 새로 예약하려는 날짜 범위와 겹치는 예약을 찾기 위한 쿼리
-    @Query("SELECT r FROM ReservationEntity r WHERE r.startDate < :endDate AND r.endDate > :startDate")
-    List<ReservationEntity> findOverlappingReservations(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+//    // JPQL 쿼리: 새로 예약하려는 날짜 범위와 겹치는 예약을 찾기 위한 쿼리
+//    @Query("SELECT r FROM ReservationEntity r WHERE r.startDate < :endDate AND r.endDate > :startDate")
+//    List<ReservationEntity> findOverlappingReservations(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    // JPQL 쿼리: 특정 객실에 대해 새로 예약하려는 날짜 범위와 겹치는 예약을 찾기 위한 쿼리
+    @Query("SELECT r FROM ReservationEntity r WHERE r.roomJoin.idx = :roomIdx " +
+            "AND r.startDate < :endDate AND r.endDate > :startDate")
+    List<ReservationEntity> findOverlappingReservations(@Param("roomIdx") Integer roomIdx,
+                                                               @Param("startDate") LocalDate startDate,
+                                                               @Param("endDate") LocalDate endDate);
+
+
+    @Query("SELECT r FROM RoomEntity r WHERE r.idx NOT IN (" +
+            "SELECT rr.roomJoin.idx FROM ReservationEntity rr WHERE " +
+            "(rr.startDate < :endDate AND rr.endDate > :startDate))")
+    List<RoomEntity> findAvailableRooms(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     Optional<ReservationEntity> findByIdx(Integer idx);
 }

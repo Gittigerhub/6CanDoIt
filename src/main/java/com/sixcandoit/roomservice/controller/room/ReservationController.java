@@ -31,6 +31,7 @@ public class ReservationController {
     //등록폼으로 이동
     @GetMapping("/create")
     public String createForm(Model model) {
+
         log.info("등록 페이지로 이동....");
 
         // 룸 데이터 조회
@@ -71,6 +72,22 @@ public class ReservationController {
         return "redirect:/res/list";
     }
 
+    // 빈 객실 목록 조회
+    @GetMapping("/available")
+    public String getAvailableRooms(@RequestParam("startDate") LocalDate startDate,
+                                    @RequestParam("endDate") LocalDate endDate,
+                                    Model model) {
+        log.info("빈 객실 목록 조회...");
+
+        // 빈 객실 목록을 조회
+        List<RoomEntity> availableRooms = reservationService.getAvailableRooms(startDate, endDate);
+
+        // 모델에 빈 객실 목록을 추가
+        model.addAttribute("Rooms", availableRooms);
+
+        return "/reserve/list"; // 빈 객실 목록을 보여주는 뷰 템플릿을 렌더링합니다.
+    }
+
     //목록페이지로 이동
     @GetMapping("/list")
     public String getAllPages(@RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
@@ -82,7 +99,6 @@ public class ReservationController {
         if (model.containsAttribute("errorMessage")) {
             model.addAttribute("errorMessage", model.getAttribute("errorMessage"));
         }
-
         List<ReservationDTO> reserveDTOList = reservationService.reserveList(sdate, edate);
 
         model.addAttribute("List", reserveDTOList);

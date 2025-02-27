@@ -84,7 +84,7 @@
                                 <span th:text="${#temporals.format(data.endDate, 'yyyy-MM-dd')}">2024-01-21</span>
                             </p>
                             <div class="d-flex justify-content-center">
-                                <a th:href="@{'/res/update/' + ${data.idx}}" class="btn btn-outline-primary btn-sm mx-2">수정</a>
+                                <a th:href="@{'/res/update/' + ${data.idx}}" class="btn btn-outline-primary btn-sm mx-2">예약 변경</a>
                                 <a th:href="@{'/res/delete/' + ${data.idx}}" class="btn btn-outline-danger btn-sm mx-2">예약 취소</a>
                             </div>
                         </a>
@@ -98,11 +98,7 @@
 </div>
 
 <script th:inline="javascript">
-    /* 성공 메시지가 있는지 확인하고 팝업으로 표시합니다. */
-    var successMessage = /*[[${successMessage}]]*/ null;
-    if (successMessage) {
-        alert(successMessage);
-    }
+
 </script>
 
 </body>

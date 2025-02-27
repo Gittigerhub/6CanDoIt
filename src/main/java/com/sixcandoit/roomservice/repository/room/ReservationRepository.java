@@ -28,5 +28,9 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     @Query("SELECT r FROM ReservationEntity r WHERE r.startDate >= :startDate AND r.endDate <= :endDate")
     List<ReservationEntity> findByStartDateAfterAndEndDateBefore(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
+    // JPQL 쿼리: 새로 예약하려는 날짜 범위와 겹치는 예약을 찾기 위한 쿼리
+    @Query("SELECT r FROM ReservationEntity r WHERE r.startDate < :endDate AND r.endDate > :startDate")
+    List<ReservationEntity> findOverlappingReservations(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
     Optional<ReservationEntity> findByIdx(Integer idx);
 }

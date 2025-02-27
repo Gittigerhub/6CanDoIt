@@ -7,6 +7,7 @@ import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@Log4j2
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -22,6 +24,12 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
+
+    // 예약이 가능한지 확인
+    private boolean checkAvailability(LocalDate startDate, LocalDate endDate) {
+        List<ReservationEntity> overlappingReservations = reservationRepository.findOverlappingReservations(startDate, endDate);
+        return overlappingReservations.isEmpty();
+    }
 
     //주어진 ID에 해당하는 데이터를 삭제
     public void reserveDelete(Integer idx) {
@@ -35,9 +43,17 @@ public class ReservationService {
         Optional<RoomEntity> roomEntityOpt = roomRepository.findByIdx(reservationDTO.getRoomIdx());
 
         if (roomEntityOpt.isPresent()) {
+            log.info("방이 존재하면...");
             ReservationEntity reserveEntity = modelMapper
                     .map(reservationDTO, ReservationEntity.class);
 
+            log.info("예약 기간이 겹치면...");
+            // 예약 기간이 겹치는지 확인
+            if (!checkAvailability(reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
+                log.info("예약 기간 겹침......저장x");
+                throw new RuntimeException("선택한 기간에 이미 예약이 존재합니다.");
+            }
+            log.info("예약 기간이 겹치치 않음...");
             // RoomEntity 설정
             RoomEntity roomEntity = roomEntityOpt.get();
             reserveEntity.setRoomJoin(roomEntity);  // ReservationEntity에 RoomEntity 설정
@@ -67,6 +83,11 @@ public class ReservationService {
             // 기존 ReservationEntity를 업데이트할 때, RoomEntity 상태도 고려
             ReservationEntity reserveEntity = modelMapper.map(reservationDTO, ReservationEntity.class);
 
+            // 예약 기간이 겹치는지 확인
+            if (!checkAvailability(reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
+                throw new RuntimeException("선택한 기간에 이미 예약이 존재합니다.");
+            }
+
             // RoomEntity를 roomIdx로 조회
             Optional<RoomEntity> roomEntityOpt = roomRepository.findByIdx(reservationDTO.getRoomIdx());
 
@@ -74,7 +95,7 @@ public class ReservationService {
                 RoomEntity roomEntity = roomEntityOpt.get();
                 reserveEntity.setRoomJoin(roomEntity);  // ReservationEntity에 RoomEntity 설정
 
-                // 예약 상태 변경 (예: 예약 중으로 상태 변경)
+                // 예약 상태 변경 (예약 중)
                 roomEntity.setResStatus("2");  // 예약 중으로 상태 변경
 
                 // 변경된 RoomEntity 저장

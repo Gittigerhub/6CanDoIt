@@ -2,6 +2,7 @@ package com.sixcandoit.roomservice.controller.admin;
 
 import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.admin.AdminService;
@@ -10,12 +11,14 @@ import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.aspectj.weaver.bcel.LazyClassGen;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -76,25 +79,133 @@ public class AdminController {
         return result;  // 응답 반환
     }
 
-    // 회원 수정
+    // 회원 수정 전 비밀번호 확인 페이지
+    @GetMapping("/verify")
+    public String ShowPasswordVerificationPage(HttpSession session, Model model){
+        log.info("비밀번호 확인 진입 했어?");
+        String adminEmail = (String) session.getAttribute("adminEmail");
+
+        if (adminEmail == null) {
+            log.warn("세션에 adminEmail 없음! 로그인 확인 필요");
+        }
+
+        model.addAttribute("adminEmail",adminEmail );
+        log.info("어드민 이메일 들어왔니?" + adminEmail);
+
+        return "/admin/verify";
+    }
+
+    // 비밀번호 검증 처리
+    @PostMapping("/verify")
+    public String verifyPassword(@RequestParam String password,
+                                 @RequestParam String adminEmail,
+                                 HttpSession session){
+
+        log.info("비밀번호 확인 진입 했나요?");
+        log.info("어드민 이메일 들어왔니? " + adminEmail);
+        log.info("입력된 비밀번호: " + password);
+
+        // 세션에서 adminEmail 가져오기 (필요한 경우)
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            adminEmail = (String) session.getAttribute("adminEmail");
+            log.info("세션에서 가져온 adminEmail: " + adminEmail);
+        }
+
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            log.warn("adminEmail이 null이거나 비어 있음!");
+            return "redirect:/admin/verify?error=email_required"; // 에러 메시지 추가 가능
+        }
+
+        // 비밀번호를 DB에서 조회하여 비교
+        boolean isPasswordValid = adminService.verifyPassword(password, adminEmail);
+        log.info("비번 DB에서 조회해서 비교 된거야?"+ isPasswordValid);
+
+        if (isPasswordValid) {
+            // 비밀번호가 맞으면 회원 정보 수정 페이지로 리디렉션
+            session.setAttribute("email", adminEmail);  // 이메일을 세션에 저장
+            System.out.println("비밀번호가 맞습니다.");
+            return "redirect:/admin/modify";  // 수정 페이지로 이동
+        } else {
+            // 비밀번호가 틀리면 다시 비밀번호 확인 페이지로 돌아가기
+            System.out.println("비밀번호가 틀렸습니다.");
+            return "redirect:/admin/verify";  // 비밀번호 페이지로 리디렉션
+        }
+    }
+
+    // 회원 정보 수정
     @GetMapping("/modify")
     public String showModifyPage(HttpSession session, Model model){
+        log.info("회원 정보 수정 진입 했니?");
         String adminEmail = (String) session.getAttribute("adminEmail");
         AdminDTO adminDTO = new AdminDTO();
 
         if (adminEmail != null){
+            log.info("관리자 이메일 ? " + adminEmail);
             adminDTO = adminService.read(adminEmail);
         }
 
         model.addAttribute("adminDTO", adminDTO);
+        log.info("회원 정보 수정 들어왔니?" + adminDTO);
+
         return "admin/modify";
     }
 
     @PostMapping("/modify")
-    public String modifyMember(@ModelAttribute AdminDTO adminDTO){
+    public String modifyAdmin(@ModelAttribute AdminDTO adminDTO){
         adminService.modify(adminDTO);
+        log.info("회원 정보를 수정해줘!!");
 
         return "redirect:/logout";
+    }
+
+    // 비밀번호 수정
+    @GetMapping("/modifypw")
+    public String showModifyPWPage(@RequestParam(value = "error", required = false) String error,
+                                   HttpSession session, Model model){
+        log.info("비밀번호 변경을 해요!!");
+
+        // 세션에서 관리자 이메일 가져오기
+        String adminEmail = (String) session.getAttribute("adminEmail");
+
+        if (adminEmail == null) {
+            log.info("로그인을 안 했어요");
+            return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로 이동
+        }
+
+        // 현재 비밀번호 오류 메시지가 있으면 추가
+        if (error != null) {
+            model.addAttribute("error", "현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        return "admin/modifypw";
+    }
+
+    @PostMapping("/modifypw")
+    public String modifyPW(@RequestParam String currentPassword,
+                           @RequestParam String newPassword,
+                           @RequestParam String confirmPassword,
+                           HttpSession session, RedirectAttributes redirectAttributes){
+
+        // 현재 로그인한 관리자 이메일 가져오기
+        String adminEmail = (String) session.getAttribute("adminEmail");
+        log.info("관리자 이메일 들어왔니? " + adminEmail);
+
+        if (adminEmail == null) {
+            log.info("로그인을 안했어요");
+            return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로 이동
+        }
+
+        // 비밀번호 검증 후 변경
+        boolean isUpdated = adminService.changePassword(adminEmail, currentPassword, newPassword);
+
+        if (!isUpdated) {
+            log.warn("현재 비밀번호가 틀렸습니다!");
+            redirectAttributes.addFlashAttribute("error", "true");
+            return "redirect:/admin/modifypw";
+        }
+        log.info("비밀번호 변경 성공 ~");
+        redirectAttributes.addFlashAttribute("success", "비밀번호가 변경되었습니다.");
+        return "redirect:/admin/";
     }
 
     // 임시비밀번호 발급

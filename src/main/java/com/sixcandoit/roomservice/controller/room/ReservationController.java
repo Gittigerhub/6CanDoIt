@@ -5,9 +5,8 @@ import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import com.sixcandoit.roomservice.service.room.ReservationService;
-import com.sixcandoit.roomservice.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -21,12 +20,11 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
-@Log
+@Log4j2
 @RequestMapping("/res")
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final RoomService roomService;
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
 
@@ -47,16 +45,29 @@ public class ReservationController {
         return "reserve/insert"; // pageInsert.html 뷰 템플릿을 찾아서 렌더링합니다.
     }
 
+    // 예외 발생 시 에러 메시지 전달
+    @ExceptionHandler(RuntimeException.class)
+    public String handleException(RuntimeException e, RedirectAttributes redirectAttributes) {
+        log.error("예외 처리 예외 발생: {}", e.getMessage());  // 예외 로그 추가
+        redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        return "redirect:/res/create"; // 예약 등록 페이지로 리다이렉트
+    }
+
     //등폭폼에서 입력한 내용을 저장
     @PostMapping("/create")
     public String createPage(@ModelAttribute ReservationDTO reservationDTO,
                              RedirectAttributes redirectAttributes) {
-        log.info("등록 처리 후 목록페이지로 이동....");
-        reservationService.reserveInsert(reservationDTO);
+        log.info("등록 처리 후 목록페이지로 이동하는 postmapping 시작....");
 
-        redirectAttributes.addFlashAttribute("successMessage",
-                "저장하였습니다.");
-
+        try {
+            reservationService.reserveInsert(reservationDTO);
+            redirectAttributes.addFlashAttribute("successMessage", "저장하였습니다.");
+            log.info("등록 처리 후....");
+        } catch (RuntimeException e) {
+            log.error("등록 예외 발생: {}", e.getMessage());  // 예외 메시지 확인 로그 추가
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        log.info("목록페이지로 이동...");
         return "redirect:/res/list";
     }
 
@@ -66,6 +77,12 @@ public class ReservationController {
                               @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
                               Model model) {
         log.info("데이터 조회 후 목록페이지로 이동....");
+
+        // 리다이렉트 후 전달된 성공 또는 실패 메시지를 받아옵니다.
+        if (model.containsAttribute("errorMessage")) {
+            model.addAttribute("errorMessage", model.getAttribute("errorMessage"));
+        }
+
         List<ReservationDTO> reserveDTOList = reservationService.reserveList(sdate, edate);
 
         model.addAttribute("List", reserveDTOList);
@@ -81,6 +98,13 @@ public class ReservationController {
                               @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
                               Model model) {
         log.info("데이터 조회 후 목록페이지로 이동....");
+
+        // 리다이렉트 후 전달된 성공 또는 실패 메시지를 받아옵니다.
+        if (model.containsAttribute("errorMessage")) {
+            // 에러 메시지가 있으면 모달을 띄워주도록 합니다.
+            model.addAttribute("errorMessage", model.getAttribute("errorMessage"));
+        }
+
         List<ReservationDTO> reserveDTOList = reservationService.reserveList(sdate, edate);
 
         model.addAttribute("List", reserveDTOList);
@@ -115,22 +139,23 @@ public class ReservationController {
         return "reserve/update"; // update-form.html 뷰 템플릿을 찾아서 렌더링합니다.
     }
 
-    //수정 폼에서 제출된 데이터를 받아와서 PageService를 통해 데이터를 수정하고, 수정이 성공하면
-    //"/getAll"로 리다이렉트합니다. 이때, 성공 메시지인 "수정하였습니다."를 Flash Attribute로
-    //추가하여 다음 페이지에 전달합니다.
+    // 예약 수정 처리
     @PostMapping("/update")
     public String updatePage(@ModelAttribute ReservationDTO updatedReserveDTO,
                              RedirectAttributes redirectAttributes) {
         log.info("수정 처리 후 목록페이지로 이동....");
-        reservationService.reserveUpdate(updatedReserveDTO);
 
-        redirectAttributes.addFlashAttribute("successMessage",
-                "수정하였습니다.");
+        try {
+            reservationService.reserveUpdate(updatedReserveDTO);
+            redirectAttributes.addFlashAttribute("successMessage", "수정하였습니다.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
         return "redirect:/res/list";
     }
 
-    //특정 CRUD 데이터를 삭제하고, 삭제가 성공하면 "/getAll"로 리다이렉트합니다. 이때, 성공 메시지인
-    //"삭제하였습니다."를 Flash Attribute로 추가하여 다음 페이지에 전달합니다.
+    // 삭제 처리
     @GetMapping("/delete/{idx}")
     public String deletePage(@PathVariable Integer idx) {
         log.info("삭제 처리 후 목록페이지로 이동....");

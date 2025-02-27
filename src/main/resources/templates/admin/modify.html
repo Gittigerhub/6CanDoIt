@@ -32,9 +32,8 @@
                                 <label for="adminPhone" class="form-label">연락처</label>
                                 <input type="text" class="form-control" id="adminPhone" th:name="adminPhone" th:field="*{adminPhone}" maxlength="11">
                             </div>
-                            <div class="mb-3 text-center">
-                                <a href="/admin/modifypw" class="btn btn-secondary mb-2">비밀번호 변경</a>
-                                <br>
+                            <div class="mb-3 d-flex justify-content-center gap-2">
+                                <button type="button" th:href="@{/admin/modifypw}" class="btn btn-secondary">비밀번호 변경</button>
                                 <button type="submit" class="btn btn-primary" value="수정">수정 완료</button>
                                 <button type="button" class="btn btn-light" onclick="window.history.back();">취소</button>
                             </div>

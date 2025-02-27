@@ -100,7 +100,7 @@ public class MenuService {
 
             // 여러개를 조회해야 할 땐 if문으로 분류에 따라 조회해야한다.
             // type : 메뉴명(1), 메뉴설명(2), 메뉴명+메뉴설명(3), 카테고리(4), 전체(0)
-            if (keyword != null) {  //검색어가 존재하면
+            if (keyword != null && !keyword.isEmpty()) {  //검색어가 존재하면
                 log.info("검색어가 존재하면...");
                 if (type.equals("1")) { //type 분류 1, 메뉴명으로 검색할 때
                     log.info("메뉴명으로 검색 하는 중...");

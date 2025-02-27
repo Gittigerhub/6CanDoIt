@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.dto.Menu;
 
-import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ public class MenuDTO {
 
     private Integer idx;                 // 기본 키
 
-    private MenuCategory menuCategory;        // 메뉴 카테고리(KF:한식, CF:중식, WF:양식, JF:일식, Dr:음료)
+    private String menuCategory;        // 메뉴 카테고리(KF:한식, CF:중식, WF:양식, JF:일식, Dr:음료)
 
     private String menuName;             // 메뉴 이름
 

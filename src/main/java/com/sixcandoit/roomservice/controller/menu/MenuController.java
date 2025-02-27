@@ -203,9 +203,6 @@ public class MenuController {
         model.addAllAttributes(pageInfo);   //페이지 정보
         model.addAttribute("type", type);   //검색 분류
         model.addAttribute("keyword", keyword); //키워드
-        model.addAttribute("bucket", bucket);
-        model.addAttribute("region", region);
-        model.addAttribute("folder", folder);
 
         return "menu/listmenu";
 

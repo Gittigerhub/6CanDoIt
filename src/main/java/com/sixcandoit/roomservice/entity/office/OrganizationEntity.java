@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.entity.office;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.AdvertisementEntity;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
@@ -42,6 +43,16 @@ public class OrganizationEntity extends BaseEntity {
 
     @Column(name = "active_yn")
     private String activeYn;              // 활성화 유무
+
+    // 본사/지사 구분을 위한 자기참조 관계 (부모)
+    @OneToMany(mappedBy = "head", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrganizationEntity> branch;    // 지사 목록
+
+    // 본사/지사 구분을 위한 자기참조 관계 (자식)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "head_id")
+    @JsonBackReference
+    private OrganizationEntity head;            // 본사
 
     // 관리자 회원 테이블과 1:N 매핑
     @OneToMany(mappedBy = "organizationJoin")

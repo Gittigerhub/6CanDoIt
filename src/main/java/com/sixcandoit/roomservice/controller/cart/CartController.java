@@ -27,9 +27,9 @@ public class CartController {
     private final CartService cartService;
     private final CartMenuService cartMenuService;
 
-    //등록
-    @PostMapping("/cart")
-    public ResponseEntity orderCart(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
+    //룸예약 장바구니 등록
+    @PostMapping("/cart/RegisterReserve")
+    public ResponseEntity cartRegisterReserve(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
                                     Principal principal) {
 
         //유효성 검사

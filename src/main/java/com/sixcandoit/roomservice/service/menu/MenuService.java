@@ -124,11 +124,15 @@ public class MenuService {
 
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             //Entity를 dTO로 변환 후 저장
-            Page<MenuDTO> menuDTOS = menuEntities.map(
-                    data -> modelMapper.map(data, MenuDTO.class));
 
-            // 4. 결과값을 전달
-            return menuDTOS;
+//            Page<MenuDTO> menuDTOS = menuEntities.map(
+//                    data -> modelMapper.map(data, MenuDTO.class));
+//
+//            // 4. 결과값을 전달
+//            return menuDTOS;
+
+            // 엔티티를 DTO로 변환
+            return menuEntities.map(menuEntity -> modelMapper.map(menuEntity, MenuDTO.class));
 
         } catch (Exception e) { //오류 발생시 처리
             throw new RuntimeException("조회 오류");

@@ -14,7 +14,17 @@
     <a>
         <br class="fs-9"> 조직:(없으면 보이지x)</br>
         <br class="fs-9"> 권한:ADMIN</br>
-        <br class="fs-9"> ID:admin</br>
+        <br class="fs-9">
+            <!-- 로그인된 사용자 이름 표시 -->
+            <p th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
+                ID: <span th:text="${#authentication.principal.username}"></span>!
+            </p>
+
+            <!-- 로그인되지 않은 경우 -->
+            <p th:if="${#authentication.principal == null or #authentication.principal == 'anonymousUser'}">
+                You are not logged in.
+            </p>
+        </br>
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">

@@ -25,6 +25,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+
         }
         .filter-container label, .filter-container select, .filter-container input {
             padding: 8px;
@@ -145,20 +146,21 @@
         </tbody>
     </table>
     <br>
+    <div class="filter-container d-flex align-items-center gap-3">
+        <div class="d-inline-flex align-items-center gap-2">
+            <label for="sales" class="mb-0">매출:</label>
+            <input type="date" id="sales" name="sales" class="form-control w-auto">
+        </div>
 
-    <div class="filter-container">
-        <div>
-            <label for="sales">매출:</label>
-            <input type="date" id="sales" name="sales">
+        <div class="d-inline-flex align-items-center gap-2">
+            <label for="amount" class="mb-0">정산:</label>
+            <input type="date" id="amount" name="amount" class="form-control w-auto">
         </div>
-        <div>
-            <label for="amount">정산:</label>
-            <input type="date" id="amount" name="amount">
-        </div>
-        <div class="button-container">
-            <button class="btn btn-primary" onclick="search()">조회</button>
-        </div>
+
+        <button class="btn btn-primary">조회</button>
     </div>
+
+
 
     <!-- 차트 표시 영역 -->
     <div class="chart-container">

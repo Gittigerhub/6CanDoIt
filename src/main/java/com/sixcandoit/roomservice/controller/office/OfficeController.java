@@ -37,6 +37,12 @@ public class OfficeController {
     private final ShopDetailService shopDetailService;
     private final ImageFileService imageFileService;
 
+    @GetMapping("/test")
+    public String test(Model model) {
+
+        return "office/test";
+    }
+
 
     @GetMapping("/list")
     public String list(@PageableDefault(page=1) Pageable page,

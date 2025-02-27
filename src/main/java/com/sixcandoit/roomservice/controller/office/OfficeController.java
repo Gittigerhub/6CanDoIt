@@ -7,6 +7,7 @@ import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.service.office.ShopDetailService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -47,7 +48,8 @@ public class OfficeController {
     @GetMapping("/list")
     public String list(@PageableDefault(page=1) Pageable page,
                        @RequestParam(value="keyword", defaultValue = "") String keyword,
-                       @RequestParam(value="type", defaultValue = "") String type, Model model) {
+                       @RequestParam(value="type", defaultValue = "") String type,
+                       HttpServletRequest request, Model model) {
 
         // 서비스에 조회 요청
         Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
@@ -72,6 +74,7 @@ public class OfficeController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("type", type);
         model.addAttribute("existsList", existsList); // exists 값 리스트를 모델에 추가
+        model.addAttribute("request", request); // 현재 페이지 url
 
         return "office/officelist";
 

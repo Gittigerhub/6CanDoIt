@@ -55,11 +55,11 @@
                   <th>주소</th>
                   <th>주문 알람 수신</th>
                   <th>활성화</th>
-<!--                  <th>가입 일자</th>-->
+                  <th>가입 일자</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="member : ${member}">
+                <tr th:each="member : ${members}">
                   <td th:text="${member.idx}"></td>
                   <td th:text="${member.memberType}"></td>
                   <td th:text="${member.memberName}"></td>
@@ -69,7 +69,8 @@
                   <td th:text="${member.memberPhone}"></td>
                   <td th:text="${member.memberAddress}"></td>
                   <td th:text="${member.alramOrder}"></td>
-<!--                  <td th:text="${member.insDate}"></td>-->
+                  <td th:text="${member.activeYn}"></td>
+                  <td th:text="${#temporals.format(member.insDate, 'yyyy-MM-dd')}"></td>
                 </tr>
                 </tbody>
               </table>

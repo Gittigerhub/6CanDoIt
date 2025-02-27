@@ -37,23 +37,43 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
 
         if(session != null) {
-            String memberEmail = authentication.getName();
-            session.setAttribute("memberEmail", memberEmail);
+            String userEmail = authentication.getName(); // 로그인한 사용자 이메일
 
             boolean isUser = authentication.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER"));
-            if(isUser) { //USER이면
+                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_MEMBER"));
+            if(isUser) { // 일반 사용자
                 System.out.println("사용자 페이지 이동");
-                super.setDefaultTargetUrl("/member/"); // 회원 메인 페이지 이동
+                session.setAttribute("memberEmail", userEmail);  // 일반 사용자 이메일 저장
+                super.setDefaultTargetUrl("/member/");
             }
 
             boolean isAdmin = authentication.getAuthorities().stream()
                     .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-            if(isAdmin) { //ADMIN이면
+            if(isAdmin) { // 관리자
                 System.out.println("관리자 페이지 이동");
-                super.setDefaultTargetUrl("/admin/"); //관리자 메인 페이지 이동
+                session.setAttribute("adminEmail", userEmail);  // 관리자 이메일 저장
+                super.setDefaultTargetUrl("/admin/");
             }
         }
+
+//        if(session != null) {
+//            String memberEmail = authentication.getName();
+//            session.setAttribute("memberEmail", memberEmail);
+//
+//            boolean isUser = authentication.getAuthorities().stream()
+//                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER"));
+//            if(isUser) { //USER이면
+//                System.out.println("사용자 페이지 이동");
+//                super.setDefaultTargetUrl("/member/"); // 회원 메인 페이지 이동
+//            }
+//
+//            boolean isAdmin = authentication.getAuthorities().stream()
+//                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//            if(isAdmin) { //ADMIN이면
+//                System.out.println("관리자 페이지 이동");
+//                super.setDefaultTargetUrl("/admin/"); //관리자 메인 페이지 이동
+//            }
+//        }
 
         super.onAuthenticationSuccess(request, response, authentication);
     }

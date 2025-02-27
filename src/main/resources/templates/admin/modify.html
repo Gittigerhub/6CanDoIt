@@ -18,19 +18,19 @@
                 <div class="card">
                     <div class="card-body">
                         <h2 style="text-align: center;">회원 정보 수정</h2>
-                        <form th:action="@{/admin/modify}" method="post">
+                        <form th:action="@{/admin/modify}" method="post" th:object="${adminDTO}">
                             <div class="mb-3 mt-3">
                                 <label for="adminEmail" class="form-label">이메일</label>
-                                <input type="email" class="form-control" id="adminEmail" th:name="adminEmail" th:value="${admin.adminEmail}" readonly disabled>
+                                <input type="email" class="form-control" id="adminEmail" th:name="adminEmail" th:field="*{adminEmail}" readonly>
                                 <small class="text-muted">이메일은 변경할 수 없습니다.</small>
                             </div>
                             <div class="mt-2 mb-3">
                                 <label for="adminName" class="form-label">이름</label>
-                                <input type="text" class="form-control" id="adminName" th:name="adminName" th:value="${admin.adminName}">
+                                <input type="text" class="form-control" id="adminName" th:name="adminName" th:field="*{adminName}">
                             </div>
                             <div class="mb-3">
                                 <label for="adminPhone" class="form-label">연락처</label>
-                                <input type="text" class="form-control" id="adminPhone" th:name="adminPhone" th:value="${admin.adminPhone}" maxlength="11">
+                                <input type="text" class="form-control" id="adminPhone" th:name="adminPhone" th:field="*{adminPhone}" maxlength="11">
                             </div>
                             <div class="mb-3 text-center">
                                 <a href="/admin/modifypw" class="btn btn-secondary mb-2">비밀번호 변경</a>

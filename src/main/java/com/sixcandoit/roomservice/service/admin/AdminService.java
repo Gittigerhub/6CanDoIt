@@ -64,22 +64,79 @@ public class AdminService {
         return adminRepository.save(adminEntity);
     }
 
+    // 비밀번호 확인
+    public boolean verifyPassword(String inputPassword, String adminEmail) {
+        // DB에서 회원 정보를 조회 (Optional<AdminEntity> 반환)
+        Optional<AdminEntity> optionalAdmin = adminRepository.findByAdminEmail(adminEmail);
+        log.info("DB에서 회원 정보 조회를 했니? " + optionalAdmin);
+
+        if (optionalAdmin.isPresent()) {
+            log.info("회원이 존재해요!!");
+            // 회원이 존재하면, 비밀번호 비교
+            AdminEntity adminEntity = optionalAdmin.get(); // AdminEntity 객체 추출
+            boolean isMatch = passwordEncoder.matches(inputPassword, adminEntity.getPassword());
+
+            // 로그 추가
+            log.info("비밀번호 검증 결과: " + isMatch); // 비밀번호 일치 여부 확인
+
+            return isMatch;
+        } else {
+            log.info("회원이 없는데요...?");
+            // 회원이 없으면 false 반환
+            return false;
+        }
+
+    }
+
     // 회원 정보 수정
     public AdminEntity modify(AdminDTO adminDTO) {
-        Optional<AdminEntity> user = adminRepository.findByAdminEmail(adminDTO.getAdminEmail());
 
-        if (user.isPresent()) {
-            String password = passwordEncoder.encode(adminDTO.getPassword());
+        log.info("관리자 이메일은?"+adminDTO.getAdminEmail());
+        Optional<AdminEntity> admin = adminRepository.findByAdminEmail(adminDTO.getAdminEmail());
+        log.info("가지고 왔나요 ? " + admin);
 
-            AdminEntity adminEntity = modelMapper.map(adminDTO, AdminEntity.class);
+        if (admin.isPresent()) {
+            log.info("회원 정보를 수정해보자");
 
-            adminEntity.setAdminEmail(adminDTO.getAdminEmail());
-            adminEntity.setPassword(password);
-            adminEntity.setLevel(user.get().getLevel());
+            // 기존 회원 정보 가져오기
+            AdminEntity adminEntity = admin.get();
+            log.info("기존 회원정보를 가지고 왔나요? " +  adminEntity);
+
+//            adminEntity.setAdminEmail(adminDTO.getAdminEmail());
+            adminEntity.setAdminName(adminDTO.getAdminName());
+            adminEntity.setAdminPhone(adminDTO.getAdminPhone());
 
             return adminRepository.save(adminEntity);
+
         }
+        log.info("null이래 ....");
         return null;
+    }
+
+    // 비밀번호 변경
+    public boolean changePassword(String adminEmail, String currentPassword, String newPassword) {
+        Optional<AdminEntity> adminOpt = adminRepository.findByAdminEmail(adminEmail);
+        log.info("비번 변경을 합시다 1차 확인 해봐" + adminOpt);
+
+        if (adminOpt.isPresent()) {
+            AdminEntity admin = adminOpt.get();
+            log.info("가지고 왔니? " + admin);
+
+            // 현재 비밀번호 확인
+            if (!passwordEncoder.matches(currentPassword, admin.getPassword())) {
+                log.info("현재 비밀번호가 틀렸어요 !! ");
+                return false; // 현재 비밀번호가 틀림
+            }
+
+            // 새 비밀번호 암호화 후 저장
+            admin.setPassword(passwordEncoder.encode(newPassword));
+            adminRepository.save(admin);
+            log.info("비밀번호 변경을 했어요~");
+            return true;
+        }
+
+        log.info("비밀번호 변경 실패~~~");
+        return false;
     }
 
     // 회원 탈퇴

@@ -251,7 +251,8 @@ public class AdminController {
         // html에 필요한 페이지 정보를 받는다
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(memberDTOS); // 내가 알기론 이거 내부 값들을 개별적으로 애드어트리뷰트해서 넘겨줘야하는걸로 기억하는데
 
-        model.addAttribute("member", memberDTOS); // 데이터 전달
+//        model.addAttribute("member", memberDTOS); // 데이터 전달
+        model.addAttribute("members", memberDTOS.getContent()); // 리스트만 전달
         model.addAttribute(pageInfo); // 페이지 정보
         model.addAttribute("type", type); // 검색 분류
         model.addAttribute("keyword", keyword); // 키워드

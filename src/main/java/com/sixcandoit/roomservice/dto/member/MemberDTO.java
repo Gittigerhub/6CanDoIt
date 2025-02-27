@@ -3,6 +3,8 @@ package com.sixcandoit.roomservice.dto.member;
 import com.sixcandoit.roomservice.constant.Level;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -25,6 +27,8 @@ public class MemberDTO {
 
     private String alramOrder;             // 주문 알람 수신여부
     private String activeYn;               // 활성화 유무
+    private LocalDateTime insDate;                 // 가입 일자
+
 
     private Level level;    //사용자 등급(열거값)
     private String membersDescription;  //열거형 설명을 저장할 변수

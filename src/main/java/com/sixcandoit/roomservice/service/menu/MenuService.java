@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.service.menu;
 
+import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
@@ -84,7 +85,7 @@ public class MenuService {
 
     }
 
-    public Page<MenuDTO> menuList(Pageable page, String type, String keyword) {
+    public Page<MenuDTO> menuList(Pageable page, String type, String keyword, MenuCategory selectedMenuCate) {
         try {
             // 1. 페이지 정보를 재가공
             int currentPage = page.getPageNumber() - 1;  // 화면의 페이지 번호를 db 페이지 번호로
@@ -119,20 +120,18 @@ public class MenuService {
                     menuEntities = menuRepository.searchMenuAll(keyword, pageable);
                 }
             }else { //검색어가 존재하지 않으면 모두 검색
-                menuEntities = menuRepository.findAll(pageable);
+                    menuEntities = menuRepository.findAll(pageable);
+
             }
 
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             //Entity를 dTO로 변환 후 저장
 
-//            Page<MenuDTO> menuDTOS = menuEntities.map(
-//                    data -> modelMapper.map(data, MenuDTO.class));
-//
-//            // 4. 결과값을 전달
-//            return menuDTOS;
+            Page<MenuDTO> menuDTOS = menuEntities.map(
+                    data -> modelMapper.map(data, MenuDTO.class));
 
-            // 엔티티를 DTO로 변환
-            return menuEntities.map(menuEntity -> modelMapper.map(menuEntity, MenuDTO.class));
+            // 4. 결과값을 전달
+            return menuDTOS;
 
         } catch (Exception e) { //오류 발생시 처리
             throw new RuntimeException("조회 오류");

@@ -23,37 +23,37 @@
 </head>
 <body>
 <style>
-    html, body {
-        height: 100%; /* 전체 페이지 높이를 100%로 설정 */
-        margin: 0;
+    body {
+        background-color: #f0f0f0 ; /* 강제로 배경색 적용 */
     }
 
-    body {
-        display: flex;
-        flex-direction: column;
-        background-color: #f0f0f0 ; /* 강제로 배경색 적용 */
+    /* 사이드바 크기 축소 */
+    #hotelsidebar {
+        position: fixed; /* 고정 위치 */
+        top: 0;
+        left: 0;
+        width: 200px; /* 사이드바의 너비 */
+        height: 100%; /* 화면 전체 높이를 차지하도록 설정 */
+        background-color: #343a40;
+        color: white;
     }
 
     /* 본문 영역을 사이드바 우측에 맞춰서 펼침 */
     #body-wrapper {
+        margin-left: 300px; /* 사이드바 너비만큼 여백 */
         padding: 20px;
         flex-grow: 1;
     }
 
-    #footer {
-        margin-top: auto; /* 푸터를 아래로 밀어내기 */
-    }
 </style>
-<div id="header">
-    <th:block th:replace="~{fragments/memberheader::header}"></th:block>
-</div>
+
 <div class="d-flex">
+    <div id="hosidebar">
+        <th:block th:replace="~{fragments/hosidebar::hosidebar}"></th:block>
+    </div>
     <div id="body-wrapper">
         <div layout:fragment="content" class="container-fluid"></div>
     </div>
-</div>
-<div id="footer">
-    <th:block th:replace="~{fragments/footer::footer}"></th:block>
 </div>
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

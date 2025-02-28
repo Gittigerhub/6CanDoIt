@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/holayout}" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>조직 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!--JQuery 반드시 추가-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--Jquery를 이용한 드래그 앤 드롭, 리사이즈, 애니메이션 등 인터랙티브 기능을 구현-->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!--부트스트랩 아이콘-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--알림창 스크립트-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="p-5">
+
+    <!-- 페이지 시작 -->
+    <div class="container">
+        <h2>조직 관리</h2>
+        <form th:action="@{/office/list}" method="get">
+
+            <div class="row p-5 bg-white">
+                <div class="mb-3">
+                    <h3>조직 검색</h3>
+                    <h2 th:text="${exists}"></h2>
+                </div>
+                <div class="col-3">
+                    <input type="radio" class="form-check-input" id="BO" name="type" th:value="${'BO'}">지사
+                    <label class="form-check-label" for="BO"></label>
+
+                    <input type="radio" class="form-check-input" id="SHOP" name="type" th:value="${'SHOP'}">매장
+                    <label class="form-check-label" for="SHOP"></label>
+                </div>
+
+                <div class="col-8">
+                    <!--검색할 단어 입력-->
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="조직명을 입력하세요"/>
+                </div>
+
+                <div class="col-1 d-flex justify-content-end">
+                    <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
+                    <button type="submit" class="btn btn-success">조회</button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="row mt-5 p-5 bg-white">
+            <div class="mb-3">
+                <h3>조직 조회</h3>
+            </div>
+            <!--조회 테이블-->
+            <table class="table table-bordered" style="text-align: center">
+                <thead>
+                <tr style="height: 50px; vertical-align: middle"> <!--테이블 제목-->
+                    <th style="width: 8%">No</th>
+                    <th style="width: 8%">분류</th>
+                    <th style="width: 24%">명칭</th>
+                    <th style="width: 32%">주소</th>
+                    <th style="width: 20%">연락처</th>
+                    <th style="width: 8%">상태</th>
+                </tr>
+                </thead>
+                <tbody> <!--조직 테이블 데이터 출력-->
+                <tr style="height: 50px; vertical-align: middle" th:each="data:${organDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                    <td th:text="${data.idx}"></td>
+                    <td th:text="${data.organType}"></td>
+                    <td>
+                        <!-- 조직 분류가 매장이 아닐때 -->
+                        <a th:href="@{/office/organ(idx=${data.idx})}" th:if="${data.organType != 'SHOP'}" th:text="${data.organName}"></a>
+                        <!-- 조직 분류가 매장일때 -->
+                        <th:block th:if="${data.organType == 'SHOP'}">
+                            <!-- 매장 상세내용이 존재한다면 상세내용 보기 진행 -->
+                            <!--
+                            dataStat.index는 Thymeleaf 템플릿 엔진에서 제공하는 dataStat 변수에 포함된 속성으로, 반복되는 항목의 현재 인덱스를 추적하는 데 사용됩니다.
+                            dataStat.index는 th:each="data:${organDTO}" 구문에서 반복되는 각 항목의 현재 인덱스를 제공합니다.
+                             -->
+                            <th:block th:if="${existsList[dataStat.index]}">
+                                <a th:href="@{/office/shopdetail/realread(idx=${data.idx})}" th:text="${data.organName}"></a>
+                            </th:block>
+                            <!-- 매장 상세내용이 존재하지 않는다면 등록 진행 -->
+                            <th:block th:unless="${existsList[dataStat.index]}">
+                                <a th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}" th:data-tel="${data.organTel}"></a>
+                            </th:block>
+                        </th:block>
+                    </td>
+                    <td th:text="${data.organAddress}"></td>
+                    <td th:text="${data.organTel}"></td>
+                    <td>
+                        <button style="font-size: 12px" th:if="${data.activeYn == 'Y'}" class="btn btn-primary">활성화</button>
+                        <button style="font-size: 12px" th:unless="${data.activeYn == 'Y'}" class="btn btn-danger">비활성화</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center" th:if="${organDTO.isEmpty()}">조회된 내역이 없습니다.</div>
+
+            <!-- 페이징 처리 시작 -->
+            <div class="d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item" th:if="${currentPage>1}">
+                        <a class="page-link" th:href="@{/office/list(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage>1}">
+                        <a class="page-link" th:href="@{/office/list(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                    </li>
+
+                    <li class="page-item" th:each="page:${#numbers.sequence(startPage, endPage, 1)}" th:class="${page == currentPage} ? 'active' : ''">
+                        <a class="page-link" th:if="${page != currentPage}"
+                           th:href="@{/office/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                        <!-- 현재 페이지일 때는 링크 없이 텍스트만 표시 -->
+                        <span th:if="${page == currentPage}" class="page-link" th:text="${page}"></span>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage<endPage}">
+                        <a class="page-link" th:href="@{/office/list(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage<endPage}">
+                        <a class="page-link" th:href="@{/office/list(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- 페이징 처리 끝 -->
+
+
+            <!-- 등록 모달 열기 버튼 시작 -->
+            <div class="d-flex justify-content-end">
+                <button id="btn-add" type="button" class="btn btn-success">추가</button>
+            </div>
+            <!-- 등록 모달 열기 버튼 끝 -->
+
+        </div>
+        <!-- 페이지 끝 -->
+
+        <!--조직 등록 모달 시작-->
+        <div class="modal fade" id="addModal" tabindex="-1" role="modal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span id="title" class="fw-light">조직 등록</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                    </div>
+                    <!--입력폼-->
+                    <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                    <input type="hidden" name="activeYn" value="Y">  <!-- 조직 활성 유무 기본(Y) -->
+                    <form id="addForm" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <p>새로운 조직을 등록합니다.</p>
+                            <div class="row">
+                                <!-- 분류 -->
+                                <div class="col-sm-6 pe-0">
+                                    <div class="form-group form-group-default">
+                                        <label>*분류 :</label>
+                                        <select id="category" name="organType" class="form-select mt-2" required>
+                                            <option value="BO">지사</option>
+                                            <option value="SHOP">매장</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 조직 명 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*업체명 :</label>
+                                        <input id="organName" name="organName" type="text" class="form-control mt-2" placeholder="업체명을 입력하세요." required maxlength="100"/>
+                                    </div>
+                                </div>
+
+                                <!-- 조직 주소 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*주소 :</label>
+                                        <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
+                                        <input id="organAddress" name="organAddress" type="text" class="form-control mt-2" placeholder="주소를 입력하세요." readonly required minlength="10" maxlength="100"/>
+
+                                        <!-- 주소입력 기능 -->
+                                        <input type="hidden" id="sample4_postcode" placeholder="우편번호" readonly>
+                                        <input type="hidden" id="sample4_roadAddress" placeholder="도로명주소" readonly>
+                                        <input type="hidden" id="sample4_jibunAddress" placeholder="지번주소" readonly>
+                                        <span id="guide" style="color:#999;display:none"></span>
+                                        <input type="hidden" id="sample4_detailAddress" placeholder="상세주소">
+                                        <input type="hidden" id="sample4_extraAddress" placeholder="참고항목" readonly>
+
+                                        <!-- 가려줄 값들 -->
+                                        <input type="hidden" name="postcode" id="postcode">
+
+                                        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+                                        <script>
+
+                                            // 숨길 주소 모은값 (추가한 내용)
+                                            $("#sample4_detailAddress").on("change", function () {
+                                                let dtl = document.getElementById('sample4_detailAddress').value
+                                                let sample4_extraAddress = document.getElementById('sample4_extraAddress').value
+                                                let sample4_roadAddress = document.getElementById('sample4_roadAddress').value
+
+                                                document.getElementById('organAddress').value = sample4_roadAddress + " " + dtl + sample4_extraAddress;
+
+                                            })
+
+
+                                            //본 예제에서는 도로명 주소 표기 방식에 대한 법령에 따라, 내려오는 데이터를 조합하여 올바른 주소를 구성하는 방법을 설명합니다.
+                                            function sample4_execDaumPostcode() {
+                                                new daum.Postcode({
+                                                    oncomplete: function(data) {
+                                                        // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                                                        // 도로명 주소의 노출 규칙에 따라 주소를 표시한다.
+                                                        // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                                                        var roadAddr = data.roadAddress; // 도로명 주소 변수
+                                                        var extraRoadAddr = ''; // 참고 항목 변수
+
+                                                        // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                                                        // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                                                        if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                                                            extraRoadAddr += data.bname;
+                                                        }
+                                                        // 건물명이 있고, 공동주택일 경우 추가한다.
+                                                        if(data.buildingName !== '' && data.apartment === 'Y'){
+                                                            extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                                                        }
+                                                        // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                                                        if(extraRoadAddr !== ''){
+                                                            extraRoadAddr = ' (' + extraRoadAddr + ')';
+                                                        }
+
+                                                        // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                                                        document.getElementById('sample4_postcode').value = data.zonecode;
+                                                        document.getElementById("sample4_roadAddress").value = roadAddr;
+                                                        document.getElementById("sample4_jibunAddress").value = data.jibunAddress;
+
+                                                        // 참고항목 문자열이 있을 경우 해당 필드에 넣는다.
+                                                        if(roadAddr !== ''){
+                                                            document.getElementById("sample4_extraAddress").value = extraRoadAddr;
+                                                        } else {
+                                                            document.getElementById("sample4_extraAddress").value = '';
+                                                        }
+
+                                                        // 추가한 코드
+
+                                                        // 나눠진 주소정보를 주소필드에 합쳐넣는다.
+                                                        document.getElementById('postcode').value = data.zonecode;
+                                                        document.getElementById('organAddress').value = roadAddr + extraRoadAddr;
+
+                                                        // 다시 재검색시, 상세주소값이 빠지도록 설정한다.
+                                                        document.getElementById('sample4_detailAddress').value = "";
+
+
+
+                                                        var guideTextBox = document.getElementById("guide");
+                                                        // 사용자가 '선택 안함'을 클릭한 경우, 예상 주소라는 표시를 해준다.
+                                                        if(data.autoRoadAddress) {
+                                                            var expRoadAddr = data.autoRoadAddress + extraRoadAddr;
+                                                            guideTextBox.innerHTML = '(예상 도로명 주소 : ' + expRoadAddr + ')';
+                                                            guideTextBox.style.display = 'block';
+
+                                                        } else if(data.autoJibunAddress) {
+                                                            var expJibunAddr = data.autoJibunAddress;
+                                                            guideTextBox.innerHTML = '(예상 지번 주소 : ' + expJibunAddr + ')';
+                                                            guideTextBox.style.display = 'block';
+                                                        } else {
+                                                            guideTextBox.innerHTML = '';
+                                                            guideTextBox.style.display = 'none';
+                                                        }
+                                                    }
+                                                }).open();
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+
+                                <!-- 조직 연락처 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*대표 연락처 :</label>
+                                        <input id="organTel" name="organTel" type="text" class="form-control mt-2" placeholder="대표 연락처를 입력하세요." required maxlength="100"/>
+                                    </div>
+                                </div>
+
+                                <!-- 조직 대표 사진 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default" id="inputImage">
+                                        <label>*대표 이미지 :</label>
+                                        <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 조직 사진 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default" id="inputImage2">
+                                        <label>*이미지 :</label>
+                                        <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                                    </div>
+                                </div>
+
+                                <!-- 조직 사진 미리보기 -->
+                                <div id="main"></div>
+
+                                <!-- 조직 사진 추가버튼 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <input type="button" id="addImage" value="이미지 추가">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--조직 등록 모달 끝-->
+
+        <!-- 매장 등록 모달 시작 -->
+        <div class="modal fade" id="shopDetailModal" tabindex="-1" role="modal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span id="title2" class="fw-light">신규 매장 등록</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                    </div>
+                    <!--입력폼-->
+                    <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                    <input type="hidden" name="activeYn" value="Y">  <!-- 조직 활성 유무 기본(Y) -->
+                    <form id="shopDetailForm" method="post">
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <p>새로운 매장을 등록합니다.</p>
+                            <!-- 조직 idx -->
+                            <input type="hidden" id="organIdx" name="organIdx">
+
+                            <div class="row">
+                                <!-- 매장 명 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*매장명 :</label>
+                                        <input id="organName2" name="organName" type="text" class="form-control" required readonly/>
+                                    </div>
+                                </div>
+
+                                <!-- 매장 전화번호 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*전화번호 :</label>
+                                        <input id="organTel2" name="organTel" type="text" class="form-control" required readonly/>
+                                    </div>
+                                </div>
+
+                                <!-- 매장 시작 시간 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*오픈시간 :</label>
+                                        <input id="openTime" name="openTime" type="time" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 매장 끝나는 시간 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*닫는시간 :</label>
+                                        <input id="closeTime" name="closeTime" type="time" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 휴무일 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*휴무일:</label>
+                                        <input id="restDay" name="restDay" type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <!-- 오픈 상태, 제휴 상태 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*영업 상태:</label>
+                                        <select id="openState" name="openState" class="form-select">
+                                            <option value="0">영업중</option>
+                                            <option value="1">종료</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*제휴 상태:</label>
+                                        <select id="partnerState" name="partnerState" class="form-select">
+                                            <option value="0">제휴중</option>
+                                            <option value="1">제휴종료</option>
+                                            <option value="2">제휴준비중</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 매장 상태 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*직영/가맹점:</label>
+                                        <select id="type" name="type" class="form-select">
+                                            <option value="0">직영</option>
+                                            <option value="1">가맹</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 활성화 유무 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*활성화 유무:</label>
+                                        <select id="activeYn" name="activeYn" class="form-select">
+                                            <option value="0">활성화</option>
+                                            <option value="1">비활성화</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 은행명, 계좌주 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*은행명:</label>
+                                        <input id="bankName" name="bankName" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*계좌주:</label>
+                                        <input id="bankOwner" name="bankOwner" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 계좌 번호 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*계좌번호:</label>
+                                        <input id="bankNum" name="bankNum" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 일별 수수료 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*일별 수수료:</label>
+                                        <input id="dayFee" name="dayFee" type="text" class="form-control" required/>
+                                    </div>
+                                </div>
+
+                                <!-- 일별 % 수수료 -->
+                                <div class="col-sm-6 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <label>*일별 수수료 률:</label>
+                                        <input id="dayFeePercent" name="dayFeePercent" type="text" class="form-control"
+                                               required/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal body 끝 -->
+                        <div class="modal-footer border-0">
+                            <button type="button" id="register" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- 매장 등록 모달 끝-->
+    </div>
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+
+            // shopdetailDTO가 없는 매장명을 클릭 시
+            $(document).on('click', '.open-modal', function () {
+                // 입력폼 초기화
+                var form = $('#shopDetailForm')[0];
+                form.reset();
+
+                // 제목 변경
+                $('#title2').text("신규 상점 등록");
+
+                // 선택한 매장명 가져오기 (필요하면 사용)
+                var organIdx = $(this).data('id');
+                var organName = $(this).data('name');
+                var organTel = $(this).data('tel');
+                console.log("선택한 매장: " + organIdx);
+                $("#organIdx").val(organIdx);
+                $("#organName2").val(organName);
+                $("#organTel2").val(organTel);
+
+                // 모달창 출력
+                $('#shopDetailModal').modal('show');
+            });
+
+            // 매장 등록버튼을 클릭했을 때 Controller 처리
+            $('#register').on('click', function () {
+                var form = $('#shopDetailForm')[0];
+                var formData = new FormData(form);          //form내의 데이터 읽기
+
+                //폼 검증 수행
+                if (form.checkValidity() === false) {
+                    form.reportValidity();                  //폼 검증
+                    return;
+                }
+
+                // 모달창 닫기
+                $('#shopDetailModal').modal('hide');
+
+                $.ajax({
+                    url: '/office/shopdetail/register',     //맵핑
+                    type: 'POST',                           //전달 방식
+                    data: formData,                         //데이터값
+                    processData: false,                     //현재상태 그대로 유지하면서 전달
+                    contentType: false,
+
+                    success: function(response) {           // Controller에서 처리가 성공하였을 경우
+                        //새로운 성공 알림창을 띄운다.
+                        Swal.fire({
+                            title: "등록 완료",
+                            text: "매장이 등록되었습니다.",
+                            icon: "success"
+                        }).then(() => {
+                            location.reload();              // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function(xhr, status, error) {   // Controller에서 처리가 실패하였을 경우
+                        //새로운 오류 알림창을 띄운다.
+                        Swal.fire({
+                            title: "오류 발생",
+                            text: "문제가 발생했습니다. 다시 시도해 주세요.",
+                            icon: "error"
+                        });
+                        //변화된 내용이 없으므로 목록페이지는 다시 읽지 않는다.
+                    }
+                });
+
+            });
+            // 매장 등록버튼을 클릭했을 때 Controller 처리 끝
+
+            // 이미지 추가 버튼 클릭했을 때
+            $("#addImage").on('click', function() {
+
+                // 이미지 추가 함수
+                addImageInput();
+
+            });
+
+            // 이미지 추가
+            function addImageInput() {
+                const container = document.getElementById('inputImage2');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                container.appendChild(newInputDiv);
+            }
+
+            // 이미지 input 초기화
+            function resetImageInput() {
+                const input = document.querySelector('input[name="imageFiles"]');
+                const container2 = document.getElementById('inputImage2');
+
+                // 파일 선택 초기화
+                if (input) {
+                    input.value = '';
+                }
+
+                // 이미지 추가창 제거
+                container2.innerHTML = '<label>*이미지 :</label>' +
+                    '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            }
+
+            // 조직 목록에서 추가를 클릭했을 때
+            $("#btn-add").on('click', function() {
+
+                // 폼 리셋
+                var form = $("#addForm")[0];
+                form.reset();
+
+                // 이미지 추가창 리셋 함수
+                resetImageInput();
+
+                // 모달창을 화면에 띄운다.
+                $("#addModal").modal('show');
+
+            });
+
+            // 조직 등록 모달에서 저장 버튼 클릭 시
+            $('#addButton').on('click', function(){
+
+                //id가 addForm인 태그내에 있는 모든 데이터를 읽어온다.
+                var form = $("#addForm")[0];
+                var formData = new FormData(form);
+
+                //폼 검증 수행
+                if(form.checkValidity() === false) {    // 유효성 검사시 폼의 오류가 발생하면
+                    form.reportValidity();              // 브라우저에 해당 필드에 메세지를 출력
+                    return;
+                }
+
+                $('#addModal').modal('hide');           // 등록 모달창 숨김
+
+                $.ajax({
+                    // Controller에 신규등록 요청
+                    url: '/office/organ/register',
+                    type: 'POST',
+                    data: formData,                     // JSON.stringify(courseData),
+                    processData: false,
+                    contentType: false,
+
+                    success: function(response) {       // Controller에서 처리가 성공하였을 경우
+                        //새로운 성공 알림창을 띄운다.
+                        Swal.fire({
+                            title: "등록 완료",
+                            text: "조직이 등록되었습니다.",
+                            icon: "success"
+                        }).then(() => {
+                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function(xhr, status, error) {   // Controller에서 처리가 실패하였을 경우
+                        //새로운 오류 알림창을 띄운다.
+                        Swal.fire({
+                            title: "오류 발생",
+                            text: "문제가 발생했습니다. 다시 시도해 주세요.",
+                            icon: "error"
+                        });
+                        //변화된 내용이 없으므로 목록페이지는 다시 읽지 않는다.
+                    }
+                });
+            });
+
+        });
+    </script>
+
+</div>
+</body>
+</html>

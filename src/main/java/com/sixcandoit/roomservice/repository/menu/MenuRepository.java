@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.repository.menu;
 
+import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,8 +39,8 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Integer> {
 
     //목록 카테고리 선택
     @Query("SELECT u FROM MenuEntity u WHERE " +
-            "u.menuCategory = :category")
-    Page<MenuEntity> selectCate(@Param("category") String category, Pageable page);
+            "u.menuCategory = :categoryEnum")
+    Page<MenuEntity> selectCate(@Param("categoryEnum") MenuCategory categoryEnum, Pageable page);
 
 
     //전체

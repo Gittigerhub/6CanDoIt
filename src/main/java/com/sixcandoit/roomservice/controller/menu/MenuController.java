@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.controller.menu;
 
-import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.service.ImageFileService;
@@ -219,17 +218,10 @@ public class MenuController {
     public String ajaxListMenu(@RequestParam(value = "category", defaultValue = "ALL") String category,
                                @PageableDefault(page = 1) Pageable page,
                                Model model){
-        //카테고리 처리
-        MenuCategory menuCategory = null;
-        if (!"ALL".equals(category)) {
-            try {
-                menuCategory = MenuCategory.valueOf(category);  //enum 변환
-            }catch (IllegalArgumentException e) {
-                category = null;    //유효하지 않은 카테고리 처리
-            }
-        }
+
         // 해당 페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<MenuDTO> menuDTOS = menuService.selcteCate(page, category);
+        Page<MenuDTO> menuDTOS = menuService.selectCate(page, category);
+
         // DTO들 리스트로 가져오기
         List<MenuDTO> menu = menuDTOS.getContent();
 
@@ -252,10 +244,10 @@ public class MenuController {
         }
 
         // 모델에 추가
-        model.addAttribute("menu", menu);  // 메뉴 리스트
-        model.addAttribute("imageFileMap", imageFileMap); // 메뉴별 이미지 리스트
-        model.addAttribute("repImageMap", repImageMap); // 메뉴별 대표 사진 여부
-        model.addAttribute("menulist", menuDTOS); // 데이터 전달
+        model.addAttribute("menu", menu);                   // 메뉴 리스트
+        model.addAttribute("imageFileMap", imageFileMap);   // 메뉴별 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap);     // 메뉴별 대표 사진 여부
+        model.addAttribute("menulist", menuDTOS);           // page 데이터 전달
 
         return "menu/listmenu :: menulistfragment";
     }

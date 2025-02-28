@@ -64,56 +64,57 @@
                     <!--메뉴 목록 표시-->
                     <div id="menuListContainer">
 
-                        <div th:fragment="menulistfragment">
-                            <table class="table table-hover">
-                                <thead>
-                                <tr>
-                                    <th>메뉴명</th>
-                                    <th>메뉴사진</th>
-                                    <th>메뉴설명</th>
-                                    <th>가격</th>
-                                    <th>등록일</th>
-                                    <th>수정</th>
-                                    <th>삭제</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <!-- 메뉴 항목 반복 출력 -->
-                                <tr th:each="menu : ${menulist}">
-                                    <td>
-                                        <!-- 메뉴명 클릭 시 상세보기로 이동하는 링크 추가 -->
-                                        <a th:href="@{/menu/readmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
-                                    </td>
-                                    <td>
-                                        <!-- 대표 이미지가 없을때 나오는 이미지 -->
-                                        <div style="flex-basis: 100%; text-align: left">
-                                            <th:block th:if="${!repImageMap[menu.idx]}">
-                                                <img style="width: 150px; height: 150px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
-                                            </th:block>
-                                        </div>
+                    <div th:fragment="menulistfragment">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>메뉴명</th>
+                            <th>메뉴사진</th>
+                            <th>메뉴설명</th>
+                            <th>가격</th>
+                            <th>등록일</th>
+                            <th>수정</th>
+                            <th>삭제</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- 메뉴 항목 반복 출력 -->
+                        <tr th:each="menu : ${menulist}">
+                            <td>
+                                <!-- 메뉴명 클릭 시 상세보기로 이동하는 링크 추가 -->
+                                <a th:href="@{/menu/readmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
+                            </td>
+                            <td>
+                                <!-- 대표 이미지가 없을때 나오는 이미지 -->
+                                <div style="flex-basis: 100%; text-align: left">
+                                    <th:block th:if="${!repImageMap[menu.idx]}">
+                                        <img style="width: 150px; height: 150px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                                    </th:block>
+                                </div>
 
-                                        <th:block th:each="data:${imageFileMap[menu.idx]}" th:if="${repImageMap[menu.idx]}">
-                                            <!-- 대표 이미지 -->
-                                            <th:block th:if="${data.repimageYn == 'Y'}">
-                                                <div style="flex-basis: 100%; text-align: left">
-                                                    <img style="width: 150px; height: 150px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                                                </div>
-                                            </th:block>
-                                        </th:block>
-                                    </td>
-                                    <td th:text="${menu.menuContent}"></td>
-                                    <td th:text="${menu.menuPrice}"></td>
-                                    <td th:text="${menu.insDate}"></td>
-                                    <td>
-                                        <button class="btn btn-info" th:onclick="|location.href='/menu/updatemenu?idx='+ ${menu.idx}|">수정</button>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-danger delMoveBtn" th:data-id="${menu.idx}">삭제</button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                <th:block th:each="data:${imageFileMap[menu.idx]}" th:if="${repImageMap[menu.idx]}">
+                                    <!-- 대표 이미지 -->
+                                    <th:block th:if="${data.repimageYn == 'Y'}">
+                                        <div style="flex-basis: 100%; text-align: left">
+                                            <img style="width: 150px; height: 150px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                        </div>
+                                    </th:block>
+                                </th:block>
+                            </td>
+                            <td th:text="${menu.menuContent}"></td>
+                            <td th:text="${menu.menuPrice}"></td>
+                            <td th:text="${menu.insDate}"></td>
+                            <td>
+                                <button class="btn btn-info" th:onclick="|location.href='/menu/updatemenu?idx='+ ${menu.idx}|">수정</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger delMoveBtn" th:data-id="${menu.idx}">삭제</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
                     <!--페이징 시작-->
                     <div class="mt-3 d-flex justify-content-center">
                         <ul class="pagination">

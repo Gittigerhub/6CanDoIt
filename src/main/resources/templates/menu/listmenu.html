@@ -152,17 +152,15 @@
 
             // 카테고리 버튼 클릭 시 메뉴 목록 갱신
             $('.category-btn').on('click', function() {
-                var selectedMenuCate = $(this).data('category');  // 선택된 카테고리 값
-                loadMenuList(selectedMenuCate);  // 메뉴 목록 갱신
-            });
+                var category = $(this).data('category');  // 선택된 카테고리 값
 
-            // 메뉴 목록을 로드하는 함수
-            function loadMenuList(menucate) {
+
+
                 $.ajax({
-                    url: '/menu/listmenu',  // 현재 페이지에서 처리할 주소
+                    url: '/menu/ajax/listmenu',  // 현재 페이지에서 처리할 주소
                     type: 'GET',
                     data: {
-                        category: menucate,  // 선택된 카테고리 값
+                        category: category,  // 선택된 카테고리 값
                     },
                     success: function (response) {
                         $('#menuListContainer').html(response);  // 받은 데이터를 메뉴 목록 영역에 표시
@@ -171,7 +169,8 @@
                         alert("메뉴 목록을 불러오는 데 실패했습니다.");
                     }
                 });
-            }
+
+            });
 
             //삭제 버튼 클릭시
             $(".delMoveBtn").on("click", function() {

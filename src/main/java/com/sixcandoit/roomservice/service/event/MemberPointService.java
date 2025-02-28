@@ -60,7 +60,7 @@ public class MemberPointService {
                 throw new RuntimeException("포인트 개별 조회 실패");
             }
             else {
-                MemberPointDTO   memberPointDTO = modelMapper.map(read,MemberPointDTO.class);
+                MemberPointDTO memberPointDTO = modelMapper.map(read,MemberPointDTO.class);
                 return  memberPointDTO;
             }
          } catch (Exception e){

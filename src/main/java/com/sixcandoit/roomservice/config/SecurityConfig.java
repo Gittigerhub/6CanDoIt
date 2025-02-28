@@ -74,7 +74,7 @@ public class SecurityConfig{
                     // 조직-매장 페이지 접근 권한
                     auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
                     // 이벤트-멤버포인트 페이지 접근 권한
-                    auth.requestMatchers("/event/**", "/event/memberpoint/**").permitAll();
+                    auth.requestMatchers("/event/**", "/event/memberpoint/**", "/event/usermemberpoint/**").permitAll();
                     // QnA 페이지 접근 권한
                     auth.requestMatchers("/qna/**", "/qna/register/**", "/reply/**").permitAll();
                     // 룸 관리, 룸 예약 페이지 접근 권한
@@ -134,7 +134,7 @@ public class SecurityConfig{
             // 조직-매장 페이지 접근 권한
             auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
             // 이벤트-멤버포인트 페이지 접근 권한
-            auth.requestMatchers("/event/**", "/event/memberpoint/**", "/upload/**","/event/update").permitAll();
+            auth.requestMatchers("/event/**", "/event/memberpoint/**", "/upload/**","/event/update/**","/event/delete","/event/user/**").permitAll();
             // QnA 페이지 접근 권한
             auth.requestMatchers("/qna/**", "/qna/register/**", "/reply/**").permitAll();
             // 룸 관리, 룸 예약 페이지 접근 권한
@@ -151,6 +151,7 @@ public class SecurityConfig{
             auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
             // 이미지 컨트롤러 접근 권한
             auth.requestMatchers("/images/**").permitAll();
+
 
             });
 

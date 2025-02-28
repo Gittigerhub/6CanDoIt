@@ -152,30 +152,19 @@ public class MenuService {
             Pageable pageable = PageRequest.of(currentPage, pageSize,
                     Sort.by(Sort.Direction.DESC, "idx"));
 
-
-            System.out.println(category);
-            System.out.println(category);
-            System.out.println(category);
-            System.out.println(page);
-            System.out.println(page);
-            System.out.println(page);
-
+            // 2. Repository에서 enum조회를 위한 category enum타입으로 변환
             MenuCategory categoryEnum = MenuCategory.valueOf(category);
 
-            // 2. 조회
+            // 3. 조회
             // 조회 결과를 저장할 변수 선언
             Page<MenuEntity> menuEntities = menuRepository.selectCate(categoryEnum, pageable);
 
-            System.out.println(menuEntities);
-            System.out.println(menuEntities);
-            System.out.println(menuEntities);
-
-            // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
+            // 4. 조회한 결과를 HTML에서 사용할 DTO로 변환
             // Entity를 dTO로 변환 후 저장
             Page<MenuDTO> menuDTOS = menuEntities.map(
                     data -> modelMapper.map(data, MenuDTO.class));
 
-            // 4. 결과값을 전달
+            // 5. 결과값을 전달
             return menuDTOS;
 
         } catch (Exception e) { //오류 발생시 처리

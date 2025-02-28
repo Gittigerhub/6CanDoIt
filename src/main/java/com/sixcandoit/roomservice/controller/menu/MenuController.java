@@ -166,23 +166,12 @@ public class MenuController {
     public String listMenu(@PageableDefault(page = 1) Pageable page, //페이지 정보
                            @RequestParam(value = "type", defaultValue = "") String type, //검색 대상
                            @RequestParam(value = "keyword", defaultValue = "") String keyword, //키워드
-                           @RequestParam(value = "menucate", defaultValue = "ALL") String menucate,
                            Model model){
-
-        //카테고리 처리
-        MenuCategory selectedMenuCate = null;
-        if (!menucate.equals("ALL")) {
-            try {
-                selectedMenuCate = MenuCategory.valueOf(menucate);  //Enum 변환
-            }catch (IllegalArgumentException e) {
-                selectedMenuCate = null;    //유효하지 않은 카테고리 처리
-            }
-        }
 
         String join = "menu";
 
         //해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<MenuDTO> menuDTOS = menuService.menuList(page, type, keyword, selectedMenuCate);
+        Page<MenuDTO> menuDTOS = menuService.menuList(page, type, keyword);
 
         //html에 필요한 페이지 정보를 받기
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(menuDTOS);
@@ -217,7 +206,6 @@ public class MenuController {
         model.addAllAttributes(pageInfo);   //페이지 정보
         model.addAttribute("type", type);   //검색 분류
         model.addAttribute("keyword", keyword); //키워드
-        model.addAttribute("menucate", menucate); //카테고리
         model.addAttribute("bucket", bucket);
         model.addAttribute("region", region);
         model.addAttribute("folder", folder);
@@ -228,24 +216,20 @@ public class MenuController {
 
     //Ajax 요청에 의해 카테고리별 메뉴목록을 반환하는 메소드
     @GetMapping("/menu/ajax/listmenu")
-    public String ajaxListMenu(@RequestParam(value = "menucate", defaultValue = "ALL") String menucate,
-                               @RequestParam(value = "type", defaultValue = "") String type,
-                               @RequestParam(value = "keyword", defaultValue = "") String keyword,
+    public String ajaxListMenu(@RequestParam(value = "category", defaultValue = "ALL") String category,
                                @PageableDefault(page = 1) Pageable page,
                                Model model){
         //카테고리 처리
-        MenuCategory selectedMenuCate = null;
-        if (!"ALL".equals(menucate)) {
+        MenuCategory menuCategory = null;
+        if (!"ALL".equals(category)) {
             try {
-                selectedMenuCate = MenuCategory.valueOf(menucate);  //enum 변환
+                menuCategory = MenuCategory.valueOf(category);  //enum 변환
             }catch (IllegalArgumentException e) {
-                selectedMenuCate = null;    //유효하지 않은 카테고리 처리
+                category = null;    //유효하지 않은 카테고리 처리
             }
         }
-
         // 해당 페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<MenuDTO> menuDTOS = menuService.menuList(page, type, keyword, selectedMenuCate);
-
+        Page<MenuDTO> menuDTOS = menuService.selcteCate(page, category);
         // DTO들 리스트로 가져오기
         List<MenuDTO> menu = menuDTOS.getContent();
 
@@ -272,7 +256,6 @@ public class MenuController {
         model.addAttribute("imageFileMap", imageFileMap); // 메뉴별 이미지 리스트
         model.addAttribute("repImageMap", repImageMap); // 메뉴별 대표 사진 여부
         model.addAttribute("menulist", menuDTOS); // 데이터 전달
-
 
         return "menu/listmenu :: menulistfragment";
     }

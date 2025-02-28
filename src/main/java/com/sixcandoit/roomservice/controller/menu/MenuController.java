@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.controller.menu;
 
+import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.service.ImageFileService;
@@ -160,16 +161,29 @@ public class MenuController {
         }
     }
 
+    //메뉴 목록 확인
     @GetMapping("/menu/listmenu")
     public String listMenu(@PageableDefault(page = 1) Pageable page, //페이지 정보
                            @RequestParam(value = "type", defaultValue = "") String type, //검색 대상
                            @RequestParam(value = "keyword", defaultValue = "") String keyword, //키워드
+                           @RequestParam(value = "menucate", defaultValue = "ALL") String menucate,
                            Model model){
+
+        //카테고리 처리
+        MenuCategory selectedMenuCate = null;
+        if (!menucate.equals("ALL")) {
+            try {
+                selectedMenuCate = MenuCategory.valueOf(menucate);  //Enum 변환
+            }catch (IllegalArgumentException e) {
+                selectedMenuCate = null;    //유효하지 않은 카테고리 처리
+            }
+        }
 
         String join = "menu";
 
         //해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<MenuDTO> menuDTOS = menuService.menuList(page, type, keyword);
+        Page<MenuDTO> menuDTOS = menuService.menuList(page, type, keyword, selectedMenuCate);
+
         //html에 필요한 페이지 정보를 받기
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(menuDTOS);
 
@@ -203,9 +217,64 @@ public class MenuController {
         model.addAllAttributes(pageInfo);   //페이지 정보
         model.addAttribute("type", type);   //검색 분류
         model.addAttribute("keyword", keyword); //키워드
+        model.addAttribute("menucate", menucate); //카테고리
+        model.addAttribute("bucket", bucket);
+        model.addAttribute("region", region);
+        model.addAttribute("folder", folder);
 
         return "menu/listmenu";
 
+    }
+
+    //Ajax 요청에 의해 카테고리별 메뉴목록을 반환하는 메소드
+    @GetMapping("/menu/ajax/listmenu")
+    public String ajaxListMenu(@RequestParam(value = "menucate", defaultValue = "ALL") String menucate,
+                               @RequestParam(value = "type", defaultValue = "") String type,
+                               @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                               @PageableDefault(page = 1) Pageable page,
+                               Model model){
+        //카테고리 처리
+        MenuCategory selectedMenuCate = null;
+        if (!"ALL".equals(menucate)) {
+            try {
+                selectedMenuCate = MenuCategory.valueOf(menucate);  //enum 변환
+            }catch (IllegalArgumentException e) {
+                selectedMenuCate = null;    //유효하지 않은 카테고리 처리
+            }
+        }
+
+        // 해당 페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
+        Page<MenuDTO> menuDTOS = menuService.menuList(page, type, keyword, selectedMenuCate);
+
+        // DTO들 리스트로 가져오기
+        List<MenuDTO> menu = menuDTOS.getContent();
+
+        // 이미지 데이터를 담을 Map 생성 (menu의 idx를 key로 저장)
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+
+        for (MenuDTO menuDTO : menu) {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(menuDTO.getIdx(), "menu");
+
+            // Map에 저장 (menu의 idx를 key로 함)
+            imageFileMap.put(menuDTO.getIdx(), imageFileDTOS);
+
+            // 대표 사진 여부 확인 후 저장
+            boolean hasRepImage = imageFileDTOS.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+            repImageMap.put(menuDTO.getIdx(), hasRepImage);
+        }
+
+        // 모델에 추가
+        model.addAttribute("menu", menu);  // 메뉴 리스트
+        model.addAttribute("imageFileMap", imageFileMap); // 메뉴별 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap); // 메뉴별 대표 사진 여부
+        model.addAttribute("menulist", menuDTOS); // 데이터 전달
+
+
+        return "menu/listmenu :: menulistfragment";
     }
 
     @GetMapping("/menu/updatemenu")

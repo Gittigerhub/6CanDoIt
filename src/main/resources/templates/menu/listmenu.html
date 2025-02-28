@@ -48,10 +48,28 @@
                 <div class="mb-5">
                     <h3>메뉴 목록</h3>
                 <div class="col-12">
+                    <!-- 카테고리 선택 UI -->
+                    <div class="row p-3 bg-white text-center">
+                        <div class="col-12">
+                            <div class="btn-group" role="group" aria-label="Category Selection">
+                                <button type="button" class="btn btn-outline-primary category-btn" data-category="Korean">한식</button>
+                                <button type="button" class="btn btn-outline-primary category-btn" data-category="Chinese">중식</button>
+                                <button type="button" class="btn btn-outline-primary category-btn" data-category="Western">양식</button>
+                                <button type="button" class="btn btn-outline-primary category-btn" data-category="Japanese">일식</button>
+                                <button type="button" class="btn btn-outline-primary category-btn" data-category="Drink">음료</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--메뉴 목록 표시-->
+                    <div id="menuListContainer">
+                        <div th:replace="menu/listmenu::menulistfragment">
+                        </div>
+                    </div>
+                    <div th:fragment="menulistfragment">
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th>카테고리</th>
                             <th>메뉴명</th>
                             <th>메뉴사진</th>
                             <th>메뉴설명</th>
@@ -64,7 +82,6 @@
                         <tbody>
                         <!-- 메뉴 항목 반복 출력 -->
                         <tr th:each="menu : ${menulist}">
-                            <td th:text="${menu.menuCategory}"></td>
                             <td>
                                 <!-- 메뉴명 클릭 시 상세보기로 이동하는 링크 추가 -->
                                 <a th:href="@{/menu/readmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
@@ -98,6 +115,7 @@
                         </tr>
                         </tbody>
                     </table>
+                    </div>
                     <!--페이징 시작-->
                     <div class="mt-3 d-flex justify-content-center">
                         <ul class="pagination">
@@ -132,6 +150,30 @@
     <script th:inline="javascript">
         $(document).ready(function() {
 
+            // 카테고리 버튼 클릭 시 메뉴 목록 갱신
+            $('.category-btn').on('click', function() {
+                var selectedMenuCate = $(this).data('category');  // 선택된 카테고리 값
+                loadMenuList(selectedMenuCate);  // 메뉴 목록 갱신
+            });
+
+            // 메뉴 목록을 로드하는 함수
+            function loadMenuList(menucate) {
+                $.ajax({
+                    url: '/menu/listmenu',  // 현재 페이지에서 처리할 주소
+                    type: 'GET',
+                    data: {
+                        category: menucate,  // 선택된 카테고리 값
+                    },
+                    success: function (response) {
+                        $('#menuListContainer').html(response);  // 받은 데이터를 메뉴 목록 영역에 표시
+                    },
+                    error: function () {
+                        alert("메뉴 목록을 불러오는 데 실패했습니다.");
+                    }
+                });
+            }
+
+            //삭제 버튼 클릭시
             $(".delMoveBtn").on("click", function() {
                 var idx = $(this).data("id")
 
@@ -188,9 +230,7 @@
                     }
                 });
             });
-
-        })
-
+        });
     </script>
 </th:block>
 

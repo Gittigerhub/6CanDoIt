@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.util.List;
 import java.util.Map;
-
 
 @Controller // get, post 매핑만 사용이 가능
 @RequiredArgsConstructor
@@ -55,7 +55,49 @@ public class NoticeController {
 
         return "notice/list";
     }
+    //사용자 공지사항 목록 페이지
+    @GetMapping("/notice/userlist")
+    public String userList(@PageableDefault(page = 1) Pageable page,
+                           @RequestParam(value = "type",defaultValue = "")String type,
+                            @RequestParam(value = "keyword",defaultValue = "")String keyword,
+    Model model          ){
+        Page<NoticeDTO> noticeDTOS = noticeService.noticeList(page, type, keyword);
+        System.out.println("Notice List:" + noticeDTOS.getContent());
 
+        //페이지네이션 정보
+        Map<String,Integer> pageInfo=PageNationUtil.Pagination(noticeDTOS);
+        System.out.println("Page Info:"+pageInfo);
+
+        //사용자에게 전달할 데이터
+        model.addAttribute("noticeDTO", noticeDTOS);
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("pageInfo", pageInfo);
+
+        return "notice/userlist";
+    }
+
+    @GetMapping("/notice/userread")
+    public String userRead(@RequestParam("idx")Integer idx,Model model){
+
+        noticeService.count(idx);//조회수 증가
+
+        //공지사항 상세 내용
+        NoticeDTO noticeDTO=noticeService.noticeRead(idx);
+
+        //이미지 조회
+        List<ImageFileDTO> imageFileDTOS=imageFileService.readImage(idx, "notice");
+
+        //대표 이미지 여부 확인
+        boolean hasRepImage =imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+        //모델에 공지사항 데이터 전달
+        model.addAttribute("noticeDTO", noticeDTO);
+        model.addAttribute("hasRepImage",hasRepImage);
+        model.addAttribute("imageFileDTOS",imageFileDTOS);
+        return "notice/userread";
+    }
 
     @GetMapping("/notice/register")
     public String register (Model model){
@@ -150,7 +192,7 @@ public class NoticeController {
         }
     }
 
-    // Qna의 Q 삭제
+
     @GetMapping("/notice/delete")
     public String delete(@RequestParam("idx") Integer idx) {
 
@@ -161,5 +203,6 @@ public class NoticeController {
 
         return "redirect:/notice/list";
     }
+
 
 }

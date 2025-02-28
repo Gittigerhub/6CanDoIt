@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/memberlayout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content" class="p-5">
+
+
+    <div class="container">
+        <div class="row">
+            <h2 th:text="${memberName.memberJoin.memberName}+'회원님'" class="memberName">OOO회원님</h2>
+
+
+            <div class="col-12">
+                <table class="table">
+                    <thead class="table-dark">
+                    <tr>
+                        <th style="width: 5%">No.</th>
+                        <th style="width: 20%">포인트</th>
+                        <th style="width: 35%">포인트 내용</th>
+                        <th style="width: 20%">포인트 기간</th>
+                        <th style="width: 20%">포인트 사용 여부</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="column" th:each="memberPoint:${memberPointDTO}" th:data-id="${memberPoint.idx}">
+                        <td th:text="${memberPoint.idx}"></td>
+
+                        <td th:text="${memberPoint.memberPoint}"></td>
+                        <td class="contents" th:text="${memberPoint.memberPointContents}"></td>
+                        <td th:text="${#temporals.format(memberPoint.memberPointStartDate, 'yy-MM-dd')}+'~'+${#temporals.format(memberPoint.memberPointEndDate, 'yy-MM-dd')}"></td>
+                        <th:block th:if="${memberPoint.memberPointOperationYn.equals('N')}">
+                            <td class="text-bg-primary">사용가능</td>
+                        </th:block>
+                        <th:block th:if="${memberPoint.memberPointOperationYn.equals('Y')}">
+                            <td class="text-bg-danger">사용함</td>
+                        </th:block>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal" id="userPointModal">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 id="title" class="modal-title"></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="userPointForm">
+                    <input type="hidden" id="idx" name="idx">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <!--매장 시작 시간, 매장 끝나는 시간-->
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*회원 이메일 :</label>
+                                    <input id="memberEmail" name="memberEmail" type="text"
+                                           class="form-control" readonly/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>* 포인트 :</label>
+                                    <input id="memberPoint" name="memberPoint" type="number" class="form-control"
+                                           readonly/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*포인트 발급일:</label>
+                                    <input id="memberPointStartDate" name="memberPointStartDate" type="datetime-local"
+                                           class="form-control" readonly/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group form-group-default">
+                                    <label>*포인트 종료일:</label>
+                                    <input id="memberPointEndDate" name="memberPointEndDate" type="datetime-local"
+                                           class="form-control" readonly/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*포인트 사용여부:</label>
+                                    <input id="memberPointOperationYn" name="memberPointOperationYn"
+                                           type="datetime-local"
+                                           class="form-control" readonly/>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-default">
+                                    <label>*포인트 내용:</label>
+                                    <input id="memberPointContents" name="memberPointContents" type="text"
+                                           class="form-control" readonly/>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><!--폼 끝-->
+    </div><!--모달끝-->
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+        function truncateText(selector, maxLength) {
+            document.querySelectorAll(selector).forEach(el => {
+                if (el.textContent.length > maxLength) {
+                    el.textContent = el.textContent.substring(0, maxLength) + "...";
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            truncateText(".contents", 20); // 20자까지 표시
+        });
+        $(document).ready(function () {
+            //수정버튼클릭시 대화상자 채우기
+            $(".column").on("click", function () {
+                //alert("삭제")
+                var idx = $(this).data("id");
+                console.log("선택된 idx: " + idx);
+
+
+                $.ajax({
+                    url: "/event/usermemberpoint/read",
+                    type: 'GET',
+                    data: {
+                        idx: idx//전달값:값
+                    },
+                    success: function (response) {//작업 성공시
+                        console.log("성공함")
+                        $('#title').text("포인트 상세보기");
+
+                        $('#idx').val(response.idx);
+                        $('#memberEmail').val(response.memberEmail);
+                        $('#memberPoint').val(response.memberPoint);
+
+                        // 날짜 변환 (datetime-local 형식)
+                        $('#memberPointStartDate').val(response.memberPointStartDate);
+                        $('#memberPointEndDate').val(response.memberPointEndDate);
+
+                        $('#memberPointOperationYn').val(response.memberPointOperationYn);
+                        $('#memberPointContents').val(response.memberPointContents);
+
+
+                        //대화창 출력
+                        $('#userPointModal').modal('show');
+
+                    },
+                    error: function () {//작업 실패시
+                        console.log("실패함")
+                        Swal.fire({
+                            icon: null,
+                            text: "조회를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+            });//수정버튼클릭시 대화상자 채우기 끝
+        });
+    </script>
+</th:block>
+</body>
+</html>

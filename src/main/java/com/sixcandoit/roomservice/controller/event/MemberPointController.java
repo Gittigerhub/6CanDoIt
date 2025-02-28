@@ -41,11 +41,7 @@ public class MemberPointController {
             List<MemberPointDTO> memberPointDTOS = memberPointService.list();
 
 
-
-
-
             model.addAttribute("memberPointDTOS", memberPointDTOS);
-
 
 
             return "event/memberpoint";

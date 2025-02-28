@@ -5,6 +5,7 @@ import com.sixcandoit.roomservice.dto.cart.CartMenuDTO;
 import com.sixcandoit.roomservice.dto.cart.CartOrdersDTO;
 import com.sixcandoit.roomservice.service.cart.CartMenuService;
 import com.sixcandoit.roomservice.service.cart.CartService;
+import com.sixcandoit.roomservice.service.menu.MenuService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,6 +27,8 @@ public class CartController {
 
     private final CartService cartService;
     private final CartMenuService cartMenuService;
+    private final MenuService menuService;
+
 
     //룸예약 장바구니 등록
     @PostMapping("/cart/RegisterReserve")

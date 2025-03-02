@@ -230,7 +230,18 @@ public class AdminService {
         }
     }
 
-    // 일반 회원 전체 목록, 데이터를 화면에 출력
+    // 관리자 회원 삭제
+    public boolean deleteAdmin(Integer idx) {
+        try {
+            adminRepository.deleteById(idx);
+            return true;
+        } catch (Exception e) {
+            log.error("관리자 삭제 실패: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // 관리자 회원 전체 목록, 데이터를 화면에 출력
     // 페이지 번호를 받아 테이블의 해당 페이지의 데이터를 읽어와서 컨트롤러에 전달
     public Page<AdminDTO> adminList(Pageable page, String type, String keyword) {
 

@@ -31,6 +31,23 @@ public class MemberController {
         return "index";
     }
 
+    // 로그인
+    @GetMapping("/login")
+    public String showLoginPage(){
+        log.info("로그인 페이지!");
+
+        return "member/login";
+    }
+
+    // 로그아웃
+    @GetMapping("/logout")
+    public String showLogoutPage(HttpSession session){
+
+        session.invalidate();
+
+        return "redirect:/member/login";
+    }
+
     // 회원가입
     @GetMapping("/register")
     public String memberRegister() {
@@ -168,47 +185,16 @@ public class MemberController {
         return "redirect:/member/login";
     }
 
-    // 로그인
-    @GetMapping("/login")
-    public String showLoginPage(){
-        log.info("showLoginPage");
+    // 회원 삭제 (일반 회원)
+    @PostMapping("/deleteMember")
+    @ResponseBody
+    public String deleteMember(@RequestParam Integer idx) {
+        log.info("회원 삭제 요청: " + idx);
 
-        return "member/login";
-    }
-
-    // 로그아웃
-    @GetMapping("/logout")
-    public String showLogoutPage(HttpSession session){
-
-        session.invalidate();
-
-        return "redirect:/member/login";
+        boolean isDeleted = memberService.deleteMember(idx);
+        return isDeleted ? "success" : "fail";
     }
 
 
-//    @GetMapping("/member")
-//    public String MemberForm() {  //Member 권한자만 접근 가능
-//        return "member";
-//    }
-//
-//    @GetMapping("/admin")
-//    public String AdminForm() { //ADMIN 권한자만 접근 가능
-//        return "admin";
-//    }
-//
-//    @GetMapping("/ho")
-//    public String HoForm() {
-//        return "ho";
-//    }
-//
-//    @GetMapping("/bo")
-//    public String BoForm() {
-//        return "bo";
-//    }
-//
-//    @GetMapping("/manager")
-//    public String ManagerForm() {
-//        return "manager";
-//    }
 
 }

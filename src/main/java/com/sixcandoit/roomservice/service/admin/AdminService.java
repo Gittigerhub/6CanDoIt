@@ -8,7 +8,6 @@ import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.service.EmailService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -20,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.Optional;
@@ -59,7 +59,7 @@ public class AdminService {
         String password = passwordEncoder.encode(adminDTO.getPassword());
         AdminEntity adminEntity = modelMapper.map(adminDTO, AdminEntity.class);
         adminEntity.setPassword(password);
-        adminEntity.setLevel(Level.ADMIN);
+        adminEntity.setLevel(Level.GUEST);
 
         return adminRepository.save(adminEntity);
     }

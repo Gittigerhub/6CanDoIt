@@ -45,6 +45,16 @@ public class AdminEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Level level;                  // 유저 권한
 
+    // 기본값 설정
+    @PrePersist
+    public void prePersist() {
+        System.out.println("prePersist 실행되었니?");
+        if (this.level == null) {
+            this.level = Level.GUEST; // 기본값 설정
+            System.out.println("level 기본값 설정했어?" + this.level);
+        }
+    }
+
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_idx")

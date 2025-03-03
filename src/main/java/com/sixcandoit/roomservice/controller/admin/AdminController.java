@@ -39,6 +39,22 @@ public class AdminController {
         return "index";
     }
 
+    // 로그인
+    @GetMapping("/login")
+    public String showLoginPage(){
+        log.info("로그인 페이지를 내놔라");
+
+        return "admin/login";
+    }
+
+    // 로그아웃
+    @GetMapping("/logout")
+    public String showLogoutPage(HttpSession session) {
+        session.invalidate();
+        log.info("로그아웃을 하자!~~");
+        return "redirect:/login";
+    }
+
     // 회원 가입
     @GetMapping("/register")
     public String register() {
@@ -59,10 +75,10 @@ public class AdminController {
     @PostMapping("/checkEmail")
     @ResponseBody
     public String checkEmail(@RequestParam("email") String email) {
-        log.info("진입여부");
+        log.info("이메일 중복 확인 진입했어?");
         boolean exists = adminService.checkEmailExistence(email);
         String result = exists? "1" :   "0";
-        log.info("email exists : " + email+exists);
+        log.info("이메일이 있어? " + email + exists);
 
         return result;  // 응답 반환
     }
@@ -71,10 +87,10 @@ public class AdminController {
     @PostMapping("/checkPhone")
     @ResponseBody
     public String checkPhone(@RequestParam("phone") String phone) {
-        log.info("진입여부 2");
+        log.info("연락처 중복 확인 진입했어?");
         boolean exists = adminService.checkPhoneExistence(phone); // 연락처 중복 여부 확인
         String result = exists ? "1" : "0"; // 중복되면 "1", 아니면 "0" 반환
-        log.info("phone exists : " + phone + exists);
+        log.info("연락처가 있어? " + phone + exists);
 
         return result;  // 응답 반환
     }
@@ -222,21 +238,24 @@ public class AdminController {
         return "redirect:/login";
     }
 
-    // 로그인
-    @GetMapping("/login")
-    public String showLoginPage(){
-        log.info("showLoginPage");
+    // 회원 삭제 (일반 회원)
+    @PostMapping("/deleteMember")
+    @ResponseBody
+    public String deleteMember(@RequestParam Integer idx) {
+        log.info("회원 삭제 요청: " + idx);
 
-        return "admin/login";
+        boolean isDeleted = memberService.deleteMember(idx);
+        return isDeleted ? "success" : "fail";
     }
 
-    // 로그아웃
-    @GetMapping("/logout")
-    public String showLogoutPage(HttpSession session) {
+    // 관리자 삭제 (관리자 계정)
+    @PostMapping("/deleteAdmin")
+    @ResponseBody
+    public String deleteAdmin(@RequestParam Integer idx) {
+        log.info("관리자 삭제 요청: " + idx);
 
-        session.invalidate();
-
-        return "redirect:/login";
+        boolean isDeleted = adminService.deleteAdmin(idx);
+        return isDeleted ? "success" : "fail";
     }
 
     // 일반 회원 목록

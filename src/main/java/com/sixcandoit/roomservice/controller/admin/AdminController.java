@@ -1,9 +1,11 @@
 package com.sixcandoit.roomservice.controller.admin;
 
+import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
+import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.admin.AdminService;
 import com.sixcandoit.roomservice.service.member.MemberService;
@@ -20,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +35,7 @@ public class AdminController {
     private final AdminService adminService;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
+    private final AdminRepository adminRepository;
 
     @GetMapping("/")
     public String IndexForm(HttpSession session, AdminDTO adminDTO) {
@@ -288,6 +292,7 @@ public class AdminController {
                                  @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
                                  @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
                                  Model model){
+        log.info("관리자 회원 목록에 접속~");
         // 해당 페이지의 내용을 서비스를 통해 데이터베이스로 부터 조회
         Page<AdminDTO> adminDTOS = adminService.adminList(page, type, keyword);
 
@@ -305,13 +310,27 @@ public class AdminController {
         return "admin/adminlist";
     }
 
-//    // 관리자 권한 변경 처리
-//    @PostMapping("/updateLevel")
-//    public String updateAdminLevel(@RequestParam Long adminId, @RequestParam int level) {
-//        // AdminService에서 adminId와 level을 받아서 권한 업데이트
-//        adminService.updateAdminLevel(adminId, level);
-//
-//        // 업데이트 후 admin 리스트 페이지로 리디렉션
-//        return "redirect:/admin/adminlist";
-//    }
+    // 관리자 권한 변경 처리
+    @PostMapping("/updateRole")
+    @ResponseBody
+    public String updateAdminRole(@RequestParam("idx") Integer idx, @RequestParam("level") Level level, Principal principal) {
+        log.info("관리자 권한 변경을 하자~");
+        String loggedInAdminEmail = principal.getName();
+        AdminEntity loggedInAdmin = adminService.findByAdminEmail(loggedInAdminEmail);
+        log.info("이메일 들어왔어?" + loggedInAdmin);
+         if (!adminService.canUpdateRole(loggedInAdmin.getLevel(),adminRepository.findById(idx).get().getLevel())) {
+            log.info("권한이 없어...");
+        return "unauthorized"; // 권한 없음
+    }
+
+    boolean success = adminService.updateAdminRole(adminRepository.findById(idx).get().getAdminEmail(), level);
+        log.info("권한이 있네 변경했니....?" + success);
+
+
+
+        return success ? "success" : "fail";
+    }
+
+
+
 }

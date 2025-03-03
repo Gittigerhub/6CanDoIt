@@ -64,6 +64,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**").permitAll();
                     auth.requestMatchers("/h2-console/**").permitAll();
                     auth.requestMatchers("/admin/login").permitAll();
+                    auth.requestMatchers("/admin/updateRole").permitAll();
                     //ajax 허용
 
                     auth.requestMatchers("/member/checkEmail", "/admin/checkEmail").permitAll();
@@ -124,6 +125,8 @@ public class SecurityConfig{
         http.authorizeHttpRequests((auth)-> {
             auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**").permitAll();
             auth.requestMatchers("/h2-console/**").permitAll();
+            auth.requestMatchers("/admin/updateRole").permitAll();
+
             auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
             //ajax 허용
             auth.requestMatchers("/member/checkPhone", "/admin/checkPhone").permitAll();

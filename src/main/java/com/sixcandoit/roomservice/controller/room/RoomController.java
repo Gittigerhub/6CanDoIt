@@ -4,12 +4,13 @@ import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import com.sixcandoit.roomservice.service.room.RoomService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -30,13 +32,14 @@ import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
-@Log
+@Log4j2
 public class RoomController {
 
     // final 선언
     private final RoomService roomService;
     private final ReservationService reservationService;
     private final RoomRepository roomRepository;
+    private final ImageFileService imageFileService;
 
     // 룸 관리 메인 페이지
     @GetMapping("/room/main")
@@ -126,7 +129,7 @@ public class RoomController {
     // 룸 등록 저장 처리
     @PostMapping("/room/register")
     public String registerProc(@Valid @ModelAttribute RoomDTO roomDTO,
-                               BindingResult bindingResult){
+                               BindingResult bindingResult, List<MultipartFile> imageFiles){
         log.info("새로운 룸을 등록합니다.");
 
         // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
@@ -162,7 +165,7 @@ public class RoomController {
         }
 
         // 등록 처리
-        roomService.roomRegister(roomDTO);
+        roomService.roomRegister(roomDTO, imageFiles);
 
         return "redirect:/room/list";
     }
@@ -195,44 +198,51 @@ public class RoomController {
     // 룸 수정 수정하기
     @PostMapping("/room/update")
     public String updateProc(@Valid @ModelAttribute RoomDTO roomDTO,
-                             BindingResult bindingResult){
+                             BindingResult bindingResult,
+                             String join, List<MultipartFile> imageFiles){
         log.info("수정된 데이터를 저장합니다.");
+        try {
+            // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
+            if (roomDTO.getRoomWifi() == null) {
+                roomDTO.setRoomWifi("N");
+            }
+            if (roomDTO.getRoomTv() == null) {
+                roomDTO.setRoomTv("N");
+            }
+            if (roomDTO.getRoomAir() == null) {
+                roomDTO.setRoomAir("N");
+            }
+            if (roomDTO.getRoomBath() == null) {
+                roomDTO.setRoomBath("N");
+            }
+            if (roomDTO.getRoomBreakfast() == null) {
+                roomDTO.setRoomBreakfast("N");
+            }
+            if (roomDTO.getRoomSmokingYn() == null) {
+                roomDTO.setRoomSmokingYn("N");
+            }
+            // 체크인, 체크아웃 값이 없으면 기본값을 설정
+            if (roomDTO.getRoomCheckIn() == null) {
+                roomDTO.setRoomCheckIn(LocalTime.of(14, 0)); // 기본 체크인 시간 (14:00)
+            }
+            if (roomDTO.getRoomCheckOut() == null) {
+                roomDTO.setRoomCheckOut(LocalTime.of(11, 0)); // 기본 체크아웃 시간 (11:00)
+            }
 
-        // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
-        if (roomDTO.getRoomWifi() == null) {
-            roomDTO.setRoomWifi("N");
-        }
-        if (roomDTO.getRoomTv() == null) {
-            roomDTO.setRoomTv("N");
-        }
-        if (roomDTO.getRoomAir() == null) {
-            roomDTO.setRoomAir("N");
-        }
-        if (roomDTO.getRoomBath() == null) {
-            roomDTO.setRoomBath("N");
-        }
-        if (roomDTO.getRoomBreakfast() == null) {
-            roomDTO.setRoomBreakfast("N");
-        }
-        if (roomDTO.getRoomSmokingYn() == null) {
-            roomDTO.setRoomSmokingYn("N");
-        }
-        // 체크인, 체크아웃 값이 없으면 기본값을 설정
-        if (roomDTO.getRoomCheckIn() == null) {
-            roomDTO.setRoomCheckIn(LocalTime.of(14, 0)); // 기본 체크인 시간 (14:00)
-        }
-        if (roomDTO.getRoomCheckOut() == null) {
-            roomDTO.setRoomCheckOut(LocalTime.of(11, 0)); // 기본 체크아웃 시간 (11:00)
-        }
+            if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
+                log.info("유효성 검사 오류 발생");
+                return "room/update"; // update로 돌아간다
+            }
+            // 유효성 검사 성공 시 수정 처리
+            roomService.roomUpdate(roomDTO, join, imageFiles);
 
-        if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
-            log.info("유효성 검사 오류 발생");
-            return "room/update"; // update로 돌아간다
-        }
-        // 유효성 검사 성공 시 수정 처리
-        roomService.roomUpdate(roomDTO);
+            return "redirect:/room/detail?idx=" + roomDTO.getIdx();
 
-        return "redirect:/room/list";
+        } catch (Exception e) {
+            // 예외가 발생했을 경우 사용자에게 오류 메시지 전달
+            log.error(e.getMessage());
+            return "room/update"; // 수정 페이지로 돌아가면서 오류 메시지 전달
+        }
     }
 
     // 룸 삭제

@@ -13,8 +13,7 @@
 <div layout:fragment="content" class="p-5">
     <div class="container">
     <h3>문의사항</h3>
-    <div class="container p-5 bg-white">
-        <div id="row" class="row">
+        <div class="row p-5 bg-white">
             <div class="col"></div>
             <div class="col-10">
                 <form th:action="@{/qna/update}" th:object="${qnaDTO}" method="post" enctype="multipart/form-data">
@@ -61,8 +60,8 @@
                 </form>
             </div>
             <div class="col"></div>
-        </div><!--row끝-->
-    </div>
+
+        </div>
     </div>
 </div>
 </body>

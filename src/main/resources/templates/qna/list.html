@@ -23,38 +23,44 @@
         <h2>문의사항</h2>
         <!--검색 기능(keyword) 시작-->
         <form th:action="@{/qna/list}" method="get">
-            <div class="row p-5 bg-white"><!--틀-->
-                <div class="mb-3">
-                    <h3>게시글 검색</h3>
-                </div>
-                <div class="col-6">
-                    <div class="input-group mb-3">
-                        <select class="form-select" name="type"><!--type-->
-                            <option value="0" th:selected="${type=='0'}">전체</option><!--검색 후 선택값으로 설정-->
-                            <option value="1" th:selected="${type=='1'}">제목만</option>
-                            <option value="2" th:selected="${type=='2'}">내용만</option>
-                            <option value="3" th:selected="${type=='3'}">제목+내용</option>
-                            <option value="4" th:selected="${type=='4'}">답변만</option>
-                            <option value="5" th:selected="${type=='5'}">자주 묻는 질문만</option>
-                        </select>
-                        <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
-                        <button class="btn btn-success" type="submit">검색</button>
+            <div class="row p-5 bg-white d-flex justify-content-center"><!--틀-->
+                <div></div>
+                <div class="col-11">
+                    <div class="row">
+                        <div class="mb-2">
+                            <h3>게시글 검색</h3>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <select class="form-select" name="type"><!--type-->
+                                    <option value="0" th:selected="${type=='0'}">전체</option><!--검색 후 선택값으로 설정-->
+                                    <option value="1" th:selected="${type=='1'}">제목만</option>
+                                    <option value="2" th:selected="${type=='2'}">내용만</option>
+                                    <option value="3" th:selected="${type=='3'}">제목+내용</option>
+                                    <option value="4" th:selected="${type=='4'}">답변만</option>
+                                    <option value="5" th:selected="${type=='5'}">자주 묻는 질문만</option>
+                                </select>
+                                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
+                                <button class="btn btn-success" type="submit">검색</button>
+                            </div>
+                        </div><!--검색-->
+                        <div class="col-4"></div>
+                        <div class="col-2">
+                            <a th:href="@{/qna/register}" class="btn btn-primary w-100" style="font-size: large">문의하기</a>
+                        </div><!--추가버튼-->
                     </div>
-                </div><!--검색-->
-                <div class="col-5"></div>
-                <div class="col-1">
-                    <a th:href="@{/qna/register}" class="btn btn-primary">등록</a>
-                </div><!--추가버튼-->
+                </div>
+                <div></div>
             </div>
         </form>  <!--검색 기능(keyword) 끝-->
         <div class="row mt-5 p-5 bg-white">
-            <div class="mb-3">
-                <h3>게시글 목록</h3>
-            </div>
             <div class="col"></div>
-            <div class="col-10">
-                <table class="table table-hover">
-                    <thead>
+            <div class="col-11">
+                <div class="mb-3 mt-3">
+                    <h3>게시글 목록</h3>
+                </div>
+                <table class="table table-hover" border="1px">
+                    <thead class="table-light">
                     <tr>
                         <th>No</th>
                         <th>종류</th>

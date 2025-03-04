@@ -33,6 +33,9 @@ public class ReservationEntity extends BaseEntity {
     @Column(name = "enddate")
     private LocalDate endDate;         // 예약 마지막 일자
 
+    @Column(name = "res_status")
+    private String resStatus;          // 예약 상태(1:예약중, 2:예약완료, 3:예약종료)
+
     // 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")

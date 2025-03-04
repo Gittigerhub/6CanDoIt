@@ -2,20 +2,27 @@ package com.sixcandoit.roomservice.controller.room;
 
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
+import com.sixcandoit.roomservice.entity.room.ReservationEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
+import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -27,6 +34,7 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
+    private final ReservationRepository reservationRepository;
 
     //등록폼으로 이동
     @GetMapping("/create")
@@ -44,6 +52,27 @@ public class ReservationController {
         model.addAttribute("roomDTOList", roomDTOList);
 
         return "reserve/insert"; // Insert.html 뷰 템플릿을 찾아서 렌더링
+    }
+
+    @PostMapping("/updateStatus/{idx}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateResStatus(@PathVariable Integer idx, @RequestBody Map<String, String> requestBody) {
+        String newStatus = requestBody.get("status");
+
+        // roomidx에 해당하는 방을 roomRepository를 통해 찾아 상태 변경
+        Optional<ReservationEntity> reservationEntityOpt = reservationRepository.findById(idx);
+        if (!reservationEntityOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("success", false));
+        }
+
+        ReservationEntity res = reservationEntityOpt.get();
+
+        // 상태 값 업데이트
+        res.setResStatus(newStatus);
+        reservationRepository.save(res); // 상태가 업데이트된 방을 저장
+
+        // 상태 변경 성공 메시지 반환
+        return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 
     // 예외 발생 시 에러 메시지 전달
@@ -160,4 +189,12 @@ public class ReservationController {
         return "redirect:/res/list";
     }
 
+    // 삭제 처리
+    @GetMapping("/deletee/{idx}")
+    public String deletePage2(@PathVariable Integer idx) {
+        log.info("삭제 처리 후 목록페이지로 이동....");
+        reservationService.reserveDelete(idx);
+
+        return "redirect:/room/reserve";
+    }
 }

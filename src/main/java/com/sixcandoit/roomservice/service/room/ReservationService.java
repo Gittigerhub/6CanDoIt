@@ -65,10 +65,7 @@ public class ReservationService {
             reserveEntity.setRoomJoin(roomEntity);  // ReservationEntity에 RoomEntity 설정
 
             // 예약 상태 변경
-            roomEntity.setResStatus("2");  // 예약 중으로 상태 변경
-
-            // 변경된 RoomEntity 저장
-            roomRepository.save(roomEntity);  // RoomEntity 저장 (필요하다면)
+            reserveEntity.setResStatus("1");  // 예약 중으로 상태 변경
 
             // ReservationEntity 저장
             ReservationEntity result = reservationRepository.save(reserveEntity);
@@ -100,13 +97,8 @@ public class ReservationService {
             if (roomEntityOpt.isPresent()) {
                 RoomEntity roomEntity = roomEntityOpt.get();
                 reserveEntity.setRoomJoin(roomEntity);  // ReservationEntity에 RoomEntity 설정
-
-                // 예약 상태 변경 (예약 중)
-                roomEntity.setResStatus("2");  // 예약 중으로 상태 변경
-
-                // 변경된 RoomEntity 저장
-                roomRepository.save(roomEntity);  // RoomEntity 저장
             }
+            reserveEntity.setResStatus("1"); // 예약 중으로 상태 변경
 
             // ReservationEntity 저장
             ReservationEntity result = reservationRepository.save(reserveEntity);

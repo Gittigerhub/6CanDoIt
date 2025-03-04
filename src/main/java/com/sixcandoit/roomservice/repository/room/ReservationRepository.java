@@ -47,4 +47,5 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     List<RoomEntity> findAvailableRooms(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     Optional<ReservationEntity> findByIdx(Integer idx);
+
 }

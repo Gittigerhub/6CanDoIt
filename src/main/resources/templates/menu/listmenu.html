@@ -76,7 +76,7 @@
                             <td th:text="${menu.menuContent}"></td>
                             <td th:text="${menu.menuPrice}"></td>
                             <td>
-                                <button class="btn btn-info addcart" data-id="${menu.idx}" data-name="${menu.menuName}" data-price="${menu.menuPrice}">장바구니 추가</button>
+                                <button class="btn btn-info addcart" th:data-id="${menu.idx}" th:data-name="${menu.menuName}" th:data-price="${menu.menuPrice}">장바구니 추가</button>
                             </td>
                         </tr>
                         </tbody>
@@ -143,11 +143,15 @@
                 var menuName = $(this).data('name');
                 var menuPrice = $(this).data('price');
 
+                console.log(menuIdx)
+                console.log(menuName)
+                console.log(menuPrice)
+
                 $.ajax({
-                    url: '/cart/cart',
+                    url: '/cart',
                     type: 'POST',
                     data: {
-                        menuIdx: menuIdx,
+                        menuidx: menuIdx,
                         menuName: menuName,
                         menuPrice: menuPrice,
                         count: 1    //기본수량 1

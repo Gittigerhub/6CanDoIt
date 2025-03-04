@@ -45,5 +45,4 @@ public class RoomDTO {
     private LocalDateTime insDate;      // 작성 일자
     private LocalDateTime modDate;      // 수정 일자
     private String resStatus;          // 예약 상태(1:빈 방, 2:예약, 3:체크인, 4:체크 아웃)
-
 }

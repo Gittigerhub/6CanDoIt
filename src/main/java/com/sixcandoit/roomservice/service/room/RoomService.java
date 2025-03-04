@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -82,7 +84,14 @@ public class RoomService {
         roomRepository.deleteById(idx);
     }
 
-    // 룸 목록
+    // 예약 관리 - 룸 목록
+    public List<RoomDTO> resList(){
+        List<RoomEntity> roomEntities = roomRepository.findAll(); // 모두 조회
+        List<RoomDTO> roomDTOS = Arrays.asList(modelMapper.map(roomEntities, RoomDTO[].class));
+        return roomDTOS;
+    }
+
+    // 객실 관리 - 룸 목록
     public Page<RoomDTO> roomList(Pageable page, String type, String keyword, String order){
 
         int currentPage = page.getPageNumber()-1; // 화면의 페이지 번호를 db 페이지 번호로

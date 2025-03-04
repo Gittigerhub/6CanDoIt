@@ -59,8 +59,8 @@
         <h2>객실 예약</h2>
         <div class="row p-5 bg-white"><!--틀-->
             <!-- 빈 객실 목록 검색 영역 -->
-            <h2 class="text-center">빈 객실 조회하기</h2>
-            <div class="container mt-5 p-5 form-container">
+            <h2 class="text-center mt-3">빈 객실 조회하기</h2>
+            <div class="col-10 container mt-3 p-5 form-container">
                 <form action="/res/available" method="get" class="row g-3">
                     <div class="col-md-5">
                         <label for="startDate" class="form-label">시작 날짜</label>
@@ -76,15 +76,15 @@
                 </form>
             </div>
             <!-- 객실 목록 테이블 -->
-            <div class="container mt-5 p-5 table-container">
-                <table class="table table-striped">
-                    <thead>
+            <div class="col-10 container mt-5 mb-5 p-5 table-container">
+                <table class="table table-hover" border="1px">
+                    <thead class="table-light">
                     <tr>
                         <th>객실 타입</th>
                         <th>객실 이름</th>
                         <th>객실 뷰</th>
                         <th>가격</th>
-                        <th></th>
+                        <th>★</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -110,7 +110,7 @@
                         </td>
                         <td th:text="${data.roomPrice}"></td>
                         <td>
-                            <a th:href="@{/res/create}" class="btn btn-outline-primary btn-sm mx-2">예약하기</a>
+                            <a th:href="@{/res/create}" class="btn btn-outline-primary btn-m w-100">예약하기</a>
                         </td>
                     </tr>
                     </tbody>

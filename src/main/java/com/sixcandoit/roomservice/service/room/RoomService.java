@@ -1,8 +1,10 @@
 package com.sixcandoit.roomservice.service.room;
 
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,54 +29,87 @@ public class RoomService {
     // final 선언, 모델 맵퍼 선언
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
+    private final ImageFileService imageFileService;
 
     // 룸 등록
-    public void roomRegister(RoomDTO roomDTO){
-        // DTO로 Entity 변환
-        RoomEntity roomEntity = modelMapper.map(roomDTO, RoomEntity.class);
-        // 룸 기본 값:
-        roomEntity.setRoomView("N"); // 창문 없음
-        roomEntity.setRoomSeason("off"); // 비성수기
-        roomEntity.setRoomCondition("Y"); // 청소 완료
-        roomEntity.setResStatus("1"); // 예약 상태(1:빈 방, 2:예약, 3:체크인, 4:체크 아웃)
+    public void roomRegister(RoomDTO roomDTO, List<MultipartFile> imageFiles){
+        System.out.println(imageFiles);
+        try {
+            // DTO로 Entity 변환
+            RoomEntity room = modelMapper.map(roomDTO, RoomEntity.class);
+            // 룸 기본 값:
+            room.setRoomView("N"); // 창문 없음
+            room.setRoomSeason("off"); // 비성수기
+            room.setRoomCondition("Y"); // 청소 완료
+            room.setResStatus("1"); // 예약 상태(1:빈 방, 2:예약, 3:체크인, 4:체크 아웃)
 
-        // 저장
-        roomRepository.save(roomEntity);
+            //--------------------------------------------------------------//
+            // 이미지 등록
+            log.info("이미지를 저장한다...");
+            List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
+
+            // 이미지 정보 추가
+            for (ImageFileEntity image : images) {
+                room.addImage(image);
+            }
+            //--------------------------------------------------------------//
+
+            // 저장
+            roomRepository.save(room);
+        } catch (Exception e){
+            throw new RuntimeException("이미지 저장 실패 : "+e.getMessage());
+        }
     }
 
     // 룸 수정
-    public void roomUpdate(RoomDTO roomDTO){
-        // 룸 데이터의 idx를 조회
-        log.info("룸 데이터의 idx를 조회한다...");
-        Optional<RoomEntity> roomEntityOpt = roomRepository.findById(roomDTO.getIdx());
+    public void roomUpdate(RoomDTO roomDTO, String join, List<MultipartFile> imageFiles){
+        try {
+            System.out.println("이미지 파일즈 길이 : " + imageFiles.size());// 룸 데이터의 idx를 조회
+            log.info("룸 데이터의 idx를 조회한다...");
+            Optional<RoomEntity> roomEntityOpt = roomRepository.findById(roomDTO.getIdx());
 
-        if (roomEntityOpt.isPresent()) { // RoomEntity가 존재하면
-            RoomEntity roomEntity = roomEntityOpt.get();
+            if (roomEntityOpt.isPresent()) { // RoomEntity가 존재하면
+                RoomEntity room = roomEntityOpt.get();
 
-            // 기존 RoomEntity에서 ResStatus를 그대로 유지
-            roomEntity.setRoomName(roomDTO.getRoomName());
-            roomEntity.setRoomInfo(roomDTO.getRoomInfo());
-            roomEntity.setRoomType(roomDTO.getRoomType());
-            roomEntity.setRoomView(roomDTO.getRoomView());
-            roomEntity.setRoomNum(roomDTO.getRoomNum());
-            roomEntity.setRoomBed(roomDTO.getRoomBed());
-            roomEntity.setRoomPrice(roomDTO.getRoomPrice());
-            roomEntity.setRoomSize(roomDTO.getRoomSize());
-            roomEntity.setRoomBreakfast(roomDTO.getRoomBreakfast());
-            roomEntity.setRoomSmokingYn(roomDTO.getRoomSmokingYn());
-            roomEntity.setRoomWifi(roomDTO.getRoomWifi());
-            roomEntity.setRoomTv(roomDTO.getRoomTv());
-            roomEntity.setRoomAir(roomDTO.getRoomAir());
-            roomEntity.setRoomBath(roomDTO.getRoomBath());
-            roomEntity.setRoomCheckIn(roomDTO.getRoomCheckIn());
-            roomEntity.setRoomCheckOut(roomDTO.getRoomCheckOut());
+                // 기존 RoomEntity에서 ResStatus를 그대로 유지
+                room.setRoomName(roomDTO.getRoomName());
+                room.setRoomInfo(roomDTO.getRoomInfo());
+                room.setRoomType(roomDTO.getRoomType());
+                room.setRoomView(roomDTO.getRoomView());
+                room.setRoomNum(roomDTO.getRoomNum());
+                room.setRoomBed(roomDTO.getRoomBed());
+                room.setRoomPrice(roomDTO.getRoomPrice());
+                room.setRoomSize(roomDTO.getRoomSize());
+                room.setRoomBreakfast(roomDTO.getRoomBreakfast());
+                room.setRoomSmokingYn(roomDTO.getRoomSmokingYn());
+                room.setRoomWifi(roomDTO.getRoomWifi());
+                room.setRoomTv(roomDTO.getRoomTv());
+                room.setRoomAir(roomDTO.getRoomAir());
+                room.setRoomBath(roomDTO.getRoomBath());
+                room.setRoomCheckIn(roomDTO.getRoomCheckIn());
+                room.setRoomCheckOut(roomDTO.getRoomCheckOut());
 
-            // 저장
-            roomRepository.save(roomEntity);
+                //--------------------------------------------------------------//
+                // 이미지 추가 등록
+                List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, roomDTO.getIdx());
+                // 이미지 정보 추가
+                // 양방향 연관관계 편의 메서드 사용
+                if (images != null && !images.isEmpty()) {
+                    for (ImageFileEntity image : images) {
+                        room.addImage(image);  // FK 자동 설정
+                    }
+                }
+                //--------------------------------------------------------------//
 
-            log.info("룸 데이터가 업데이트되었습니다.");
-        } else {
-            throw new IllegalStateException("수정할 Room이 존재하지 않습니다.");
+                // 저장
+                roomRepository.save(room);
+
+                log.info("룸 데이터가 업데이트되었습니다.");
+            } else {
+                throw new IllegalStateException("수정할 Room이 존재하지 않습니다.");
+            }
+        }catch (Exception e){
+            throw new RuntimeException("수정 오류 발생");
         }
     }
 

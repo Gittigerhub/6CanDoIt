@@ -24,6 +24,30 @@
                             <h4>객실 등록</h4>
                         </div>
                         <div class="card-body">
+
+                            <!-- 조직 대표 사진 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default" id="inputImage">
+                                    <label>*대표 이미지 :</label>
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*" required/>
+                                </div>
+                            </div>
+                            <!-- 조직 사진 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default" id="inputImage2">
+                                    <label>*이미지 :</label>
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                                </div>
+                            </div>
+                            <!-- 조직 사진 미리보기 -->
+                            <div id="main"></div>
+                            <!-- 조직 사진 추가버튼 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <input type="button" id="addImage" value="이미지 추가">
+                                </div>
+                            </div>
+
                             <div class="mb-3 mt-3"><!--객실 유형-->
                                 <label for="roomType" class="form-label">객실 타입:</label>
                                 <select id="roomType" th:field="*{roomType}" class="form-select" aria-label="Default select example">
@@ -130,5 +154,39 @@
         </div><!--row 끝-->
     </div>
 </div>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        // 이미지 추가 버튼 클릭했을 때
+        $("#addImage").on('click', function() {
+
+            // 이미지 추가 함수
+            addImageInput();
+
+        });
+
+        // 이미지 추가
+        function addImageInput() {
+            const container = document.getElementById('inputImage2');
+            const newInputDiv = document.createElement('div');
+            newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            container.appendChild(newInputDiv);
+        }
+
+        // 이미지 input 초기화
+        function resetImageInput() {
+            const input = document.querySelector('input[name="imageFiles"]');
+            const container2 = document.getElementById('inputImage2');
+
+            // 파일 선택 초기화
+            if (input) {
+                input.value = '';
+            }
+
+            // 이미지 추가창 제거
+            container2.innerHTML = '<label>*이미지 :</label>' +
+                '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+        }
+    });
+</script>
 </body>
 </html>

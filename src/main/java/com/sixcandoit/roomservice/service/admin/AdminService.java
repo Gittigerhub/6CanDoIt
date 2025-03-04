@@ -45,6 +45,13 @@ public class AdminService {
         return adminRepository.existsByAdminPhone(phone); // 연락처 중복 여부 확인
     }
 
+    // 이메일 찾기 메서드
+    public AdminEntity findByAdminEmail(String adminEmail) {
+        System.out.println("입력된 이메일: " + adminEmail);
+        return adminRepository.findByAdminEmail(adminEmail)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 가진 관리자가 존재하지 않습니다."));
+    }
+
     // 관리자 회원 가입
     public AdminEntity register(AdminDTO adminDTO) {
         Optional<AdminEntity> user = adminRepository.findByAdminEmail(adminDTO.getAdminEmail());
@@ -280,6 +287,33 @@ public class AdminService {
 
         return adminDTOS;
     }
+
+    // 권한 변경
+    public boolean updateAdminRole(String adminEmail, Level newLevel) {
+        AdminEntity admin = findByAdminEmail(adminEmail);
+        log.info("이메일을 찾아요" + admin.getAdminName());
+        admin.setLevel(newLevel);
+        log.info("새 권한을 찾아요" + newLevel);
+        adminRepository.save(admin);
+        log.info("저장 완료~" + admin);
+        return true;
+    }
+
+    // 피라미드식 권한 변경
+    public boolean canUpdateRole(Level currentAdminLevel, Level targetLevel) {
+        log.info("당신의 권한은?" + currentAdminLevel);
+        if (currentAdminLevel == Level.ADMIN) {
+            return true; // ADMIN은 모든 레벨 변경 가능
+        }
+        if (currentAdminLevel == Level.HO) {
+            return targetLevel == Level.BO || targetLevel == Level.MANAGER;
+        }
+        if (currentAdminLevel == Level.BO) {
+            return targetLevel == Level.MANAGER;
+        }
+        return false; // MANAGER는 권한 변경 불가
+    }
+
 
 
 

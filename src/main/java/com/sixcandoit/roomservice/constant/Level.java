@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Level {
 
-    ADMIN("슈퍼어드민"),
+    ADMIN("최고 관리자"),
     HO("본사 관리자"), BO("지사 관리자"), MANAGER("매니저"),
     MEMBER("사용자"),
     GUEST("관리자 승인 대기");

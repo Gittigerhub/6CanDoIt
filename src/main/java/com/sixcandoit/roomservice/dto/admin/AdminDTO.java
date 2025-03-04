@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.dto.admin;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.notice.NoticeEntity;
@@ -40,6 +41,12 @@ public class AdminDTO {
         this.level = level; //키값 저장
         this.levelDescription =
                 level != null?level.getDescription():null;
+    }
+
+    // 권한 설정
+    public void setNewLevel(Level newLevel) {
+        this.level = newLevel;
+        this.levelDescription = newLevel != null ? newLevel.getDescription() : null;
     }
 
     //사용자 이름을 출력하는 메소드

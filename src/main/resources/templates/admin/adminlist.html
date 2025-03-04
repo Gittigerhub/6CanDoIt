@@ -58,7 +58,17 @@
                     <tbody>
                     <tr th:each="admin : ${admin}">
                         <td th:text="${admin.idx}"></td>
-                        <td th:text="${admin.level}"></td>
+<!--                        <td th:text="${admin.level}"></td>-->
+                        <td>
+                            <select class="form-select role-select" th:data-admin-id="${admin.idx}">
+                                <option th:each="role : ${T(com.sixcandoit.roomservice.constant.Level).values()}"
+                                        th:value="${role}" th:text="${role.description}"
+                                        th:selected="${admin.level == role}">
+                                </option>
+                            </select>
+                            <button class="btn btn-primary btn-sm update-role-btn" th:data-admin-id="${admin.idx}">권한 변경</button>
+
+                        </td>
                         <td th:text="${admin.adminName}"></td>
                         <td th:text="${admin.adminEmail}"></td>
                         <td th:text="${admin.adminPhone}"></td>
@@ -105,14 +115,46 @@
         <div class="col"></div>
     </div>
     <script>
+        // 권한 변경
+        $(document).ready(function () {
+            $(".update-role-btn").click(function () {
+                let idx = $(this).data("admin-id");
+                let newLevel = $(this).closest("tr").find(".role-select").val();
+
+                if (!confirm("이 관리자의 권한을 변경하시겠습니까?")) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "/admin/updateRole",
+                    type: "POST",
+                    // contentType: "application/json",
+                    data: { idx: idx, level: newLevel },
+                    success: function (response) {
+                        if (response === "success") {
+                            alert("권한이 변경되었습니다.");
+                            location.reload();
+                        } else {
+                            alert("권한 변경에 실패했습니다.");
+                        }
+                    },
+                    error: function () {
+                        alert("오류 발생! 관리자에게 문의하세요.");
+                    }
+                });
+            });
+        });
+
+
+        // 회원 탈퇴
         function deleteAdmin(idx) {
-            console.log("관리자 삭제 요청, idx:", idx); // 디버깅 로그
+            console.log("관리자 삭제 요청, idx:", idx);
 
             if (!confirm("정말로 이 관리자를 삭제하시겠습니까?")) return;
 
             $.post("/admin/deleteAdmin", { idx: idx })
                 .done(function(response) {
-                    console.log("서버 응답:", response); // 디버깅 로그
+                    console.log("서버 응답:", response);
                     if (response === "success") {
                         alert("관리자가 삭제되었습니다.");
                         location.reload();
@@ -121,7 +163,7 @@
                     }
                 })
                 .fail(function(error) {
-                    console.error("삭제 요청 실패:", error); // 디버깅 로그
+                    console.error("삭제 요청 실패:", error);
                     alert("오류 발생! 관리자에게 문의하세요.");
                 });
         }

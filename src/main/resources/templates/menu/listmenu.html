@@ -17,39 +17,13 @@
     <div class="row mt-5">
         <div class="col-2"></div>
         <div class="col-8">
-            <!--검색 기능(keyword) 시작-->
-            <form th:action="@{/menu/listmenu}" method="get">
-                <div class="row p-5 bg-white"><!--틀-->
-                    <div class="mb-3">
-                        <h3>메뉴 검색</h3>
-                    </div>
-                    <div class="col-6">
-                        <div class="input-group mb-3">
-                            <select class="form-select" name="type"><!--type-->
-                                <option value="1" th:selected="${type=='1'}">메뉴명</option><!--검색 후 선택값으로 설정-->
-                                <option value="2" th:selected="${type=='2'}">메뉴설명</option>
-                                <option value="3" th:selected="${type=='3'}">메뉴명+설명</option>
-                                <option value="4" th:selected="${type=='4'}">카테고리</option>
-                                <option value="0" th:selected="${type=='0'}">전체</option>
-                            </select>
-                            <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
-                            <button class="btn btn-success" type="submit">검색</button>
-                        </div>
-                    </div><!--검색-->
-                    <div class="col-4"></div>
-                    <div class="col-2">
-                        <a th:href="@{/menu/registermenu}" class="btn btn-primary">등록</a>
-                    </div><!--추가버튼-->
-                </div>
-            </form>
-            <!--검색 기능(keyword) 끝-->
             <!-- 검색 결과 테이블 -->
-            <div class="row mt-4 p-3 bg-white">
+            <div class="row mt-5 p-3 bg-white">
                 <div class="mb-5">
-                    <h3>메뉴 목록</h3>
+                    <h2>메뉴 목록</h2>
                 <div class="col-12">
                     <!-- 카테고리 선택 UI -->
-                    <div class="row p-3 bg-white text-center">
+                    <div class="row mb-5 mt-3 bg-white text-center">
                         <div class="col-12">
                             <div class="btn-group" role="group" aria-label="Category Selection">
                                 <button type="button" class="btn btn-outline-primary category-btn" data-category="Korean">한식</button>
@@ -72,9 +46,7 @@
                             <th>메뉴사진</th>
                             <th>메뉴설명</th>
                             <th>가격</th>
-                            <th>등록일</th>
-                            <th>수정</th>
-                            <th>삭제</th>
+                            <th>장바구니</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -103,12 +75,8 @@
                             </td>
                             <td th:text="${menu.menuContent}"></td>
                             <td th:text="${menu.menuPrice}"></td>
-                            <td th:text="${menu.insDate}"></td>
                             <td>
-                                <button class="btn btn-info" th:onclick="|location.href='/menu/updatemenu?idx='+ ${menu.idx}|">수정</button>
-                            </td>
-                            <td>
-                                <button class="btn btn-danger delMoveBtn" th:data-id="${menu.idx}">삭제</button>
+                                <button class="btn btn-info addcart" data-id="${menu.idx}" data-name="${menu.menuName}" data-price="${menu.menuPrice}">장바구니 추가</button>
                             </td>
                         </tr>
                         </tbody>
@@ -153,8 +121,6 @@
             $('.category-btn').on('click', function() {
                 var category = $(this).data('category');  // 선택된 카테고리 값
 
-
-
                 $.ajax({
                     url: '/menu/ajax/listmenu',  // 현재 페이지에서 처리할 주소
                     type: 'GET',
@@ -171,63 +137,97 @@
 
             });
 
-            //삭제 버튼 클릭시
-            $(".delMoveBtn").on("click", function() {
-                var idx = $(this).data("id")
+            //장바구니에 메뉴 추가
+            $('.addcart').on('click', function() {
+                var menuIdx = $(this).data('id');
+                var menuName = $(this).data('name');
+                var menuPrice = $(this).data('price');
 
                 $.ajax({
-                    url: "/menu/removemenu",
-                    type: 'GET',
+                    url: '/cart/cart',
+                    type: 'POST',
                     data: {
-                        idx: idx                        // 전달값 : 메뉴 ID
+                        menuIdx: menuIdx,
+                        menuName: menuName,
+                        menuPrice: menuPrice,
+                        count: 1    //기본수량 1
                     },
-                    success: function (response) {      // 작업 성공시
+                    success: function (response) {
                         Swal.fire({
                             icon: null,
-                            text: "삭제하였습니다",
-                            customClass: {
-                                container: 'bootstrap-swal-container',
-                                popup: 'card shadow-sm',
-                                title: 'h4 text-success',
-                                content: 'text-dark',
-                            },
+                            text: "장바구니에 추가되었습니다!",
                             showConfirmButton: false,
-                            timer: 2000,
-                            willOpen: () => {
-                                Swal.showLoading();
-                            },
-                            buttonsStyling: false,
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false
-                        }).then(() => {
-                            // 삭제 완료 후 '/menu/listmenu'로 리디렉션
-                            location.href = "/menu/listmenu";  // 페이지 이동
+                            timer: 1500,
                         });
                     },
-                    error: function () {                // 작업 실패시
+                    error: function () {
                         Swal.fire({
                             icon: null,
-                            text: "삭제를 실패하였습니다",
-                            customClass: {
-                                container: 'bootstrap-swal-container',
-                                popup: 'card shadow-sm',
-                                title: 'h4 text-success',
-                                content: 'text-dark',
-                            },
+                            text: "장바구니 추가에 실패하였습니다!",
                             showConfirmButton: false,
-                            timer: 2000,
-                            willOpen: () => {
-                                Swal.showLoading();
-                            },
-                            buttonsStyling: false,
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false
+                            timer: 1500,
                         });
                     }
                 });
             });
+
+            // //삭제 버튼 클릭시
+            // $(".delMoveBtn").on("click", function() {
+            //     var idx = $(this).data("id")
+            //
+            //     $.ajax({
+            //         url: "/menu/removemenu",
+            //         type: 'GET',
+            //         data: {
+            //             idx: idx                        // 전달값 : 메뉴 ID
+            //         },
+            //         success: function (response) {      // 작업 성공시
+            //             Swal.fire({
+            //                 icon: null,
+            //                 text: "삭제하였습니다",
+            //                 customClass: {
+            //                     container: 'bootstrap-swal-container',
+            //                     popup: 'card shadow-sm',
+            //                     title: 'h4 text-success',
+            //                     content: 'text-dark',
+            //                 },
+            //                 showConfirmButton: false,
+            //                 timer: 2000,
+            //                 willOpen: () => {
+            //                     Swal.showLoading();
+            //                 },
+            //                 buttonsStyling: false,
+            //                 allowOutsideClick: false,
+            //                 allowEscapeKey: false,
+            //                 allowEnterKey: false
+            //             }).then(() => {
+            //                 // 삭제 완료 후 '/menu/listmenu'로 리디렉션
+            //                 location.href = "/menu/listmenu";  // 페이지 이동
+            //             });
+            //         },
+            //         error: function () {                // 작업 실패시
+            //             Swal.fire({
+            //                 icon: null,
+            //                 text: "삭제를 실패하였습니다",
+            //                 customClass: {
+            //                     container: 'bootstrap-swal-container',
+            //                     popup: 'card shadow-sm',
+            //                     title: 'h4 text-success',
+            //                     content: 'text-dark',
+            //                 },
+            //                 showConfirmButton: false,
+            //                 timer: 2000,
+            //                 willOpen: () => {
+            //                     Swal.showLoading();
+            //                 },
+            //                 buttonsStyling: false,
+            //                 allowOutsideClick: false,
+            //                 allowEscapeKey: false,
+            //                 allowEnterKey: false
+            //             });
+            //         }
+            //     });
+            // });
         });
     </script>
 </th:block>

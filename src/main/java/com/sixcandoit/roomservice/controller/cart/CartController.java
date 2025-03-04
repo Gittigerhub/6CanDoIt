@@ -30,9 +30,9 @@ public class CartController {
     private final MenuService menuService;
 
 
-    //룸예약 장바구니 등록
-    @PostMapping("/cart/RegisterReserve")
-    public ResponseEntity cartRegisterReserve(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
+    //장바구니 등록
+    @PostMapping("/cart")
+    public ResponseEntity registerCart(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
                                     Principal principal) {
 
         //유효성 검사
@@ -48,9 +48,11 @@ public class CartController {
         }
 
         //값이 잘 넘어왔다면
+        // 이메일로 회원을 찾고 장바구니에 메뉴 추가
         String email = principal.getName();
 
         try {
+            //장바구니에 추가
             Integer cartMenuIdx = cartService.addCart(cartMenuDTO, email);
             //저장 후 브라우저로 재전송
             return new ResponseEntity<Integer>(cartMenuIdx, HttpStatus.OK);
@@ -63,9 +65,12 @@ public class CartController {
 
     @GetMapping("/cart/cartlist")
     public String getCart(Principal principal, Model model) {
+        // 사용자 이메일을 이용해 장바구니 정보 가져오기
+        String email = principal.getName();
+
         //사용자에게 보여줄 장바구니 목록
         List<CartDetailDTO> cartDetailDTOList =
-                cartService.cartDetailDTOList(principal.getName());
+                cartService.cartDetailDTOList(email);
 
         //사용자에게 보여줄 장바구니 목록 중에 CartDetailDTO(꼭 필요한 정보만 가공한 DTO)로 담은 List
         model.addAttribute("cartDetailDTOList", cartDetailDTOList);
@@ -102,7 +107,7 @@ public class CartController {
         return new ResponseEntity<>(cartMenuDTO.getMenuidx(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/cartmenu/{cartmenuidx}")
+    @DeleteMapping("/cart/cart/{cartmenuidx}")
     public ResponseEntity deleteCartMenu(@PathVariable("cartmenuidx") Integer cartmenuidx,
                                          Principal principal) {
         if (!cartService.validateCartMenu(cartmenuidx, principal.getName())) {

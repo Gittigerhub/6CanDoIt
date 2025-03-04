@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.service.cart;
 
+import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.dto.cart.CartDetailDTO;
 import com.sixcandoit.roomservice.dto.cart.CartMenuDTO;
 import com.sixcandoit.roomservice.dto.cart.CartOrdersDTO;
@@ -54,6 +55,12 @@ public class CartService {
         MenuEntity menuEntity = menuRepository.findById(cartMenuDTO.getMenuidx())
                 .orElseThrow(EntityNotFoundException::new);
 
+        //메뉴정보를 MenuDTO로 변환
+        MenuDTO menuDTO = new MenuDTO();
+        menuDTO.setIdx(menuEntity.getIdx());
+        menuDTO.setMenuName(menuEntity.getMenuName());
+        menuDTO.setMenuPrice(menuEntity.getMenuPrice());
+
         //카트 찾기
         CartEntity cartEntity
                 = cartRepository.findByMemberJoin_memberEmail(memberEntity.get().getMemberEmail());
@@ -86,6 +93,7 @@ public class CartService {
         }
     }
 
+    //장바구니 상세 리스트 반환(CartDetailDTO로 반환)
     public List<CartDetailDTO> cartDetailDTOList(String memberEmail) {
 
         List<CartDetailDTO> cartDetailDTOList = new ArrayList<>();
@@ -102,12 +110,37 @@ public class CartService {
         if (cartEntity == null) {
             return cartDetailDTOList;
         }
+
         //장바구니에 담겨있는 메뉴를 조회
         //cartDetailDTOList = cartMenuRepository.findByCartDetailDTOList(cartEntity.getIdx());
+        List<CartMenuEntity> cartMenuEntities = cartMenuRepository.findByCartEntity_Idx(cartEntity.getIdx());
+
+        // CartMenuEntity에서 CartDetailDTO로 변환
+        for (CartMenuEntity cartMenuEntity : cartMenuEntities) {
+            MenuEntity menuEntity = cartMenuEntity.getMenuEntity();
+
+            // MenuEntity에서 값을 가져와 CartDetailDTO 생성
+            CartDetailDTO cartDetailDTO = new CartDetailDTO();
+            cartDetailDTO.setCartMenuIdx(cartMenuEntity.getIdx());
+            cartDetailDTO.setMenuName(menuEntity.getMenuName());
+            cartDetailDTO.setMenuPrice(menuEntity.getMenuPrice());
+            cartDetailDTO.setCount(cartMenuEntity.getCount());
+
+            //MenuEntity에서 첫 번째 이미지 경로를 가져온다
+            if (!menuEntity.getImageFileJoin().isEmpty()) {
+                cartDetailDTO.setMenuImg(menuEntity.getImageFileJoin().get(0).getUrl());
+            } else {
+                cartDetailDTO.setMenuImg(null); //이미지가 없으면 null로 처리
+            }
+
+            //리스트에 추가
+            cartDetailDTOList.add(cartDetailDTO);
+        }
 
         return cartDetailDTOList;
     }
 
+    //장바구니 메뉴 유효성 검사
     public boolean validateCartMenu(Integer cartMenuidx,String memberEmail) {
         Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
 
@@ -122,14 +155,15 @@ public class CartService {
         return true;
     }
 
+    //장바구니 메뉴 삭제
     public void deleteCartMenu(Integer cartMenuidx) {
         CartMenuEntity cartMenuEntity
                 = cartMenuRepository.findById(cartMenuidx).orElseThrow(EntityNotFoundException::new);
         cartMenuRepository.delete(cartMenuEntity);
     }
 
-    //장바구니에서 들어온 주문
 
+    //장바구니에서 들어온 주문
     public Integer orderCartMenu(List<CartOrdersDTO> cartOrdersDTOList, String memberEmail) {
         //cartOrderDTOList cartMenuIdx가 들어있음
 

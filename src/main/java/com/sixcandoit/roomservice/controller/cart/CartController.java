@@ -35,6 +35,9 @@ public class CartController {
     public ResponseEntity registerCart(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
                                     Principal principal) {
 
+        System.out.println(cartMenuDTO);
+        System.out.println(principal);
+
         //유효성 검사
         if (bindingResult.hasErrors()) {
             StringBuffer sb = new StringBuffer();

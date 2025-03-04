@@ -41,7 +41,7 @@ public class OfficeController {
     @GetMapping("/test")
     public String test(Model model) {
 
-        return "office/test";
+        return "memberindex";
     }
 
 

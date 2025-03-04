@@ -8,9 +8,8 @@ import lombok.Getter;
 public enum Level {
 
     ADMIN("최고 관리자"),
-    HO("본사 관리자"), BO("지사 관리자"), MANAGER("매니저"),
-    MEMBER("사용자"),
-    GUEST("관리자 승인 대기");
+    HO("본사 관리자"), BO("지사 관리자"), GUEST("관리자 승인 대기"),
+    MEMBER("일반 사용자");
 
     private final String description;
 

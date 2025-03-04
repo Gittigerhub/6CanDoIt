@@ -6,10 +6,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collection;
 
 @Component
 public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -20,62 +22,39 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         HttpSession session = request.getSession();
 
-        //System.out.println(authentication.getPrincipal());
-        //3. 기본제공하는 정보 및 추가적인 정보를 섹션등을 이용해서 활용한다.
         // 사용자 정보 출력
         System.out.println("사용자 이름: " + authentication.getName());
         System.out.println("사용자 권한: " + authentication.getAuthorities());
+
         // 사용자 추가 정보 출력
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
             if (token.getPrincipal() instanceof CustomUserDetails) {
                 CustomUserDetails userDetails = (CustomUserDetails) token.getPrincipal();
-//                System.out.println("호텔: " + userDetails.getHotels());
-                // 패스워드는 출력하지 않는 것이 보안상 좋습니다.
             }
         }
 
-
-        if(session != null) {
+        if (session != null) {
             String userEmail = authentication.getName(); // 로그인한 사용자 이메일
+            session.setAttribute("userEmail", userEmail); // 모든 등급의 사용자 이메일 저장
 
-            boolean isUser = authentication.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_MEMBER"));
-            if(isUser) { // 일반 사용자
-                System.out.println("사용자 페이지 이동");
-                session.setAttribute("memberEmail", userEmail);  // 일반 사용자 이메일 저장
-                super.setDefaultTargetUrl("/member/");
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            String targetUrl = "/"; // 기본 URL
+
+            if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                targetUrl = "/admin/"; // 최고 관리자 페이지
+            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_HO"))) {
+                targetUrl = "/ho"; // HO 관리자 페이지
+            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_BO"))) {
+                targetUrl = "/bo"; // BO 관리자 페이지
+            } else {
+                targetUrl = "/member/"; // 일반 사용자
             }
 
-            boolean isAdmin = authentication.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-            if(isAdmin) { // 관리자
-                System.out.println("관리자 페이지 이동");
-                session.setAttribute("adminEmail", userEmail);  // 관리자 이메일 저장
-                super.setDefaultTargetUrl("/admin/");
-            }
+            response.sendRedirect(targetUrl);
+            return; // super.onAuthenticationSuccess() 실행되지 않도록 종료
         }
-
-//        if(session != null) {
-//            String memberEmail = authentication.getName();
-//            session.setAttribute("memberEmail", memberEmail);
-//
-//            boolean isUser = authentication.getAuthorities().stream()
-//                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER"));
-//            if(isUser) { //USER이면
-//                System.out.println("사용자 페이지 이동");
-//                super.setDefaultTargetUrl("/member/"); // 회원 메인 페이지 이동
-//            }
-//
-//            boolean isAdmin = authentication.getAuthorities().stream()
-//                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-//            if(isAdmin) { //ADMIN이면
-//                System.out.println("관리자 페이지 이동");
-//                super.setDefaultTargetUrl("/admin/"); //관리자 메인 페이지 이동
-//            }
-//        }
 
         super.onAuthenticationSuccess(request, response, authentication);
     }
-
 }

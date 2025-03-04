@@ -1,21 +1,14 @@
 package com.sixcandoit.roomservice.controller.member;
 
-import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
-import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.service.member.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +21,7 @@ public class MemberController {
     @GetMapping("/")
     public String IndexForm(HttpSession session, MemberDTO memberDTO) {
         session.setAttribute("memberName", memberDTO.getMemberName());
-        return "index";
+        return "memberindex";
     }
 
     // 로그인

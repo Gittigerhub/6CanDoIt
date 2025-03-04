@@ -19,4 +19,13 @@ public class CartDetailDTO {
     private int count;  //주문 수량
 
     private String menuImg;    //메뉴 이미지 경로
+
+//    // 생성자에서 메뉴 정보 추가
+//    public CartDetailDTO(Integer cartMenuIdx, String menuName, int menuPrice, int count, String menuImg) {
+//        this.cartMenuIdx = cartMenuIdx;
+//        this.menuName = menuName;
+//        this.menuPrice = menuPrice;
+//        this.count = count;
+//        this.menuImg = menuImg;
+//    }
 }

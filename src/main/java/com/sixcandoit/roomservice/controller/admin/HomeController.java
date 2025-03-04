@@ -1,4 +1,4 @@
-package com.sixcandoit.roomservice.controller;
+package com.sixcandoit.roomservice.controller.admin;
 
 import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import jakarta.servlet.http.HttpSession;
@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-public class HomeCotroller {
+public class HomeController {
+
 //    @GetMapping("/")
 //    public String IndexForm(HttpSession session, AdminDTO adminDTO) {
 //        log.info("최고 관리자 페이지 진입");

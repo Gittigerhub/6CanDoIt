@@ -217,8 +217,8 @@
             return true; // 비밀번호 일치 시 폼 제출
         }
 
-            // 이메일, 연락처 중복 체크 함수
-            $(function () {
+        // 이메일, 연락처 중복 체크 함수
+        $(function () {
             $("#registerForm").on("submit", function (event) {
                 event.preventDefault();  // 폼 제출을 막고 Ajax로 처리
 
@@ -269,115 +269,54 @@
             });
         });
 
-
-
-    // // 이메일 중복 체크 함수
-        // $(function () {
-        //     $("#registerForm").on("submit", function (event) {
-        //         event.preventDefault();
-        //
-        //
-        //         $.ajax({
-        //             url: '/member/checkEmail',
-        //             method: 'POST',
-        //             dataType: 'text',
-        //             data: {"email": $("#memberEmail").val()},
-        //             success: function (checkMail) {
-        //                 if (parseInt(checkMail) === 1) {
-        //                     console.log("ajax 응답된거 있어?", checkMail);
-        //                     var myModal = new bootstrap.Modal($("#emailMismatchModal"));
-        //                     myModal.show();
-        //
-        //                 } else {
-        //                     console.log("일로 들어온거구나" + checkMail);
-        //                     $("#registerForm").off("submit").submit();
-        //                 }
-        //             },
-        //             error: function (xhr, errmsg, err) {
-        //                 console.log("why?" + xhr.status);
-        //                 return true;
-        //             }
-        //
-        //         });
-        //     })
-        // })
-        //
-        // // 연락처 중복 체크 함수
-        // $(function () {
-        //     $("#registerForm").on("submit", function (event) {
-        //         event.preventDefault();
-        //
-        //         $.ajax({
-        //             url: '/member/checkPhone', // 연락처 중복 체크 URL로 수정
-        //             method: 'POST',
-        //             dataType: 'text',
-        //             data: {"phone": $("#memberPhone").val()}, // 이메일 대신 연락처로 수정
-        //             success: function (checkPhone) {
-        //                 if (parseInt(checkPhone) === 1) {
-        //                     var myModal = new bootstrap.Modal($("#phoneMismatchModal")); // 모달 ID 변경
-        //                     myModal.show();
-        //                 } else {
-        //                     $("#registerForm").off("submit").submit(); // 중복이 없으면 폼 제출
-        //                 }
-        //             },
-        //             error: function (xhr, errmsg, err) {
-        //                 console.log("error: " + xhr.status);
-        //                 return true;
-        //             }
-        //         });
-        //     });
-        // });
-
-
-
         // 주소 API
-                function execDaumPostcode() {
-                    new daum.Postcode({
-                        oncomplete: function (data) {
-                            var fullAddress = '';  // 최종적으로 합칠 주소
-                            var extraAddr = '';    // 참고항목
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function (data) {
+                    var fullAddress = '';  // 최종적으로 합칠 주소
+                    var extraAddr = '';    // 참고항목
 
-                            // 도로명 주소 또는 지번 주소 선택
-                            if (data.userSelectedType === 'R') {
-                                fullAddress = data.roadAddress;
-                            } else {
-                                fullAddress = data.jibunAddress;
-                            }
-
-                            // 도로명 주소일 경우 추가적인 정보 처리
-                            if (data.userSelectedType === 'R') {
-                                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                                    extraAddr += data.bname;
-                                }
-                                if (data.buildingName !== '' && data.apartment === 'Y') {
-                                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                                }
-                                // 참고항목이 있을 경우 추가
-                                if (extraAddr !== '') {
-                                    extraAddr = ' (' + extraAddr + ')';
-                                }
-                            }
-
-                            // 최종 주소에 참고항목 추가
-                            fullAddress += extraAddr;
-
-                            // 주소, 우편번호를 입력란에 채우기
-                            document.getElementById('memberPostcode').value = data.zonecode;
-                            document.getElementById("memberAddress").value = fullAddress;  // 주소를 memberAddress 필드에 삽입
-                        }
-                    }).open();
-                }
-
-                // form submit 전에 memberAddress에 상세 주소 추가
-                function combineAddress() {
-                    var detailedAddress = document.getElementById("memberExtraAddress").value.trim();
-                    var memberAddress = document.getElementById("memberAddress").value.trim();
-
-                    // 상세 주소가 존재하고, memberAddress에 이미 상세주소가 포함되지 않으면 합침
-                    if (detailedAddress && !memberAddress.endsWith(detailedAddress)) {
-                        document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
+                    // 도로명 주소 또는 지번 주소 선택
+                    if (data.userSelectedType === 'R') {
+                        fullAddress = data.roadAddress;
+                    } else {
+                        fullAddress = data.jibunAddress;
                     }
+
+                    // 도로명 주소일 경우 추가적인 정보 처리
+                    if (data.userSelectedType === 'R') {
+                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                            extraAddr += data.bname;
+                        }
+                        if (data.buildingName !== '' && data.apartment === 'Y') {
+                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        // 참고항목이 있을 경우 추가
+                        if (extraAddr !== '') {
+                            extraAddr = ' (' + extraAddr + ')';
+                        }
+                    }
+
+                    // 최종 주소에 참고항목 추가
+                    fullAddress += extraAddr;
+
+                    // 주소, 우편번호를 입력란에 채우기
+                    document.getElementById('memberPostcode').value = data.zonecode;
+                    document.getElementById("memberAddress").value = fullAddress;  // 주소를 memberAddress 필드에 삽입
                 }
+            }).open();
+        }
+
+        // form submit 전에 memberAddress에 상세 주소 추가
+        function combineAddress() {
+            var detailedAddress = document.getElementById("memberExtraAddress").value.trim();
+            var memberAddress = document.getElementById("memberAddress").value.trim();
+
+            // 상세 주소가 존재하고, memberAddress에 이미 상세주소가 포함되지 않으면 합침
+            if (detailedAddress && !memberAddress.endsWith(detailedAddress)) {
+                document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
+            }
+        }
 
 
 

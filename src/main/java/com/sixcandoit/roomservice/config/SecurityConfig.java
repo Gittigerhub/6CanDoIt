@@ -92,8 +92,11 @@ public class SecurityConfig{
                     auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
                     // 이미지 컨트롤러 접근 권한
                     auth.requestMatchers("/images/**").permitAll();
+                    // ho, bo 권한 설정
+                    auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
+                    auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
 
-                    });
+                });
 
         //관리자회원 로그인
         http.formLogin(login -> login
@@ -154,7 +157,9 @@ public class SecurityConfig{
             auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
             // 이미지 컨트롤러 접근 권한
             auth.requestMatchers("/images/**").permitAll();
-
+            // ho, bo 권한 설정
+            auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
+            auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
 
             });
 

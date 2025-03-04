@@ -6,12 +6,12 @@
     <title>예약 관리</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle
-    .min.js"></script>
-    <!-- Add jQuery -->
-    <!--<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .card {
             border: 1px solid #ddd;
@@ -37,36 +37,130 @@
             text-decoration: none; /* 밑줄 없애기 */
             color: black; /* 글자 색을 검은색으로 변경 */
         }
+
+        /* 커스텀 클릭 메뉴 스타일 */
+        #contextMenu {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 5px 0;
+            width: 150px;
+            border-radius: 4px;
+        }
+
+        #contextMenu a {
+            display: block;
+            padding: 8px 10px;
+            text-decoration: none;
+            color: black;
+            cursor: pointer;
+        }
+
+        #contextMenu a:hover {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 <body>
 <div layout:fragment="content">
+
+    <!--객실 resStatus 상태 변경 AJAX-->
+    <script>
+        // showContextMenu 함수 정의
+        function showContextMenu(event, idx) {
+            event.preventDefault();  // 기본 동작을 막음
+            const menu = document.getElementById('contextMenu');
+            menu.style.left = `${event.pageX}px`;
+            menu.style.top = `${event.pageY}px`;
+            menu.style.display = 'block';
+
+            // 메뉴 클릭 시 상태 변경
+            menu.onclick = function(e) {
+                const selectedStatus = e.target.getAttribute('data-status');
+                if (selectedStatus) {
+                    updateRoomStatus(idx, selectedStatus);
+                }
+                menu.style.display = 'none';  // 메뉴 닫기
+            };
+        }
+
+        // updateRoomStatus 함수 정의
+        function updateRoomStatus(idx, newStatus) {
+            fetch(`/room/updateStatus/${idx}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('상태가 변경되었습니다!');
+                        location.reload();  // 페이지 새로고침
+                    } else {
+                        alert('상태 변경에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('에러가 발생했습니다.');
+                });
+        }
+
+        // 페이지 내 다른 부분 클릭 시, 메뉴 숨기기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('contextMenu');
+            // 메뉴 외부 클릭 시 숨기기
+            if (menu.style.display === 'block' && !menu.contains(event.target) && !event.target.closest('.card')) {
+                menu.style.display = 'none';
+            }
+        });
+    </script>
+
+    <!-- 클릭 메뉴 -->
+    <div id="contextMenu">
+        <a href="javascript:void(0)" data-status="1">빈 방</a>
+        <a href="javascript:void(0)" data-status="2">예약 중</a>
+        <a href="javascript:void(0)" data-status="3">체크인</a>
+        <a href="javascript:void(0)" data-status="4">체크아웃</a>
+    </div>
+
+    <!-- 객실 목록 -->
     <div class="container mt-5 p-5 bg-white">
         <div class="row">
             <h2 class="text-center">현재 객실 목록</h2>
-            <div class="col-sm-6 mt-4 col-md-4 col-lg-3 mb-4" th:each="data : ${List}">
-                <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;">
+            <div class="col-sm-6 mt-4 col-md-4 col-lg-3 mb-4" th:each="data : ${roomDTOList}">
+                <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;" th:onclick="|showContextMenu(event, ${data.idx})|">
                     <div class="card-body text-center">
-                        여기에 체크인 체크아웃 객실 띄울 거임
+                        <p class="card-text" style="font-size: 12px">
+                            <strong>번호:</strong> <span th:text="${data.idx}">1</span>
+                        </p>
+                        <p class="card-title" th:text="${data.roomName}" style="font-size: 27px">방 이름</p>
+                        <i class="bi bi-tags-fill"></i>
+                        <p class="badge rounded-pill text-bg-secondary" style="font-size: 13px" th:if="${data.resStatus == '1'}">빈 방</p>
+                        <p class="badge rounded-pill text-bg-primary" style="font-size: 13px" th:if="${data.resStatus == '2'}">예약중</p>
+                        <p class="badge rounded-pill text-bg-danger" style="font-size: 13px" th:if="${data.resStatus == '3'}">체크인</p>
+                        <p class="badge rounded-pill text-bg-dark" style="font-size: 13px" th:if="${data.resStatus == '4'}">체크아웃</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container mt-5 p-5 bg-white">
 
+    <div class="container mt-5 p-5 bg-white">
         <div class="row">
             <div class="col-lg-2"></div>
             <div class="col-lg-8">
                 <h2 class="text-center">객실 예약 조회</h2>
                 <!-- 검색 영역 -->
-                <form th:action="@{/res/reserve}" method="get">
+                <form th:action="@{/room/reserve}" method="get">
                     <div class="input-group mb-3 mt-3">
-                        <input type="date" class="form-control" name="sdate"
-                               th:value="${sdate}"> <!--예약시작일-->
-                        <input type="date" class="form-control" name="edate"
-                               th:value="${edate}"> <!--예약종료일-->
-
+                        <input type="date" class="form-control" name="sdate" th:value="${sdate}"> <!--예약시작일-->
+                        <input type="date" class="form-control" name="edate" th:value="${edate}"> <!--예약종료일-->
                         <button type="submit" class="btn btn-primary">검색</button>
                         <button type="reset" class="btn btn-secondary">지우기</button>
                     </div>
@@ -78,26 +172,24 @@
 
         <!-- 데이터 목록 -->
         <div class="row mt-5">
-            <div class="col-sm-6 col-md-4 col-lg-3 mb-4" th:each="data : ${List}">
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-4" th:each="data : ${reserveDTOList}">
                 <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;">
                     <div class="card-body text-center">
-                        <a th:href="@{detail(idx=${data.idx})}">
-                            <p class="card-text" style="font-size: 12px">
-                                <strong>번호:</strong> <span th:text="${data.idx}">1</span>
-                            </p>
-                            <p class="card-title" th:text="${data.roomName}">방 이름</p>
-                            <p>
-                                <strong>예약자:</strong> <span th:text="${data.username}"></span>
-                            </p>
-                            <p style="font-size: 12px">
-                                <span th:text="${#temporals.format(data.startDate, 'yyyy-MM-dd')}">2024-01-21</span> ~
-                                <span th:text="${#temporals.format(data.endDate, 'yyyy-MM-dd')}">2024-01-21</span>
-                            </p>
-                            <div class="d-flex justify-content-center">
-                                <a th:href="@{'/res/update/' + ${data.idx}}" class="btn btn-outline-primary btn-sm mx-2">수정</a>
-                                <a th:href="@{'/res/delete/' + ${data.idx}}" class="btn btn-outline-danger btn-sm mx-2">예약 취소</a>
-                            </div>
-                        </a>
+                        <p class="card-text" style="font-size: 12px">
+                            <strong>번호:</strong> <span th:text="${data.idx}">1</span>
+                        </p>
+                        <p class="card-title" th:text="${data.roomName}">방 이름</p>
+                        <p>
+                            <strong>예약자:</strong> <span th:text="${data.username}"></span>
+                        </p>
+                        <p style="font-size: 12px">
+                            <span th:text="${#temporals.format(data.startDate, 'yyyy-MM-dd')}">2024-01-21</span> ~
+                            <span th:text="${#temporals.format(data.endDate, 'yyyy-MM-dd')}">2024-01-21</span>
+                        </p>
+                        <div class="d-flex justify-content-center">
+                            <a th:href="@{'/res/update/' + ${data.idx}}" class="btn btn-outline-primary btn-sm mx-2">예약 변경</a>
+                            <a th:href="@{'/res/delete/' + ${data.idx}}" class="btn btn-outline-danger btn-sm mx-2">예약 취소</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -108,11 +200,6 @@
 </div>
 
 <script th:inline="javascript">
-    /* 성공 메시지가 있는지 확인하고 팝업으로 표시합니다. */
-    var successMessage = /*[[${successMessage}]]*/ null;
-    if (successMessage) {
-        alert(successMessage);
-    }
 </script>
 
 </body>

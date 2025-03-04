@@ -2,7 +2,6 @@ package com.sixcandoit.roomservice.service.room;
 
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
-import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,6 @@ public class RoomService {
 
     // final 선언, 모델 맵퍼 선언
     private final RoomRepository roomRepository;
-    private ReservationRepository reservationRepository;
     private final ModelMapper modelMapper;
 
     // 룸 등록

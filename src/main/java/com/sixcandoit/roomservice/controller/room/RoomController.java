@@ -1,6 +1,10 @@
 package com.sixcandoit.roomservice.controller.room;
 
+import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
+import com.sixcandoit.roomservice.entity.room.RoomEntity;
+import com.sixcandoit.roomservice.repository.room.RoomRepository;
+import com.sixcandoit.roomservice.service.room.ReservationService;
 import com.sixcandoit.roomservice.service.room.RoomService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
@@ -9,16 +13,20 @@ import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,6 +35,8 @@ public class RoomController {
 
     // final 선언
     private final RoomService roomService;
+    private final ReservationService reservationService;
+    private final RoomRepository roomRepository;
 
     // 룸 관리 메인 페이지
     @GetMapping("/room/main")
@@ -54,6 +64,54 @@ public class RoomController {
 
         return "room/list";
     }
+
+    //관리자용 예약 목록 리스트
+    @GetMapping("/room/reserve")
+    public String reslist(@RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
+                          @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
+                          Model model) {
+        log.info("데이터 조회 후 목록페이지로 이동....");
+
+        // Room 리스트 데이터 가져오기
+        List<RoomDTO> roomDTOList = roomService.resList();
+        model.addAttribute("roomDTOList", roomDTOList);  // roomList를 모델에 추가
+
+        // 리다이렉트 후 전달된 성공 또는 실패 메시지를 받아옵니다.
+        if (model.containsAttribute("errorMessage")) {
+            // 에러 메시지가 있으면 모달을 띄워주도록 합니다.
+            model.addAttribute("errorMessage", model.getAttribute("errorMessage"));
+        }
+
+        List<ReservationDTO> reserveDTOList = reservationService.reserveList(sdate, edate);
+
+        model.addAttribute("reserveDTOList", reserveDTOList);
+        model.addAttribute("sdate", sdate);
+        model.addAttribute("edate", edate);
+
+        return "room/reserve";
+    }
+
+    @PostMapping("/room/updateStatus/{idx}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateRoomStatus(@PathVariable Integer idx, @RequestBody Map<String, String> requestBody) {
+        String newStatus = requestBody.get("status");
+
+        // roomidx에 해당하는 방을 roomRepository를 통해 찾아 상태 변경
+        Optional<RoomEntity> roomEntityOpt = roomRepository.findById(idx);
+        if (!roomEntityOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("success", false));
+        }
+
+        RoomEntity room = roomEntityOpt.get();
+
+        // 상태 값 업데이트
+        room.setResStatus(newStatus);
+        roomRepository.save(room); // 상태가 업데이트된 방을 저장
+
+        // 상태 변경 성공 메시지 반환
+        return ResponseEntity.ok(Collections.singletonMap("success", true));
+    }
+
 
     // 룸 등록
     @GetMapping("/room/register")

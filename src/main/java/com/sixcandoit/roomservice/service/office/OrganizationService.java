@@ -225,4 +225,12 @@ public class OrganizationService {
 
     }
 
+    public List<OrganizationDTO> getAllOrganizations() {
+        List<OrganizationEntity> organizations = organizationRepository.findAll();
+        List<OrganizationDTO> organizationDTOs = organizations.stream()
+                .map(org -> new OrganizationDTO(org.getIdx(), org.getOrganName()))
+                .collect(Collectors.toList());
+        return organizationDTOs;
+    }
+
 }

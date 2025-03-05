@@ -18,7 +18,7 @@
       <div class="ms-5">
         <ul class="navbar-nav d-flex flex-row ms-5" style="padding-top: 30px">
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" href="#">Home</a>
+            <a class="nav-link" style="font-size: 20px" href="/member/">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" style="font-size: 20px" th:href="@{/res/list}">Hotel</a>
@@ -49,9 +49,9 @@
                 안녕하세요 <span th:text="${#authentication.principal.username}"></span>님.
               </a>
               <ul class="dropdown-menu dropdown-menu-dark text-center">
-                <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/qna/list}">마이페이지</a></li>
+                <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/member/verify}">회원 정보 수정</a></li>
                 <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/qna/list}">장바구니</a></li>
-                <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/logout}">로그아웃</a></li>
+                <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/member/logout}">로그아웃</a></li>
               </ul>
             </li>
           </ul>

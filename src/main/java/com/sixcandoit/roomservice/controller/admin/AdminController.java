@@ -3,11 +3,14 @@ package com.sixcandoit.roomservice.controller.admin;
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
+import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.admin.AdminService;
 import com.sixcandoit.roomservice.service.member.MemberService;
+import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -33,6 +37,7 @@ public class AdminController {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final AdminRepository adminRepository;
+    private final OrganizationService organizationService;
 
     @GetMapping("/")
     public String IndexForm(HttpSession session, AdminDTO adminDTO) {
@@ -73,7 +78,13 @@ public class AdminController {
 
     // 회원 가입
     @GetMapping("/register")
-    public String register() {
+    public String register(Model model) {
+        log.info("관리자 회원 가입 접속");
+        List<OrganizationDTO> organizations = organizationService.getAllOrganizations(); // 호텔명 리스트 가져오기
+
+        log.info("호텔 정보 내놔" + organizations);
+        model.addAttribute("organizations", organizations);
+
         return "admin/register";
     }
 
@@ -284,7 +295,7 @@ public class AdminController {
         Page<MemberDTO> memberDTOS = memberService.memberList(page, type, keyword);
 
         // html에 필요한 페이지 정보를 받는다
-        Map<String, Integer> pageInfo = PageNationUtil.Pagination(memberDTOS); // 내가 알기론 이거 내부 값들을 개별적으로 애드어트리뷰트해서 넘겨줘야하는걸로 기억하는데
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(memberDTOS);
 
 //        model.addAttribute("member", memberDTOS); // 데이터 전달
         model.addAttribute("members", memberDTOS.getContent()); // 리스트만 전달
@@ -298,7 +309,8 @@ public class AdminController {
         return "admin/memberlist";
     }
 
-    // 최고 관리자 회원 목록
+    // 최고
+    // 관리자 회원 목록
     @GetMapping("/adminlist")
     public String showAdminList(@PageableDefault(page = 1) Pageable page, // 페이지 정보
                                  @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
@@ -309,7 +321,7 @@ public class AdminController {
         Page<AdminDTO> adminDTOS = adminService.adminList(page, type, keyword);
 
         // html에 필요한 페이지 정보를 받는다
-        Map<String, Integer> pageInfo = PageNationUtil.Pagination(adminDTOS); // 내가 알기론 이거 내부 값들을 개별적으로 애드어트리뷰트해서 넘겨줘야하는걸로 기억하는데
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(adminDTOS);
 
         model.addAttribute("admin", adminDTOS); // 데이터 전달
         model.addAttribute(pageInfo); // 페이지 정보
@@ -333,7 +345,7 @@ public class AdminController {
         Page<AdminDTO> adminDTOS = adminService.adminList(page, type, keyword);
 
         // html에 필요한 페이지 정보를 받는다
-        Map<String, Integer> pageInfo = PageNationUtil.Pagination(adminDTOS); // 내가 알기론 이거 내부 값들을 개별적으로 애드어트리뷰트해서 넘겨줘야하는걸로 기억하는데
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(adminDTOS);
 
         model.addAttribute("admin", adminDTOS); // 데이터 전달
         model.addAttribute(pageInfo); // 페이지 정보
@@ -361,8 +373,6 @@ public class AdminController {
 
     boolean success = adminService.updateAdminRole(adminRepository.findById(idx).get().getAdminEmail(), level);
         log.info("권한이 있네 변경했니....?" + success);
-
-
 
         return success ? "success" : "fail";
     }

@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.service.room;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -66,7 +68,8 @@ public class RoomService {
         try {
             System.out.println("이미지 파일즈 길이 : " + imageFiles.size());// 룸 데이터의 idx를 조회
             log.info("룸 데이터의 idx를 조회한다...");
-            Optional<RoomEntity> roomEntityOpt = roomRepository.findById(roomDTO.getIdx());
+            log.info("수정할 룸의 idx: " + roomDTO.getIdx());
+            Optional<RoomEntity> roomEntityOpt = roomRepository.findByIdx(roomDTO.getIdx());
 
             if (roomEntityOpt.isPresent()) { // RoomEntity가 존재하면
                 RoomEntity room = roomEntityOpt.get();
@@ -91,13 +94,17 @@ public class RoomService {
 
                 //--------------------------------------------------------------//
                 // 이미지 추가 등록
+                log.info("수정 이미지 추가를 진행");
                 List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, roomDTO.getIdx());
                 // 이미지 정보 추가
                 // 양방향 연관관계 편의 메서드 사용
                 if (images != null && !images.isEmpty()) {
+                    log.info("새로운 이미지가 등록되었습니다.");
                     for (ImageFileEntity image : images) {
                         room.addImage(image);  // FK 자동 설정
                     }
+                } else {
+                    log.warning("이미지가 없거나 저장 실패.");
                 }
                 //--------------------------------------------------------------//
 
@@ -109,13 +116,32 @@ public class RoomService {
                 throw new IllegalStateException("수정할 Room이 존재하지 않습니다.");
             }
         }catch (Exception e){
-            throw new RuntimeException("수정 오류 발생");
+            log.severe("수정 오류 발생: " + e.getMessage());
+            throw new RuntimeException("수정 오류 발생: " + e.getMessage());
         }
     }
 
     // 룸 삭제
-    public void roomDelete(Integer idx){
-        roomRepository.deleteById(idx);
+    public void roomDelete(Integer idx, String join){
+        try {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
+
+            // dto => entity
+            List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                    .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                    .collect(Collectors.toList());
+
+            // 모든 이미지 삭제
+            for (ImageFileEntity imageFileEntity : imageFileEntities) {
+                imageFileService.deleteImage(imageFileEntity.getIdx());
+            }
+
+            roomRepository.deleteById(idx);
+        } catch (Exception e) {
+            throw new RuntimeException("삭제를 실패했습니다." + e.getMessage());
+        }
+
     }
 
     // 예약 관리 - 룸 목록

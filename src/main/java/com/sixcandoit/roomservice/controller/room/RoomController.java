@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.controller.room;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
@@ -174,11 +175,24 @@ public class RoomController {
     @GetMapping("/room/detail")
     public String detail(@RequestParam Integer idx, Model model){
 
-        log.info("개별 데이터를 읽는 중입니다.");
+        // join값 생성
+        String join = "room";
+
+        log.info("룸 개별 데이터를 읽는 중입니다.");
         RoomDTO roomDTO = roomService.roomDetail(idx);
 
-        log.info("개별 데이터를 페이지에 전달하는 중입니다.");
+        log.info("룸 이미지 데이터를 읽는 중입니다.");
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+        log.info("룸 개별 데이터를 페이지에 전달하는 중입니다.");
         model.addAttribute("roomDTO", roomDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
 
         return "room/detail";
     }
@@ -199,9 +213,12 @@ public class RoomController {
     @PostMapping("/room/update")
     public String updateProc(@Valid @ModelAttribute RoomDTO roomDTO,
                              BindingResult bindingResult,
-                             String join, List<MultipartFile> imageFiles){
+                             List<MultipartFile> imageFiles){
+
         log.info("수정된 데이터를 저장합니다.");
         try {
+
+            String join = "room";
             // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
             if (roomDTO.getRoomWifi() == null) {
                 roomDTO.setRoomWifi("N");
@@ -248,8 +265,12 @@ public class RoomController {
     // 룸 삭제
     @GetMapping("/room/delete")
     public String delete(@RequestParam Integer idx){
+
+        // join값 생성
+        String join = "room";
+
         log.info("데이터를 삭제합니다.");
-        roomService.roomDelete(idx);
+        roomService.roomDelete(idx, join);
 
         return "redirect:/room/list";
     }

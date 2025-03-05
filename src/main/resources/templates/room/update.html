@@ -167,40 +167,42 @@
         </div><!--row 끝-->
     </div>
 </div>
-<script th:inline="javascript">
-    $(document).ready(function () {
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () {
 
-        // 이미지 추가 버튼 클릭했을 때
-        $("#addImage").on('click', function() {
+            // 이미지 추가 버튼 클릭했을 때
+            $("#addImage").on('click', function() {
 
-            // 이미지 추가 함수
-            addImageInput();
+                // 이미지 추가 함수
+                addImageInput();
 
-        });
+            });
 
-        // 이미지 추가
-        function addImageInput() {
-            const container = document.getElementById('inputImage2');
-            const newInputDiv = document.createElement('div');
-            newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
-            container.appendChild(newInputDiv);
-        }
-
-        // 이미지 input 초기화
-        function resetImageInput() {
-            const input = document.querySelector('input[name="imageFiles"]');
-            const container2 = document.getElementById('inputImage2');
-
-            // 파일 선택 초기화
-            if (input) {
-                input.value = '';
+            // 이미지 추가
+            function addImageInput() {
+                const container = document.getElementById('inputImage2');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                container.appendChild(newInputDiv);
             }
 
-            // 이미지 추가창 제거
-            container2.innerHTML = '<label>*이미지 :</label>' +
-                '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
-        }
-    });
-</script>
+            // 이미지 input 초기화
+            function resetImageInput() {
+                const input = document.querySelector('input[name="imageFiles"]');
+                const container2 = document.getElementById('inputImage2');
+
+                // 파일 선택 초기화
+                if (input) {
+                    input.value = '';
+                }
+
+                // 이미지 추가창 제거
+                container2.innerHTML = '<label>*이미지 :</label>' +
+                    '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            }
+        });
+    </script>
+</th:block>
 </body>
 </html>

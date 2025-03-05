@@ -26,10 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -55,11 +52,32 @@ public class RoomController {
                         @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
                         @RequestParam(value = "order", defaultValue = "") String order, // 가격순
                         Model model){
+        String join = "room";
+
         // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
         Page<RoomDTO> roomDTOList = roomService.roomList(page, type, keyword, order);
         // html에 필요한 페이지 정보를 받는다.
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(roomDTOList);
 
+        // DTO들 리스트로 가져오기
+        List<RoomDTO> room = roomDTOList.getContent();
+        // 이미지 데이터를 담을 Map 생성 (menu의 idx를 key로 저장)
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+        for (RoomDTO roomDTO : room) {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(roomDTO.getIdx(), join);
+            // Map에 저장 (menu의 idx를 key로 함)
+            imageFileMap.put(roomDTO.getIdx(), imageFileDTOS);
+            // 대표 사진 여부 확인 후 저장
+            boolean hasRepImage = imageFileDTOS.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+            repImageMap.put(roomDTO.getIdx(), hasRepImage);
+        }
+
+        model.addAttribute("room", room);  // 룸 리스트
+        model.addAttribute("imageFileMap", imageFileMap); // 룸 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap); // 룸 대표 사진 여부
         model.addAttribute("roomDTOList", roomDTOList); // 데이터 전달
         model.addAllAttributes(pageInfo); // 페이지 정보
         model.addAttribute("type", type); //검색분류

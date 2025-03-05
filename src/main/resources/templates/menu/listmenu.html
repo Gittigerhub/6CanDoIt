@@ -142,18 +142,33 @@
                 var menuIdx = $(this).data('id');
                 var menuName = $(this).data('name');
                 var menuPrice = $(this).data('price');
+                var menuImg = $(this).closest('tr').find('img').attr('src');  // 메뉴 이미지 URL을 가져옴
+
 
                 console.log(menuIdx)
                 console.log(menuName)
                 console.log(menuPrice)
+                console.log(menuImg)
+
+                var cartItem = {
+                    menuidx: menuIdx,
+                    menuName: menuName,
+                    menuPrice: menuPrice,
+                    menuImg: menuImg,
+                    count: 1    // 기본 수량 1
+                };
+
 
                 $.ajax({
                     url: '/cart',
                     type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(cartItem),  // 데이터를 JSON 형식으로 전송
                     data: {
                         menuidx: menuIdx,
                         menuName: menuName,
                         menuPrice: menuPrice,
+                        menuImg: menuImg,
                         count: 1    //기본수량 1
                     },
                     success: function (response) {

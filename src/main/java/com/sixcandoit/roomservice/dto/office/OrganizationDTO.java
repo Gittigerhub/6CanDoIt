@@ -28,4 +28,9 @@ public class OrganizationDTO {
 
     private List<AdminDTO> adminDTO;        // 관리자 회원 DTOlist
 
+    public OrganizationDTO(Integer idx, String organName) {
+        this.idx = idx;
+        this.organName = organName;
+    }
+
 }

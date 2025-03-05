@@ -36,6 +36,11 @@ public class AdminDTO {
 
     private OrganizationDTO organDTO;     // 조직 테이블 DTO
 
+    // 조직명 끌고오기
+    public String getOrganName() {
+        return organDTO != null ? organDTO.getOrganName() : "호텔 없음";
+    }
+
     //해당키와 설명을 저장하는 사용자 함수를 선언
     public void setLevel(Level level) {
         this.level = level; //키값 저장

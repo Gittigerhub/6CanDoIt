@@ -35,6 +35,17 @@
                             <div id="confirmPasswordFeedback" class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
                             <div id="confirmPasswordValid" class="valid-feedback">비밀번호가 일치합니다.</div>
                         </div>
+                        <div class="mb-3">
+                            <label for="organization" class="form-label">호텔명</label>
+                            <select class="form-select" id="organization" name="organization" required>
+                                <option th:if="${#lists.isEmpty(organizations)}" value="" disabled>등록된 호텔이 없습니다.</option>
+                                <option th:each="org : ${organizations}"
+                                        th:value="${org.idx}"
+                                        th:text="${org.organName}"
+                                        th:selected="${adminDTO != null && adminDTO.organDTO != null && adminDTO.organDTO.idx == org.idx}">
+                                </option>
+                            </select>
+                        </div>
                         <div class="mt-2 mb-3">
                             <label for="adminName" class="form-label">이름</label>
                             <input type="text" class="form-control" id="adminName" name="adminName" placeholder="이름을 입력하세요." required>

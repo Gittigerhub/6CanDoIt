@@ -55,14 +55,13 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="admin : ${admin}">
+                    <tr th:each="admin : ${admin}" th:if="${admin.level == T(com.sixcandoit.roomservice.constant.Level).BO or admin.level == T(com.sixcandoit.roomservice.constant.Level).GUEST}">
                         <td th:text="${admin.idx}"></td>
-<!--                        <td th:text="${admin.level}"></td>-->
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 <select class="form-select form-select-sm role-select" th:data-admin-id="${admin.idx}" style="width: auto;">
                                     <option th:each="role : ${T(com.sixcandoit.roomservice.constant.Level).values()}"
-                                            th:if="${role != T(com.sixcandoit.roomservice.constant.Level).MEMBER}"
+                                            th:if="${role == T(com.sixcandoit.roomservice.constant.Level).BO or role == T(com.sixcandoit.roomservice.constant.Level).GUEST}"
                                             th:value="${role}" th:text="${role.description}"
                                             th:selected="${admin.level == role}">
                                     </option>

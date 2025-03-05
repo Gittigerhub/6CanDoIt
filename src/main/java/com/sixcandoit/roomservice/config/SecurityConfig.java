@@ -71,7 +71,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/member/checkPhone", "/admin/checkPhone").permitAll();
                     auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
                     auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "HO","BO", "MEMBER");
-                    auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
+                    auth.requestMatchers("/admin/**", "/member/**").hasAnyRole("ADMIN","HO","BO");
                     // 조직-매장 페이지 접근 권한
                     auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
                     // 이벤트-멤버포인트 페이지 접근 권한
@@ -112,7 +112,7 @@ public class SecurityConfig{
 
         //로그아웃
         http.logout(logout-> logout
-                .logoutUrl("/logout")
+                .logoutUrl("/admin/logout")
                 .logoutSuccessUrl("/admin/login")); //로그아웃
 
         //관리자인 경우 관리자 로그인처리
@@ -136,7 +136,7 @@ public class SecurityConfig{
 
             auth.requestMatchers("/member/checkEmail", "/admin/checkEmail").permitAll();
             auth.requestMatchers("/member/**").hasAnyRole("ADMIN","HO","BO", "MEMBER");
-            auth.requestMatchers("/admin/**", "/member/**").hasRole("ADMIN");
+            auth.requestMatchers("/admin/**", "/member/**").hasAnyRole("ADMIN","HO","BO");
             // 조직-매장 페이지 접근 권한
             auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
             // 이벤트-멤버포인트 페이지 접근 권한
@@ -181,7 +181,7 @@ public class SecurityConfig{
 
         //로그아웃
         http.logout(logout-> logout
-                .logoutUrl("/logout")
+                .logoutUrl("/member/logout")
                 .logoutSuccessUrl("/member/login")); //로그아웃
 
         //일반 사용자인 경우 일반 사용자로그인 처리

@@ -53,8 +53,8 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "alram_order")
     private String alramOrder;             // 주문 알람 수신여부
 
-    @Column(name = "active_yn")
-    private String activeYn;               // 활성화 유무
+//    @Column(name = "active_yn")
+//    private String activeYn;               // 활성화 유무
 
     @Enumerated(EnumType.STRING)
     private Level level;                  // 유저 권한

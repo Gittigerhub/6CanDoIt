@@ -298,7 +298,7 @@ public class AdminController {
         return "admin/memberlist";
     }
 
-    // 관리자 회원 목록
+    // 최고 관리자 회원 목록
     @GetMapping("/adminlist")
     public String showAdminList(@PageableDefault(page = 1) Pageable page, // 페이지 정보
                                  @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
@@ -320,6 +320,30 @@ public class AdminController {
 //        List<MemberEntity> memberList = memberRepository.findAll();
 //        model.addAttribute("memberList", memberList);
         return "admin/adminlist";
+    }
+
+    // 본사 관리자 회원 목록
+    @GetMapping("/holist")
+    public String showHoList(@PageableDefault(page = 1) Pageable page, // 페이지 정보
+                                @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
+                                @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
+                                Model model){
+        log.info("관리자 회원 목록에 접속~");
+        // 해당 페이지의 내용을 서비스를 통해 데이터베이스로 부터 조회
+        Page<AdminDTO> adminDTOS = adminService.adminList(page, type, keyword);
+
+        // html에 필요한 페이지 정보를 받는다
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(adminDTOS); // 내가 알기론 이거 내부 값들을 개별적으로 애드어트리뷰트해서 넘겨줘야하는걸로 기억하는데
+
+        model.addAttribute("admin", adminDTOS); // 데이터 전달
+        model.addAttribute(pageInfo); // 페이지 정보
+        model.addAttribute("type", type); // 검색 분류
+        model.addAttribute("keyword", keyword); // 키워드
+
+
+//        List<MemberEntity> memberList = memberRepository.findAll();
+//        model.addAttribute("memberList", memberList);
+        return "admin/holist";
     }
 
     // 관리자 권한 변경 처리

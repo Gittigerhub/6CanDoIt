@@ -26,7 +26,7 @@ public class MemberDTO {
 //    private String memberExtraAddress;     // 상세 주소
 
     private String alramOrder;             // 주문 알람 수신여부
-    private String activeYn;               // 활성화 유무
+//    private String activeYn;               // 활성화 유무
     private LocalDateTime insDate;                 // 가입 일자
 
 

@@ -38,8 +38,8 @@ public class AdminEntity extends BaseEntity {
     @Column(name = "admin_phone")
     private String adminPhone;            // 관리자 연락처
 
-    @Column(name = "active_yn")
-    private String activeYn;              // 활성 유무
+//    @Column(name = "active_yn")
+//    private String activeYn;              // 활성 유무
 
     // 관리자, 회원 구분을 위한 권한 분류
     @Enumerated(EnumType.STRING)

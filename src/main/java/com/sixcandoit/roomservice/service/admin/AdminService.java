@@ -301,14 +301,14 @@ public class AdminService {
 
     // 피라미드식 권한 변경
     public boolean canUpdateRole(Level currentAdminLevel, Level targetLevel) {
-        log.info("당신의 권한은?" + currentAdminLevel);
+        log.info("당신의 권한은? " + currentAdminLevel);
         if (currentAdminLevel == Level.ADMIN) {
             return true; // ADMIN은 모든 레벨 변경 가능
         }
         if (currentAdminLevel == Level.HO) {
-            return targetLevel == Level.BO;
+            return targetLevel == Level.BO || targetLevel == Level.GUEST; // BO와 GUEST 변경 가능
         }
-        return false; // BO 권한 변경 불가
+        return false; // BO는 권한 변경 불가
     }
 
 

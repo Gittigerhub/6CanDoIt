@@ -54,7 +54,6 @@
                   <th>연락처</th>
                   <th>주소</th>
                   <th>주문 알람 수신</th>
-                  <th>활성화</th>
                   <th>가입 일자</th>
                   <th>회원 탈퇴</th>
                 </tr>
@@ -70,7 +69,6 @@
                   <td th:text="${member.memberPhone}"></td>
                   <td th:text="${member.memberAddress}"></td>
                   <td th:text="${member.alramOrder}"></td>
-                  <td th:text="${member.activeYn}"></td>
                   <td th:text="${#temporals.format(member.insDate, 'yyyy-MM-dd')}"></td>
                   <td>
                     <button class="btn btn-danger btn-sm" th:onclick="|deleteMember('${member.idx}')|">탈퇴</button>

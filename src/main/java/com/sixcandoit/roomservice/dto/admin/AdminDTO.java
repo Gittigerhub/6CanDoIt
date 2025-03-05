@@ -28,7 +28,7 @@ public class AdminDTO {
     private String password;              // 비밀번호
     private String adminName;             // 이름
     private String adminPhone;            // 연락처
-    private String activeYn;              // 활성 유무
+//    private String activeYn;              // 활성 유무
 
     private Level level;
     //열거형 키(설명)

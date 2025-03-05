@@ -32,10 +32,10 @@ public class CartController {
 
     //장바구니 등록
     @PostMapping("/cart")
-    public ResponseEntity registerCart(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
+    public ResponseEntity registerCart(Integer idx, BindingResult bindingResult,
                                     Principal principal) {
 
-        System.out.println(cartMenuDTO);
+        //System.out.println(cartMenuDTO);
         System.out.println(principal);
 
         //유효성 검사
@@ -56,7 +56,7 @@ public class CartController {
 
         try {
             //장바구니에 추가
-            Integer cartMenuIdx = cartService.addCart(cartMenuDTO, email);
+            Integer cartMenuIdx = cartService.addCart(idx, email);
             //저장 후 브라우저로 재전송
             return new ResponseEntity<Integer>(cartMenuIdx, HttpStatus.OK);
 

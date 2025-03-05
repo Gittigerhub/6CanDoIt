@@ -55,7 +55,7 @@ public class MemberController {
             return "redirect:/register";
         }
 
-        return "redirect:/";
+        return "redirect:/member/login";
     }
 
     // 이메일 중복 확인

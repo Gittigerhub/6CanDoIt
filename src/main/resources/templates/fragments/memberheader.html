@@ -10,40 +10,54 @@
 <div th:fragment="header">
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark" style="height: 100px">
     <div class="container-fluid d-flex justify-content-between align-items-center">
-      <div class="col-4">
+
+      <div class="col-4 ms-5">
         <img class="ms-5" width="100px" height="auto" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/6CanDoIt%EB%A1%9C%EA%B3%A0.png">
       </div>
-      <div class="col-3 justify-content-center">
-        <ul class="navbar-nav d-flex flex-row" style="padding-top: 30px">
+
+      <div class="ms-5">
+        <ul class="navbar-nav d-flex flex-row ms-5" style="padding-top: 30px">
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" href="#">매장 안내</a>
+            <a class="nav-link" style="font-size: 20px" href="#">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" th:href="@{/res/list}">객실 예약</a>
+            <a class="nav-link" style="font-size: 20px" th:href="@{/res/list}">Hotel</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" href="#">룸 서비스</a>
+            <a class="nav-link" style="font-size: 20px" href="#">RoomService</a>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" style="font-size: 20px" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              고객센터
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" style="font-size: 20px" th:href="@{/qna/list}">문의사항</a></li>
-            </ul>
+          <li class="nav-item">
+            <a class="nav-link" style="font-size: 20px" href="/qna/list">Support</a>
           </li>
         </ul>
       </div>
-      <div class="col-4 text-end me-5" style="font-size: 25px; color: #FFFFFF8C; padding-top: 30px">
-        <!-- 로그인된 사용자 이름 표시 -->
-        <th:block th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
-          안녕하세요 <span th:text="${#authentication.principal.username}"></span>님.
-        </th:block>
+
+      <div class="ms-auto justify-content-center me-5" style="font-size: 25px; color: #FFFFFF8C; padding-top: 30px">
         <!-- 로그인되지 않은 경우 -->
         <th:block th:if="${#authentication.principal == null or #authentication.principal == 'anonymousUser'}">
-          비회원 입니다.
+          <ul class="navbar-nav d-flex flex-row me-5">
+            <li class="nav-item">
+              <a class="nav-link" href="/member/login">Sign in</a>
+            </li>
+          </ul>
+        </th:block>
+        <!-- 로그인된 사용자 이름 표시 -->
+        <th:block th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
+          <ul class="navbar-nav d-flex flex-row me-5">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                안녕하세요 <span th:text="${#authentication.principal.username}"></span>님.
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark text-center">
+                <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/qna/list}">마이페이지</a></li>
+                <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/qna/list}">장바구니</a></li>
+                <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/logout}">로그아웃</a></li>
+              </ul>
+            </li>
+          </ul>
         </th:block>
       </div>
+
     </div>
   </nav>
 </div>

@@ -4,10 +4,12 @@ import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.dto.cart.CartDetailDTO;
 import com.sixcandoit.roomservice.dto.cart.CartOrdersDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
+import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.cart.CartEntity;
 import com.sixcandoit.roomservice.entity.cart.CartMenuEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
+import com.sixcandoit.roomservice.repository.ImageFileRepository;
 import com.sixcandoit.roomservice.repository.cart.CartMenuRepository;
 import com.sixcandoit.roomservice.repository.cart.CartRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
@@ -43,6 +45,8 @@ public class CartService {
     //장바구니에 넣을 장바구니메뉴를 만들려면 메뉴를 참조.
     //참조한 메뉴를 가지고 장바구니 메뉴를 만들어야 한다.
 
+    private final ImageFileRepository imageFileRepository;
+
     //등록_장바구니 만들기
     //장바구니를 따로 생성하지는 않고, 장바구니에 넣을 메뉴가 컨트롤러로 들어오면
     //해당 값을 가지고 넣을 것이고, 컨트롤러에서 들어오는 email을 통해서 멤버를 찾게 할 예정
@@ -59,6 +63,12 @@ public class CartService {
         menuDTO.setIdx(menuEntity.getIdx());
         menuDTO.setMenuName(menuEntity.getMenuName());
         menuDTO.setMenuPrice(menuEntity.getMenuPrice());
+
+        // 메뉴 이미지 파일 가져오기
+        List<ImageFileEntity> imageFileEntities = imageFileRepository.menuJoin(menuEntity.getIdx());
+
+        // 변환된 ImageFileDTO 리스트를 menuDTO에 설정
+        menuDTO.setMenuImgDTOList(imageFileEntities);  // List<ImageFileDTO> 전달
 
         //카트 찾기
         CartEntity cartEntity

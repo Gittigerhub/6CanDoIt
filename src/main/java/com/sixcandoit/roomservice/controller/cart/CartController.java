@@ -32,23 +32,23 @@ public class CartController {
 
     //장바구니 등록
     @PostMapping("/cart")
-    public ResponseEntity registerCart(Integer idx, BindingResult bindingResult,
+    public ResponseEntity registerCart(Integer idx,
                                     Principal principal) {
 
         //System.out.println(cartMenuDTO);
         System.out.println(principal);
 
-        //유효성 검사
-        if (bindingResult.hasErrors()) {
-            StringBuffer sb = new StringBuffer();
-
-            List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
-
-            for (FieldError fieldError : fieldErrorList) {
-                sb.append(fieldError.getDefaultMessage());
-            }
-            return new ResponseEntity<String>(sb.toString(), HttpStatus.BAD_REQUEST);
-        }
+//        //유효성 검사 >>  BindingResult 사용하려면 @Valid ~DTO 객체를 받아야함
+//        if (bindingResult.hasErrors()) {
+//            StringBuffer sb = new StringBuffer();
+//
+//            List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
+//
+//            for (FieldError fieldError : fieldErrorList) {
+//                sb.append(fieldError.getDefaultMessage());
+//            }
+//            return new ResponseEntity<String>(sb.toString(), HttpStatus.BAD_REQUEST);
+//        }
 
         //값이 잘 넘어왔다면
         // 이메일로 회원을 찾고 장바구니에 메뉴 추가

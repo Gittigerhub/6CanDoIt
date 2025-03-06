@@ -45,10 +45,22 @@ public class EmailService {
 
     }
 
-    public String getTempEmailHTML(String password) {
+    public String getTempEmailHTML(String password, int separator) {
         Context context = new Context(  );
         context.setVariable("message", password);
-        log.info("겟접근");
+        String prefixUrl = "http://localhost:8080/";
+        String suffixUrl = "/login";
+        if(separator == 1){
+            context.setVariable("forwardUrl", prefixUrl+"admin"+suffixUrl);
+        }
+        else if(separator == 2){
+
+            context.setVariable("forwardUrl", prefixUrl+"member"+suffixUrl);
+        }
+        else {
+            log.info("없는 경로 구분자");
+        }
+        log.info("이메일 접근");
         return templateEngine.process("admin/TempEmailHTML", context);
     }
 

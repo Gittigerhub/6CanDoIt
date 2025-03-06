@@ -200,7 +200,7 @@ public class AdminService {
 //                    tempPassword+"\n"+
 //                    "로그인 후 반드시 비밀번호를 변경해 주십시오."; //본문내용
 
-                String message = emailService.getTempEmailHTML(tempPassword);
+                String message = emailService.getTempEmailHTML(tempPassword, 1);
                 String to = read.get().getAdminEmail();
                 String subject = "임시 비밀번호 발급";
                 log.info(message);

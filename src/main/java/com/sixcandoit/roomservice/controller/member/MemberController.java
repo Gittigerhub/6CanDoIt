@@ -28,33 +28,27 @@ public class MemberController {
     @GetMapping("/login")
     public String showLoginPage(){
         log.info("로그인 페이지!");
-
-        return "member/login";
+        return "member/sign";
     }
 
     // 로그아웃
     @GetMapping("/logout")
     public String showLogoutPage(HttpSession session){
-
         session.invalidate();
-
         return "redirect:/member/login";
     }
 
     // 회원가입
     @GetMapping("/register")
     public String memberRegister() {
-        return "member/register";
+        return "member/sign";
     }
-
 
     @PostMapping("/register")
     public String registerProc(@ModelAttribute MemberDTO memberDTO){
-
         if (memberService.register(memberDTO) == null){
-            return "redirect:/register";
+            return "redirect:/member/login";
         }
-
         return "redirect:/member/login";
     }
 
@@ -162,20 +156,13 @@ public class MemberController {
         return "redirect:/member/";
     }
 
-
     // 임시비밀번호 발급
-    @GetMapping("/password")
-    public String showPasswordPage(){
-        return "member/password";
-    }
-
     @PostMapping("/password")
-    public String modifyPassword(@ModelAttribute MemberDTO memberDTO){
+    @ResponseBody
+    public String modifyPassword(@RequestBody MemberDTO memberDTO){
         log.info("패스워드 컨트롤러 진입 여부");
-        memberService.passwordSend(memberDTO);
-        //스크립트로 출력할 메세지를 전달
-
-        return "redirect:/member/login";
+        boolean result = memberService.passwordSend(memberDTO);
+        return result ? "success" : "fail";
     }
 
     // 회원 삭제 (일반 회원)
@@ -187,7 +174,5 @@ public class MemberController {
         boolean isDeleted = memberService.deleteMember(idx);
         return isDeleted ? "success" : "fail";
     }
-
-
 
 }

@@ -311,72 +311,71 @@
         </div>
         <a class="withdrawal-link" th:onclick="|deleteMember('${memberDTO.idx}')|">회원 탈퇴</a>
     </form>
-</div>
+    <script th:inline="javascript">
+        // 주소
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var fullAddress = '';
+                    var extraAddr = '';
 
-<script th:inline="javascript">
-    // 주소
-    function execDaumPostcode() {
-        new daum.Postcode({
-            oncomplete: function(data) {
-                var fullAddress = '';
-                var extraAddr = '';
-
-                if (data.userSelectedType === 'R') {
-                    fullAddress = data.roadAddress;
-                } else {
-                    fullAddress = data.jibunAddress;
-                }
-
-                if (data.userSelectedType === 'R') {
-                    if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                        extraAddr += data.bname;
-                    }
-                    if (data.buildingName !== '' && data.apartment === 'Y') {
-                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                    }
-                    if (extraAddr !== '') {
-                        extraAddr = ' (' + extraAddr + ')';
-                    }
-                }
-
-                fullAddress += extraAddr;
-
-                document.getElementById('memberPostcode').value = data.zonecode;
-                document.getElementById("memberAddress").value = fullAddress;
-            }
-        }).open();
-    }
-
-    // form submit 전에 memberAddress에 상세 주소 추가
-    function combineAddress() {
-        var detailedAddress = document.getElementById("memberExtraAddress").value;
-        var memberAddress = document.getElementById("memberAddress").value;
-
-        if (detailedAddress) {
-            document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
-        }
-    }
-
-    // 회원 탈퇴
-    function deleteMember(idx) {
-        if (confirm("정말 탈퇴하시겠습니까?")) {
-            fetch('/member/deleteMember', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ idx: idx })
-            })
-                .then(response => response.text())
-                .then(result => {
-                    if (result === "success") {
-                        alert("회원 탈퇴가 완료되었습니다.");
-                        window.location.href = "/member/login";
+                    if (data.userSelectedType === 'R') {
+                        fullAddress = data.roadAddress;
                     } else {
-                        alert("회원 탈퇴에 실패했습니다.");
+                        fullAddress = data.jibunAddress;
                     }
-                })
-                .catch(error => console.error('Error:', error));
+
+                    if (data.userSelectedType === 'R') {
+                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                            extraAddr += data.bname;
+                        }
+                        if (data.buildingName !== '' && data.apartment === 'Y') {
+                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        if (extraAddr !== '') {
+                            extraAddr = ' (' + extraAddr + ')';
+                        }
+                    }
+
+                    fullAddress += extraAddr;
+
+                    document.getElementById('memberPostcode').value = data.zonecode;
+                    document.getElementById("memberAddress").value = fullAddress;
+                }
+            }).open();
         }
-    }
-</script>
+
+        // form submit 전에 memberAddress에 상세 주소 추가
+        function combineAddress() {
+            var detailedAddress = document.getElementById("memberExtraAddress").value;
+            var memberAddress = document.getElementById("memberAddress").value;
+
+            if (detailedAddress) {
+                document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
+            }
+        }
+
+        // 회원 탈퇴
+        function deleteMember(idx) {
+            if (confirm("정말 탈퇴하시겠습니까?")) {
+                fetch('/member/deleteMember', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ idx: idx })
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        if (result === "success") {
+                            alert("회원 탈퇴가 완료되었습니다.");
+                            window.location.href = "/member/login";
+                        } else {
+                            alert("회원 탈퇴에 실패했습니다.");
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+</div>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.repository.admin;
 
+import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import org.springframework.data.domain.Page;
@@ -51,10 +52,16 @@ public interface AdminRepository extends JpaRepository<AdminEntity, Integer> {
             " u.adminPhone LIKE %:keyword%")
     Page<AdminEntity> searchAdminPhone(@Param("keyword") String keyword, Pageable page);
 
+    // 관리자 권한만
+    @Query("SELECT u FROM AdminEntity u WHERE u.level = :level")
+    Page<AdminEntity> searchAdminLevel(@Param("level") Level level, Pageable page);
+
     // 모든 항목에서
     @Query("SELECT u FROM AdminEntity u WHERE "
             + "( u.adminName LIKE %:keyword% OR u.adminEmail LIKE %:keyword% OR u.adminPhone LIKE %:keyword%)")
     Page<AdminEntity> searchAdminNameAndEmailAndPhone(@Param("keyword") String keyword, Pageable page);
 
     Optional<Object> findByIdx(Integer idx);
+
+    Level level(Level level);
 }

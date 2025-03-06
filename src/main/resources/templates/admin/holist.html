@@ -2,8 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/superlayout}"
->
+      layout:decorate="~{layouts/superlayout}">
 <head>
     <meta charset="UTF-8">
     <title>관리자 회원 목록</title>
@@ -13,35 +12,48 @@
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
-    <!--  <h2>회원 목록</h2>-->
-
     <div class="container">
         <!--검색 기능-->
-        <form th:action="@{/admin/adminlist}" method="get">
-            <div class="row p-5 bg-white"> <!--틀-->
+        <form th:action="@{/admin/holist}" method="get">
+            <div class="row p-5 bg-white">
                 <div class="mb-3">
                     <h3>회원 조회</h3>
                 </div>
                 <div class="col-8">
                     <div class="input-group mb-3">
-                        <select class="form-select" id="type">
-                            <option th:selected="${type == null}">선택 안함</option>
-                            <option th:selected="${type == 0}">이름</option>
-                            <option th:selected="${type == 1}">이메일</option>
-                            <option th:selected="${type == 2}">전화번호</option>
+                        <select class="form-select" id="type" name="type">
+                            <option value="" th:selected="${type == null}">선택 안함</option>
+                            <option value="0" th:selected="${type == 0}">전체 검색</option>
+                            <option value="1" th:selected="${type == 1}">이름</option>
+                            <option value="2" th:selected="${type == 2}">이메일</option>
+                            <option value="3" th:selected="${type == 3}">전화번호</option>
+                            <option value="4" th:selected="${type == 4}">관리자 권한</option>
                         </select>
-                        <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
+
+                        <!-- 키워드 입력 필드 -->
+                        <input type="text" class="form-control" id="keyword" name="keyword" th:value="${keyword}" placeholder="Search">
+
+                        <!-- 관리자 권한 선택 드롭다운 (처음에는 숨김) -->
+                        <select class="form-select" id="level" name="level" style="display: none;">
+                            <option value="">권한 선택</option>
+                            <option th:each="lvl : ${T(com.sixcandoit.roomservice.constant.Level).values()}"
+                                    th:if="${lvl == T(com.sixcandoit.roomservice.constant.Level).BO or lvl == T(com.sixcandoit.roomservice.constant.Level).GUEST}"
+                                    th:value="${lvl}" th:text="${lvl.description}" th:selected="${level == lvl}">
+                            </option>
+                        </select>
+
                         <button class="btn btn-success" type="submit">검색</button>
                     </div>
-                </div><!--검색-->
+                </div>
+
                 <div class="col-5"></div>
             </div>
         </form>  <!--검색 기능(keyword) 끝-->
+
         <div class="row mt-5 p-5 bg-white">
             <div class="mb-3">
                 <h3>회원 목록</h3>
             </div>
-            <!--        <div class="col"></div>-->
             <div class="col-18">
                 <table class="table">
                     <thead>
@@ -64,8 +76,7 @@
                                 <select class="form-select form-select-sm role-select" th:data-admin-id="${admin.idx}" style="width: auto;">
                                     <option th:each="role : ${T(com.sixcandoit.roomservice.constant.Level).values()}"
                                             th:if="${role == T(com.sixcandoit.roomservice.constant.Level).BO or role == T(com.sixcandoit.roomservice.constant.Level).GUEST}"
-                                            th:value="${role}" th:text="${role.description}"
-                                            th:selected="${admin.level == role}">
+                                            th:value="${role}" th:text="${role.description}" th:selected="${admin.level == role}">
                                     </option>
                                 </select>
                                 <button class="btn btn-primary btn-sm update-role-btn" th:data-admin-id="${admin.idx}">권한 변경</button>
@@ -86,37 +97,58 @@
             <div class="mt-3 d-flex justify-content-center">
                 <ul class="pagination">
 
-                    <li class="page-item" th:unless="${startPage>1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
-                        <a class="page-link" th:href="@{/admin/adminlist(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                    <li class="page-item" th:unless="${startPage>1}">
+                        <a class="page-link" th:href="@{/admin/holist(page=1, type=${type}, keyword=${keyword})}">≪</a>
                     </li>
 
-                    <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
-                        <a class="page-link" th:href="@{/admin/adminlist(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                    <li class="page-item" th:unless="${currentPage==1}">
+                        <a class="page-link" th:href="@{/admin/holist(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
                     </li>
 
                     <li class="page-item" th:each="page:${#numbers.sequence((startPage != null ? startPage : 1), (endPage != null ? endPage : 1), 1)}" th:class="${page == currentPage} ? 'active' : ''">
                         <a class="page-link" th:if="${page != currentPage}"
-                           th:href="@{/admin/adminlist(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
-                        <!-- 현재 페이지일 때는 링크 없이 텍스트만 표시 -->
+                           th:href="@{/admin/holist(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
                         <span th:if="${page == currentPage}" class="page-link" th:text="${page}"></span>
                     </li>
 
                     <li class="page-item" th:if="${currentPage<endPage}">
-                        <a class="page-link" th:href="@{/admin/adminlist(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                        <a class="page-link" th:href="@{/admin/holist(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
                     </li>
 
                     <li class="page-item" th:if="${currentPage<endPage}">
-                        <a class="page-link" th:href="@{/admin/adminlist(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                        <a class="page-link" th:href="@{/admin/holist(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
                     </li>
                 </ul>
             </div>
             <!--페이징 끝-->
 
         </div>
-        <div class="col"></div>
     </div>
+
     <script>
-        // 권한 변경
+        // 관리자 권한 검색
+        $(document).ready(function () {
+            function updateSearchUI() {
+                let selectedType = $("#type").val();
+                if (selectedType === "4") {
+                    $("#keyword").hide();  // 키워드 입력 필드 숨기기
+                    $("#level").show();    // 관리자 권한 선택 드롭다운 보이기
+                } else {
+                    $("#keyword").show();  // 키워드 입력 필드 보이기
+                    $("#level").hide();    // 관리자 권한 선택 드롭다운 숨기기
+                }
+            }
+
+            // 검색 타입 변경 시 UI 업데이트
+            $("#type").change(function () {
+                updateSearchUI();
+            });
+
+            // 페이지 로드 시 UI 업데이트 (새로고침 후에도 적용되도록)
+            updateSearchUI();
+        });
+
+    // 권한 변경
         $(document).ready(function () {
             $(".update-role-btn").click(function () {
                 let idx = $(this).data("admin-id");
@@ -129,7 +161,6 @@
                 $.ajax({
                     url: "/admin/updateRole",
                     type: "POST",
-                    // contentType: "application/json",
                     data: { idx: idx, level: newLevel },
                     success: function (response) {
                         if (response === "success") {
@@ -145,7 +176,6 @@
                 });
             });
         });
-
 
         // 회원 탈퇴
         function deleteAdmin(idx) {

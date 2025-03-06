@@ -250,7 +250,7 @@ public class AdminService {
 
     // 관리자 회원 전체 목록, 데이터를 화면에 출력
     // 페이지 번호를 받아 테이블의 해당 페이지의 데이터를 읽어와서 컨트롤러에 전달
-    public Page<AdminDTO> adminList(Pageable page, String type, String keyword) {
+    public Page<AdminDTO> adminList(Pageable page, String type, String keyword, Level level) {
 
         int currentPage = page.getPageNumber() - 1; // 화면의 페이지 번호를 db 페이지 번호로
         int pageLimit = 10; // 한 페이지를 구성하는 레코드 수
@@ -273,7 +273,10 @@ public class AdminService {
             } else if (type.equals("3")) { // type 분류 3, 핸드폰 번호로 검색할 때
                 log.info("핸드폰 번호로 검색하는 중...");
                 adminEntities = adminRepository.searchAdminPhone(keyword, pageable);
-            } else { // 전체 검색 = 0
+            }else if (type.equals("4")){
+                log.info("권한으로 검색하는 중...");
+                adminEntities = adminRepository.searchAdminLevel(level, pageable);
+            }else { // 전체 검색 = 0
                 log.info("전체 조회 검색 중...");
                 adminEntities = adminRepository.searchAdminNameAndEmailAndPhone(keyword, pageable);
             }

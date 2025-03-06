@@ -52,7 +52,7 @@ public class QnaEntity extends BaseEntity {
     private AdminEntity adminJoin;
 
     // 문의 사항 댓글 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "qnaJoin")
+    @OneToMany(mappedBy = "qnaJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReplyEntity> replyJoin;
 
     // 이미지 파일 테이블과 1:N 매핑

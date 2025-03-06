@@ -77,7 +77,7 @@
                             <td th:text="${menu.menuContent}"></td>
                             <td th:text="${menu.menuPrice}"></td>
                             <td>
-                                <input class="form-control" name="count" style="width: 70px" th:type="Number" th:value="${1}">
+                                <input class="form-control count" name="count" style="width: 70px" th:type="Number" th:value="${1}">
                             </td>
                             <td>
                                 <button class="btn btn-info addcart" th:data-id="${menu.idx}" th:data-name="${menu.menuName}" th:data-price="${menu.menuPrice}">장바구니 추가</button>
@@ -143,8 +143,8 @@
 
             //장바구니에 메뉴 추가
             $('.addcart').on('click', function() {
-                var menuIdx = $(this).data('id');
-                var count = $(this).closest('tr').find('.count').val();  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
+                var menuIdx = parseInt($(this).data('id'), 10);
+                var count = parseInt($(this).closest('tr').find('.count').val(), 10);  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
 
                 console.log(menuIdx)
                 console.log(count)
@@ -152,9 +152,8 @@
                 $.ajax({
                     url: '/cart',
                     type: 'POST',
-                    contentType: 'application/json', // 데이터를 JSON 형식으로 전송
                     data: {
-                        menuidx: menuIdx,
+                        idx: menuIdx,
                         count: count
                     },
                     success: function (response) {

@@ -18,16 +18,16 @@
       <div class="ms-5">
         <ul class="navbar-nav d-flex flex-row ms-5" style="padding-top: 30px">
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" href="/member/">Home</a>
+            <a class="nav-link" style="font-size: 20px" href="/member/">홈</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" th:href="@{/res/list}">Hotel</a>
+            <a class="nav-link" style="font-size: 20px" th:href="@{/res/list}">호텔</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" href="#">RoomService</a>
+            <a class="nav-link" style="font-size: 20px" href="#">룸서비스</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" href="/qna/list">Support</a>
+            <a class="nav-link" style="font-size: 20px" href="/qna/list">고객지원</a>
           </li>
         </ul>
       </div>
@@ -37,7 +37,7 @@
         <th:block th:if="${#authentication.principal == null or #authentication.principal == 'anonymousUser'}">
           <ul class="navbar-nav d-flex flex-row me-5">
             <li class="nav-item">
-              <a class="nav-link" href="/member/login">Sign in</a>
+              <a class="nav-link" href="/member/login">로그인</a>
             </li>
           </ul>
         </th:block>
@@ -46,9 +46,9 @@
           <ul class="navbar-nav d-flex flex-row me-5">
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                안녕하세요 <span th:text="${#authentication.principal.username}"></span>님.
+                안녕하세요 <span th:text="${#authentication.principal.member.memberName}"></span>님.
               </a>
-              <ul class="dropdown-menu dropdown-menu-dark text-center">
+              <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end text-center mt-2">
                 <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/member/verify}">회원 정보 수정</a></li>
                 <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/qna/list}">장바구니</a></li>
                 <li><a class="dropdown-item" style="font-size: 15px" th:href="@{/member/logout}">로그아웃</a></li>

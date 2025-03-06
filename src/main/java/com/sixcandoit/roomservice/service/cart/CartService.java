@@ -19,6 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class CartService {
+
+    private final ModelMapper modelMapper;
 
     private final OrdersService ordersService;
 
@@ -52,17 +55,15 @@ public class CartService {
     //해당 값을 가지고 넣을 것이고, 컨트롤러에서 들어오는 email을 통해서 멤버를 찾게 할 예정
     public Integer addCart(Integer idx, String memberEmail) {
         //회원 찾기
-        Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
+        MemberEntity memberEntity = memberRepository.findByMemberEmail(memberEmail)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다: " + memberEmail));;
 
         //메뉴 검증
         MenuEntity menuEntity = menuRepository.findById(idx)
                 .orElseThrow(EntityNotFoundException::new);
 
         //메뉴정보를 MenuDTO로 변환
-        MenuDTO menuDTO = new MenuDTO();
-        menuDTO.setIdx(menuEntity.getIdx());
-        menuDTO.setMenuName(menuEntity.getMenuName());
-        menuDTO.setMenuPrice(menuEntity.getMenuPrice());
+        MenuDTO menuDTO = modelMapper.map(menuEntity, MenuDTO.class);
 
         // 메뉴 이미지 파일 가져오기
         List<ImageFileEntity> imageFileEntities = imageFileRepository.menuJoin(menuEntity.getIdx());
@@ -72,13 +73,13 @@ public class CartService {
 
         //카트 찾기
         CartEntity cartEntity
-                = cartRepository.findByMemberJoin_memberEmail(memberEntity.get().getMemberEmail());
+                = cartRepository.findByMemberJoin_memberEmail(memberEntity.getMemberEmail());
 
-        //카트 없으면 새로 생성
-        if (cartEntity == null) {
-            cartEntity = CartEntity.createCartEntity(memberEntity.get(), cartEntity.getCartMenuCount());
-            cartRepository.save(cartEntity);
-        }
+//        //카트 없으면 새로 생성
+//        if (cartEntity == null) {
+//            cartEntity = CartEntity.createCartEntity(memberEntity, cartEntity.getCartMenuCount());
+//            cartRepository.save(cartEntity);
+//        }
 
         //카트가 없으면 새로 생성, 있다면 있는걸로
         //장바구니 메뉴를 만들어 넣어주고, 저장한다.

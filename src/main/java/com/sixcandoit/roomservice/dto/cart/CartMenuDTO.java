@@ -21,5 +21,6 @@ public class CartMenuDTO {
     @Min(value = 1, message = "최소 수량은 1개입니다.")
     private int count;
 
-    private MenuDTO menuDTO;    //menuDTO 추가
+    private MenuDTO menuDTO;    // menuDTO 추가
+
 }

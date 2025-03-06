@@ -164,7 +164,7 @@ public class MemberService {
     }
 
     //임시비밀번호 발급(아이디, 회원명, 전화번호를 입력받아서 일치하면 해당 메일(아이디)로 임시비밀번호를 전송)
-    public void passwordSend(MemberDTO memberDTO) {
+    public boolean passwordSend(MemberDTO memberDTO) {
         try { //서버가 멈추는 것을 예방
             Optional<MemberEntity> read = memberRepository.findByMemberEmail(memberDTO.getMemberEmail()); //조회
             if (!read.isPresent()) { //일치하는 회원이 없으면
@@ -175,37 +175,26 @@ public class MemberService {
                 log.info("dpfj2");
                 throw new IllegalStateException("회원이름이 일치하지 않습니다.");
             }
-//            if (!read.get().getMemberPhone().equals(memberDTO.getMemberPhone())){ //전화번호가 일치하지 않으면
-//                throw new IllegalStateException("전화번호가 일치하지 않습니다.");
-//            }
-            else {
-                String tempPassword = generateTempPassword(8); //임시비밀번호 생성
-                read.get().setPassword(passwordEncoder.encode(tempPassword)); //임시비밀번호를 저장
-                memberRepository.save(read.get()); //데이터베이스에 저장
+            
+            String tempPassword = generateTempPassword(8); //임시비밀번호 생성
+            read.get().setPassword(passwordEncoder.encode(tempPassword)); //임시비밀번호를 저장
+            memberRepository.save(read.get()); //데이터베이스에 저장
 
-                //임시비밀번호를 회원 이메일(아이디)로 전달
-//            String emailSubject = "임시비밀번호 발급"; //메일제목
-//            String emailText = "안녕하세요 " + read.get().getMemberName() + "님.\n" +
-//                    "요청하신 임시 비밀번호는 다음과 같습니다.\n" +
-//                    tempPassword + "\n" +
-//                    "로그인 후 반드시 비밀번호를 변경해 주십시오."; //본문내용
-                String message = emailService.getTempEmailHTML(tempPassword);
-                String to = read.get().getMemberEmail();
-                String subject = "임시 비밀번호 발급";
+            String message = emailService.getTempEmailHTML(tempPassword);
+            String to = read.get().getMemberEmail();
+            String subject = "임시 비밀번호 발급";
 
-
-                emailService.sendEmail(to, subject, message); //메일전송
-            }
+            emailService.sendEmail(to, subject, message); //메일전송
+            return true;
 
         } catch (IllegalStateException e) { //상태오류(데이터베이스 처리 실패시)
             //e.getMessage() 오류메세지
             System.out.println("회원 가입을 실패하였습니다." + e.getMessage());
-            throw e; //호출한 곳으로 돌아간다.(return)
+            return false;
         } catch (Exception e) { //비정상적인 처리(오류발생)
             System.out.println("예기치 않은 문제가 발생하였습니다." + e.getMessage());
-            throw new RuntimeException("가입 중 오류가 발생하였습니다."); //사용자가 오류처리
+            return false;
         }
-
     }
 
     //비밀번호 생성기(입력한 자리수만큼 임시비밀번호를 생성)

@@ -68,23 +68,25 @@ public class MemberService {
 
     // 비밀번호 확인
     public boolean verifyPassword(String inputPassword, String memberEmail) {
+        log.info("비밀번호 검증 시작 - 이메일: " + memberEmail);
+        
         // DB에서 회원 정보를 조회 (Optional<MemberEntity> 반환)
         Optional<MemberEntity> optionalMember = memberRepository.findByMemberEmail(memberEmail);
 
         if (optionalMember.isPresent()) {
             // 회원이 존재하면, 비밀번호 비교
             MemberEntity memberEntity = optionalMember.get(); // MemberEntity 객체 추출
+            log.info("회원 정보 조회 성공 - 이메일: " + memberEmail);
+            
             boolean isMatch = passwordEncoder.matches(inputPassword, memberEntity.getPassword());
-
-            // 로그 추가
-            System.out.println("비밀번호 검증 결과: " + isMatch); // 비밀번호 일치 여부 확인
+            log.info("비밀번호 검증 결과 - 이메일: " + memberEmail + ", 일치여부: " + isMatch);
 
             return isMatch;
         } else {
             // 회원이 없으면 false 반환
+            log.error("회원 정보 조회 실패 - 이메일: " + memberEmail);
             return false;
         }
-
     }
 
     // 회원 정보 수정

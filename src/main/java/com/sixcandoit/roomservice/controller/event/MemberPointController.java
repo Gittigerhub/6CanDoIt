@@ -35,13 +35,21 @@ public class MemberPointController {
     
     //포인트 목록
     @GetMapping("/memberpoint")
-    public String memberPoint( Model model) {
+    public String memberPointList(@PageableDefault(page = 1)Pageable page,
+                              @RequestParam(value = "type", defaultValue = "")String type,
+                              @RequestParam(value = "keyword", defaultValue = "")String keyword,
+                              Model model) {
+        System.out.println("type: " + type + " keyword: " + keyword+"page: " + page);
         try {
-            log.info("get에 들어옴");
-            List<MemberPointDTO> memberPointDTOS = memberPointService.list();
+           //해당 페이지 내용을 서비스를 통해 데이터베이스로부터 조회
 
+            Page<MemberPointDTO> memberPointDTO = memberPointService.list(page, type, keyword);
 
-            model.addAttribute("memberPointDTOS", memberPointDTOS);
+            Map<String, Integer> pageInfo = PageNationUtil.Pagination(memberPointDTO);
+            model.addAttribute("memberPointDTO", memberPointDTO);
+            model.addAllAttributes(pageInfo);
+            model.addAttribute("type", type);
+            model.addAttribute("keyword", keyword);
 
 
             return "event/memberpoint";

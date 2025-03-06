@@ -32,9 +32,9 @@
                     <tbody>
                     <tr class="column" th:each="memberPoint:${memberPointDTO}" th:data-id="${memberPoint.idx}">
                         <td th:text="${memberPoint.idx}"></td>
-
                         <td th:text="${memberPoint.memberPoint}"></td>
-                        <td class="contents" th:text="${memberPoint.memberPointContents}"></td>
+                        <td class="contents" th:text="${#strings.length(memberPoint.memberPointContents)>30 ? #strings.substring(memberPoint.memberPointContents,0,30)+'...':
+                        memberPoint.memberPointContents}"></td>
                         <td th:text="${#temporals.format(memberPoint.memberPointStartDate, 'yy-MM-dd')}+'~'+${#temporals.format(memberPoint.memberPointEndDate, 'yy-MM-dd')}"></td>
                         <th:block th:if="${memberPoint.memberPointOperationYn.equals('N')}">
                             <td class="text-bg-primary">사용가능</td>
@@ -49,6 +49,59 @@
             </div>
 
         </div>
+        <!--검색 기능-->
+        <form th:action="@{/event/usermemberpoint}" method="get">
+            <div class="container bg-white">
+                <div>
+                    <h3>게시글 검색</h3>
+                </div>
+                <div class="col-12">
+                    <div class="input-group mb-3">
+                        <select class="form-select" name="type">
+                            <option th:selected="${type==null}"></option>
+                            <option value="0" th:selected="${type=='0'}">전체</option>
+                            <option value="1" th:selected="${type=='1'}">내용</option>
+                            <option value="2" th:selected="${type=='2'}">사용유무</option>
+                        </select>
+                        <input type="text" class="form-control" name="keyword" th:value="${keyword}"
+                               placeholder="Search">
+                        <button class="btn btn-success" type="submit">검색</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!--검색 끝-->
+
+        <!--페이징-->
+        <div class="mt-3 d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item" th:unless="${startPage <= 1}">
+                    <a class="page-link"
+                       th:href="@{/event/usermemberpoint(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                </li>
+                <li class="page-item" th:unless="${currentPage <= 1}">
+                    <a class="page-link"
+                       th:href="@{/event/usermemberpoint(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                </li>
+                <th:block th:each="page:${#numbers.sequence(startPage,endPage,1)}">
+                    <li class="page-item">
+                        <a class="page-link"
+                           th:href="@{/event/usermemberpoint(page=${page}, type=${type}, keyword=${keyword})}"
+                           th:text="${page}"></a>
+                    </li>
+                </th:block>
+                <li class="page-item" th:unless="${currentPage>=endPage}">
+                    <a class="page-link"
+                       th:href="@{/event/usermemberpoint(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                </li>
+                <li class="page-item" th:unless="${currentPage >= endPage}">
+                    <a class="page-link"
+                       th:href="@{/event/usermemberpoint(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                </li>
+
+            </ul>
+
+        </div><!--페이징 끝-->
 
     </div>
 
@@ -71,7 +124,8 @@
                             <div class="col-sm-6">
                                 <div class="form-group form-group-default">
                                     <label>*회원 이메일 :</label>
-                                    <input id="memberEmail" name="memberEmail" type="text"
+                                    <input id="memberPointEmail" th:value="${memberName.getMemberJoin().memberEmail}"
+                                           name="memberPointEmail" type="text"
                                            class="form-control" readonly/>
                                 </div>
                             </div>
@@ -106,9 +160,7 @@
                                 <div class="form-group form-group-default">
                                     <label>*포인트 사용여부:</label>
                                     <input id="memberPointOperationYn" name="memberPointOperationYn"
-                                           type="datetime-local"
                                            class="form-control" readonly/>
-
                                 </div>
                             </div>
                         </div>
@@ -117,8 +169,8 @@
                             <div class="col-sm-12">
                                 <div class="form-group form-group-default">
                                     <label>*포인트 내용:</label>
-                                    <input id="memberPointContents" name="memberPointContents" type="text"
-                                           class="form-control" readonly/>
+                                    <textarea class="form-control" rows="5" id="memberPointContents"
+                                              name="memberPointContents"></textarea><br>
                                 </div>
                             </div>
                         </div>
@@ -135,17 +187,6 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
 
-        function truncateText(selector, maxLength) {
-            document.querySelectorAll(selector).forEach(el => {
-                if (el.textContent.length > maxLength) {
-                    el.textContent = el.textContent.substring(0, maxLength) + "...";
-                }
-            });
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            truncateText(".contents", 20); // 20자까지 표시
-        });
         $(document).ready(function () {
             //수정버튼클릭시 대화상자 채우기
             $(".column").on("click", function () {
@@ -164,16 +205,14 @@
                         console.log("성공함")
                         $('#title').text("포인트 상세보기");
 
-                        $('#idx').val(response.idx);
-                        $('#memberEmail').val(response.memberEmail);
-                        $('#memberPoint').val(response.memberPoint);
+                        $('#idx').val(response.userPoint.idx);
+                        $('#memberPoint').val(response.userPoint.memberPoint);
 
-                        // 날짜 변환 (datetime-local 형식)
-                        $('#memberPointStartDate').val(response.memberPointStartDate);
-                        $('#memberPointEndDate').val(response.memberPointEndDate);
+                        $('#memberPointStartDate').val(response.userPoint.memberPointStartDate);
+                        $('#memberPointEndDate').val(response.userPoint.memberPointEndDate);
 
-                        $('#memberPointOperationYn').val(response.memberPointOperationYn);
-                        $('#memberPointContents').val(response.memberPointContents);
+                        $('#memberPointOperationYn').val(response.userPoint.memberPointOperationYn);
+                        $('#memberPointContents').val(response.userPoint.memberPointContents);
 
 
                         //대화창 출력

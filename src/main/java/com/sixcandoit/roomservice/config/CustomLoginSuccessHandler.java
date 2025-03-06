@@ -36,7 +36,7 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         if (session != null) {
             String userEmail = authentication.getName(); // 로그인한 사용자 이메일
-            session.setAttribute("userEmail", userEmail); // 모든 등급의 사용자 이메일 저장
+            session.setAttribute("memberEmail", userEmail); // 세션 키를 memberEmail로 통일
 
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             String targetUrl = "/"; // 기본 URL

@@ -80,7 +80,14 @@ public class MemberController {
     @GetMapping("/verify")
     public String ShowPasswordVerificationPage(HttpSession session, Model model){
         String memberEmail = (String) session.getAttribute("memberEmail");
-        model.addAttribute("memberEmail",memberEmail );
+        log.info("세션에서 가져온 memberEmail: " + memberEmail);
+        
+        if (memberEmail == null) {
+            log.error("세션에 memberEmail이 없습니다.");
+            return "redirect:/member/login";
+        }
+        
+        model.addAttribute("memberEmail", memberEmail);
         return "/member/verify";
     }
 
@@ -88,20 +95,25 @@ public class MemberController {
     @PostMapping("/verify")
     public String verifyPassword(@RequestParam String password,
                                  @RequestParam String memberEmail,
-                                 HttpSession session){
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes){
 
+        log.info("비밀번호 검증 시도 - 이메일: " + memberEmail);
+        
         // 비밀번호를 DB에서 조회하여 비교
         boolean isPasswordValid = memberService.verifyPassword(password, memberEmail);
+        log.info("비밀번호 검증 결과: " + isPasswordValid);
 
         if (isPasswordValid) {
             // 비밀번호가 맞으면 회원 정보 수정 페이지로 리디렉션
-            session.setAttribute("email", memberEmail);  // 이메일을 세션에 저장
-            System.out.println("비밀번호가 맞습니다.");
-            return "redirect:/member/modify";  // 수정 페이지로 이동
+            session.setAttribute("memberEmail", memberEmail);
+            log.info("비밀번호 검증 성공 - 세션에 memberEmail 저장: " + memberEmail);
+            return "redirect:/member/modify";
         } else {
-            // 비밀번호가 틀리면 다시 비밀번호 확인 페이지로 돌아가기
-            System.out.println("비밀번호가 틀렸습니다.");
-            return "redirect:/member/verify";  // 비밀번호 페이지로 리디렉션
+            // 비밀번호가 틀리면 에러 메시지와 함께 다시 비밀번호 확인 페이지로 돌아가기
+            log.error("비밀번호 검증 실패 - 이메일: " + memberEmail);
+            redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+            return "redirect:/member/verify";
         }
     }
 

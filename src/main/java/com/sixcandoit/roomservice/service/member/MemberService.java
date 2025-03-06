@@ -180,7 +180,7 @@ public class MemberService {
             read.get().setPassword(passwordEncoder.encode(tempPassword)); //임시비밀번호를 저장
             memberRepository.save(read.get()); //데이터베이스에 저장
 
-            String message = emailService.getTempEmailHTML(tempPassword);
+            String message = emailService.getTempEmailHTML(tempPassword, 2);
             String to = read.get().getMemberEmail();
             String subject = "임시 비밀번호 발급";
 

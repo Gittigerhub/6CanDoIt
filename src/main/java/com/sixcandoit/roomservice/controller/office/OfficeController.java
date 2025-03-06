@@ -115,6 +115,41 @@ public class OfficeController {
 
     }
 
+    @GetMapping("/bo/list")
+    public String bolist(@PageableDefault(page=1) Pageable page,
+                         @RequestParam(value="keyword", defaultValue = "") String keyword,
+                         @RequestParam(value="type", defaultValue = "") String type,
+                         HttpServletRequest request, Model model) {
+
+        // 서비스에 조회 요청
+        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
+
+        // 조회결과를 이용한 페이지 처리
+        Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
+
+        // 매장 상세정보 서비스로 조회
+        // 각 OrganizationDTO에 대해 exists 값을 계산하여 리스트에 추가
+        List<Boolean> existsList = new ArrayList<>();
+
+        for (OrganizationDTO organization : organDTO) {
+
+            // shopCheck 메소드 호출하여 exists 값을 확인
+            boolean exists = shopDetailService.shopCheck(organization.getIdx()); // 조직의 idx를 사용
+            existsList.add(exists);
+        }
+
+        // 페이지 정보, 조회내용, 검색어, 조직 타입을 전달
+        model.addAllAttributes(pageInfo);
+        model.addAttribute("organDTO", organDTO);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("type", type);
+        model.addAttribute("existsList", existsList); // exists 값 리스트를 모델에 추가
+        model.addAttribute("request", request); // 현재 페이지 url
+
+        return "office/boadminlist";
+
+    }
+
     @PostMapping("/organ/register")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
     public ResponseEntity<String> register(@ModelAttribute OrganizationDTO organizationDTO, List<MultipartFile> imageFiles) {

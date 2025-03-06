@@ -42,11 +42,12 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th>메뉴명</th>
-                            <th>메뉴사진</th>
-                            <th>메뉴설명</th>
-                            <th>가격</th>
-                            <th>장바구니</th>
+                            <th style="width: 15%">메뉴명</th>
+                            <th style="width: 20%">메뉴사진</th>
+                            <th style="width: 25%">메뉴설명</th>
+                            <th style="width: 10%">가격</th>
+                            <th style="width: 10%">수량</th>
+                            <th style="width: 20%">장바구니</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -75,6 +76,9 @@
                             </td>
                             <td th:text="${menu.menuContent}"></td>
                             <td th:text="${menu.menuPrice}"></td>
+                            <td>
+                                <input class="form-control" name="count" style="width: 70px" th:type="Number" th:value="${1}">
+                            </td>
                             <td>
                                 <button class="btn btn-info addcart" th:data-id="${menu.idx}" th:data-name="${menu.menuName}" th:data-price="${menu.menuPrice}">장바구니 추가</button>
                             </td>
@@ -140,36 +144,18 @@
             //장바구니에 메뉴 추가
             $('.addcart').on('click', function() {
                 var menuIdx = $(this).data('id');
-                var menuName = $(this).data('name');
-                var menuPrice = $(this).data('price');
-                var menuImg = $(this).closest('tr').find('img').attr('src');  // 메뉴 이미지 URL을 가져옴
-
+                var count = $(this).closest('tr').find('.count').val();  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
 
                 console.log(menuIdx)
-                console.log(menuName)
-                console.log(menuPrice)
-                console.log(menuImg)
-
-                var cartItem = {
-                    menuidx: menuIdx,
-                    menuName: menuName,
-                    menuPrice: menuPrice,
-                    menuImg: menuImg,
-                    count: 1    // 기본 수량 1
-                };
-
+                console.log(count)
 
                 $.ajax({
                     url: '/cart',
                     type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(cartItem),  // 데이터를 JSON 형식으로 전송
+                    contentType: 'application/json', // 데이터를 JSON 형식으로 전송
                     data: {
                         menuidx: menuIdx,
-                        menuName: menuName,
-                        menuPrice: menuPrice,
-                        menuImg: menuImg,
-                        count: 1    //기본수량 1
+                        count: count
                     },
                     success: function (response) {
                         Swal.fire({

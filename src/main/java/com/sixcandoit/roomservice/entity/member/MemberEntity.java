@@ -68,7 +68,7 @@ public class MemberEntity extends BaseEntity {
     }
 
     // 예약 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "memberJoin")
+    @OneToMany(mappedBy = "memberJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReservationEntity> reservationJoin;
 
     // 문의 사항 테이블과 1:N 매핑
@@ -76,11 +76,11 @@ public class MemberEntity extends BaseEntity {
     private List<QnaEntity> qnaJoin;
 
     // 회원 포인트 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "memberJoin")
+    @OneToMany(mappedBy = "memberJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberPointEntity> memberPointJoin;
 
     // 장바구니 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "memberJoin")
+    @OneToMany(mappedBy = "memberJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartEntity> cartJoin;
 
     // 주문 테이블과 1:N 매핑

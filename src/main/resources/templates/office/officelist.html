@@ -18,12 +18,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!--알림창 스크립트-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        a {
-            text-decoration: none;
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
@@ -84,7 +78,7 @@
                     <td th:text="${data.organType}"></td>
                     <td>
                         <!-- 조직 분류가 매장이 아닐때 -->
-                        <a th:href="@{/office/organ(idx=${data.idx})}" th:if="${data.organType != 'SHOP'}" th:text="${data.organName}"></a>
+                        <a style="text-decoration: none; font-weight: bold" th:href="@{/office/organ(idx=${data.idx})}" th:if="${data.organType != 'SHOP'}" th:text="${data.organName}"></a>
                         <!-- 조직 분류가 매장일때 -->
                         <th:block th:if="${data.organType == 'SHOP'}">
                             <!-- 매장 상세내용이 존재한다면 상세내용 보기 진행 -->
@@ -93,11 +87,11 @@
                             dataStat.index는 th:each="data:${organDTO}" 구문에서 반복되는 각 항목의 현재 인덱스를 제공합니다.
                              -->
                             <th:block th:if="${existsList[dataStat.index]}">
-                                <a th:href="@{/office/shopdetail/realread(idx=${data.idx})}" th:text="${data.organName}"></a>
+                                <a style="text-decoration: none; font-weight: bold" th:href="@{/office/shopdetail/realread(idx=${data.idx})}" th:text="${data.organName}"></a>
                             </th:block>
                             <!-- 매장 상세내용이 존재하지 않는다면 등록 진행 -->
                             <th:block th:unless="${existsList[dataStat.index]}">
-                                <a th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}" th:data-tel="${data.organTel}"></a>
+                                <a style="text-decoration: none; font-weight: bold" th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}" th:data-tel="${data.organTel}"></a>
                             </th:block>
                         </th:block>
                     </td>

@@ -26,7 +26,7 @@ public class OrdersMenuEntity extends BaseEntity {
     @JoinColumn(name = "member_idx")
     private OrdersEntity ordersEntity;
 
-    // 회원 테이블과 1:1 매핑
+    // 메뉴 테이블과 1:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_idx")
     private MenuEntity menuEntity;

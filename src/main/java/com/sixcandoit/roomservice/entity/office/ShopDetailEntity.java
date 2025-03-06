@@ -65,11 +65,11 @@ public class ShopDetailEntity extends BaseEntity {
     private OrganizationEntity organizationJoin;
 
     // 정산내역 테이블과 1:N 매칭
-    @OneToMany(mappedBy = "shopDetailJoin")
+    @OneToMany(mappedBy = "shopDetailJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CalculateEntity> calculateJoins;
 
     // 메뉴 테이블과 1:N 매칭
-    @OneToMany(mappedBy = "shopDetailJoin")
+    @OneToMany(mappedBy = "shopDetailJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MenuEntity> menuJoin;
 
 

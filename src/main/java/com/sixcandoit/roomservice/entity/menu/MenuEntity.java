@@ -69,7 +69,7 @@ public class MenuEntity extends BaseEntity {
     private ShopDetailEntity shopDetailJoin;
 
     // 메뉴 옵션 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "menuJoin")
+    @OneToMany(mappedBy = "menuJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MenuOptionEntity> menuOptionJoin;
 
     // 장바구니 테이블과 N:1 매핑

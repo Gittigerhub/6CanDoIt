@@ -32,11 +32,12 @@ public class CartController {
 
     //장바구니 등록
     @PostMapping("/cart")
-    public ResponseEntity registerCart(Integer idx,
-                                    Principal principal) {
+    @ResponseBody
+    public ResponseEntity registerCart(Integer idx, int count, Principal principal) {
 
-        //System.out.println(cartMenuDTO);
-        System.out.println(principal);
+        System.out.println("메뉴 Idx : " + idx);
+        System.out.println("메뉴 수량 : " + count);
+        System.out.println("로그인 정보 : " + principal.getName());
 
 //        //유효성 검사 >>  BindingResult 사용하려면 @Valid ~DTO 객체를 받아야함
 //        if (bindingResult.hasErrors()) {
@@ -50,7 +51,7 @@ public class CartController {
 //            return new ResponseEntity<String>(sb.toString(), HttpStatus.BAD_REQUEST);
 //        }
 
-        //값이 잘 넘어왔다면
+        // 값이 잘 넘어왔다면
         // 이메일로 회원을 찾고 장바구니에 메뉴 추가
         String email = principal.getName();
 
@@ -139,3 +140,5 @@ public class CartController {
         return new ResponseEntity<Integer>(orderidx, HttpStatus.OK);
     }
 }
+//현재 contentType: 'application/json'으로 요청을 보내고 있어서
+//Spring이 @RequestParam이 아니라 @RequestBody로 받아야 매핑할 수 있음.

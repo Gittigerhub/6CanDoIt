@@ -12,9 +12,38 @@
 <body>
 <div th:fragment="hosidebar" class="clk d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px; height: 100vh;">
     <a>
-        <br class="fs-9"> 조직:(없으면 보이지x)</br>
-        <br class="fs-9"> 권한:ADMIN</br>
-        <br class="fs-9">ID:admin</br>
+        <br class="fs-9">
+            <!-- 로그인된 사용자 조직명 표시 -->
+            <th:block th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
+                조직: <span th:text="${#authentication.principal.admin.organizationJoin.organName}"></span>
+            </th:block>
+            <!-- 로그인되지 않은 경우 -->
+            <th:block th:if="${#authentication.principal == null or #authentication.principal == 'anonymousUser'}">
+                조직: 없음.
+            </th:block>
+        </br>
+
+        <br class="fs-9">
+            <!-- 로그인된 사용자 권한 표시 -->
+            <th:block th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
+                권한: <span th:text="${#authentication.principal.admin.level}"></span>
+            </th:block>
+            <!-- 로그인되지 않은 경우 -->
+            <th:block th:if="${#authentication.principal == null or #authentication.principal == 'anonymousUser'}">
+                권한: 없음.
+            </th:block>
+        </br>
+
+        <br class="fs-9">
+            <!-- 로그인된 사용자 이름 표시 -->
+            <th:block th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
+                ID: <span th:text="${#authentication.principal.admin.adminName}"></span>
+            </th:block>
+            <!-- 로그인되지 않은 경우 -->
+            <th:block th:if="${#authentication.principal == null or #authentication.principal == 'anonymousUser'}">
+                로그인이 되어있지 않습니다.
+            </th:block>
+        </br>
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">

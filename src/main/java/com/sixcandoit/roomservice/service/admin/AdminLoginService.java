@@ -41,14 +41,20 @@ public class AdminLoginService implements UserDetailsService {
         //2. 사용자 정의로 만든 CustomUserDetails정보를 이용해서 Entity정보를 Details에 전달한다.
         //SecurityConfig에서 설정할 내용은 없으면 CustomLoginSuccessHandler에서 작업을 진행한다.
         if (adminEntity.isPresent()) { // 관리자에 존재하면
+
+            AdminEntity admin = adminRepository.findByAdminEmail(AdminEmail)
+                    .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + AdminEmail));
+
+            return new CustomUserDetails(admin); // ✅ Admin 엔티티 전체 전달
+
             //List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(adminEntity.get().getRoleType().name()));
-            return new CustomUserDetails(
-                    adminEntity.get().getAdminEmail(),
-                    adminEntity.get().getPassword(),
+//            return new CustomUserDetails(
+//                    adminEntity.get().getAdminEmail(),
+//                    adminEntity.get().getPassword(),
 //                    adminEntity.get().getHotel(),
-                    adminEntity.get().getLevel()
+//                    adminEntity.get().getLevel()
                     //authorities
-            );
+//            );
         }
         //일반회원 및 관리자에 존재하지 않으면 오류발생(Console)
         throw new UsernameNotFoundException("알 수 없는 아이디 : "+ AdminEmail);

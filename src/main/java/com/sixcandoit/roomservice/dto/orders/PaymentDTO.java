@@ -20,4 +20,8 @@ public class PaymentDTO {
     private Integer paymentCashPrice; //현금결제금액
     private String paymentPayType; //결제구분
     private String paymentApproval; //승인번호
+
+    public PaymentDTO(Integer idx, Integer paymentPrice, String paymentState, Integer paymentCardPrice, String paymentPayType, String paymentApproval) {
+    }
 }
+

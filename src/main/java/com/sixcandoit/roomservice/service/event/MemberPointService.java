@@ -6,7 +6,11 @@ import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.event.MemberPointRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -14,14 +18,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberPointService {
-
     private  final MemberPointRepository memberPointRepository;
     private  final MemberRepository memberRepository;
     private  final ModelMapper modelMapper;
-
     /*-------------------------------------------------
     함수명 : register(MemberPointDTO memberPointDTO)
     인수 : memberPointDTO
@@ -114,19 +117,32 @@ public class MemberPointService {
     출력 : 목록
     설명 : 포인트 정보들을 목록을 출력할때 사용
     ---------------------------------------------------*/
-    public List<MemberPointDTO> list(){
+    public Page<MemberPointDTO> list(Pageable page, String type, String keyword){
         List<MemberPointEntity> memberPointlist = memberPointRepository.findAll();
-
-        List<MemberPointDTO> memberPointDTOlist = Arrays.asList(modelMapper.map(memberPointlist, MemberPointDTO[].class));
-        /*List<MemberPointDTO> memberPointDTOList = memberPointlist.stream()
-                .map(memberPoint -> {
-                    // memberPointEntity -> memberPointDTO 변환
-                    MemberPointDTO memberPointDTO = modelMapper.map(memberPoint, MemberPointDTO.class);
-                    return memberPointDTO;
-                })
-                .collect(Collectors.toList());*/
-
-        return memberPointDTOlist;
+        System.out.println("Service = page: "+page+",type:"+type+",keyword:"+keyword);
+        //List<MemberPointDTO> memberPointDTOlist = Arrays.asList(modelMapper.map(memberPointlist, MemberPointDTO[].class));
+        Pageable pageable= PageRequest.of(Math.max(page.getPageNumber()-1,0),10);
+        System.out.println("실행중:"+pageable.getPageNumber());
+        Page<MemberPointEntity> memberPointEntities;
+        if(!keyword.isEmpty()){
+            if(type.equals("1")){
+                log.info("이메일로 검색을 하는 중");
+                memberPointEntities = memberPointRepository.findByEmail(keyword,pageable);
+            }else if(type.equals("2")){
+                log.info("회원이름으로 검색하는 중");
+                memberPointEntities=memberPointRepository.findByName(keyword,pageable);
+            }else {
+                log.info("회원 이름과 이메일로 검색하는 중");
+                memberPointEntities = memberPointRepository.findByNameOrEmail(keyword,pageable);
+            }
+        }
+        else{
+            log.info("모든 대상으로 검색");
+            memberPointEntities=memberPointRepository.findAll(pageable);
+        }
+        Page<MemberPointDTO> memberPointDTOS=memberPointEntities.map(entity -> modelMapper.map(entity,MemberPointDTO.class));
+        System.out.println("실행중2:"+memberPointDTOS.getSize());
+        return memberPointDTOS;
     }
 
     

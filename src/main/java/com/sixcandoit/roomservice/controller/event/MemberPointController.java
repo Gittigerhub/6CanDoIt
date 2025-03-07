@@ -93,7 +93,7 @@ public class MemberPointController {
     //포인트 수정
     @GetMapping("/memberpoint/read")
     @ResponseBody
-    public Map<String, Object> MemberPointRead(@RequestParam Integer idx, Map map){
+    public Map<String, Object> MemberPointRead(@RequestParam Integer idx){
         MemberPointDTO memberPointDTO = memberPointService.read(idx);
         Map<String,Object> response = new HashMap<>();
         response.put("memberPointDTO",memberPointDTO);

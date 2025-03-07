@@ -1,19 +1,15 @@
 package com.sixcandoit.roomservice.repository.event;
 
-import com.sixcandoit.roomservice.dto.event.MemberPointDTO;
 import com.sixcandoit.roomservice.entity.event.MemberPointEntity;
-import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface MemberPointRepository extends JpaRepository<MemberPointEntity, Integer> {
@@ -40,12 +36,14 @@ public interface MemberPointRepository extends JpaRepository<MemberPointEntity, 
     Page<MemberPointEntity> findByContents(@Param("keyword") String keyword, Pageable pageable);
 
     //포인트 사용여부로 검색
-    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberPointOperationYn LIKE %:keyword")
-    Page<MemberPointEntity> findByPointOperationYn(@Param("keyword") String keyword, Pageable pageable);
+    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberPointOperationYn LIKE %:buttonValue")
+    Page<MemberPointEntity> findByPointOperationYn(@Param("buttonValue") String buttonValue, Pageable pageable);
+    
+    //포인트 기간으로 검색
+    @Query("SELECT m FROM MemberPointEntity m where m.memberPointStartDate BETWEEN :startDatee AND :endDate")
+    Page<MemberPointEntity> findByStartDate(@Param("date") LocalDateTime startDate, @Param("data") LocalDateTime endDate, Pageable pageable);
 
-    //포인트 내용 또는 사용 여부로 검색
-    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberPointContents LIKE %:keyword OR  m.memberPointOperationYn LIKE %:keyword")
-    Page<MemberPointEntity> findByContentsOrOperationYn(@Param("keyword") String keyword, Pageable pageable);
+
 
 
 

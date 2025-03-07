@@ -35,10 +35,12 @@
                                 <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Drink">음료</button>
                             </div>
                             <div class="position-relative d-inline-block ms-5">
-                                <i class="bi bi-cart4 align-middle" style="font-size: 24px;"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
-                                    0
-                                </span>
+                                <a th:href="@{/cart/cartlist}">
+                                    <i class="bi bi-cart4 align-middle" style="font-size: 24px;"></i>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
+                                        0
+                                    </span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -88,7 +90,7 @@
                                 <input class="form-control mx-auto" name="count" style="width: 70px" th:type="Number" th:value="${1}">
                             </td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <i class="bi bi-cart-plus-fill addcart" th:data-id="${menu.idx}" th:data-name="${menu.menuName}" th:data-price="${menu.menuPrice}" style="font-size: 24px"></i>
+                                <i class="bi bi-cart-plus-fill addCart" th:data-id="${menu.idx}" th:data-name="${menu.menuName}" th:data-price="${menu.menuPrice}" style="font-size: 24px"></i>
                             </td>
                         </tr>
                         </tbody>
@@ -150,7 +152,7 @@
             });
 
             //장바구니에 메뉴 추가
-            $('.addcart').on('click', function() {
+            $('.addCart').on('click', function() {
                 var menuIdx = $(this).data('id');
                 var count = $(this).closest('tr').find('.count').val();  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
 

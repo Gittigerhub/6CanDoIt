@@ -182,6 +182,9 @@ public class MenuService {
                     menuRepository.findById(menuDTO.getIdx())
                             .orElseThrow(EntityNotFoundException::new);
 
+            // ModelMapper를 사용하여 DTO의 데이터를 엔티티에 반영
+            modelMapper.map(menuDTO, menuEntity);
+
             // 기존 이미지들 업데이트 (새로운 이미지들 추가)
             List<ImageFileEntity> updateImages
                     = imageFileService.updateImage(multipartFiles, join, menuDTO.getIdx());

@@ -15,7 +15,7 @@
     <div class="row mt-5">
         <div class="col-2"></div>
         <div class="col-8">
-            <form th:action="@{/menu/updatemenu}" th:object="${menuDTO}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/admin/menu/updatemenu}" th:object="${menuDTO}" method="post" enctype="multipart/form-data">
                <div class="card">
                    <div class="card-body">
                        <h2>메뉴 수정</h2>
@@ -23,11 +23,11 @@
                    <div class="card-body">
                         <input name="idx" type="hidden" th:field="*{idx}">
                         <label for="menuCategory" class="form-label">카테고리:</label>
-                        <input type=text class="form-control" id="menuCategory" name="menuCategory" th:field="*{menuCategory}" disabled>
+                        <input type=text class="form-control" id="menuCategory" name="menuCategory" th:field="*{menuCategory}" >
 
                         <div class="mb-3">
                             <label for="menuName" class="form-label">메뉴명:</label>
-                            <input type="text" class="form-control" id="menuName" th:field="*{menuName}" readonly>
+                            <input type="text" class="form-control" id="menuName" th:field="*{menuName}" >
                             <p th:if="${#fields.hasErrors('menuName')}" th:errors="*{menuName}" class="fieldError"></p>
                         </div>
                         <div class="mb-3"><!--메뉴설명-->
@@ -181,7 +181,7 @@
                        <div class="col-12">
                            <button type="submit" class="btn btn-primary">등록</button>
                            <button type="button" class="btn btn-danger"
-                                   th:onclick="|location.href='/menu/listmenu'|">목록으로</button>
+                                   th:onclick="|location.href='/admin/menu/adlistmenu'|">목록으로</button>
                        </div>
                    </div>
                </div>

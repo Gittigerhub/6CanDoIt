@@ -48,4 +48,14 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
 
     Optional<ReservationEntity> findByIdx(Integer idx);
 
+    // 특정 organization의 room들에 대한 예약 조회
+    List<ReservationEntity> findByRoomJoin_OrganizationJoin_Idx(Integer organ_idx);
+
+    // 특정 organization의 room들에 대한 예약을 날짜 범위로 조회
+    @Query("SELECT r FROM ReservationEntity r WHERE r.roomJoin.organizationJoin.idx = :organ_idx " +
+            "AND r.startDate >= :startDate AND r.endDate <= :endDate")
+    List<ReservationEntity> findByRoomJoin_OrganizationJoin_IdxAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+            @Param("organ_idx") Integer organ_idx,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }

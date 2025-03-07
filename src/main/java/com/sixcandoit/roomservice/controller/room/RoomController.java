@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,7 +44,10 @@ public class RoomController {
 
     // 룸 관리 메인 페이지
     @GetMapping("/room/main")
-    public String main() {
+    public String main(@RequestParam(required = false) Integer organ_idx, Model model) {
+        if (organ_idx != null) {
+            model.addAttribute("organ_idx", organ_idx);
+        }
         return "room/main";
     }
 
@@ -108,24 +112,42 @@ public class RoomController {
     @GetMapping("/room/reserve")
     public String reslist(@RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
                           @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
+                          @RequestParam(required = false) Integer organ_idx,
                           Model model) {
         log.info("데이터 조회 후 목록페이지로 이동....");
 
-        // Room 리스트 데이터 가져오기
-        List<RoomDTO> roomDTOList = roomService.resList();
-        model.addAttribute("roomDTOList", roomDTOList);  // roomList를 모델에 추가
+        // Room 리스트 데이터 가져오기 (organ_idx에 따라 필터링)
+        List<RoomDTO> roomDTOList;
+        if (organ_idx != null) {
+            // organ_idx가 있는 경우 해당 organization의 room만 조회
+            roomDTOList = roomService.resList();  // 전체 목록 조회
+            // organ_idx로 필터링
+            roomDTOList = roomDTOList.stream()
+                    .filter(room -> room.getOrgan_idx() != null && room.getOrgan_idx().equals(organ_idx))
+                    .collect(Collectors.toList());
+        } else {
+            roomDTOList = roomService.resList();
+        }
+        model.addAttribute("roomDTOList", roomDTOList);
 
         // 리다이렉트 후 전달된 성공 또는 실패 메시지를 받아옵니다.
         if (model.containsAttribute("errorMessage")) {
-            // 에러 메시지가 있으면 모달을 띄워주도록 합니다.
             model.addAttribute("errorMessage", model.getAttribute("errorMessage"));
         }
 
-        List<ReservationDTO> reserveDTOList = reservationService.reserveList(sdate, edate);
+        // 예약 리스트 데이터 가져오기 (organ_idx에 따라 필터링)
+        List<ReservationDTO> reserveDTOList;
+        if (organ_idx != null) {
+            // organ_idx에 해당하는 room들의 예약만 조회
+            reserveDTOList = reservationService.reserveListByOrganization(organ_idx, sdate, edate);
+        } else {
+            reserveDTOList = reservationService.reserveList(sdate, edate);
+        }
 
         model.addAttribute("reserveDTOList", reserveDTOList);
         model.addAttribute("sdate", sdate);
         model.addAttribute("edate", edate);
+        model.addAttribute("organ_idx", organ_idx);
 
         return "room/reserve";
     }

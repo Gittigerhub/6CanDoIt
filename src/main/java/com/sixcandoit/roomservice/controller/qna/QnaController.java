@@ -158,6 +158,19 @@ public class QnaController {
         model.addAttribute("qnaDTO", qnaDTO);
         model.addAttribute("imageFileDTOS", imageFileDTOS);
         model.addAttribute("hasRepImage", hasRepImage);
+        
+        // 현재 로그인한 사용자 정보 추가
+        if (userDetails != null) {
+            model.addAttribute("currentUser", userDetails.getMember().getMemberName());
+        }
+
+        // 디버깅을 위한 로그 추가
+        log.info("현재 로그인한 사용자: {}", userDetails != null ? userDetails.getMember().getMemberName() : "anonymous");
+        log.info("글 작성자: {}", qnaDTO.getMemberName());
+        log.info("FavYn 값: {}", qnaDTO.getFavYn());
+        if (userDetails != null) {
+            log.info("사용자 권한: {}", userDetails.getAuthorities());
+        }
 
         // 관리자인 경우 관리자용 뷰 반환
         if (userDetails != null && 
@@ -172,6 +185,10 @@ public class QnaController {
                 .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)")) &&
             !qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName()) &&
             !"Y".equals(qnaDTO.getFavYn())) {
+            log.warn("접근 제한 - 사용자: {}, 작성자: {}, FavYn: {}", 
+                userDetails.getMember().getMemberName(), 
+                qnaDTO.getMemberName(), 
+                qnaDTO.getFavYn());
             throw new RuntimeException("자신이 작성한 글만 읽을 수 있습니다.");
         }
 
@@ -238,16 +255,59 @@ public class QnaController {
 
     // Qna의 Q 삭제
     @GetMapping("/qna/delete")
-    public String delete(@RequestParam Integer idx){
+    public String delete(@RequestParam Integer idx,
+                        @AuthenticationPrincipal CustomUserDetails userDetails,
+                        RedirectAttributes redirectAttributes) {
         String join = "qna";
+        
+        // 인증되지 않은 사용자 체크
+        if (userDetails == null) {
+            log.warn("인증되지 않은 사용자의 삭제 시도");
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
+            redirectAttributes.addFlashAttribute("alertMessage", "로그인이 필요합니다.");
+            return "redirect:/qna/list";
+        }
+        
+        // QnA 데이터 조회
+        QnaDTO qnaDTO = qnaService.qnaRead(idx);
+        
+        // 작성자 검증
+        if (!qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName())) {
+            log.warn("권한 없는 사용자의 삭제 시도 - 사용자: {}, 작성자: {}", 
+                userDetails.getMember().getMemberName(), 
+                qnaDTO.getMemberName());
+            
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
+            redirectAttributes.addFlashAttribute("alertMessage", "자신이 작성한 글만 삭제할 수 있습니다.");
+            
+            return "redirect:/qna/list";
+        }
 
-        // 해당 질문에 달린 답변을 먼저 삭제
-        replyService.deleteRepliesByQnaIdx(idx);
+        try {
+            // 해당 질문에 달린 답변을 먼저 삭제
+            replyService.deleteRepliesByQnaIdx(idx);
 
-        log.info("데이터를 삭제합니다.");
-        qnaService.qnaDelete(idx, join);
+            log.info("데이터를 삭제합니다.");
+            qnaService.qnaDelete(idx, join);
 
-        return "redirect:/qna/list";
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "success");
+            redirectAttributes.addFlashAttribute("alertTitle", "삭제 완료");
+            redirectAttributes.addFlashAttribute("alertMessage", "게시글이 삭제되었습니다.");
+            
+            return "redirect:/qna/list";
+        } catch (Exception e) {
+            log.error("게시글 삭제 중 오류 발생: " + e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "삭제 실패");
+            redirectAttributes.addFlashAttribute("alertMessage", "게시글 삭제 중 오류가 발생했습니다.");
+            return "redirect:/qna/list";
+        }
     }
 
     // 자주 묻는 질문을 등록 및 해제

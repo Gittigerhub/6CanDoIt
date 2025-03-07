@@ -40,13 +40,15 @@ public class QnaService {
     public void qnaRegister(QnaDTO qnaDTO, List<MultipartFile> imageFiles) throws Exception {
         log.info("QnA 등록을 시작합니다.");
 
+        // 기본값 설정
+        qnaDTO.setFavYn("N");  // 자주 묻는 질문 기본값: N
+        qnaDTO.setReplyYn("N"); // 답변 여부 기본값: N
+
         // QnaDTO를 QnaEntity로 변환
         QnaEntity qna = modelMapper.map(qnaDTO, QnaEntity.class);
 
-        // 기본값 설정
-        qna.setFavYn("N");  // 자주 묻는 질문 기본값: N
-        qna.setReplyYn("N"); // 답변 여부 기본값: N
-        qna.setQnaHits(0);    // 조회수 기본값: 0
+        // 조회수 기본값: 0
+        qna.setQnaHits(0);
 
         // 작성자 정보 설정
         qna.setMemberName(qnaDTO.getMemberName());
@@ -89,8 +91,21 @@ public class QnaService {
             }
 
             System.out.println("수정작업 시작!!!!!!!");
+            
+            // 기본값 설정
+            if (qnaDTO.getFavYn() == null) {
+                qnaDTO.setFavYn("N");
+            }
+            if (qnaDTO.getReplyYn() == null) {
+                qnaDTO.setReplyYn("N");
+            }
+
             // DTO => Entity
             QnaEntity qna = modelMapper.map(qnaDTO, QnaEntity.class);
+
+            // Entity에도 기본값 설정
+            qna.setFavYn(qnaDTO.getFavYn());
+            qna.setReplyYn(qnaDTO.getReplyYn());
 
             // 회원 정보 설정
             MemberEntity memberEntity = modelMapper.map(qnaDTO.getMemberDTO(), MemberEntity.class);
@@ -163,6 +178,9 @@ public class QnaService {
                 // 자주 묻는 질문 설정
                 if (qnaDTO.getFavYn() == null) { // FavYn이 null인 경우 기본값 "N" 설정
                     qnaDTO.setFavYn("N");
+                }
+                if (qnaDTO.getReplyYn() == null) { // ReplyYn이 null인 경우 기본값 "N" 설정
+                    qnaDTO.setReplyYn("N");
                 }
 
                 log.info("QnaEntity 수정 진행...");

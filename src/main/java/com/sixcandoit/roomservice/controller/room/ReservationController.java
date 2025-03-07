@@ -1,11 +1,13 @@
 package com.sixcandoit.roomservice.controller.room;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.room.ReservationEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,10 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,6 +34,7 @@ public class ReservationController {
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
     private final ReservationRepository reservationRepository;
+    private final ImageFileService imageFileService;
 
     //등록폼으로 이동
     @GetMapping("/create")
@@ -106,13 +106,31 @@ public class ReservationController {
     public String getAvailableRooms(@RequestParam("startDate") LocalDate startDate,
                                     @RequestParam("endDate") LocalDate endDate,
                                     Model model) {
+        String join = "room";
+
         log.info("빈 객실 목록 조회...");
 
         // 빈 객실 목록을 조회
         List<RoomEntity> availableRooms = reservationService.getAvailableRooms(startDate, endDate);
 
+        // 이미지 데이터를 담을 Map 생성 (menu의 idx를 key로 저장)
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+        for (RoomEntity roomEntity : availableRooms) {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(roomEntity.getIdx(), join);
+            // Map에 저장 (menu의 idx를 key로 함)
+            imageFileMap.put(roomEntity.getIdx(), imageFileDTOS);
+            // 대표 사진 여부 확인 후 저장
+            boolean hasRepImage = imageFileDTOS.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+            repImageMap.put(roomEntity.getIdx(), hasRepImage);
+        }
+
         // 모델에 빈 객실 목록을 추가
         model.addAttribute("Rooms", availableRooms);
+        model.addAttribute("imageFileMap", imageFileMap); // 룸 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap); // 룸 대표 사진 여부
 
         return "/reserve/list"; // 빈 객실 목록을 보여주는 뷰 템플릿을 렌더링
     }

@@ -5,11 +5,12 @@ import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
+import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Log4j2
 public class QnaService {
 
     // final 선언, 모델 맵퍼 선언
@@ -36,45 +37,37 @@ public class QnaService {
     private final ImageFileService imageFileService;
 
     // Qna의 Q 쓰기
-    public void qnaRegister(QnaDTO qnaDTO, List<MultipartFile> imageFiles) {
+    public void qnaRegister(QnaDTO qnaDTO, List<MultipartFile> imageFiles) throws Exception {
+        log.info("QnA 등록을 시작합니다.");
 
-        System.out.println(imageFiles);
-        try {
-            // DTO를 Entity로 변환
-            QnaEntity qna =
-                    modelMapper.map(qnaDTO, QnaEntity.class);
+        // QnaDTO를 QnaEntity로 변환
+        QnaEntity qna = modelMapper.map(qnaDTO, QnaEntity.class);
 
-            // FavYn의 기본값 N(1:1 질문)으로 설정
-            log.info("favYn의 기본값을 N으로 설정...");
-            qna.setFavYn("N");
+        // 기본값 설정
+        qna.setFavYn("N");  // 자주 묻는 질문 기본값: N
+        qna.setReplyYn("N"); // 답변 여부 기본값: N
+        qna.setQnaHits(0);    // 조회수 기본값: 0
 
-            // ReplyYn의 기본값 N(미답변)으로 설정
-            log.info("replyYn의 기본값을 N으로 설정...");
-            qna.setReplyYn("N");
+        // 작성자 정보 설정
+        qna.setMemberName(qnaDTO.getMemberName());
+        qna.setMemberJoin(modelMapper.map(qnaDTO.getMemberDTO(), MemberEntity.class));
 
-            System.out.println(imageFiles);
-            // 이미지 등록
-            log.info("이미지를 저장한다...");
+        log.info("작성자 정보 설정 완료 - 이름: {}", qna.getMemberName());
+
+        // QnA 저장
+        QnaEntity savedQna = qnaRepository.save(qna);
+
+        // 이미지 파일 처리
+        if (imageFiles != null && !imageFiles.isEmpty()) {
             List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
-            System.out.println(imageFiles);
-            // 이미지 정보 추가
+            // 자동 FK 생성
             for (ImageFileEntity image : images) {
-                qna.addImage(image);
+                savedQna.addImage(image);
             }
-            System.out.println(imageFiles);
-            // 저장
-            log.info("저장을 수행한다...");
-            qnaRepository.save(qna);
-
-            // qnaImg 업데이트 (첫 번째 이미지를 대표 이미지로 설정)
-            //qna.setQnaImgFromImageFile();
-
-            // 저장된 QnaEntity에서 이미지 URL을 DTO로 전달
-            //qnaDTO.setQnaImg(qna.getQnaImg());
-
-        } catch (Exception e){
-            throw new RuntimeException("이미지 저장 실패 : "+e.getMessage());
+            qnaRepository.save(savedQna);
         }
+
+        log.info("QnA 등록이 완료되었습니다.");
     }
 
     // Qna의 Q 수정
@@ -82,99 +75,102 @@ public class QnaService {
         try {
             System.out.println("이미지 파일즈 길이 : " + imageFiles.size());
             // 데이터의 idx를 조회
-            Optional<QnaEntity> qnaEntitys = qnaRepository.findById(qnaDTO.getIdx());
+            Optional<QnaEntity> qnaEntityOptional = qnaRepository.findById(qnaDTO.getIdx());
 
-            if (qnaEntitys.isEmpty()) { // QnaEntity가 존재하지 않으면
+            if (qnaEntityOptional.isEmpty()) { // QnaEntity가 존재하지 않으면
                 throw new RuntimeException("수정할 게시글 조회 실패");
-
-            } else {
-                System.out.println("수정작업 시작!!!!!!!");
-                // DTO => Entity
-                QnaEntity qna = modelMapper.map(qnaDTO, QnaEntity.class);
-
-                //해당 QnaEntity에 관련된 답변이 존재하는지 확인
-                log.info("해당 QnaEntity에 관련된 답변이 존재하는지 확인...");
-                Optional<ReplyEntity> replyEntity = replyRepository.findByQnaJoin(qna);
-
-                if (replyEntity.isPresent()){ // 답변이 존재하면 수정 불가
-                    log.info("답변이 존재하면 수정 불가...");
-                    throw new IllegalStateException("답변이 완료된 문의사항은 수정이 불가합니다.");
-
-                } else {
-                    System.out.println("통과!!!!!!!");
-
-                    // 빈 파일 제거 후 유효한 파일 리스트만 남김
-                    // 자꾸 빈파일이 넘겨져 파일을 넘길때와 같이 길이가 1이되어 오류가 생김으로 유효리스트 생성
-                    List<MultipartFile> validImageFiles = imageFiles.stream()
-                            .filter(file -> file != null && !file.isEmpty()) // 비어 있지 않은 파일만 필터링
-                            .collect(Collectors.toList());
-
-                    System.out.println("유효한 이미지 파일 개수: " + validImageFiles.size());
-
-                    // 이미지 들어오면
-                    if (!validImageFiles.isEmpty()) {
-                        System.out.println("이미지 작업 시작!!!!");
-                        // 기존 이미지 조회
-                        List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(qnaDTO.getIdx(), join);
-
-                        // 기존 이미지 삭제
-                        // dto = > entity 변환
-                        log.info("이미지를 삭제한다");
-                        List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
-                                .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
-                                .collect(Collectors.toList());
-
-                        // DB, 저장소에서 모든 이미지 삭제
-                        for (ImageFileEntity imageFileEntity : imageFileEntities) {
-                            imageFileService.deleteImage(imageFileEntity.getIdx());
-                        }
-
-                        // 새로운 이미지 등록
-                        log.info("이미지를 저장한다");
-                        List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
-
-                        // 자동 FK 생성
-                        for (ImageFileEntity image : images) {
-                            qna.addImage(image);
-
-                        }
-
-                    } else {
-                        // modelmapper를 이용하면 새로운 객체가 되어 기존 이미지 연관관계가 사라져 버리기 때문에
-                        // 새로 설정해야함
-                        System.out.println("이미지 작업2 시작!!!!");
-                        // 기존 이미지 조회
-                        List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(qnaDTO.getIdx(), join);
-
-                        // dto = > entity 변환
-                        List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
-                                .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
-                                .collect(Collectors.toList());
-
-                        // 자동 FK 생성
-                        for (ImageFileEntity image : imageFileEntities) {
-                            qna.addImage(image);
-
-                        }
-
-                    }
-
-                    log.info("자주 묻는 질문 설정");
-                    // 자주 묻는 질문 설정
-                    if (qnaDTO.getFavYn() == null) { // FavYn이 null인 경우 기본값 "N" 설정
-                        qnaDTO.setFavYn("N");
-                    }
-
-                    log.info("QnaEntity 수정 진행...");
-                    qnaRepository.save(qna);
-                    log.info("QnaEntity 수정 완료...");
-
-                }
-
             }
 
-        }catch (Exception e){
-            throw new RuntimeException("수정 오류 발생");
+            QnaEntity existingQna = qnaEntityOptional.get();
+            
+            // 작성자 본인 확인
+            if (!existingQna.getMemberJoin().getIdx().equals(qnaDTO.getMemberDTO().getIdx())) {
+                throw new RuntimeException("자신이 작성한 글만 수정할 수 있습니다.");
+            }
+
+            System.out.println("수정작업 시작!!!!!!!");
+            // DTO => Entity
+            QnaEntity qna = modelMapper.map(qnaDTO, QnaEntity.class);
+
+            // 회원 정보 설정
+            MemberEntity memberEntity = modelMapper.map(qnaDTO.getMemberDTO(), MemberEntity.class);
+            qna.setMemberJoin(memberEntity);
+            qna.setMemberName(qnaDTO.getMemberName());
+
+            //해당 QnaEntity에 관련된 답변이 존재하는지 확인
+            log.info("해당 QnaEntity에 관련된 답변이 존재하는지 확인...");
+            Optional<ReplyEntity> replyEntity = replyRepository.findByQnaJoin(qna);
+
+            if (replyEntity.isPresent()){ // 답변이 존재하면 수정 불가
+                log.info("답변이 존재하면 수정 불가...");
+                throw new IllegalStateException("답변이 완료된 문의사항은 수정이 불가합니다.");
+
+            } else {
+                System.out.println("통과!!!!!!!");
+
+                // 빈 파일 제거 후 유효한 파일 리스트만 남김
+                List<MultipartFile> validImageFiles = imageFiles.stream()
+                        .filter(file -> file != null && !file.isEmpty()) // 비어 있지 않은 파일만 필터링
+                        .collect(Collectors.toList());
+
+                System.out.println("유효한 이미지 파일 개수: " + validImageFiles.size());
+
+                // 이미지 들어오면
+                if (!validImageFiles.isEmpty()) {
+                    System.out.println("이미지 작업 시작!!!!");
+                    // 기존 이미지 조회
+                    List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(qnaDTO.getIdx(), join);
+
+                    // 기존 이미지 삭제
+                    log.info("이미지를 삭제한다");
+                    List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                            .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                            .collect(Collectors.toList());
+
+                    // DB, 저장소에서 모든 이미지 삭제
+                    for (ImageFileEntity imageFileEntity : imageFileEntities) {
+                        imageFileService.deleteImage(imageFileEntity.getIdx());
+                    }
+
+                    // 새로운 이미지 등록
+                    log.info("이미지를 저장한다");
+                    List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
+
+                    // 자동 FK 생성
+                    for (ImageFileEntity image : images) {
+                        qna.addImage(image);
+                    }
+
+                } else {
+                    // modelmapper를 이용하면 새로운 객체가 되어 기존 이미지 연관관계가 사라져 버리기 때문에
+                    // 새로 설정해야함
+                    System.out.println("이미지 작업2 시작!!!!");
+                    // 기존 이미지 조회
+                    List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(qnaDTO.getIdx(), join);
+
+                    // dto = > entity 변환
+                    List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                            .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                            .collect(Collectors.toList());
+
+                    // 자동 FK 생성
+                    for (ImageFileEntity image : imageFileEntities) {
+                        qna.addImage(image);
+                    }
+                }
+
+                log.info("자주 묻는 질문 설정");
+                // 자주 묻는 질문 설정
+                if (qnaDTO.getFavYn() == null) { // FavYn이 null인 경우 기본값 "N" 설정
+                    qnaDTO.setFavYn("N");
+                }
+
+                log.info("QnaEntity 수정 진행...");
+                qnaRepository.save(qna);
+                log.info("QnaEntity 수정 완료...");
+            }
+        } catch (Exception e){
+            throw new RuntimeException(e.getMessage());
         }
     }
 

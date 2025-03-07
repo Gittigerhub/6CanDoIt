@@ -184,9 +184,9 @@
                             <button style="font-size: 12px" th:unless="${data.favYn == 'Y'}" class="btn btn-light">1:1</button>
                         </td>
                         <td>
-                            <a th:href="@{read(idx=${data.idx})}" th:text="${data.qnaTitle}"></a>
+                            <a th:href="@{/qna/read(idx=${data.idx})}" th:text="${data.qnaTitle}"></a>
                         </td>
-                        <td></td>
+                        <td th:text="${data.memberName}"></td>
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${data.qnaHits}"></td>
@@ -195,7 +195,7 @@
                             <span th:unless="${data.replyYn == 'Y'}" class="badge bg-danger">미답변</span>
                         </td>
                         <td>
-                            <a th:href="@{read(idx=${data.idx})}" class="btn btn-sm" 
+                            <a th:href="@{/qna/read(idx=${data.idx})}" class="btn btn-sm" 
                                th:classappend="${data.replyYn == 'Y'} ? 'btn-secondary disabled' : 'btn-primary'"
                                style="background-color: #0d6efd; border-color: #0d6efd;"
                                th:style="${data.replyYn == 'Y'} ? 'background-color: #8bb9fe; border-color: #8bb9fe;' : ''">답변하기</a>
@@ -208,9 +208,9 @@
                             <button style="font-size: 12px" th:unless="${data.favYn == 'Y'}" class="btn btn-light">1:1</button>
                         </td>
                         <td>
-                            <a th:href="@{read(idx=${data.idx})}" th:text="${data.qnaTitle}"></a>
+                            <a th:href="@{/qna/read(idx=${data.idx})}" th:text="${data.qnaTitle}"></a>
                         </td>
-                        <td></td>
+                        <td th:text="${data.memberName}"></td>
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${data.qnaHits}"></td>
@@ -219,7 +219,7 @@
                             <span th:unless="${data.replyYn == 'Y'}" class="badge bg-danger">미답변</span>
                         </td>
                         <td>
-                            <a th:href="@{read(idx=${data.idx})}" class="btn btn-sm" 
+                            <a th:href="@{/qna/read(idx=${data.idx})}" class="btn btn-sm" 
                                th:classappend="${data.replyYn == 'Y'} ? 'btn-secondary disabled' : 'btn-primary'"
                                style="background-color: #0d6efd; border-color: #0d6efd;"
                                th:style="${data.replyYn == 'Y'} ? 'background-color: #8bb9fe; border-color: #8bb9fe;' : ''">답변하기</a>

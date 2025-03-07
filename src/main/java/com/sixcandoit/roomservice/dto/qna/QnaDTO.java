@@ -13,9 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class QnaDTO {
 
-    private Integer idx;                // 기본 키
+    private Integer idx;                // 게시글 번호
 
     @NotBlank(message = "제목을 입력하세요.")
     @Size(min = 1, max = 30, message = "제목은 최대 30자까지 작성 가능합니다.")
@@ -39,6 +40,5 @@ public class QnaDTO {
         return this;
     }
 
-    private String memberIdx;           // 멤버 idx
-
+    private String memberName;         // 작성자 이름
 }

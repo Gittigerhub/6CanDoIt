@@ -82,7 +82,7 @@
                         <td>
                             <a th:href="@{read(idx=${data.idx})}" th:text="${data.qnaTitle}"></a>
                         </td>
-                        <td></td>
+                        <td th:text="${data.memberName}"></td>
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${data.qnaHits}"></td>
@@ -96,7 +96,7 @@
                         <td>
                             <a th:href="@{read(idx=${data.idx})}" th:text="${data.qnaTitle}"></a>
                         </td>
-                        <td></td>
+                        <td th:text="${data.memberName}"></td>
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${data.qnaHits}"></td>

@@ -60,5 +60,25 @@
 <!-- Core theme JS-->
 <script src="/js/scripts.js"></script>
 <th:block layout:fragment="script"></th:block>
+
+<!-- SweetAlert 메시지 표시 -->
+<script th:inline="javascript">
+    // 페이지 로드 시 SweetAlert 메시지 체크
+    document.addEventListener('DOMContentLoaded', function() {
+        const sweetAlert = /*[[${sweetAlert}]]*/ false;
+        if (sweetAlert) {
+            const alertType = /*[[${alertType}]]*/ 'error';
+            const alertTitle = /*[[${alertTitle}]]*/ '오류';
+            const alertMessage = /*[[${alertMessage}]]*/ '';
+            
+            Swal.fire({
+                icon: alertType,
+                title: alertTitle,
+                text: alertMessage,
+                confirmButtonText: '확인'
+            });
+        }
+    });
+</script>
 </body>
 </html>

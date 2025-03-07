@@ -1,6 +1,8 @@
 package com.sixcandoit.roomservice.controller.qna;
 
+import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
+import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.qna.QnaService;
@@ -9,17 +11,21 @@ import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +39,7 @@ public class QnaController {
     private final QnaService qnaService;
     private final ImageFileService imageFileService;
     private final ReplyService replyService;
+    private final ModelMapper modelMapper;
 
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
     // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
@@ -77,8 +84,17 @@ public class QnaController {
 
     // Qna의 Q 등록
     @GetMapping("/qna/register")
-    public String register(Model model){
+    public String register(@AuthenticationPrincipal CustomUserDetails userDetails, Model model){
         log.info("질문 페이지로 이동합니다.");
+        
+        // 인증되지 않은 사용자 체크
+        if (userDetails == null) {
+            log.error("인증되지 않은 사용자의 접근");
+            return "redirect:/member/login";  // 로그인 페이지로 리다이렉트
+        }
+
+        log.info("현재 로그인한 사용자: {}", userDetails.getUsername());
+        log.info("사용자 권한: {}", userDetails.getAuthorities());
 
         model.addAttribute("qnaDTO", new QnaDTO()); // 빈 QnaDTO 객체 전달
 
@@ -88,25 +104,43 @@ public class QnaController {
     // Qna의 Q 등록 저장 처리
     @PostMapping("/qna/register")
     public String registerProc(@Valid @ModelAttribute QnaDTO qnaDTO,
-                               BindingResult bindingResult, List<MultipartFile> imageFiles) {
+                             BindingResult bindingResult, 
+                             List<MultipartFile> imageFiles,
+                             @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("질문한 내용을 저장합니다.");
-        System.out.println(qnaDTO);
-        System.out.println(imageFiles);
+        
+        // 인증되지 않은 사용자 체크
+        if (userDetails == null) {
+            log.error("인증되지 않은 사용자의 접근");
+            return "redirect:/member/login";  // 로그인 페이지로 리다이렉트
+        }
+
         if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
             log.info("유효성 검사 오류 발생");
             return "qna/register"; // register로 돌아간다
         }
 
-        // 유효성 검사 성공 시 등록 처리
-        qnaService.qnaRegister(qnaDTO, imageFiles);
-        System.out.println(imageFiles);
+        try {
+            // 현재 로그인한 사용자 정보 설정
+            qnaDTO.setMemberName(userDetails.getMember().getMemberName());
+            qnaDTO.setMemberDTO(modelMapper.map(userDetails.getMember(), MemberDTO.class));
+            
+            log.info("작성자 정보 설정 - 이름: {}", qnaDTO.getMemberName());
 
-        return "redirect:/qna/list";
+            // 유효성 검사 성공 시 등록 처리
+            qnaService.qnaRegister(qnaDTO, imageFiles);
+            
+            return "redirect:/qna/list";
+        } catch (Exception e) {
+            log.error("QnA 등록 중 오류 발생: " + e.getMessage(), e);
+            return "qna/register";
+        }
     }
 
     // Qna의 Q 읽기
     @GetMapping("/qna/read")
-    public String read(@RequestParam Integer idx, Model model){
+    public String read(@RequestParam Integer idx, Model model,
+                      @AuthenticationPrincipal CustomUserDetails userDetails){
 
         String join = "qna";
 
@@ -125,14 +159,46 @@ public class QnaController {
         model.addAttribute("imageFileDTOS", imageFileDTOS);
         model.addAttribute("hasRepImage", hasRepImage);
 
+        // 관리자인 경우 관리자용 뷰 반환
+        if (userDetails != null && 
+            userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
+            return "qna/adminread";
+        }
+
+        // 일반 회원인 경우 자신의 글만 읽을 수 있음
+        if (userDetails != null && 
+            !userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)")) &&
+            !qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName())) {
+            throw new RuntimeException("자신이 작성한 글만 읽을 수 있습니다.");
+        }
+
         return "qna/read";
     }
 
     // Qna의 Q 수정할 게시글 불러오기
     @GetMapping("/qna/update")
-    public String update(@RequestParam Integer idx, Model model){
+    public String update(@RequestParam Integer idx, Model model, 
+                        @AuthenticationPrincipal CustomUserDetails userDetails,
+                        RedirectAttributes redirectAttributes) {
         log.info("수정할 데이터를 읽는 중입니다.");
         QnaDTO qnaDTO = qnaService.qnaRead(idx);
+
+        // 작성자 검증
+        if (userDetails == null || !qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName())) {
+            log.warn("Unauthorized access attempt to edit QnA. User: {}, QnA author: {}", 
+                userDetails != null ? userDetails.getMember().getMemberName() : "anonymous", 
+                qnaDTO.getMemberName());
+            
+            // SweetAlert를 위한 메시지 설정
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
+            redirectAttributes.addFlashAttribute("alertMessage", "자신이 작성한 글만 수정할 수 있습니다.");
+            
+            return "redirect:/qna/list";  // 권한이 없으면 목록으로 리다이렉트
+        }
 
         log.info("개별 데이터를 페이지로 전달합니다.");
         model.addAttribute("qnaDTO", qnaDTO);
@@ -143,18 +209,29 @@ public class QnaController {
     // Qna의 Q 수정할 게시글 수정하기
     @PostMapping("/qna/update")
     public String updateProc(@ModelAttribute QnaDTO qnaDTO,
-                             String join, List<MultipartFile> imageFiles) {
+                             String join, List<MultipartFile> imageFiles,
+                             @AuthenticationPrincipal CustomUserDetails userDetails,
+                             RedirectAttributes redirectAttributes) {
         log.info("수정된 데이터를 저장합니다.");
-        System.out.println("이미지 파일즈 길이 : " + imageFiles.size());
+        
         try {
+            // 기존 값들 유지
+            qnaDTO.setMemberName(userDetails.getMember().getMemberName());
+            qnaDTO.setMemberDTO(modelMapper.map(userDetails.getMember(), MemberDTO.class));
+            
+            log.info("작성자 정보 설정 - 이름: {}", qnaDTO.getMemberName());
+            
             // 서비스 메서드 호출 (수정 처리)
             qnaService.qnaUpdate(qnaDTO, join, imageFiles);
             return "redirect:/qna/read?idx=" + qnaDTO.getIdx();
 
-        } catch (Exception e) {
-            // 예외가 발생했을 경우 사용자에게 오류 메시지 전달
-            log.error(e.getMessage());
-            return "qna/update"; // 수정 페이지로 돌아가면서 오류 메시지 전달
+        } catch (RuntimeException e) {
+            // SweetAlert를 위한 메시지 설정
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "수정 실패");
+            redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+            return "redirect:/qna/list";
         }
     }
 
@@ -177,5 +254,16 @@ public class QnaController {
     public String updateFavYn(@RequestParam Integer idx, @RequestParam String favYn) {
         qnaService.updateFavYn(idx, favYn);
         return "redirect:/qna/read?idx=" + idx; // 상세 페이지로 리다이렉트
+    }
+
+    // 예외 처리기 추가
+    @ExceptionHandler(RuntimeException.class)
+    public String handleRuntimeException(RuntimeException e, RedirectAttributes redirectAttributes) {
+        // SweetAlert를 위한 메시지 설정
+        redirectAttributes.addFlashAttribute("sweetAlert", true);
+        redirectAttributes.addFlashAttribute("alertType", "error");
+        redirectAttributes.addFlashAttribute("alertTitle", "오류 발생");
+        redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+        return "redirect:/qna/list";
     }
 }

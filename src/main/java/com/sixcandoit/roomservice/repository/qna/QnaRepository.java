@@ -27,18 +27,18 @@ public interface QnaRepository extends JpaRepository<QnaEntity, Integer> {
     Page<QnaEntity> searchQnaAll(@Param("keyword") String keyword, Pageable page);
 
     // 답변만
-    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyJoin r WHERE "+
+    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyList r WHERE "+
             " r.replyTitle like %:keyword% or r.replyContents like %:keyword%")
     Page<QnaEntity> searchReplyAll(@Param("keyword") String keyword, Pageable page);
 
     // 모든 항목에서
-    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyJoin r WHERE "+
+    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyList r WHERE "+
             " (q.qnaTitle LIKE %:keyword% OR q.qnaContents LIKE %:keyword%) "+
             " OR (r.replyTitle LIKE %:keyword% OR r.replyContents LIKE %:keyword%)")
     Page<QnaEntity> searchQnaAndReply(@Param("keyword") String keyword, Pageable page);
 
     // 자주 묻는 질문
-    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyJoin r WHERE " +
+    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyList r WHERE " +
             "(q.favYn = 'Y')")
     Page<QnaEntity> searchFavYn(Pageable page);
 

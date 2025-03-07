@@ -77,7 +77,10 @@ public class SecurityConfig{
                     // 이벤트-멤버포인트 페이지 접근 권한
                     auth.requestMatchers("/event/**", "/event/memberpoint/**", "/event/usermemberpoint/**").permitAll();
                     // QnA 페이지 접근 권한
-                    auth.requestMatchers("/qna/**", "/qna/register/**", "/reply/**").permitAll();
+                    auth.requestMatchers("/qna/qnalist/**").hasAnyRole("ADMIN", "HO", "BO");
+                    auth.requestMatchers("/qna/list", "/qna/read", "/qna/register", "/qna/update").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+                    auth.requestMatchers("/qna/delete", "/qna/favYn/update").hasAnyRole("ADMIN", "HO", "BO");
+                    auth.requestMatchers("/reply/**").hasAnyRole("ADMIN", "HO", "BO");
                     // 룸 관리, 룸 예약 페이지 접근 권한
                     auth.requestMatchers("/room/**", "/res/**").permitAll();
                     // 공지사항 페이지 접근 권한
@@ -142,7 +145,10 @@ public class SecurityConfig{
             // 이벤트-멤버포인트 페이지 접근 권한
             auth.requestMatchers("/event/**", "/event/memberpoint/**", "/upload/**","/event/update/**","/event/delete","/event/user/**").permitAll();
             // QnA 페이지 접근 권한
-            auth.requestMatchers("/qna/**", "/qna/register/**", "/reply/**").permitAll();
+            auth.requestMatchers("/qna/qnalist/**").hasAnyRole("ADMIN", "HO", "BO");
+            auth.requestMatchers("/qna/list", "/qna/read", "/qna/register", "/qna/update").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+            auth.requestMatchers("/qna/delete", "/qna/favYn/update").hasAnyRole("ADMIN", "HO", "BO");
+            auth.requestMatchers("/reply/**").hasAnyRole("ADMIN", "HO", "BO");
             // 룸 관리, 룸 예약 페이지 접근 권한
             auth.requestMatchers("/room/**", "/res/**").permitAll();
             // 공지사항 페이지 접근 권한

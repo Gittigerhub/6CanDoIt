@@ -6,13 +6,11 @@ import com.sixcandoit.roomservice.service.qna.ReplyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,19 +23,20 @@ public class ReplyController {
     // Qna의 A 읽기 -> Q 상세보기에서 목록 출력
     // Qna의 A 등록 -> 모달 처리
     @PostMapping("/reply/register")
-    public String register(@Valid @RequestParam Integer qnaIdx,
+    @ResponseBody
+    public ResponseEntity<String> register(@Valid @RequestParam Integer qnaIdx,
                            @ModelAttribute ReplyDTO replyDTO,
-                           BindingResult bindingResult,
-                           Model model){
-        if (bindingResult.hasErrors()){
-            // 오류가 있으면 질문 페이지로 돌아간다.
-            model.addAttribute("qnaDTO", qnaService.qnaRead(qnaIdx));
-            return "redirect:/qna/read?idx=" + qnaIdx;
+                           BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("입력값이 올바르지 않습니다.");
         }
-        // 답변 등록 처리
-        replyService.replyRegister(replyDTO);
-
-        return "redirect:/qna/read?idx=" + qnaIdx;
+        try {
+            // 답변 등록 처리
+            replyService.replyRegister(replyDTO);
+            return ResponseEntity.ok("답변이 등록되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("답변 등록에 실패했습니다.");
+        }
     }
 
     // Qna의 A 수정 처리

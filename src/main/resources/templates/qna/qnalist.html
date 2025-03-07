@@ -13,6 +13,106 @@
             text-decoration: none; /* 밑줄 없애기 */
             color: black; /* 글자 색을 검은색으로 변경 */
         }
+        
+        /* 테이블 스타일 추가 */
+        .table {
+            border: 1px solid #dee2e6;
+            margin-bottom: 1rem;
+            background-color: #fff;
+        }
+        
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            padding: 1rem;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* 버튼 스타일 개선 */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        /* 뱃지 스타일 개선 */
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+        }
+        
+        .badge.text-bg-light {
+            color: #666 !important;
+            background-color: #f8f9fa !important;
+            border-color: #dee2e6 !important;
+        }
+        
+        .badge.text-bg-light:hover {
+            background-color: #e9ecef !important;
+        }
+        
+        .badge.text-bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        /* 게시글 목록 제목 스타일 */
+        .table-title {
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        /* 셀렉트 박스 스타일 */
+        .form-select {
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+        
+        .form-select option {
+            padding: 8px 12px;
+        }
+        
+        .form-select option:disabled {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            margin: 8px 0;
+            cursor: default;
+        }
+        
+        .form-select option:not(:disabled) {
+            padding-left: 12px;
+            margin: 4px 0;
+        }
+        
+        .search-select {
+            max-width: 140px;
+        }
+        
+        .status-select {
+            max-width: 160px;
+            background-color: #f8f9fa;
+        }
+
     </style>
 </head>
 <body>
@@ -28,16 +128,26 @@
                 </div>
                 <div class="col-6">
                     <div class="input-group mb-3">
-                        <select class="form-select" name="type"><!--type-->
+                        <select class="form-select" name="type" style="border-radius: 4px 0 0 4px;"><!--type-->
                             <option value="0" th:selected="${type=='0'}">전체</option><!--검색 후 선택값으로 설정-->
                             <option value="1" th:selected="${type=='1'}">제목만</option>
                             <option value="2" th:selected="${type=='2'}">내용만</option>
                             <option value="3" th:selected="${type=='3'}">제목+내용</option>
                             <option value="4" th:selected="${type=='4'}">답변만</option>
-                            <option value="5" th:selected="${type=='5'}">자주 묻는 질문만</option>
                         </select>
-                        <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search"><!--keyword-->
+                        <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search" style="border-left: 0;"><!--keyword-->
                         <button class="btn btn-success" type="submit">검색</button>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <a th:href="@{/qna/qnalist(type=5)}" class="badge text-decoration-none" 
+                           th:classappend="${type=='5'} ? 'text-bg-danger' : 'text-bg-light border'"
+                           style="font-size: 0.9rem; padding: 8px 16px; cursor: pointer;">자주 묻는 질문</a>
+                        <a th:href="@{/qna/qnalist(type=6)}" class="badge text-decoration-none"
+                           th:classappend="${type=='6'} ? 'text-bg-danger' : 'text-bg-light border'"
+                           style="font-size: 0.9rem; padding: 8px 16px; cursor: pointer;">미답변</a>
+                        <a th:href="@{/qna/qnalist(type=7)}" class="badge text-decoration-none"
+                           th:classappend="${type=='7'} ? 'text-bg-danger' : 'text-bg-light border'"
+                           style="font-size: 0.9rem; padding: 8px 16px; cursor: pointer;">답변완료</a>
                     </div>
                 </div><!--검색-->
                 <div class="col-5"></div>
@@ -46,12 +156,12 @@
             </div>
         </form>  <!--검색 기능(keyword) 끝-->
         <div class="row mt-5 p-5 bg-white">
-            <div class="mb-3">
-                <h3>게시글 목록</h3>
-            </div>
             <div class="col"></div>
-            <div class="col-10">
-                <table class="table table-hover">
+            <div class="col-11">
+                <div class="table-title">
+                    <h3>게시글 목록</h3>
+                </div>
+                <table class="table table-hover shadow-sm">
                     <thead>
                     <tr>
                         <th>No</th>
@@ -61,6 +171,8 @@
                         <th>작성일</th>
                         <th>수정일</th>
                         <th>조회수</th>
+                        <th>답변 여부</th>
+                        <th>답변하기</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -78,6 +190,16 @@
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${data.qnaHits}"></td>
+                        <td>
+                            <span th:if="${data.replyYn == 'Y'}" class="badge bg-secondary">답변완료</span>
+                            <span th:unless="${data.replyYn == 'Y'}" class="badge bg-danger">미답변</span>
+                        </td>
+                        <td>
+                            <a th:href="@{read(idx=${data.idx})}" class="btn btn-sm" 
+                               th:classappend="${data.replyYn == 'Y'} ? 'btn-secondary disabled' : 'btn-primary'"
+                               style="background-color: #0d6efd; border-color: #0d6efd;"
+                               th:style="${data.replyYn == 'Y'} ? 'background-color: #8bb9fe; border-color: #8bb9fe;' : ''">답변하기</a>
+                        </td>
                     </tr>
                     <tr th:each="data:${qnalist}" th:unless="${data.favYn == 'Y'}">
                         <td th:text="${data.idx}"></td>
@@ -92,6 +214,16 @@
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${data.qnaHits}"></td>
+                        <td>
+                            <span th:if="${data.replyYn == 'Y'}" class="badge bg-secondary">답변완료</span>
+                            <span th:unless="${data.replyYn == 'Y'}" class="badge bg-danger">미답변</span>
+                        </td>
+                        <td>
+                            <a th:href="@{read(idx=${data.idx})}" class="btn btn-sm" 
+                               th:classappend="${data.replyYn == 'Y'} ? 'btn-secondary disabled' : 'btn-primary'"
+                               style="background-color: #0d6efd; border-color: #0d6efd;"
+                               th:style="${data.replyYn == 'Y'} ? 'background-color: #8bb9fe; border-color: #8bb9fe;' : ''">답변하기</a>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

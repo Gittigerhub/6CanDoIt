@@ -42,5 +42,12 @@ public interface QnaRepository extends JpaRepository<QnaEntity, Integer> {
             "(q.favYn = 'Y')")
     Page<QnaEntity> searchFavYn(Pageable page);
 
+    // 미답변 QnA 검색
+    @Query("SELECT q FROM QnaEntity q WHERE q.replyYn = 'N'")
+    Page<QnaEntity> searchUnreplied(Pageable page);
+
+    // 답변완료 QnA 검색
+    @Query("SELECT q FROM QnaEntity q WHERE q.replyYn = 'Y'")
+    Page<QnaEntity> searchReplied(Pageable page);
 
 }

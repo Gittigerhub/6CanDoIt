@@ -39,6 +39,9 @@ public class QnaEntity extends BaseEntity {
     @Column(name = "fav_yn")
     private String favYn;              // 자주 묻는 질문 설정 (Y: 활성, N: 비활성)
 
+    @Column(name = "reply_yn", columnDefinition = "varchar(1) default 'N'")
+    private String replyYn;            // 답변 여부 (Y: 답변완료, N: 미답변)
+
     // 회원 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx")

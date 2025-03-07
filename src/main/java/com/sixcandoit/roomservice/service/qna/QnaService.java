@@ -47,6 +47,11 @@ public class QnaService {
             // FavYn의 기본값 N(1:1 질문)으로 설정
             log.info("favYn의 기본값을 N으로 설정...");
             qna.setFavYn("N");
+
+            // ReplyYn의 기본값 N(미답변)으로 설정
+            log.info("replyYn의 기본값을 N으로 설정...");
+            qna.setReplyYn("N");
+
             System.out.println(imageFiles);
             // 이미지 등록
             log.info("이미지를 저장한다...");
@@ -224,6 +229,12 @@ public class QnaService {
             } else if (type.equals("5")) { // type 분류 5, 자주 묻는 질문만 검색할 때
                 log.info("자주 묻는 질문만 검색 중...");
                 qnaEntities = qnaRepository.searchFavYn(pageable);
+            } else if (type.equals("6")) { // type 분류 6, 미답변만 검색할 때
+                log.info("미답변만 검색 중...");
+                qnaEntities = qnaRepository.searchUnreplied(pageable);
+            } else if (type.equals("7")) { // type 분류 7, 답변완료만 검색할 때
+                log.info("답변완료만 검색 중...");
+                qnaEntities = qnaRepository.searchReplied(pageable);
             } else { // 전체 검색 = 0
                 log.info("전체 조회 검색 중...");
                 qnaEntities = qnaRepository.searchQnaAndReply(keyword, pageable);

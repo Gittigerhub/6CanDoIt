@@ -30,6 +30,7 @@ public class QnaDTO {
     private LocalDateTime modDate;      // 수정 일자
     private List<ReplyDTO> replyList;    // 댓글 목록
     private String favYn;              // 자주 묻는 질문 설정 (Y: 활성, N: 비활성)
+    private String replyYn;            // 답변 여부 (Y: 답변완료, N: 미답변)
 
     private MemberDTO memberDTO;       // Member 참조
 

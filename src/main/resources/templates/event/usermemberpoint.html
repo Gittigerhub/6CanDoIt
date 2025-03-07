@@ -13,12 +13,46 @@
 <div layout:fragment="content" class="p-5">
 
 
+    <!--검색 기능-->
+    <form th:action="@{/event/usermemberpoint}" method="get">
+        <div class="container bg-white">
+            <div class>
+                <div class="row-6">
+                    <h3>게시글 검색</h3>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="input-group mb-3">
+                    <select class="form-select" id="selectBox" name="type">
+                        <option th:selected="${type==null}"></option>
+                        <option value="1" th:selected="${type=='1'}">내용</option>
+                        <option value="2" th:selected="${type=='2'}">사용</option>
+                        <option value="3" th:selected="${type=='3'}">기간</option>
+                    </select>
+                    <th:block th:if="${type=='1' || type==null}">
+                        <input type="text" class="form-control" name="keyword" th:value="${keyword}"
+                               placeholder="Search">
+                    </th:block>
+                    <th:block th:if="${type=='2'}">
+                        <select class="form-select" name="type">
+                            <option value="N">사용가능</option>
+                            <option value="Y">사용함</option>
+                        </select>
+                    </th:block>
+                    <th:block th:if="${type=='3'}">
+                        <input class="startDay" type="datetime-local">~<input class="endDay" type="datetime-local">
+                    </th:block>
+                    <button class="btn btn-success" type="submit">검색</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!--검색 끝-->
+
+
     <div class="container">
         <div class="row">
-            <h2 th:text="${memberName.memberJoin.memberName}+'회원님'" class="memberName">OOO회원님</h2>
-
-
-            <div class="col-12">
+            <div class="col-12 mainTable">
                 <table class="table">
                     <thead class="table-dark">
                     <tr>
@@ -49,28 +83,7 @@
             </div>
 
         </div>
-        <!--검색 기능-->
-        <form th:action="@{/event/usermemberpoint}" method="get">
-            <div class="container bg-white">
-                <div>
-                    <h3>게시글 검색</h3>
-                </div>
-                <div class="col-12">
-                    <div class="input-group mb-3">
-                        <select class="form-select" name="type">
-                            <option th:selected="${type==null}"></option>
-                            <option value="0" th:selected="${type=='0'}">전체</option>
-                            <option value="1" th:selected="${type=='1'}">내용</option>
-                            <option value="2" th:selected="${type=='2'}">사용유무</option>
-                        </select>
-                        <input type="text" class="form-control" name="keyword" th:value="${keyword}"
-                               placeholder="Search">
-                        <button class="btn btn-success" type="submit">검색</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <!--검색 끝-->
+
 
         <!--페이징-->
         <div class="mt-3 d-flex justify-content-center">
@@ -122,14 +135,8 @@
                         <!--매장 시작 시간, 매장 끝나는 시간-->
                         <div class="row mt-2">
                             <div class="col-sm-6">
-                                <div class="form-group form-group-default">
-                                    <label>*회원 이메일 :</label>
-                                    <input id="memberPointEmail" th:value="${memberName.getMemberJoin().memberEmail}"
-                                           name="memberPointEmail" type="text"
-                                           class="form-control" readonly/>
-                                </div>
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-12">
                                 <div class="form-group form-group-default">
                                     <label>* 포인트 :</label>
                                     <input id="memberPoint" name="memberPoint" type="number" class="form-control"
@@ -243,6 +250,12 @@
                     }
                 });
             });//수정버튼클릭시 대화상자 채우기 끝
+
+            $("#selectBox").on("click",function (){
+
+                $("#selectBox").load(window.location.href + "#selectBox");
+            });
+
         });
     </script>
 </th:block>

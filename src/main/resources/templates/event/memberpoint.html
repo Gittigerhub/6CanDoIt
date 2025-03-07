@@ -44,7 +44,7 @@
                     <td th:if="${data.memberPointOperationYn}=='Y'" th:text="'-'+${data.memberPoint}">Doe</td>
                     <td th:if="${data.memberPointOperationYn}=='N'" th:text="'+'+${data.memberPoint}">Doe</td>
                     <td><span class="totalPoints">0</span></td>
-                    <td th:text="${data.memberPointEndDate}">Doe</td>
+                    <td th:text="${#temporals.format(data.memberPointEndDate)}">Doe</td>
                     <td th:text="${data.memberPointOperationYn}"></td>
                     <td>
                         <button type="button" class="btn btn-primary memberPointEdit" th:data-id="${data.idx}">수정

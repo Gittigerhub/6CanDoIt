@@ -257,9 +257,14 @@ public class RoomService {
         }
     }
 
-    // 조직별 룸 목록 조회
-    public Page<RoomDTO> getRoomsByOrganization(Integer organ_idx, Pageable pageable) {
-        Page<RoomEntity> roomEntities = roomRepository.findByOrganIdx(organ_idx, pageable);
+    // 특정 organization의 룸 목록 조회
+    public Page<RoomDTO> getRoomsByOrganization(Integer organIdx, Pageable page) {
+        int currentPage = page.getPageNumber()-1;
+        int pageLimit = 5;
+        
+        Pageable pageable = PageRequest.of(currentPage, pageLimit, Sort.by(Sort.Direction.DESC, "idx"));
+        
+        Page<RoomEntity> roomEntities = roomRepository.findByOrganIdx(organIdx, pageable);
         return roomEntities.map(entity -> modelMapper.map(entity, RoomDTO.class));
     }
 }

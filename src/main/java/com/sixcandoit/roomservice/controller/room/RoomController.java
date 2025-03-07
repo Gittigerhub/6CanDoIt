@@ -61,8 +61,10 @@ public class RoomController {
         // 조직별 룸 목록 조회
         Page<RoomDTO> roomDTOS;
         if (organ_idx != null) {
+            log.info("조직별 룸 목록을 조회합니다. organ_idx: " + organ_idx);
             roomDTOS = roomService.getRoomsByOrganization(organ_idx, page);
         } else {
+            log.info("전체 룸 목록을 조회합니다.");
             roomDTOS = roomService.roomList(page, type, keyword, order);
         }
         

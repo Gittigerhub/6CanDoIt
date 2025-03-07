@@ -43,6 +43,10 @@ public class ReplyService {
         ReplyEntity replyEntitys = modelMapper.map(replyDTO, ReplyEntity.class);
         replyEntitys.setQnaJoin(qnaEntity);
 
+        // QnA의 답변 여부를 'Y'로 변경
+        qnaEntity.setReplyYn("Y");
+        qnaRepository.save(qnaEntity);
+
         replyRepository.save(replyEntitys);
     }
 
@@ -77,7 +81,17 @@ public class ReplyService {
 
     // Qna의 A 삭제
     public void replyDelete(Integer idx){
-        replyRepository.deleteById(idx);
+        // 답변 엔티티 조회
+        Optional<ReplyEntity> replyEntity = replyRepository.findById(idx);
+        if (replyEntity.isPresent()) {
+            // QnA 엔티티의 답변 여부를 'N'으로 변경
+            QnaEntity qnaEntity = replyEntity.get().getQnaJoin();
+            qnaEntity.setReplyYn("N");
+            qnaRepository.save(qnaEntity);
+            
+            // 답변 삭제
+            replyRepository.deleteById(idx);
+        }
     }
 
     // 질문에 달린 모든 답변을 삭제

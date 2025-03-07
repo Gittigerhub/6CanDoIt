@@ -58,4 +58,9 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
             @Param("organ_idx") Integer organ_idx,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    // 회원 idx로 FK가 지정된 예약데이터 중 resStatus가 2:예약관료 상태인 것만 조회
+    @Query("select r from ReservationEntity r where r.memberJoin.idx = :idx and r.resStatus = '2'")
+    Optional<ReservationEntity> CheckInReserv(@Param("idx") Integer idx);
+
 }

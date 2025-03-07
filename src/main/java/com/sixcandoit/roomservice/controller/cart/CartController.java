@@ -57,7 +57,7 @@ public class CartController {
 
         try {
             //장바구니에 추가
-            Integer cartMenuIdx = cartService.addCart(idx, email);
+            Integer cartMenuIdx = cartService.addCart(idx, email, count);
             //저장 후 브라우저로 재전송
             return new ResponseEntity<Integer>(cartMenuIdx, HttpStatus.OK);
 

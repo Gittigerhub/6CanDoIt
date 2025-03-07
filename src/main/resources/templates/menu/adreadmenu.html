@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/memberlayout}">
+      layout:decorate="~{layouts/superlayout}">
 <head>
     <meta charset="UTF-8">
     <title>메뉴 세부</title>
@@ -15,7 +15,7 @@
         <div class="col-2"></div>
         <div class="col-8">
             <!--메뉴 세부 정보 표시-->
-            <form th:action="@{/menu/readmenu}" th:object="${menuDTO}" method="get">
+            <form th:action="@{/admin/menu/adreadmenu}" th:object="${menuDTO}" method="get">
                 <!--디자인-->
                 <div class="card">
                     <div class="card-body">
@@ -55,9 +55,9 @@
                                                 <label class="form-label">대표 메뉴 이미지:</label>
                                                 <th:block th:unless="${data.getRepimageYn()} == 'Y'">
                                                     <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" alt="대표 이미지">
-<!--                                                    <div>-->
-<!--                                                        <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>-->
-<!--                                                    </div>-->
+                                                    <div>
+                                                        <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                                    </div>
                                                 </th:block>
                                             </div>
                                         </th:block>
@@ -129,10 +129,10 @@
 
 
                         <div class="col-12">
-<!--                            <button type="button" class="btn btn-warning"-->
-<!--                                    th:onclick="|location.href='/admin/menu/updatemenu?idx='+ ${menuDTO.idx}|">수정</button>-->
+                            <button type="button" class="btn btn-warning"
+                                    th:onclick="|location.href='/admin/menu/updatemenu?idx='+ ${menuDTO.idx}|">수정</button>
                             <button type="button" class="btn btn-primary"
-                                    th:onclick="|location.href='/member/menu/listmenu'|">목록</button>
+                                    th:onclick="|location.href='/menu/listmenu'|">목록</button>
                         </div>
                     </div>
                 </div>

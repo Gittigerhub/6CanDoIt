@@ -136,4 +136,22 @@ public class ReservationService {
 
         return reservationDTOS;
     }
+
+    public List<ReservationDTO> reserveListByOrganization(Integer organ_idx, LocalDate startDate, LocalDate endDate) {
+        List<ReservationEntity> reserveEntities;
+
+        if(startDate == null) {
+            // organ_idx에 해당하는 room들의 예약만 조회
+            reserveEntities = reservationRepository.findByRoomJoin_OrganizationJoin_Idx(organ_idx);
+        } else {
+            if(endDate == null) {
+                endDate = startDate.plusDays(1);
+            }
+            // organ_idx와 날짜 조건에 맞는 예약 조회
+            reserveEntities = reservationRepository.findByRoomJoin_OrganizationJoin_IdxAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
+                organ_idx, startDate, endDate);
+        }
+
+        return Arrays.asList(modelMapper.map(reserveEntities, ReservationDTO[].class));
+    }
 }

@@ -158,8 +158,15 @@ public class RoomService {
     // 예약 관리 - 룸 목록
     public List<RoomDTO> resList(){
         List<RoomEntity> roomEntities = roomRepository.findAll(); // 모두 조회
-        List<RoomDTO> roomDTOS = Arrays.asList(modelMapper.map(roomEntities, RoomDTO[].class));
-        return roomDTOS;
+        return roomEntities.stream()
+                .map(entity -> {
+                    RoomDTO dto = modelMapper.map(entity, RoomDTO.class);
+                    if (entity.getOrganizationJoin() != null) {
+                        dto.setOrgan_idx(entity.getOrganizationJoin().getIdx());
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     // 객실 관리 - 룸 목록

@@ -46,22 +46,17 @@ public class MemberService {
 
     // 일반 사용자 회원 가입
     public MemberEntity register(MemberDTO memberDTO) {
-
         // 이메일 중복 체크
         if (checkEmailExistence(memberDTO.getMemberEmail())) {
             throw new IllegalStateException("이미 가입된 회원입니다.");
         }
-
-//        Optional<MemberEntity> user = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
-//        if (user.isPresent()) {
-//            throw new IllegalStateException("이미 가입된 회원입니다.");
-//        }
 
         String password = passwordEncoder.encode(memberDTO.getPassword());
 
         MemberEntity memberEntity = modelMapper.map(memberDTO, MemberEntity.class);
         memberEntity.setPassword(password);
         memberEntity.setLevel(Level.MEMBER);
+        memberEntity.setMemberType("일반"); // 일반 회원가입의 경우 memberType을 '일반'으로 설정
 
         return memberRepository.save(memberEntity);
     }

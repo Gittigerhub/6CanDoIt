@@ -179,7 +179,7 @@
             const navLinks = document.querySelectorAll('.nav-link:not(.submenu .nav-link)');
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
-                    // 하위 메뉴가 있는 경우
+                    // 하위 메뉴가 있는 경우 (회원관리 메뉴)
                     if (this.dataset.hasSubmenu) {
                         e.preventDefault();
                         const wasActive = this.classList.contains('active');
@@ -201,17 +201,26 @@
                             if (submenu) {
                                 submenu.classList.add('show');
                                 submenu.style.display = 'block';
-                                // 하위 메뉴 아이템들의 스타일 초기화
                                 submenu.querySelectorAll('.nav-link').forEach(item => {
                                     item.style.color = '#ffffff99';
                                 });
                             }
                         }
+                    } else {
+                        // 일반 메뉴 클릭 시 즉시 모든 하위 메뉴 닫기
+                        document.querySelectorAll('.submenu').forEach(menu => {
+                            menu.classList.remove('show');
+                            menu.style.display = 'none';
+                        });
+                        // 모든 메뉴의 active 상태 제거
+                        navLinks.forEach(link => link.classList.remove('active'));
+                        // 현재 메뉴 활성화
+                        this.classList.add('active');
                     }
                 });
             });
 
-            // 하위 메뉴 아이템 클릭 이벤트
+            // 하위 메뉴 아이템 클릭 이벤트 
             const submenuItems = document.querySelectorAll('.submenu .nav-link');
             submenuItems.forEach(item => {
                 item.addEventListener('click', function(e) {

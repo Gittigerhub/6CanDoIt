@@ -57,9 +57,7 @@
                             <a th:href="@{/notice/read(idx=${data.idx})}" th:text="${data.noticeTitle}"></a>
                         </td>
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd HH:mm')}"></td>
-
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd HH:mm')}"></td>
-
                         <td th:text="${data.noticeHits}"></td>
                     </tr>
                     </tbody>
@@ -85,15 +83,17 @@
                         <li class="page-item" th:unless="${currentPage < endPage}">
                             <a class="page-link" th:href="@{/notice/list(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
                         </li>
-
                     </ul>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="d-flex justify-content-end mt-3">
-        <a th:href="@{/notice/register}" class="btn btn-primary">등록</a>
+        <!-- '등록' 버튼을 박스 안에 넣기 -->
+        <div class="row p-5 bg-white">
+            <div class="d-flex justify-content-end">
+                <a th:href="@{/notice/register}" class="btn btn-primary">등록</a>
+            </div>
+        </div>
     </div>
 </div>
 

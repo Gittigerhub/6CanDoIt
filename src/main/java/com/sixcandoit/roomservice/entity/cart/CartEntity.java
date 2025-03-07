@@ -41,13 +41,14 @@ public class CartEntity extends BaseEntity {
     @JsonBackReference
     private ReservationEntity reservationJoin;
 
-//    //카트 생성 메소드
-//    public static CartEntity createCartEntity(MemberEntity memberJoin, int cartMenuCount) {
-//
-////        CartEntity cart = new CartEntity();
-////        cart.setCartMenuCount(cartMenuCount);
-////        cart.setMemberJoin(memberJoin);
-////        return cart;
-//
-//    }
+    // 카트 생성 메소드
+    public static CartEntity createCartEntity(MemberEntity memberJoin, ReservationEntity reservationJoin) {
+
+        CartEntity cart = new CartEntity();
+        cart.setMemberJoin(memberJoin);
+        cart.setReservationJoin(reservationJoin);
+        return cart;
+
+    }
+
 }

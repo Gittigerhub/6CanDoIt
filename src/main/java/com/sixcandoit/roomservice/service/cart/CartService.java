@@ -9,11 +9,13 @@ import com.sixcandoit.roomservice.entity.cart.CartEntity;
 import com.sixcandoit.roomservice.entity.cart.CartMenuEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
+import com.sixcandoit.roomservice.entity.room.ReservationEntity;
 import com.sixcandoit.roomservice.repository.ImageFileRepository;
 import com.sixcandoit.roomservice.repository.cart.CartMenuRepository;
 import com.sixcandoit.roomservice.repository.cart.CartRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.repository.menu.MenuRepository;
+import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.service.orders.OrdersService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -34,6 +36,8 @@ public class CartService {
 
     private final ModelMapper modelMapper;
 
+    private final ReservationRepository reservationRepository;
+
     private final OrdersService ordersService;
 
     private final MenuRepository menuRepository;
@@ -53,14 +57,18 @@ public class CartService {
     //등록_장바구니 만들기
     //장바구니를 따로 생성하지는 않고, 장바구니에 넣을 메뉴가 컨트롤러로 들어오면
     //해당 값을 가지고 넣을 것이고, 컨트롤러에서 들어오는 email을 통해서 멤버를 찾게 할 예정
-    public Integer addCart(Integer idx, String memberEmail) {
+    public Integer addCart(Integer idx, String memberEmail, int count) {
         //회원 찾기
         MemberEntity memberEntity = memberRepository.findByMemberEmail(memberEmail)
-                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다: " + memberEmail));;
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다: " + memberEmail));
+
+        // 예약 찾기
+        ReservationEntity reservationEntity = reservationRepository.CheckInReserv(memberEntity.getIdx())
+                .orElseThrow(() -> new EntityNotFoundException("이용중인 예약건을 찾을 수 없습니다."));
 
         //메뉴 검증
         MenuEntity menuEntity = menuRepository.findById(idx)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("선택한 메뉴를 찾을 수 없습니다."));
 
         //메뉴정보를 MenuDTO로 변환
         MenuDTO menuDTO = modelMapper.map(menuEntity, MenuDTO.class);
@@ -71,22 +79,24 @@ public class CartService {
         // 변환된 ImageFileDTO 리스트를 menuDTO에 설정
         menuDTO.setMenuImgDTOList(imageFileEntities);  // List<ImageFileDTO> 전달
 
-        //카트 찾기
-        CartEntity cartEntity
-                = cartRepository.findByMemberJoin_memberEmail(memberEntity.getMemberEmail());
+        // 카트 찾기
+        CartEntity cartEntity = cartRepository.findByMemberJoin(memberEntity.getIdx())
+                .orElseThrow(() -> new EntityNotFoundException("카트가 없습니다."));
 
-//        //카트 없으면 새로 생성
-//        if (cartEntity == null) {
-//            cartEntity = CartEntity.createCartEntity(memberEntity, cartEntity.getCartMenuCount());
-//            cartRepository.save(cartEntity);
-//        }
+        // 카트 없으면 새로 생성
+        if (cartEntity == null) {
+            cartEntity = CartEntity.createCartEntity(memberEntity, reservationEntity);
+            cartRepository.save(cartEntity);
+        }
 
-        //카트가 없으면 새로 생성, 있다면 있는걸로
-        //장바구니 메뉴를 만들어 넣어주고, 저장한다.
+        // 카트idx를 FK로 카트메뉴를 생성한다.
+        CartMenuEntity createCartMenu = CartMenuEntity.createCartMenuEntity(cartEntity, menuEntity, count);
+
+        // 카트메뉴가 있읅경우엔 가져온다.
         CartMenuEntity saveCartMenu
                 = cartMenuRepository.findByCartEntity_IdxAndIdx(cartEntity.getIdx(), idx);
 
-        //동일한 메뉴가 장바구니에 있다면 해당 메뉴의 수량이 증가하도록
+        // 동일한 메뉴가 장바구니에 있다면 해당 메뉴의 수량이 증가하도록
         if (saveCartMenu != null) {
             //수량 증가
             saveCartMenu.addCount(1);
@@ -108,18 +118,18 @@ public class CartService {
 
         List<CartDetailDTO> cartDetailDTOList = new ArrayList<>();
 
-        Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(memberEmail);
+        // 회원 찾기
+        MemberEntity memberEntity = memberRepository.findByMemberEmail(memberEmail)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다: " + memberEmail));
 
-        if (memberEntity.isEmpty()) {
+        if (memberEntity == null) {
             // 만약 회원이 없다면 빈 리스트 반환 (혹은 적절한 예외 처리)
             return cartDetailDTOList;
         }
-        CartEntity cartEntity = cartRepository.findByMemberJoin_memberEmail(memberEntity.get().getMemberEmail());
 
-        //카트가 존재하지 않는다면
-        if (cartEntity == null) {
-            return cartDetailDTOList;
-        }
+        // 카트 조회
+        CartEntity cartEntity = cartRepository.findByMemberJoin(memberEntity.getIdx())
+                .orElseThrow(() -> new EntityNotFoundException("회원의 카트를 찾을 수 없습니다."));
 
         //장바구니에 담겨있는 메뉴를 조회
         //cartDetailDTOList = cartMenuRepository.findByCartDetailDTOList(cartEntity.getIdx());

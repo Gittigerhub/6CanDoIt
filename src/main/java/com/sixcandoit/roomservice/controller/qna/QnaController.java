@@ -166,11 +166,12 @@ public class QnaController {
             return "qna/adminread";
         }
 
-        // 일반 회원인 경우 자신의 글만 읽을 수 있음
+        // 자주 묻는 질문이거나 작성자인 경우에만 조회 가능
         if (userDetails != null && 
             !userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)")) &&
-            !qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName())) {
+            !qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName()) &&
+            !"Y".equals(qnaDTO.getFavYn())) {
             throw new RuntimeException("자신이 작성한 글만 읽을 수 있습니다.");
         }
 

@@ -87,7 +87,7 @@
                                     <h5 class="modal-title" id="replyModalLabel">답변 등록</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <form th:action="@{/reply/register}" method="post">
+                                <form id="replyForm" th:action="@{/reply/register}" method="post">
                                     <div class="modal-body">
                                         <!-- QnaIdx를 숨겨서 전달 -->
                                         <input type="hidden" name="qnaIdx" th:value="${qnaDTO.idx}">
@@ -174,6 +174,42 @@
 </div>
 <th:block layout:fragment="script">
     <script th:inline="javascript">
+        $(document).ready(function() {
+            // 답변 등록 폼 제출 처리
+            $('#replyForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        // 모달 닫기
+                        $('#replyModal').modal('hide');
+                        
+                        // SweetAlert2로 성공 메시지 표시
+                        Swal.fire({
+                            title: '성공!',
+                            text: '답변이 작성되었습니다.',
+                            icon: 'success',
+                            confirmButtonText: '확인'
+                        }).then((result) => {
+                            // 페이지 새로고침
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        // 에러 발생 시 처리
+                        Swal.fire({
+                            title: '오류 발생',
+                            text: '답변 작성 중 문제가 발생했습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                    }
+                });
+            });
+        });
     </script>
 </th:block>
 </body>

@@ -233,4 +233,8 @@ public class OrganizationService {
         return organizationDTOs;
     }
 
+    public Optional<OrganizationEntity> findById(Integer idx) {
+        return organizationRepository.findById(idx);
+    }
+
 }

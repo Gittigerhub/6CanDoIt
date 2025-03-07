@@ -6,6 +6,7 @@ import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
+import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import com.sixcandoit.roomservice.service.room.RoomService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -38,6 +39,7 @@ public class RoomController {
     private final ReservationService reservationService;
     private final RoomRepository roomRepository;
     private final ImageFileService imageFileService;
+    private final OrganizationService organizationService;
 
     // 룸 관리 메인 페이지
     @GetMapping("/room/main")
@@ -47,42 +49,55 @@ public class RoomController {
 
     // 룸 전체 목록
     @GetMapping("/room/list")
-    private String list(@PageableDefault(page = 1) Pageable page, // 페이지 정보
-                        @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
-                        @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
-                        @RequestParam(value = "order", defaultValue = "") String order, // 가격순
-                        Model model){
-        String join = "room";
+    private String list(@PageableDefault(page = 1) Pageable page,
+                        @RequestParam(value = "type", defaultValue = "") String type,
+                        @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                        @RequestParam(value = "order", defaultValue = "") String order,
+                        @RequestParam(required = false) Integer organ_idx,
+                        Model model) {
 
-        // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<RoomDTO> roomDTOList = roomService.roomList(page, type, keyword, order);
-        // html에 필요한 페이지 정보를 받는다.
-        Map<String, Integer> pageInfo = PageNationUtil.Pagination(roomDTOList);
+        log.info("룸 목록을 출력합니다.");
 
-        // DTO들 리스트로 가져오기
-        List<RoomDTO> room = roomDTOList.getContent();
-        // 이미지 데이터를 담을 Map 생성 (menu의 idx를 key로 저장)
+        // 조직별 룸 목록 조회
+        Page<RoomDTO> roomDTOS;
+        if (organ_idx != null) {
+            roomDTOS = roomService.getRoomsByOrganization(organ_idx, page);
+        } else {
+            roomDTOS = roomService.roomList(page, type, keyword, order);
+        }
+        
+        // 페이지 정보 생성
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(roomDTOS);
+
+        // 이미지 정보 가져오기
         Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
         Map<Integer, Boolean> repImageMap = new HashMap<>();
-        for (RoomDTO roomDTO : room) {
-            // 이미지 조회
-            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(roomDTO.getIdx(), join);
-            // Map에 저장 (menu의 idx를 key로 함)
-            imageFileMap.put(roomDTO.getIdx(), imageFileDTOS);
-            // 대표 사진 여부 확인 후 저장
-            boolean hasRepImage = imageFileDTOS.stream()
+
+        for (RoomDTO roomDTO : roomDTOS.getContent()) {
+            List<ImageFileDTO> imageList = imageFileService.readImage(roomDTO.getIdx(), "room");
+            imageFileMap.put(roomDTO.getIdx(), imageList);
+
+            // 대표이미지 존재 여부 확인
+            boolean hasRepImage = imageList.stream()
                     .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
             repImageMap.put(roomDTO.getIdx(), hasRepImage);
         }
 
-        model.addAttribute("room", room);  // 룸 리스트
-        model.addAttribute("imageFileMap", imageFileMap); // 룸 이미지 리스트
-        model.addAttribute("repImageMap", repImageMap); // 룸 대표 사진 여부
-        model.addAttribute("roomDTOList", roomDTOList); // 데이터 전달
-        model.addAllAttributes(pageInfo); // 페이지 정보
-        model.addAttribute("type", type); //검색분류
-        model.addAttribute("keyword", keyword); // 키워드
-        model.addAttribute("order", order); // 가격순
+        // 페이지 정보를 모델에 추가
+        model.addAttribute("roomDTOS", roomDTOS);
+        model.addAttribute("currentPage", pageInfo.get("currentPage"));
+        model.addAttribute("startPage", pageInfo.get("startPage"));
+        model.addAttribute("endPage", pageInfo.get("endPage"));
+        model.addAttribute("prevPage", pageInfo.get("prevPage"));
+        model.addAttribute("nextPage", pageInfo.get("nextPage"));
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("order", order);
+        model.addAttribute("organ_idx", organ_idx);
+
+        // 이미지 정보를 모델에 추가
+        model.addAttribute("imageFileMap", imageFileMap);
+        model.addAttribute("repImageMap", repImageMap);
 
         return "room/list";
     }
@@ -134,13 +149,32 @@ public class RoomController {
         return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 
-
     // 룸 등록
     @GetMapping("/room/register")
-    public String register(Model model){
+    public String register(@RequestParam(required = false) Integer organ_idx, Model model){
         log.info("룸 등록 페이지로 이동합니다.");
 
-        model.addAttribute("roomDTO", new RoomDTO()); // 빈 RoomDTO 객체 전달
+        RoomDTO roomDTO = new RoomDTO();
+        // 기본값 설정
+        roomDTO.setRoomNum(2);                // 투숙객 수 기본값
+        roomDTO.setRoomBed(0);                // 침대 타입 기본값
+        roomDTO.setRoomPrice(0);              // 가격 기본값
+        roomDTO.setRoomSize(0);               // 평수 기본값
+        roomDTO.setRoomWifi("N");             // 와이파이 기본값
+        roomDTO.setRoomTv("N");               // TV 기본값
+        roomDTO.setRoomAir("N");              // 에어컨 기본값
+        roomDTO.setRoomBath("N");             // 전용욕실 기본값
+        roomDTO.setRoomBreakfast("N");        // 조식 기본값
+        roomDTO.setRoomSmokingYn("N");        // 흡연 기본값
+        roomDTO.setRoomCheckIn(LocalTime.of(14, 0));    // 체크인 시간 기본값
+        roomDTO.setRoomCheckOut(LocalTime.of(11, 0));   // 체크아웃 시간 기본값
+
+        if (organ_idx != null) {
+            roomDTO.setOrgan_idx(organ_idx);
+        }
+        
+        model.addAttribute("roomDTO", roomDTO);
+        model.addAttribute("organ_idx", organ_idx);
 
         return "room/register";
     }
@@ -186,6 +220,10 @@ public class RoomController {
         // 등록 처리
         roomService.roomRegister(roomDTO, imageFiles);
 
+        // organ_idx가 있으면 해당 조직의 목록으로 리다이렉트
+        if (roomDTO.getOrgan_idx() != null) {
+            return "redirect:/room/list?organ_idx=" + roomDTO.getOrgan_idx();
+        }
         return "redirect:/room/list";
     }
 

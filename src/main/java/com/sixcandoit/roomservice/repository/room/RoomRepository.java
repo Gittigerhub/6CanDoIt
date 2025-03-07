@@ -43,4 +43,8 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     // 체크아웃 방 검색
     @Query("SELECT u FROM RoomEntity u WHERE u.resStatus = '4'")
     Page<RoomEntity> searchRes4(Pageable page);
+
+    // 조직 idx로 방 검색
+    @Query("SELECT r FROM RoomEntity r WHERE r.organizationJoin.idx = :organIdx")
+    Page<RoomEntity> findByOrganIdx(@Param("organIdx") Integer organIdx, Pageable pageable);
 }

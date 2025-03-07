@@ -3,9 +3,11 @@ package com.sixcandoit.roomservice.service.room;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
+import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
+import com.sixcandoit.roomservice.service.office.OrganizationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -32,6 +34,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
     private final ImageFileService imageFileService;
+    private final OrganizationService organizationService;
 
     // 룸 등록
     public void roomRegister(RoomDTO roomDTO, List<MultipartFile> imageFiles){
@@ -39,6 +42,14 @@ public class RoomService {
         try {
             // DTO로 Entity 변환
             RoomEntity room = modelMapper.map(roomDTO, RoomEntity.class);
+            
+            // organ_idx가 있다면 OrganizationEntity 설정
+            if (roomDTO.getOrgan_idx() != null) {
+                OrganizationEntity organization = organizationService.findById(roomDTO.getOrgan_idx())
+                        .orElseThrow(() -> new RuntimeException("Organization not found with id: " + roomDTO.getOrgan_idx()));
+                room.setOrganizationJoin(organization);
+            }
+            
             // 룸 기본 값:
             room.setRoomView("N"); // 창문 없음
             room.setRoomSeason("off"); // 비성수기
@@ -244,5 +255,11 @@ public class RoomService {
             // 해당 Room이 존재하지 않으면 예외 처리
             throw new IllegalStateException("해당 Room이 존재하지 않습니다.");
         }
+    }
+
+    // 조직별 룸 목록 조회
+    public Page<RoomDTO> getRoomsByOrganization(Integer organ_idx, Pageable pageable) {
+        Page<RoomEntity> roomEntities = roomRepository.findByOrganIdx(organ_idx, pageable);
+        return roomEntities.map(entity -> modelMapper.map(entity, RoomDTO.class));
     }
 }

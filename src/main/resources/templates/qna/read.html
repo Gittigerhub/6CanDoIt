@@ -62,8 +62,12 @@
                     <div class="card-footer">
                         <a th:href="@{/qna/update(idx=${qnaDTO.idx})}" 
                            class="btn btn-primary"
-                           th:onclick="${qnaDTO.replyList != null && !qnaDTO.replyList.empty} ? 'event.preventDefault(); showUpdateAlert();' : ''">수정</a>
-                        <a th:href="@{/qna/delete(idx=${qnaDTO.idx})}" class="btn btn-danger">삭제</a>
+                           th:if="${currentUser != null and currentUser == qnaDTO.memberName}"
+                           th:onclick="${qnaDTO.replyList != null and not #lists.isEmpty(qnaDTO.replyList)} ? 'event.preventDefault(); showUpdateAlert();' : ''">수정</a>
+                        <a th:href="@{/qna/delete(idx=${qnaDTO.idx})}" 
+                           class="btn btn-danger"
+                           th:if="${currentUser != null and currentUser == qnaDTO.memberName}"
+                           onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
                     </div>
 
                 </div>
@@ -83,10 +87,8 @@
                             <span th:text="${#temporals.format(reply.modDate, 'yyyy-MM-dd HH:mm')}"></span>
                         </p>
                     </div>
-                    <div class="card-footer">
-                        <a th:href="@{/qna/list}" class="btn btn-secondary mt-3">목록</a>
-                    </div>
                 </div><!-- 답변 목록 끝 -->
+                <a th:href="@{/qna/list}" class="btn btn-secondary mt-3">목록</a>
             </div>
             <div class="col"></div>
         </div><!--row끝-->

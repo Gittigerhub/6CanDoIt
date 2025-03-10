@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -40,6 +42,18 @@ public class PaymentEntity extends BaseEntity {
 
     @Column(name = "payment_approval")
     private String paymentApproval;           // 승인 번호
+
+    @Column(name = "order_id")
+    private String orderId;                   // 주문 ID (토스페이먼츠 연동용)
+
+    @Column(name = "error_code")
+    private String errorCode;                 // 에러 코드
+
+    @Column(name = "error_message")
+    private String errorMessage;              // 에러 메시지
+
+    @Column(name = "reg_date")
+    private LocalDateTime regDate;            // 등록일시
 
     // 주문 테이블과 1:1 매핑
     @OneToOne(mappedBy = "paymentJoin")

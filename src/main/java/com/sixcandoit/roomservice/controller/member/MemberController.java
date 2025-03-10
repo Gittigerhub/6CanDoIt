@@ -1,10 +1,12 @@
 package com.sixcandoit.roomservice.controller.member;
 
+import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.service.member.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -185,6 +187,15 @@ public class MemberController {
 
         boolean isDeleted = memberService.deleteMember(idx);
         return isDeleted ? "success" : "fail";
+    }
+
+    // 마이페이지
+    @GetMapping("/mypage")
+    public String myPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        MemberDTO memberDTO = memberService.read(userDetails.getUsername());
+        model.addAttribute("memberDTO", memberDTO);
+
+        return "member/mypage";
     }
 
 }

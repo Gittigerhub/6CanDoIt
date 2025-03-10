@@ -65,7 +65,7 @@ public class AdminController {
     public String showLoginPage(){
         log.info("로그인 페이지를 내놔라");
 
-        return "admin/login";
+        return "admin/sign";
     }
 
     // 로그아웃
@@ -73,7 +73,7 @@ public class AdminController {
     public String showLogoutPage(HttpSession session) {
         session.invalidate();
         log.info("로그아웃을 하자!~~");
-        return "redirect:/login";
+        return "redirect:/admin/login";
     }
 
     // 회원 가입
@@ -92,10 +92,10 @@ public class AdminController {
     public String registerProc(@ModelAttribute AdminDTO adminDTO){
 
         if (adminService.register(adminDTO) == null){
-            return "redirect:admin/register";
+            return "redirect:/admin/login";
         }
 
-        return "redirect:/";
+        return "redirect:/admin/login";
     }
 
     // 이메일 중복 확인
@@ -130,6 +130,7 @@ public class AdminController {
 
         if (adminEmail == null) {
             log.warn("세션에 adminEmail 없음! 로그인 확인 필요");
+            return "redirect:/admin/login";
         }
 
         model.addAttribute("adminEmail",adminEmail );

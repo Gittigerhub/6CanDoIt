@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.controller.notice;
 
-
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
 import com.sixcandoit.roomservice.service.ImageFileService;
@@ -9,6 +8,7 @@ import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -33,6 +34,7 @@ public class NoticeController {
 
     private final NoticeService noticeService;
     private final ImageFileService  imageFileService;
+    private final ModelMapper modelMapper;
 
 
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
@@ -59,8 +61,8 @@ public class NoticeController {
     @GetMapping("/notice/userlist")
     public String userList(@PageableDefault(page = 1) Pageable page,
                            @RequestParam(value = "type",defaultValue = "")String type,
-                            @RequestParam(value = "keyword",defaultValue = "")String keyword,
-    Model model          ){
+                           @RequestParam(value = "keyword",defaultValue = "")String keyword,
+                           Model model          ){
         Page<NoticeDTO> noticeDTOS = noticeService.noticeList(page, type, keyword);
         System.out.println("Notice List:" + noticeDTOS.getContent());
 
@@ -193,16 +195,16 @@ public class NoticeController {
     }
 
 
-    @GetMapping("/notice/delete")
-    public String delete(@RequestParam("idx") Integer idx) {
-
-        String join="notice";
-
+    @PostMapping("/notice/delete/{idx}")
+    public String delete(@PathVariable("idx") Integer idx) {
+        String join = "notice";
         log.info("데이터를 삭제합니다.");
-        noticeService.noticeDelete(idx,join);
-
+        noticeService.noticeDelete(idx, join);
         return "redirect:/notice/list";
     }
 
 
+    public ModelMapper getModelMapper() {
+        return modelMapper;
+    }
 }

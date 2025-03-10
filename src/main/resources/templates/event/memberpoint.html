@@ -14,50 +14,6 @@
 
     <h3>포인트 상세</h3>
 
-
-
-
-    <div class="container mt-5 bg-white">
-        <div class="container">
-            <button type="button" class="btn btn-primary" id="register-btn">등록</button>
-            <h2>관리자 포인트 테이블 </h2>
-
-            <!--조회 테이블-->
-            <table class="table table-bordered" style="text-align: center">
-                <thead>
-                <tr> <!--테이블 제목-->
-                    <th style="width: 4%">No</th>
-                    <th style="width: 10%">회원 이름</th>
-                    <th style="width: 16%">회원 아이디</th>
-                    <th style="width: 16%">계산 된 포인트</th>
-                    <th style="width: 10%">총 포인트</th>
-                    <th style="width: 16%">포인트 종료날</th>
-                    <th style="width: 8%">사용여부</th>
-                    <th style="width: 20%">상태</th>
-                </tr>
-                </thead>
-                <tbody> <!--조직 테이블 데이터 출력-->
-                <tr th:each="data:${memberPointDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
-                    <td th:text="${data.idx}">John</td>
-                    <td th:text="${data.memberJoin.memberName}">Doe</td>
-                    <td th:text="${data.memberJoin.memberEmail}">john@example.com</td>
-                    <td th:if="${data.memberPointOperationYn}=='Y'" th:text="'-'+${data.memberPoint}">Doe</td>
-                    <td th:if="${data.memberPointOperationYn}=='N'" th:text="'+'+${data.memberPoint}">Doe</td>
-                    <td><span class="totalPoints">0</span></td>
-                    <td th:text="${#temporals.format(data.memberPointEndDate)}">Doe</td>
-                    <td th:text="${data.memberPointOperationYn}"></td>
-                    <td>
-                        <button type="button" class="btn btn-primary memberPointEdit" th:data-id="${data.idx}">수정
-                        </button>
-                        <button type="button" class="btn btn-secondary memberPointDelete" th:data-id="${data.idx}">삭제
-                        </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
     <!--검색 기능-->
     <form th:action="@{/event/memberpoint}" method="get">
         <div class="container bg-white">
@@ -79,6 +35,52 @@
         </div>
     </form>
     <!--검색 끝-->
+
+    <div class="container mt-5 bg-white">
+        <div class="container">
+
+            <h2>관리자 포인트 테이블 </h2>
+
+            <!--조회 테이블-->
+            <table class="table table-bordered" style="text-align: center">
+                <thead>
+                <tr> <!--테이블 제목-->
+                    <th style="width: 4%">No</th>
+                    <th style="width: 10%">회원 이름</th>
+                    <th style="width: 16%">회원 아이디</th>
+                    <th style="width: 16%">포인트</th>
+                    <th style="width: 10%">총 포인트</th>
+                    <th style="width: 16%">포인트 종료날</th>
+                    <th style="width: 8%">사용여부</th>
+                    <th style="width: 20%">상태</th>
+                </tr>
+                </thead>
+                <tbody> <!--조직 테이블 데이터 출력-->
+                <tr th:each="data:${memberPointDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
+                    <td th:text="${data.idx}">John</td>
+                    <td th:text="${data.memberJoin.memberName}">Doe</td>
+                    <td th:text="${data.memberJoin.memberEmail}">john@example.com</td>
+                    <td th:if="${data.memberPointOperationYn}=='Y'" th:text="0">Doe</td>
+                    <td th:if="${data.memberPointOperationYn}=='N'" th:text="'+'+${data.memberPoint}">Doe</td>
+                    <td><span class="totalPoints">0</span></td>
+                    <td th:text="${#temporals.format(data.memberPointStartDate, 'yy-MM-dd')}+'~'
+                    +${#temporals.format(data.memberPointEndDate, 'yy-MM-dd')}">Doe</td>
+                    <td th:text="${data.memberPointOperationYn}"></td>
+                    <td>
+                        <button type="button" class="btn btn-primary memberPointEdit" th:data-id="${data.idx}">수정
+                        </button>
+                        <button type="button" class="btn btn-secondary memberPointDelete" th:data-id="${data.idx}">삭제
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <button style="float: right" type="button" class="btn btn-primary" id="register-btn">등록</button>
+        </div>
+    </div>
+
+
+
 
     <!--페이징-->
     <div class="mt-3 d-flex justify-content-center">

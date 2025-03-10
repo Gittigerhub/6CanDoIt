@@ -38,13 +38,13 @@ public class OfficeController {
     private final ShopDetailService shopDetailService;
     private final ImageFileService imageFileService;
 
-    @GetMapping("/test")
-    public String test(Model model) {
 
-        return "memberindex";
-    }
-
-
+    /* -----------------------------------------------------------------------------
+        경로 : /office/list
+        인수 : Pageable page, String keyword, String type, HttpServletRequest request, Model model
+        출력 : 조직테이블 데이터 목록 출력
+        설명 : 관리자 페이지에서 검색이 가능한 조직테이블 데이터 목록 출력
+    ----------------------------------------------------------------------------- */
     @GetMapping("/list")
     public String list(@PageableDefault(page=1) Pageable page,
                        @RequestParam(value="keyword", defaultValue = "") String keyword,
@@ -77,6 +77,75 @@ public class OfficeController {
         model.addAttribute("request", request); // 현재 페이지 url
 
         return "office/officelist";
+
+    }
+
+    /* -----------------------------------------------------------------------------
+        경로 : /office/list
+        인수 : Pageable page, String keyword, String type, HttpServletRequest request, Model model
+        출력 : 조직테이블 데이터 목록 출력
+        설명 : 관리자 페이지에서 검색이 가능한 조직테이블 데이터 목록 출력
+    ----------------------------------------------------------------------------- */
+    @GetMapping("/member/list")
+    public String hotelList(@PageableDefault(page=1) Pageable page,
+                       @RequestParam(value="keyword", defaultValue = "") String keyword,
+                       @RequestParam(value="type", defaultValue = "") String type,
+                       HttpServletRequest request, Model model) {
+
+        // 서비스에 조회 요청
+        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
+
+        // 조회결과를 이용한 페이지 처리
+        Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
+
+        // 매장 상세정보 서비스로 조회
+        // 각 OrganizationDTO에 대해 exists 값을 계산하여 리스트에 추가
+        List<Boolean> existsList = new ArrayList<>();
+
+        for (OrganizationDTO organization : organDTO) {
+
+            // shopCheck 메소드 호출하여 exists 값을 확인
+            boolean exists = shopDetailService.shopCheck(organization.getIdx()); // 조직의 idx를 사용
+            existsList.add(exists);
+        }
+
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
+        // 조직 정보  List로 변환
+        List<OrganizationDTO> organDTOList = organDTO.getContent();
+
+        // 이미지 데이터를 담을 Map 생성
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+
+        for (OrganizationDTO organizationDTO : organDTOList) {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(organizationDTO.getIdx(), join);
+
+            // Map에 저장 (oorganizationDTO의 idx를 key로 저장)
+            imageFileMap.put(organizationDTO.getIdx(), imageFileDTOS);
+
+            // 대표 사진 여부 확인 후 저장
+            boolean hasRepImage = imageFileDTOS.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+            repImageMap.put(organizationDTO.getIdx(), hasRepImage);
+        }
+
+
+        // 페이지 정보, 조회내용, 검색어, 조직 타입을 전달
+        model.addAllAttributes(pageInfo);
+        model.addAttribute("organDTO", organDTO);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("type", type);
+        model.addAttribute("existsList", existsList); // exists 값 리스트를 모델에 추가
+        model.addAttribute("request", request); // 현재 페이지 url
+        model.addAttribute("imageFileMap", imageFileMap); // 메뉴별 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap); // 메뉴별 대표 사진 여부
+
+
+        return "office/hotelpage";
 
     }
 

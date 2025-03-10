@@ -49,12 +49,15 @@
               <span th:text="${#temporals.format(noticeDTO.modDate,'yyyy-MM-dd HH:mm')}"></span>
             </p>
 
-            <!-- 목록 버튼을 카드 안에 배치하고 오른쪽 정렬 -->
+            <!-- 목록, 수정, 삭제 버튼을 카드 안에 배치하고 오른쪽 정렬 -->
             <div class="d-flex justify-content-end mt-3">
-              <a th:href="@{/notice/list}" class="btn btn-secondary">목록</a>
-              <a th:href="@{/notice/delete/{id}(id=${noticeDTO.idx})}"
-                 class="btn btn-danger"
-                 onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</a>
+              <a th:href="@{/notice/list}" class="btn btn-secondary ms-2">목록</a>
+              <a th:href="@{/notice/update(idx=${noticeDTO.idx})}" class="btn btn-warning ms-2">수정</a>
+              <form th:action="@{|/notice/delete/${noticeDTO.idx}|}" method="post" style="display: inline-block;" class="ms-2"
+                    onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-danger">삭제</button>
+              </form>
             </div>
           </div>
         </div>

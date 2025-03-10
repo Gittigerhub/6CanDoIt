@@ -11,49 +11,49 @@
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
-
   <h3 class="text-center">공지 사항 수정</h3>
   <div class="container p-5 bg-white">
     <div class="row">
       <div class="col"></div>
       <div class="col-10">
         <form th:action="@{/notice/update}" th:object="${noticeDTO}" method="post" enctype="multipart/form-data">
-          <!--디자인-->
           <div class="card">
             <div class="card-header">
               <h4>게시글 수정</h4>
             </div>
-            <!-- id와 name은 DTO에 변수명으로 작업 -->
             <div class="card-body">
-              <!--번호 숨김 처리-->
-              <input type="hidden" name="id" th:value="${noticeDTO.idx}">
-              <input type="hidden" name="join" value="notice">
+              <!-- 번호 숨김 처리 -->
+              <input type="hidden" th:field="*{idx}">  <!-- NoticeDTO의 idx 필드를 숨기기 -->
+              <input type="hidden" name="join" value="notice"> <!-- join 값 고정 -->
 
+              <!-- 번호 -->
               <div class="mb-3 mt-3">
                 <label for="idx" class="form-label">번호:</label>
-                <input type="text"  class="form-control" id="idx" name="idx"
-                       th:value="${noticeDTO.idx}" readonly>
+                <input type="text" th:field="*{idx}" class="form-control" id="idx" readonly>
               </div>
-              <div class="mb-3 mt-3"><!--게시글제목-->
+
+              <!-- 게시글 제목 -->
+              <div class="mb-3 mt-3">
                 <label for="noticeTitle" class="form-label">제목:</label>
                 <input type="text" th:field="*{noticeTitle}" class="form-control" id="noticeTitle" name="noticeTitle">
-                <span th:if="${#fields.hasErrors('noticeTitle')}"
-                      style="color: red;"
-                      th:errors="*{noticeTitle}"></span> <!-- 오류 메시지 출력 -->
+                <span th:if="${#fields.hasErrors('noticeTitle')}" style="color: red;" th:errors="*{noticeTitle}"></span> <!-- 오류 메시지 출력 -->
               </div>
+
+              <!-- 게시글 내용 -->
               <div class="mb-3 mt-3">
-                <!--내용-->
                 <label for="noticeContents" class="form-label">내용:</label>
                 <textarea th:field="*{noticeContents}" class="form-control" rows="5" id="noticeContents" name="noticeContents"></textarea>
-                <span th:if="${#fields.hasErrors('noticeContents')}"
-                      style="color: red;"
-                      th:errors="*{noticeContents}"></span> <!-- 오류 메시지 출력 -->
+                <span th:if="${#fields.hasErrors('noticeContents')}" style="color: red;" th:errors="*{noticeContents}"></span> <!-- 오류 메시지 출력 -->
               </div>
+
+              <!-- 이미지 파일 -->
               <div class="mb-3">
-                <label>참고이미지</label>
+                <label>참고 이미지</label>
                 <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
               </div>
             </div>
+
+            <!-- 제출 버튼 -->
             <div class="card-footer">
               <button type="submit" class="btn btn-primary">수정 완료</button>
               <a th:href="@{/notice/read(idx=${noticeDTO.idx})}" class="btn btn-danger">취소</a>
@@ -62,9 +62,8 @@
         </form>
       </div>
       <div class="col"></div>
-    </div><!--row 끝-->
+    </div>
   </div>
-
 </div>
 </body>
 </html>

@@ -550,7 +550,7 @@
         <form id="signupForm" class="signup-form" th:action="@{/member/register}" method="post" onsubmit="return validateForm() && validatePassword() && combineAddress()">
             <div class="input__block signup-input__block">
                 <div class="address-input">
-                    <input type="email" name="memberEmail" placeholder="이메일" required>
+                    <input type="email" id="memberEmail" name="memberEmail" placeholder="이메일" required>
                     <input type="button" value="이메일 인증">
                 </div>
             </div>
@@ -567,6 +567,8 @@
             </div>
             <div class="input__block">
                 <input type="tel" name="memberPhone" id="memberPhone" placeholder="전화번호" required>
+                <div id="confirmPhoneFeedback" class="invalid-feedback">잘못된 전화번호 형식입니다.</div>
+                <div id="confirmPhoneValid" class="valid-feedback">올바른 전화번호 형식입니다.</div>
             </div>
             <div class="input__block">
                 <div class="radio-group with-bg">
@@ -1190,6 +1192,46 @@ E-mail : himyeongsun@gmail.com
                     }
                 });
             });
+        });
+
+        // 전화번호 유효성 검사
+        document.getElementById("memberPhone").addEventListener("input", function() {
+            var phone = this.value;
+            var phoneInput = this;
+            var phoneFeedback = document.getElementById("confirmPhoneFeedback");
+            var phoneValid = document.getElementById("confirmPhoneValid");
+
+            // 전화번호 형식 검사 (000-0000-0000 또는 000-000-0000)
+            var phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;
+
+            // 입력값이 비어있는 경우
+            if (phone === "") {
+                phoneInput.classList.remove("is-invalid", "is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "none";
+                return;
+            }
+
+            if (!phonePattern.test(phone)) {
+                phoneInput.classList.remove("is-valid");
+                phoneInput.classList.add("is-invalid");
+                phoneFeedback.style.display = "block";
+                phoneValid.style.display = "none";
+            } else {
+                phoneInput.classList.remove("is-invalid");
+                phoneInput.classList.add("is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "block";
+            }
+
+            // 자동으로 하이픈 추가
+            var value = phone.replace(/[^0-9]/g, ''); // 숫자만 추출
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+            }
+            this.value = value;
         });
 
         // 주소 검색 API

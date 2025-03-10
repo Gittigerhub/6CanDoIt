@@ -12,95 +12,95 @@
     <!-- Daum 우편번호 API 스크립트 추가 -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <th:block layout:fragment="css">
-    <style>
-        body {
-            font-family: "Montserrat", sans-serif;
-            background: white;
-        }
+        <style>
+            body {
+                font-family: "Montserrat", sans-serif;
+                background: white;
+            }
 
-        .container {
-            display: block;
-            max-width: 680px;
-            width: 80%;
-            margin: 120px auto;
-        }
+            .container {
+                display: block;
+                max-width: 680px;
+                width: 80%;
+                margin: 120px auto;
+            }
 
-        h1 {
+            h1 {
                 color: #333333;
-            font-size: 48px;
-            letter-spacing: -3px;
-            text-align: center;
-            margin: 120px 0 80px 0;
-            transition: 0.2s linear;
-        }
+                font-size: 48px;
+                letter-spacing: -3px;
+                text-align: center;
+                margin: 120px 0 80px 0;
+                transition: 0.2s linear;
+            }
 
-        .links {
-            list-style-type: none;
-        }
-        .links li {
-            display: inline-block;
-            margin: 0 20px 0 0;
-            transition: 0.2s linear;
-        }
-        .links li:nth-child(2) {
-            opacity: 0.6;
-        }
-        .links li:nth-child(2):hover {
-            opacity: 1;
-        }
-        .links li:nth-child(3) {
-            opacity: 0.6;
-            float: right;
-        }
-        .links li:nth-child(3):hover {
-            opacity: 1;
-        }
-        .links li a {
-            text-decoration: none;
-            color: #0f132a;
-            font-weight: bolder;
-            text-align: center;
-            cursor: pointer;
-        }
+            .links {
+                list-style-type: none;
+            }
+            .links li {
+                display: inline-block;
+                margin: 0 20px 0 0;
+                transition: 0.2s linear;
+            }
+            .links li:nth-child(2) {
+                opacity: 0.6;
+            }
+            .links li:nth-child(2):hover {
+                opacity: 1;
+            }
+            .links li:nth-child(3) {
+                opacity: 0.6;
+                float: right;
+            }
+            .links li:nth-child(3):hover {
+                opacity: 1;
+            }
+            .links li a {
+                text-decoration: none;
+                color: #0f132a;
+                font-weight: bolder;
+                text-align: center;
+                cursor: pointer;
+            }
 
-        form {
-            width: 100%;
-            max-width: 680px;
-            margin: 40px auto 10px;
-        }
-        form .input__block {
-            margin: 20px auto;
-            display: block;
-            position: relative;
-        }
-        form .input__block.first-input__block::before {
-            content: "";
-            position: absolute;
-            top: -15px;
-            left: 50px;
-            display: block;
-            width: 0;
-            height: 0;
-            background: transparent;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 15px solid rgba(15, 19, 42, 0.1);
-            transition: 0.2s linear;
-        }
-        form .input__block.signup-input__block::before {
-            content: "";
-            position: absolute;
-            top: -15px;
-            left: 120px;
-            display: block;
-            width: 0;
-            height: 0;
-            background: transparent;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 15px solid rgba(15, 19, 42, 0.1);
-            transition: 0.2s linear;
-        }
+            form {
+                width: 100%;
+                max-width: 680px;
+                margin: 40px auto 10px;
+            }
+            form .input__block {
+                margin: 20px auto;
+                display: block;
+                position: relative;
+            }
+            form .input__block.first-input__block::before {
+                content: "";
+                position: absolute;
+                top: -15px;
+                left: 50px;
+                display: block;
+                width: 0;
+                height: 0;
+                background: transparent;
+                border-left: 15px solid transparent;
+                border-right: 15px solid transparent;
+                border-bottom: 15px solid rgba(15, 19, 42, 0.1);
+                transition: 0.2s linear;
+            }
+            form .input__block.signup-input__block::before {
+                content: "";
+                position: absolute;
+                top: -15px;
+                left: 120px;
+                display: block;
+                width: 0;
+                height: 0;
+                background: transparent;
+                border-left: 15px solid transparent;
+                border-right: 15px solid transparent;
+                border-bottom: 15px solid rgba(15, 19, 42, 0.1);
+                transition: 0.2s linear;
+            }
             form .input__block.password-reset-input__block::before {
                 content: "";
                 position: absolute;
@@ -138,279 +138,279 @@
             }
             form .input__block input:autofill {
                 background-color: rgba(15, 19, 42, 0.1) !important;
-        }
-        form .input__block input {
-            display: block;
-            width: 90%;
-            max-width: 680px;
-            height: 50px;
-            margin: 0 auto;
-            border-radius: 8px;
-            border: none;
+            }
+            form .input__block input {
+                display: block;
+                width: 90%;
+                max-width: 680px;
+                height: 50px;
+                margin: 0 auto;
+                border-radius: 8px;
+                border: none;
                 color: #333333;
-            padding: 0 15px;
-            font-size: 14px;
-            font-family: "Montserrat", sans-serif;
-        }
-        form .input__block input:focus, form .input__block input:active {
-            outline: none;
-            border: none;
+                padding: 0 15px;
+                font-size: 14px;
+                font-family: "Montserrat", sans-serif;
+            }
+            form .input__block input:focus, form .input__block input:active {
+                outline: none;
+                border: none;
                 color: #333333;
-        }
-        form .input__block input.repeat__password {
-            opacity: 0;
-            display: none;
-            transition: 0.2s linear;
-        }
-        form .input__block input[type="date"]::-webkit-calendar-picker-indicator {
-            opacity: 0.5;
-        }
-        form .input__block input[type="date"]::-webkit-datetime-edit-text,
-        form .input__block input[type="date"]::-webkit-datetime-edit-month-field,
-        form .input__block input[type="date"]::-webkit-datetime-edit-day-field,
-        form .input__block input[type="date"]::-webkit-datetime-edit-year-field {
-            color: rgba(15, 19, 42, 0.6);
-        }
-        form .signin__btn {
+            }
+            form .input__block input.repeat__password {
+                opacity: 0;
+                display: none;
+                transition: 0.2s linear;
+            }
+            form .input__block input[type="date"]::-webkit-calendar-picker-indicator {
+                opacity: 0.5;
+            }
+            form .input__block input[type="date"]::-webkit-datetime-edit-text,
+            form .input__block input[type="date"]::-webkit-datetime-edit-month-field,
+            form .input__block input[type="date"]::-webkit-datetime-edit-day-field,
+            form .input__block input[type="date"]::-webkit-datetime-edit-year-field {
+                color: rgba(15, 19, 42, 0.6);
+            }
+            form .signin__btn {
                 background: #333333;
-            color: white;
-            display: block;
-            width: 92.5%;
-            max-width: 680px;
-            height: 50px;
-            border-radius: 8px;
-            margin: 0 auto;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: "Montserrat", sans-serif;
+                color: white;
+                display: block;
+                width: 92.5%;
+                max-width: 680px;
+                height: 50px;
+                border-radius: 8px;
+                margin: 0 auto;
+                border: none;
+                cursor: pointer;
+                font-size: 14px;
+                font-family: "Montserrat", sans-serif;
                 box-shadow: 0 15px 30px rgba(51, 51, 51, 0.2);
-            transition: 0.2s linear;
-        }
-        form .signin__btn:hover {
+                transition: 0.2s linear;
+            }
+            form .signin__btn:hover {
                 box-shadow: 0 0 0 rgba(51, 51, 51, 0);
                 background: #4a4a4a;
-        }
+            }
 
-        .separator {
-            display: block;
-            margin: 30px auto 10px;
-            text-align: center;
-            height: 40px;
-            position: relative;
-            background: transparent;
-            color: rgba(15, 19, 42, 0.4);
-            font-size: 13px;
-            width: 90%;
-            max-width: 680px;
-        }
-        .separator::before {
-            content: "";
-            position: absolute;
-            top: 8px;
-            left: 0;
-            background: rgba(15, 19, 42, 0.2);
-            height: 1px;
-            width: 45%;
-        }
-        .separator::after {
-            content: "";
-            position: absolute;
-            top: 8px;
-            right: 0;
-            background: rgba(15, 19, 42, 0.2);
-            height: 1px;
-            width: 45%;
-        }
+            .separator {
+                display: block;
+                margin: 30px auto 10px;
+                text-align: center;
+                height: 40px;
+                position: relative;
+                background: transparent;
+                color: rgba(15, 19, 42, 0.4);
+                font-size: 13px;
+                width: 90%;
+                max-width: 680px;
+            }
+            .separator::before {
+                content: "";
+                position: absolute;
+                top: 8px;
+                left: 0;
+                background: rgba(15, 19, 42, 0.2);
+                height: 1px;
+                width: 45%;
+            }
+            .separator::after {
+                content: "";
+                position: absolute;
+                top: 8px;
+                right: 0;
+                background: rgba(15, 19, 42, 0.2);
+                height: 1px;
+                width: 45%;
+            }
 
             .google__btn {
-            display: block;
-            width: 90%;
-            max-width: 680px;
-            margin: 20px auto;
-            height: 50px;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: "Montserrat", sans-serif;
-            border-radius: 8px;
-            border: none;
-            line-height: 40px;
-            background: #5b90f0;
-            color: white;
-            box-shadow: 0 15px 30px rgba(91, 144, 240, 0.36);
-            transition: 0.2s linear;
-        }
+                display: block;
+                width: 90%;
+                max-width: 680px;
+                margin: 20px auto;
+                height: 50px;
+                cursor: pointer;
+                font-size: 14px;
+                font-family: "Montserrat", sans-serif;
+                border-radius: 8px;
+                border: none;
+                line-height: 40px;
+                background: #5b90f0;
+                color: white;
+                box-shadow: 0 15px 30px rgba(91, 144, 240, 0.36);
+                transition: 0.2s linear;
+            }
             .google__btn .fa {
-            font-size: 20px;
-            padding: 0 5px 0 0;
-        }
+                font-size: 20px;
+                padding: 0 5px 0 0;
+            }
             .google__btn:hover {
-            box-shadow: 0 0 0 rgba(91, 144, 240, 0);
-        }
+                box-shadow: 0 0 0 rgba(91, 144, 240, 0);
+            }
 
-        footer p {
-            text-align: center;
-        }
-        footer p .fa {
+            footer p {
+                text-align: center;
+            }
+            footer p .fa {
                 color: #333333;
-        }
-        footer p a {
-            text-decoration: none;
-            font-size: 17px;
-            margin: 0 5px;
-        }
-        footer p a .fa-facebook {
-            color: #3b5998;
-        }
-        footer p a .fa-twitter {
-            color: #1da1f2;
-        }
-        footer p a .fa-instagram {
-            color: #f77737;
-        }
-        footer p a .fa-linkedin {
-            color: #0077b5;
-        }
-        footer p a .fa-behance {
-            color: #1769ff;
-        }
+            }
+            footer p a {
+                text-decoration: none;
+                font-size: 17px;
+                margin: 0 5px;
+            }
+            footer p a .fa-facebook {
+                color: #3b5998;
+            }
+            footer p a .fa-twitter {
+                color: #1da1f2;
+            }
+            footer p a .fa-instagram {
+                color: #f77737;
+            }
+            footer p a .fa-linkedin {
+                color: #0077b5;
+            }
+            footer p a .fa-behance {
+                color: #1769ff;
+            }
 
-        /* 회원가입 폼 스타일 추가 */
-        .signup-form {
-            display: none;
-        }
+            /* 회원가입 폼 스타일 추가 */
+            .signup-form {
+                display: none;
+            }
 
-        .signup-form.active {
-            display: block;
-        }
+            .signup-form.active {
+                display: block;
+            }
 
-        .form-check {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
+            .form-check {
+                margin: 10px 0;
+                padding-left: 20px;
+            }
 
-        .form-check input[type="radio"],
-        .form-check input[type="checkbox"] {
-            margin-right: 8px;
-        }
+            .form-check input[type="radio"],
+            .form-check input[type="checkbox"] {
+                margin-right: 8px;
+            }
 
-        .radio-group {
-            display: flex;
-            width: 90%;
-            max-width: 680px;
-            height: 50px;
-            margin: 0 auto;
-            border-radius: 8px;
-            border: none;
-            padding: 0 15px;
-            font-size: 14px;
-            font-family: "Montserrat", sans-serif;
-            align-items: center;
-        }
+            .radio-group {
+                display: flex;
+                width: 90%;
+                max-width: 680px;
+                height: 50px;
+                margin: 0 auto;
+                border-radius: 8px;
+                border: none;
+                padding: 0 15px;
+                font-size: 14px;
+                font-family: "Montserrat", sans-serif;
+                align-items: center;
+            }
 
-        .radio-group.with-bg {
-            background: rgba(15, 19, 42, 0.1);
-        }
-
-        .radio-group > label {
-            flex: 0 0 90px;
-            margin-right: 0;
-            color: rgba(15, 19, 42, 0.6);
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        .radio-group .radio-options {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex: 1;
-        }
-
-        .radio-group .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .radio-group .radio-option label {
-            color: rgba(15, 19, 42, 0.6);
-        }
-
-        .radio-group input[type="radio"] {
-            margin-right: 5px;
-            width: 14px;
-            height: 14px;
-            cursor: pointer;
-        }
-
-        .radio-group input[type="radio"]:checked + label {
-            color: rgba(15, 19, 42, 0.6);
-        }
-
-        .address-input {
-            display: flex;
-            gap: 10px;
-            width: 90%;
-            max-width: 680px;
-            margin: 0 auto;
-            padding: 0;
-        }
-
-        .address-input input[type="text"] {
-            width: calc(100% - 110px);
-            height: 50px;
-            border-radius: 8px;
-            border: none;
-            background: rgba(15, 19, 42, 0.1);
-                color: rgba(15, 19, 42, 0.6);
-            padding: 0 15px;
-            font-size: 14px;
-            font-family: "Montserrat", sans-serif;
-        }
-
-        .address-input input[type="button"] {
-            width: 100px;
-            height: 50px;
-                background: #333333;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: "Montserrat", sans-serif;
-            flex-shrink: 0;
-            padding: 0;
-        }
-
-        .address-input input[type="button"]:hover,
-        .address-input input[type="button"]:focus,
-        .address-input input[type="button"]:active {
-                background: #4a4a4a;
-            color: white;
-        }
-
-        .address-input input[readonly] {
+            .radio-group.with-bg {
                 background: rgba(15, 19, 42, 0.1);
-        }
+            }
 
-        .terms-agreement {
-            width: 90%;
-            max-width: 680px;
-            margin: 20px auto;
-            padding: 20px;
-            background: rgba(15, 19, 42, 0.05);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
+            .radio-group > label {
+                flex: 0 0 90px;
+                margin-right: 0;
+                color: rgba(15, 19, 42, 0.6);
+                font-size: 14px;
+                white-space: nowrap;
+            }
+
+            .radio-group .radio-options {
+                display: flex;
+                align-items: center;
                 gap: 20px;
-        }
+                flex: 1;
+            }
 
-        .terms-agreement h4 {
-            color: rgba(15, 19, 42, 0.7);
-            margin: 0;
-            width: 100%;
-            text-align: left;
+            .radio-group .radio-option {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .radio-group .radio-option label {
+                color: rgba(15, 19, 42, 0.6);
+            }
+
+            .radio-group input[type="radio"] {
+                margin-right: 5px;
+                width: 14px;
+                height: 14px;
+                cursor: pointer;
+            }
+
+            .radio-group input[type="radio"]:checked + label {
+                color: rgba(15, 19, 42, 0.6);
+            }
+
+            .address-input {
+                display: flex;
+                gap: 10px;
+                width: 90%;
+                max-width: 680px;
+                margin: 0 auto;
+                padding: 0;
+            }
+
+            .address-input input[type="text"] {
+                width: calc(100% - 110px);
+                height: 50px;
+                border-radius: 8px;
+                border: none;
+                background: rgba(15, 19, 42, 0.1);
+                color: rgba(15, 19, 42, 0.6);
+                padding: 0 15px;
+                font-size: 14px;
+                font-family: "Montserrat", sans-serif;
+            }
+
+            .address-input input[type="button"] {
+                width: 100px;
+                height: 50px;
+                background: #333333;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+                font-family: "Montserrat", sans-serif;
+                flex-shrink: 0;
+                padding: 0;
+            }
+
+            .address-input input[type="button"]:hover,
+            .address-input input[type="button"]:focus,
+            .address-input input[type="button"]:active {
+                background: #4a4a4a;
+                color: white;
+            }
+
+            .address-input input[readonly] {
+                background: rgba(15, 19, 42, 0.1);
+            }
+
+            .terms-agreement {
+                width: 90%;
+                max-width: 680px;
+                margin: 20px auto;
+                padding: 20px;
+                background: rgba(15, 19, 42, 0.05);
+                border-radius: 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .terms-agreement h4 {
+                color: rgba(15, 19, 42, 0.7);
+                margin: 0;
+                width: 100%;
+                text-align: left;
                 font-size: 16px;
                 font-weight: bold;
             }
@@ -418,7 +418,7 @@
             .terms-agreement h5 {
                 color: rgba(15, 19, 42, 0.7);
                 margin: 0 0 10px 0;
-            font-size: 14px;
+                font-size: 14px;
                 font-weight: bold;
             }
 
@@ -462,7 +462,7 @@
             }
 
             .terms-agreement textarea {
-            width: 100%;
+                width: 100%;
                 height: 80px;
                 margin: 10px 0;
                 padding: 10px;
@@ -497,100 +497,124 @@
                 text-align: center;
                 margin-top: 10px;
                 color: #333333;
-        }
-    </style>
+            }
+
+            /* 기존 스타일 유지 */
+            .invalid-feedback, .valid-feedback {
+                margin-top: 5px;
+                font-size: 14px;
+                display: none;
+            }
+            .invalid-feedback {
+                color: #dc3545;
+            }
+            .valid-feedback {
+                color: #28a745;
+            }
+            .input__block {
+                position: relative;
+            }
+            .input__block .invalid-feedback,
+            .input__block .valid-feedback {
+                width: 90%;
+                margin: 5px auto 0;
+                padding: 0 15px;
+            }
+        </style>
     </th:block>
 </head>
 <body>
 <div layout:fragment="content">
-<div class="container">
+    <div class="container">
         <h1 id="formTitle">로그인</h1>
 
-    <ul class="links">
+        <ul class="links">
             <li><a onclick="showLoginForm(); return false;">로그인</a></li>
             <li><a onclick="showSignupForm(); return false;">회원가입</a></li>
             <li><a onclick="showPasswordResetForm(); return false;">비밀번호 재발급</a></li>
-    </ul>
+        </ul>
 
 
-    <!-- 로그인 폼 -->
-    <form id="loginForm" class="login-form" th:action="@{/member/login}" method="post">
-        <div class="input__block first-input__block">
+        <!-- 로그인 폼 -->
+        <form id="loginForm" class="login-form" th:action="@{/member/login}" method="post">
+            <div class="input__block first-input__block">
                 <input type="email" name="memberEmail" placeholder="이메일" required>
-        </div>
-        <div class="input__block">
-            <input type="password" name="password" placeholder="비밀번호" required>
-        </div>
-        <button type="submit" class="signin__btn">로그인</button>
-    </form>
-
-    <!-- 회원가입 폼 -->
-    <form id="signupForm" class="signup-form" th:action="@{/member/register}" method="post" onsubmit="return validateForm()">
-        <div class="input__block signup-input__block">
-                <input type="email" name="memberEmail" placeholder="이메일" required>
-        </div>
-        <div class="input__block">
-            <input type="password" name="password" id="password" placeholder="비밀번호" required>
-        </div>
-        <div class="input__block">
-            <input type="password" name="confirmPassword" id="confirmPassword" placeholder="비밀번호 확인" required>
-        </div>
-        <div class="input__block">
-            <input type="text" name="memberName" placeholder="이름" required>
-        </div>
-        <div class="input__block">
-            <input type="tel" name="memberPhone" placeholder="전화번호" required>
-        </div>
-        <div class="input__block">
-            <div class="radio-group with-bg">
-                <label>생년월일</label>
-                <input type="date" name="memberBirth" required style="background: transparent;">
             </div>
-        </div>
-        <div class="input__block">
-            <div class="radio-group with-bg">
-                <label>성별</label>
-                <div class="radio-options">
-                    <div class="radio-option">
-                        <input type="radio" name="memberGender" value="남성" id="male" required>
-                        <label for="male">남성</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" name="memberGender" value="여성" id="female" required>
-                        <label for="female">여성</label>
+            <div class="input__block">
+                <input type="password" name="password" placeholder="비밀번호" required>
+            </div>
+            <button type="submit" class="signin__btn">로그인</button>
+        </form>
+
+        <!-- 회원가입 폼 -->
+        <form id="signupForm" class="signup-form" th:action="@{/member/register}" method="post" onsubmit="return validateForm() && validatePassword() && combineAddress()">
+            <div class="input__block signup-input__block">
+                <input type="email" name="memberEmail" placeholder="이메일" required>
+            </div>
+            <div class="input__block">
+                <input type="password" name="password" id="password" placeholder="비밀번호" required>
+            </div>
+            <div class="input__block">
+                <input type="password" name="confirmPassword" id="confirmPassword" placeholder="비밀번호 확인" required>
+                <div id="confirmPasswordFeedback" class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+                <div id="confirmPasswordValid" class="valid-feedback">비밀번호가 일치합니다.</div>
+            </div>
+            <div class="input__block">
+                <input type="text" name="memberName" placeholder="이름" required>
+            </div>
+            <div class="input__block">
+                <input type="tel" name="memberPhone" placeholder="전화번호" required>
+            </div>
+            <div class="input__block">
+                <div class="radio-group with-bg">
+                    <label>생년월일</label>
+                    <input type="date" name="memberBirth" required style="background: transparent;">
+                </div>
+            </div>
+            <div class="input__block">
+                <div class="radio-group with-bg">
+                    <label>성별</label>
+                    <div class="radio-options">
+                        <div class="radio-option">
+                            <input type="radio" name="memberGender" value="남성" id="male" required>
+                            <label for="male">남성</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="memberGender" value="여성" id="female" required>
+                            <label for="female">여성</label>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="input__block">
-            <div class="address-input">
-                <input type="text" id="memberPostcode" placeholder="우편번호" readonly>
-                <input type="button" onclick="execDaumPostcode()" value="주소 검색">
+            <div class="input__block">
+                <div class="address-input">
+                    <input type="text" id="memberPostcode" placeholder="우편번호" readonly>
+                    <input type="button" onclick="execDaumPostcode()" value="주소 검색">
+                </div>
             </div>
-        </div>
-        <div class="input__block">
-            <input type="text" id="memberAddress" name="memberAddress" placeholder="주소" readonly required>
-        </div>
-        <div class="input__block">
-            <input type="text" id="memberExtraAddress" name="memberExtraAddress" placeholder="상세 주소">
-        </div>
-        <div class="input__block">
-            <div class="radio-group with-bg">
-                <label>주문 알림</label>
-                <div class="radio-options">
-                    <div class="radio-option">
-                        <input type="radio" name="alramOrder" value="YES" id="alramYes" checked>
-                        <label for="alramYes">수신</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" name="alramOrder" value="NO" id="alramNo">
-                        <label for="alramNo">미수신</label>
+            <div class="input__block">
+                <input type="text" id="memberAddress" name="memberAddress" placeholder="주소" readonly required>
+            </div>
+            <div class="input__block">
+                <input type="text" id="memberExtraAddress" name="memberExtraAddress" placeholder="상세 주소">
+            </div>
+            <div class="input__block">
+                <div class="radio-group with-bg">
+                    <label>주문 알림</label>
+                    <div class="radio-options">
+                        <div class="radio-option">
+                            <input type="radio" name="alramOrder" value="YES" id="alramYes" checked>
+                            <label for="alramYes">수신</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="alramOrder" value="NO" id="alramNo">
+                            <label for="alramNo">미수신</label>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="terms-agreement">
-            <h4>이용약관 및 정보수집 동의</h4>
+            <div class="terms-agreement">
+                <h4>이용약관 및 정보수집 동의</h4>
                 <div class="terms-section collapsed">
                     <h5>[필수] 서비스 이용약관 동의</h5>
                     <div class="terms-content">
@@ -834,7 +858,7 @@
   ① "몰"과 이용자 간에 발생한 전자상거래 분쟁에 관한 소송은 제소 당시의 이용자의 주소에 의하고, 주소가 없는 경우에는 거소를 관할하는 지방법원의 전속관할로 합니다. 다만, 제소 당시 이용자의 주소 또는 거소가 분명하지 않거나 외국 거주자의 경우에는 민사소송법상의 관할법원에 제기합니다.
 
   ② "몰"과 이용자 간에 제기된 전자상거래 소송에는 한국법을 적용합니다.</textarea>
-            <div class="form-check">
+                        <div class="form-check">
                             <input type="checkbox" id="serviceTerms" required>
                             <label for="serviceTerms">서비스 이용약관에 동의합니다.</label>
                         </div>
@@ -911,61 +935,117 @@ E-mail : himyeongsun@gmail.com
                 <div class="form-check all-terms">
                     <input type="checkbox" id="allTerms">
                     <label for="allTerms">모든 약관에 동의합니다.</label>
+                </div>
             </div>
-        </div>
-        <button type="submit" class="signin__btn">회원가입</button>
-    </form>
+            <button type="submit" class="signin__btn">회원가입</button>
+        </form>
 
-    <!-- 비밀번호 재발급 폼 -->
+        <!-- 비밀번호 재발급 폼 -->
         <form id="passwordResetForm" class="password-reset-form" style="display: none;" th:action="@{/member/password}" method="post" onsubmit="return validatePasswordReset()">
             <div class="input__block password-reset-input__block">
-            <input type="text" name="memberName" id="resetName" placeholder="이름" required>
-        </div>
-        <div class="input__block">
-            <input type="email" name="memberEmail" id="resetEmail" placeholder="이메일" required>
-        </div>
-        <button type="submit" class="signin__btn">비밀번호 재발급</button>
+                <input type="text" name="memberName" id="resetName" placeholder="이름" required>
+            </div>
+            <div class="input__block">
+                <input type="email" name="memberEmail" id="resetEmail" placeholder="이메일" required>
+            </div>
+            <button type="submit" class="signin__btn">비밀번호 재발급</button>
             <div id="resetMessage" style="text-align: center; margin-top: 10px;"></div>
-    </form>
+        </form>
 
-    <div class="separator">또는</div>
+        <div class="separator">또는</div>
 
-    <button class="google__btn">
-        <i class="fa fa-google"></i> Google로 계속하기
-    </button>
+        <button class="google__btn">
+            <i class="fa fa-google"></i> Google로 계속하기
+        </button>
+    </div>
+    <!-- 이메일 중복 시 띄울 모달 -->
+    <div class="modal fade" id="emailMismatchModal" tabindex="-1" aria-labelledby="emailMismatchModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailMismatchModalLabel">이메일 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    이미 가입된 이메일입니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 비밀번호 불일치 시 띄울 모달 -->
+    <div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordMismatchModalLabel">비밀번호 불일치</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    비밀번호가 일치하지 않습니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 연락처 중복 시 띄울 모달 -->
+    <div class="modal fade" id="phoneMismatchModal" tabindex="-1" aria-labelledby="phoneMismatchModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="phoneMismatchModalLabel">연락처 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    이미 가입된 연락처입니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <th:block layout:fragment="script">
-<script>
-    // 폼 전환 함수
-    function showLoginForm() {
-        document.querySelector('.login-form').style.display = 'block';
-        document.querySelector('.signup-form').style.display = 'none';
-        document.querySelector('.password-reset-form').style.display = 'none';
-        document.querySelector('.links li:nth-child(2)').style.opacity = '0.6';
-        document.querySelector('.links li:nth-child(3)').style.opacity = '0.6';
-        document.querySelector('.links li:nth-child(1)').style.opacity = '1';
+    <script>
+        // 폼 전환 함수
+        function showLoginForm() {
+            document.querySelector('.login-form').style.display = 'block';
+            document.querySelector('.signup-form').style.display = 'none';
+            document.querySelector('.password-reset-form').style.display = 'none';
+            document.querySelector('.links li:nth-child(2)').style.opacity = '0.6';
+            document.querySelector('.links li:nth-child(3)').style.opacity = '0.6';
+            document.querySelector('.links li:nth-child(1)').style.opacity = '1';
             document.getElementById('formTitle').textContent = '로그인';
-    }
+        }
 
-    function showSignupForm() {
-        document.querySelector('.login-form').style.display = 'none';
-        document.querySelector('.signup-form').style.display = 'block';
-        document.querySelector('.password-reset-form').style.display = 'none';
-        document.querySelector('.links li:nth-child(1)').style.opacity = '0.6';
-        document.querySelector('.links li:nth-child(3)').style.opacity = '0.6';
-        document.querySelector('.links li:nth-child(2)').style.opacity = '1';
+        function showSignupForm() {
+            document.querySelector('.login-form').style.display = 'none';
+            document.querySelector('.signup-form').style.display = 'block';
+            document.querySelector('.password-reset-form').style.display = 'none';
+            document.querySelector('.links li:nth-child(1)').style.opacity = '0.6';
+            document.querySelector('.links li:nth-child(3)').style.opacity = '0.6';
+            document.querySelector('.links li:nth-child(2)').style.opacity = '1';
             document.getElementById('formTitle').textContent = '회원가입';
-    }
+        }
 
-    function showPasswordResetForm() {
-        document.querySelector('.login-form').style.display = 'none';
-        document.querySelector('.signup-form').style.display = 'none';
-        document.querySelector('.password-reset-form').style.display = 'block';
-        document.querySelector('.links li:nth-child(1)').style.opacity = '0.6';
-        document.querySelector('.links li:nth-child(2)').style.opacity = '0.6';
-        document.querySelector('.links li:nth-child(3)').style.opacity = '1';
+        function showPasswordResetForm() {
+            document.querySelector('.login-form').style.display = 'none';
+            document.querySelector('.signup-form').style.display = 'none';
+            document.querySelector('.password-reset-form').style.display = 'block';
+            document.querySelector('.links li:nth-child(1)').style.opacity = '0.6';
+            document.querySelector('.links li:nth-child(2)').style.opacity = '0.6';
+            document.querySelector('.links li:nth-child(3)').style.opacity = '1';
             document.getElementById('formTitle').textContent = '비밀번호 재발급';
         }
 
@@ -997,62 +1077,170 @@ E-mail : himyeongsun@gmail.com
         });
 
         // 회원가입 폼 제출 시 필수 약관 확인
-    function validateForm() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
 
-        if (password !== confirmPassword) {
-            alert('비밀번호가 일치하지 않습니다.');
-            return false;
-        }
-        return true;
-    }
-
-    // 주소 검색 API
-    function execDaumPostcode() {
-        new daum.Postcode({
-            oncomplete: function(data) {
-                let fullAddr = '';
-                let extraAddr = '';
-
-                if (data.userSelectedType === 'R') {
-                    fullAddr = data.roadAddress;
-                } else {
-                    fullAddr = data.jibunAddress;
-                }
-
-                if(data.userSelectedType === 'R'){
-                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
-                        extraAddr += data.bname;
-                    }
-                    if(data.buildingName !== '' && data.apartment === 'Y'){
-                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                    }
-                    if(extraAddr !== ''){
-                        extraAddr = ' (' + extraAddr + ')';
-                    }
-                }
-
-                document.getElementById('memberPostcode').value = data.zonecode;
-                document.getElementById('memberAddress').value = fullAddr;
+            if (password !== confirmPassword) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return false;
             }
-        }).open();
-    }
+            return true;
+        }
 
-    // 비밀번호 재발급 검증
-    function validatePasswordReset() {
+        // 비밀번호 확인
+        document.getElementById("password").addEventListener("input", checkPasswordMatch);
+        document.getElementById("confirmPassword").addEventListener("input", checkPasswordMatch);
+
+        function checkPasswordMatch() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+            var confirmPasswordInput = document.getElementById("confirmPassword");
+            var confirmPasswordFeedback = document.getElementById("confirmPasswordFeedback");
+            var confirmPasswordValid = document.getElementById("confirmPasswordValid");
+
+            // 비밀번호 입력 필드가 비어있는지 체크
+            if (password === "" || confirmPassword === "") {
+                confirmPasswordInput.classList.remove("is-invalid", "is-valid");
+                confirmPasswordFeedback.style.display = "none";
+                confirmPasswordValid.style.display = "none";
+                return; // 비밀번호가 비어있으면 아무것도 표시하지 않음
+            }
+
+            if (password !== confirmPassword) {
+                confirmPasswordInput.classList.remove("is-valid");
+                confirmPasswordInput.classList.add("is-invalid");
+                confirmPasswordFeedback.style.display = "block";
+                confirmPasswordValid.style.display = "none";
+            } else {
+                confirmPasswordInput.classList.remove("is-invalid");
+                confirmPasswordInput.classList.add("is-valid");
+                confirmPasswordFeedback.style.display = "none";
+                confirmPasswordValid.style.display = "block";
+            }
+        }
+
+        // 비밀번호 일치 체크 함수 (회원가입 폼 제출 전에 실행)
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+                // 모달 띄우기
+                var myModal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
+                myModal.show();
+                return false; // 폼 제출 막기
+            }
+            return true; // 비밀번호 일치 시 폼 제출
+        }
+
+        // 이메일, 연락처 중복 체크 함수
+        $(function () {
+            $("#signupForm").on("submit", function (event) {
+                event.preventDefault();  // 폼 제출을 막고 Ajax로 처리
+
+                var email = $("input[name='memberEmail']").val();
+                var phone = $("input[name='memberPhone']").val();
+                var isValid = true;
+
+                // Promise를 사용하여 두 체크를 동시에 실행
+                Promise.all([
+                    // 이메일 중복 체크
+                    $.ajax({
+                        url: '/member/checkEmail',
+                        method: 'POST',
+                        data: { "email": email }
+                    }),
+                    // 연락처 중복 체크
+                    $.ajax({
+                        url: '/member/checkPhone',
+                        method: 'POST',
+                        data: { "phone": phone }
+                    })
+                ]).then(function(results) {
+                    const [emailResult, phoneResult] = results;
+
+                    // 이메일 중복 체크
+                    if (parseInt(emailResult) === 1) {
+                        var emailModal = new bootstrap.Modal(document.getElementById('emailMismatchModal'));
+                        emailModal.show();
+                        isValid = false;
+                    }
+
+                    // 연락처 중복 체크
+                    if (parseInt(phoneResult) === 1) {
+                        var phoneModal = new bootstrap.Modal(document.getElementById('phoneMismatchModal'));
+                        phoneModal.show();
+                        isValid = false;
+                    }
+
+                    // 둘 다 중복이 아닐 경우에만 폼 제출
+                    if (isValid) {
+                        document.getElementById("signupForm").submit();
+                    }
+                }).catch(function(error) {
+                    console.error("중복 체크 실패:", error);
+                    alert("회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+                });
+            });
+        });
+
+        // 주소 검색 API
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    let fullAddr = '';
+                    let extraAddr = '';
+
+                    if (data.userSelectedType === 'R') {
+                        fullAddr = data.roadAddress;
+                    } else {
+                        fullAddr = data.jibunAddress;
+                    }
+
+                    if(data.userSelectedType === 'R'){
+                        if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                            extraAddr += data.bname;
+                        }
+                        if(data.buildingName !== '' && data.apartment === 'Y'){
+                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        if(extraAddr !== ''){
+                            extraAddr = ' (' + extraAddr + ')';
+                        }
+                    }
+
+                    document.getElementById('memberPostcode').value = data.zonecode;
+                    document.getElementById('memberAddress').value = fullAddr;
+                }
+            }).open();
+        }
+
+        // form submit 전에 memberAddress에 상세 주소 추가
+        function combineAddress() {
+            var detailedAddress = document.getElementById("memberExtraAddress").value.trim();
+            var memberAddress = document.getElementById("memberAddress").value.trim();
+
+            // 상세 주소가 존재하고, memberAddress에 이미 상세주소가 포함되지 않으면 합침
+            if (detailedAddress && !memberAddress.endsWith(detailedAddress)) {
+                document.getElementById("memberAddress").value = memberAddress + " " + detailedAddress;
+            }
+        }
+
+        // 비밀번호 재발급 검증
+        function validatePasswordReset() {
             const name = document.getElementById('resetName').value;
-        const email = document.getElementById('resetEmail').value;
-        const messageDiv = document.getElementById('resetMessage');
-        
-        // 서버에 비밀번호 재발급 요청
-        fetch('/member/password', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+            const email = document.getElementById('resetEmail').value;
+            const messageDiv = document.getElementById('resetMessage');
+
+            // 서버에 비밀번호 재발급 요청
+            fetch('/member/password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'text/plain'
-            },
-            body: JSON.stringify({
+                },
+                body: JSON.stringify({
                     memberName: name,
                     memberEmail: email
                 })
@@ -1060,25 +1248,25 @@ E-mail : himyeongsun@gmail.com
                 .then(response => response.text())
                 .then(result => {
                     if (result === 'success') {
-                messageDiv.style.color = '#4CAF50';
-                messageDiv.textContent = '이메일로 임시 비밀번호가 발송되었습니다.';
+                        messageDiv.style.color = '#4CAF50';
+                        messageDiv.textContent = '이메일로 임시 비밀번호가 발송되었습니다.';
                         setTimeout(() => {
                             showLoginForm();
                         }, 2000);
-            } else {
+                    } else {
                         messageDiv.style.color = '#333333';
                         messageDiv.textContent = '이름 또는 이메일이 일치하지 않습니다.';
-            }
-        })
-        .catch(error => {
+                    }
+                })
+                .catch(error => {
                     console.error('Error:', error);
                     messageDiv.style.color = '#333333';
-            messageDiv.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
-        });
+                    messageDiv.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+                });
 
-        return false; // 폼 기본 제출 방지
-    }
-</script>
+            return false; // 폼 기본 제출 방지
+        }
+    </script>
 </th:block>
 </body>
 </html>

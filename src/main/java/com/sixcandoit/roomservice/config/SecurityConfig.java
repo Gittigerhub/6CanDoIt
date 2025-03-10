@@ -80,6 +80,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/qna/qnalist/**").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/qna/list", "/qna/read", "/qna/register", "/qna/update", "/qna/delete").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
                     auth.requestMatchers("/qna/favYn/update").hasAnyRole("ADMIN", "HO", "BO");
+                    auth.requestMatchers("/qna/adminread").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/reply/**").hasAnyRole("ADMIN", "HO", "BO");
                     // 룸 관리, 룸 예약 페이지 접근 권한
                     auth.requestMatchers("/room/**", "/res/**").permitAll();
@@ -148,6 +149,7 @@ public class SecurityConfig{
             auth.requestMatchers("/qna/qnalist/**").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/qna/list", "/qna/read", "/qna/register", "/qna/update", "/qna/delete").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             auth.requestMatchers("/qna/favYn/update").hasAnyRole("ADMIN", "HO", "BO");
+            auth.requestMatchers("/qna/adminread").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/reply/**").hasAnyRole("ADMIN", "HO", "BO");
             // 룸 관리, 룸 예약 페이지 접근 권한
             auth.requestMatchers("/room/**", "/res/**").permitAll();

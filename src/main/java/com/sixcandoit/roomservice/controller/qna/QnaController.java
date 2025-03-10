@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -64,10 +66,23 @@ public class QnaController {
 
     // 관리자용 QnA 전체 목록 페이지
     @GetMapping("/qna/qnalist")
-    public String qnalist(@PageableDefault(page = 1) Pageable page, // 페이지 정보
-                       @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
-                       @RequestParam(value = "keyword", defaultValue = "") String keyword, // 키워드
-                       Model model){
+    public String qnalist(@PageableDefault(page = 1) Pageable page,
+                       @RequestParam(value = "type", defaultValue = "") String type,
+                       @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                       @AuthenticationPrincipal CustomUserDetails userDetails,
+                       Model model,
+                       RedirectAttributes redirectAttributes) {
+        
+        // 관리자 권한 체크
+        if (userDetails == null || !userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
+            // 권한이 없는 경우 일반 사용자 목록으로 리다이렉트
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
+            redirectAttributes.addFlashAttribute("alertMessage", "관리자만 접근할 수 있습니다.");
+            return "redirect:/qna/list";
+        }
 
         // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
         Page<QnaDTO> qnaDTOS = qnaService.qnaList(page, type, keyword);
@@ -140,7 +155,8 @@ public class QnaController {
     // Qna의 Q 읽기
     @GetMapping("/qna/read")
     public String read(@RequestParam Integer idx, Model model,
-                      @AuthenticationPrincipal CustomUserDetails userDetails){
+                      @AuthenticationPrincipal CustomUserDetails userDetails,
+                      RedirectAttributes redirectAttributes){
 
         String join = "qna";
 
@@ -164,35 +180,88 @@ public class QnaController {
             model.addAttribute("currentUser", userDetails.getMember().getMemberName());
         }
 
-        // 디버깅을 위한 로그 추가
-        log.info("현재 로그인한 사용자: {}", userDetails != null ? userDetails.getMember().getMemberName() : "anonymous");
-        log.info("글 작성자: {}", qnaDTO.getMemberName());
-        log.info("FavYn 값: {}", qnaDTO.getFavYn());
-        if (userDetails != null) {
-            log.info("사용자 권한: {}", userDetails.getAuthorities());
-        }
-
-        // 관리자인 경우 관리자용 뷰 반환
+        // 일반 회원은 자신의 글이나 자주 묻는 질문만 조회 가능
         if (userDetails != null && 
-            userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
-            return "qna/adminread";
-        }
-
-        // 자주 묻는 질문이거나 작성자인 경우에만 조회 가능
-        if (userDetails != null && 
-            !userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)")) &&
             !qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName()) &&
             !"Y".equals(qnaDTO.getFavYn())) {
+            
+            // 관리자인 경우 adminread로 리다이렉트
+            if (userDetails.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
+                return "redirect:/qna/adminread?idx=" + idx;
+            }
+            
             log.warn("접근 제한 - 사용자: {}, 작성자: {}, FavYn: {}", 
                 userDetails.getMember().getMemberName(), 
                 qnaDTO.getMemberName(), 
                 qnaDTO.getFavYn());
-            throw new RuntimeException("자신이 작성한 글만 읽을 수 있습니다.");
+            
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
+            redirectAttributes.addFlashAttribute("alertMessage", "자주 묻는 질문이나 자신이 작성한 글만 읽을 수 있습니다.");
+            return "redirect:/qna/list";
         }
 
         return "qna/read";
+    }
+
+    // 관리자용 Qna 읽기
+    @GetMapping("/qna/adminread")
+    public String adminread(@RequestParam Integer idx, Model model,
+                      @AuthenticationPrincipal CustomUserDetails userDetails,
+                      RedirectAttributes redirectAttributes){
+
+        // 상세 로깅 추가
+        if (userDetails != null) {
+            log.info("현재 로그인한 사용자: {}", userDetails.getUsername());
+            log.info("사용자 권한: {}", userDetails.getAuthorities());
+        } else {
+            log.warn("로그인하지 않은 사용자의 접근");
+        }
+
+        // 관리자 권한 체크
+        if (userDetails == null || !userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
+            log.warn("관리자 권한 체크 실패 - 사용자 정보: {}", 
+                userDetails != null ? userDetails.getAuthorities() : "null");
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
+            redirectAttributes.addFlashAttribute("alertMessage", "관리자만 접근할 수 있습니다.");
+            return "redirect:/qna/list";
+        }
+
+        String join = "qna";
+
+        qnaService.count(idx); // 조회수 증가
+        log.info("관리자용 개별 데이터를 읽는 중입니다.");
+        QnaDTO qnaDTO = qnaService.qnaRead(idx);
+
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx, join);
+
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+        log.info("개별 데이터를 페이지에 전달하는 중입니다.");
+        model.addAttribute("qnaDTO", qnaDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
+        
+        // 현재 로그인한 사용자 정보 추가 (안전하게 처리)
+        try {
+            if (userDetails != null && userDetails.getMember() != null) {
+                model.addAttribute("currentUser", userDetails.getMember().getMemberName());
+            } else {
+                model.addAttribute("currentUser", userDetails.getUsername());
+            }
+        } catch (Exception e) {
+            log.warn("사용자 정보 설정 중 오류 발생: {}", e.getMessage());
+            model.addAttribute("currentUser", "Unknown");
+        }
+
+        return "qna/adminread";
     }
 
     // Qna의 Q 수정할 게시글 불러오기
@@ -203,19 +272,22 @@ public class QnaController {
         log.info("수정할 데이터를 읽는 중입니다.");
         QnaDTO qnaDTO = qnaService.qnaRead(idx);
 
-        // 작성자 검증
-        if (userDetails == null || !qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName())) {
+        // 작성자이거나 관리자인 경우에만 수정 가능
+        boolean isAdmin = userDetails != null && userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
+        boolean isAuthor = userDetails != null && qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName());
+
+        if (!isAdmin && !isAuthor) {
             log.warn("Unauthorized access attempt to edit QnA. User: {}, QnA author: {}", 
                 userDetails != null ? userDetails.getMember().getMemberName() : "anonymous", 
                 qnaDTO.getMemberName());
             
-            // SweetAlert를 위한 메시지 설정
             redirectAttributes.addFlashAttribute("sweetAlert", true);
             redirectAttributes.addFlashAttribute("alertType", "error");
             redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
-            redirectAttributes.addFlashAttribute("alertMessage", "자신이 작성한 글만 수정할 수 있습니다.");
+            redirectAttributes.addFlashAttribute("alertMessage", "작성자나 관리자만 수정할 수 있습니다.");
             
-            return "redirect:/qna/list";  // 권한이 없으면 목록으로 리다이렉트
+            return "redirect:/qna/list";
         }
 
         log.info("개별 데이터를 페이지로 전달합니다.");
@@ -273,8 +345,12 @@ public class QnaController {
         // QnA 데이터 조회
         QnaDTO qnaDTO = qnaService.qnaRead(idx);
         
-        // 작성자 검증
-        if (!qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName())) {
+        // 작성자이거나 관리자인 경우에만 삭제 가능
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
+        boolean isAuthor = qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName());
+
+        if (!isAdmin && !isAuthor) {
             log.warn("권한 없는 사용자의 삭제 시도 - 사용자: {}, 작성자: {}", 
                 userDetails.getMember().getMemberName(), 
                 qnaDTO.getMemberName());
@@ -282,7 +358,7 @@ public class QnaController {
             redirectAttributes.addFlashAttribute("sweetAlert", true);
             redirectAttributes.addFlashAttribute("alertType", "error");
             redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
-            redirectAttributes.addFlashAttribute("alertMessage", "자신이 작성한 글만 삭제할 수 있습니다.");
+            redirectAttributes.addFlashAttribute("alertMessage", "작성자나 관리자만 삭제할 수 있습니다.");
             
             return "redirect:/qna/list";
         }
@@ -299,7 +375,8 @@ public class QnaController {
             redirectAttributes.addFlashAttribute("alertTitle", "삭제 완료");
             redirectAttributes.addFlashAttribute("alertMessage", "게시글이 삭제되었습니다.");
             
-            return "redirect:/qna/list";
+            // 관리자가 삭제한 경우 관리자 목록으로, 작성자가 삭제한 경우 일반 목록으로 리다이렉트
+            return isAdmin ? "redirect:/qna/qnalist" : "redirect:/qna/list";
         } catch (Exception e) {
             log.error("게시글 삭제 중 오류 발생: " + e.getMessage(), e);
             redirectAttributes.addFlashAttribute("sweetAlert", true);
@@ -315,6 +392,57 @@ public class QnaController {
     public String updateFavYn(@RequestParam Integer idx, @RequestParam String favYn) {
         qnaService.updateFavYn(idx, favYn);
         return "redirect:/qna/read?idx=" + idx; // 상세 페이지로 리다이렉트
+    }
+
+    // 관리자용 Qna 수정 처리
+    @PostMapping("/qna/adminupdate")
+    @ResponseBody
+    public ResponseEntity<String> adminUpdate(@ModelAttribute QnaDTO qnaDTO,
+                             List<MultipartFile> imageFiles,
+                             @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("관리자용 QnA 수정 처리...");
+        
+        // 관리자 권한 체크
+        if (userDetails == null || !userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
+            return ResponseEntity.status(403).body("관리자만 수정할 수 있습니다.");
+        }
+
+        try {
+            // 서비스 메서드 호출 (수정 처리)
+            qnaService.qnaUpdate(qnaDTO, "qna", imageFiles);
+            return ResponseEntity.ok("QnA가 성공적으로 수정되었습니다.");
+        } catch (RuntimeException e) {
+            log.error("QnA 수정 중 오류 발생: " + e.getMessage(), e);
+            return ResponseEntity.badRequest().body("QnA 수정 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 관리자용 Qna 삭제 처리
+    @PostMapping("/qna/admindelete")
+    @ResponseBody
+    public ResponseEntity<String> adminDelete(@RequestParam Integer idx,
+                        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("관리자용 QnA 삭제 처리...");
+        
+        // 관리자 권한 체크
+        if (userDetails == null || !userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
+            return ResponseEntity.status(403).body("관리자만 삭제할 수 있습니다.");
+        }
+
+        try {
+            // 해당 질문에 달린 답변을 먼저 삭제
+            replyService.deleteRepliesByQnaIdx(idx);
+
+            // QnA 삭제
+            qnaService.qnaDelete(idx, "qna");
+            
+            return ResponseEntity.ok("QnA가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            log.error("QnA 삭제 중 오류 발생: " + e.getMessage(), e);
+            return ResponseEntity.badRequest().body("QnA 삭제 중 오류가 발생했습니다.");
+        }
     }
 
     // 예외 처리기 추가

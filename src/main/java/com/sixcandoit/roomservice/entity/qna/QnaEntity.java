@@ -30,10 +30,10 @@ public class QnaEntity extends BaseEntity {
     @Column(name = "qna_contents", nullable = false)
     private String qnaContents;        // 내용
 
-    @Column(name = "fav_yn", nullable = false)
+    @Column(name = "fav_yn", columnDefinition = "varchar(1) default 'N'")
     private String favYn = "N";              // 자주 묻는 질문 여부
 
-    @Column(name = "reply_yn", nullable = false)
+    @Column(name = "reply_yn", columnDefinition = "varchar(1) default 'N'")
     private String replyYn = "N";            // 답변 여부
 
     @Column(name = "qna_hits", nullable = false)

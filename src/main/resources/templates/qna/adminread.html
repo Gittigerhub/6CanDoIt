@@ -73,7 +73,7 @@
                             <!-- 수정 버튼 (모달 띄우기) -->
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#qnaUpdateModal">수정</button>
                             <!-- 삭제 버튼 -->
-                            <button class="btn btn-danger" onclick="deleteQna()">삭제</button>
+                            <button id="deleteQnaBtn" class="btn btn-danger">삭제</button>
                         </div>
                     </div>
 
@@ -208,64 +208,110 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         $(document).ready(function() {
-
-            // 기존 답변 등록 폼 제출 처리
-            $('#replyForm').on('submit', function(e) {
-                e.preventDefault();
+            // SweetAlert 처리
+            const sweetAlert = /*[[${sweetAlert}]]*/ false;
+            if (sweetAlert) {
+                const alertType = /*[[${alertType}]]*/ '';
+                const alertTitle = /*[[${alertTitle}]]*/ '';
+                const alertMessage = /*[[${alertMessage}]]*/ '';
                 
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        $('#replyModal').modal('hide');
-                        Swal.fire({
-                            title: '성공!',
-                            text: '답변이 작성되었습니다.',
-                            icon: 'success',
-                            confirmButtonText: '확인'
-                        }).then((result) => {
-                            location.reload();
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            title: '오류 발생',
-                            text: '답변 작성 중 문제가 발생했습니다.',
-                            icon: 'error',
-                            confirmButtonText: '확인'
+                Swal.fire({
+                    title: alertTitle,
+                    text: alertMessage,
+                    icon: alertType,
+                    confirmButtonText: '확인'
+                });
+            }
+
+            // QnA 삭제 처리
+            $('#deleteQnaBtn').click(function() {
+                const qnaIdx = /*[[${qnaDTO.idx}]]*/ 0;
+                
+                Swal.fire({
+                    title: '정말 삭제하시겠습니까?',
+                    text: "답변을 포함한 게시글이 모두 삭제됩니다.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '삭제',
+                    cancelButtonText: '취소'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/qna/admindelete',
+                            type: 'POST',
+                            data: { idx: qnaIdx },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: '삭제 완료!',
+                                    text: '게시글이 삭제되었습니다.',
+                                    icon: 'success',
+                                    confirmButtonText: '확인'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '/qna/qnalist';
+                                    }
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire({
+                                    title: '오류 발생',
+                                    text: '게시글 삭제 중 문제가 발생했습니다.',
+                                    icon: 'error',
+                                    confirmButtonText: '확인'
+                                });
+                            }
                         });
                     }
                 });
+            });
+
+            // 모달이 닫힐 때 포커스 관리
+            $('.modal').on('hidden.bs.modal', function () {
+                const triggerButton = $('[data-bs-toggle="modal"][data-bs-target="#' + $(this).attr('id') + '"]');
+                if (triggerButton.length) {
+                    triggerButton.focus();
+                }
             });
 
             // QnA 수정 폼 제출 처리
             $('#qnaUpdateForm').on('submit', function(e) {
                 e.preventDefault();
                 
-                let formData = new FormData(this);
+                const formData = new FormData(this);
                 
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: '/qna/adminupdate',
                     type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function(response) {
-                        $('#qnaUpdateModal').modal('hide');
                         Swal.fire({
                             title: '성공!',
-                            text: 'QnA가 수정되었습니다.',
+                            text: response,
                             icon: 'success',
                             confirmButtonText: '확인'
                         }).then((result) => {
-                            location.reload();
+                            if (result.isConfirmed) {
+                                window.location.reload();
+                            }
                         });
                     },
                     error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        
+                        let errorMessage = 'QnA 수정 중 문제가 발생했습니다.';
+                        if (xhr.status === 403) {
+                            errorMessage = '관리자 권한이 필요합니다.';
+                        }
+                        
                         Swal.fire({
                             title: '오류 발생',
-                            text: 'QnA 수정 중 문제가 발생했습니다.',
+                            text: errorMessage,
                             icon: 'error',
                             confirmButtonText: '확인'
                         });
@@ -273,45 +319,6 @@
                 });
             });
         });
-
-        // QnA 삭제 함수
-        function deleteQna() {
-            Swal.fire({
-                title: '삭제 확인',
-                text: '정말로 이 QnA를 삭제하시겠습니까?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: '삭제',
-                cancelButtonText: '취소'
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    $.ajax({
-                        url: '/qna/admindelete',
-                        type: 'POST',
-                        data: { idx: [[${qnaDTO.idx}]] },
-                        success: function(response) {
-                            Swal.fire({
-                                title: '성공!',
-                                text: 'QnA가 삭제되었습니다.',
-                                icon: 'success',
-                                confirmButtonText: '확인'
-                            }).then((result) => {
-                                window.location.href = '/qna/qnalist';
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                title: '오류 발생',
-                                text: 'QnA 삭제 중 문제가 발생했습니다.',
-                                icon: 'error',
-                                confirmButtonText: '확인'
-                            });
-                        }
-                    });
-                }
-            });
-        }
     </script>
 </th:block>
 </body>

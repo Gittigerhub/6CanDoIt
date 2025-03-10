@@ -19,6 +19,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
 import java.util.List;
@@ -27,7 +28,9 @@ import java.util.Optional;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-public class OrdersCotroller {
+@RequestMapping("/member")
+
+public class MemberOrdersCotroller {
 
     private final OrdersService ordersService;
 

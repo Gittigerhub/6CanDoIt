@@ -87,10 +87,10 @@
                             <td style="vertical-align: middle; text-align: center;" th:text="${menu.menuContent}"></td>
                             <td style="vertical-align: middle; text-align: center;" th:text="${#numbers.formatInteger(menu.menuPrice, 0, 'COMMA')} + '원'"></td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <input class="form-control mx-auto" name="count" style="width: 70px" th:type="Number" th:value="${1}">
+                                <input class="form-control mx-auto count" name="count" style="width: 70px" th:type="Number" th:value="${1}">
                             </td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <i class="bi bi-cart-plus-fill addCart" th:data-id="${menu.idx}" th:data-name="${menu.menuName}" th:data-price="${menu.menuPrice}" style="font-size: 24px"></i>
+                                <i class="bi bi-cart-plus-fill addCart" th:data-id="${menu.idx}" style="font-size: 24px"></i>
                             </td>
                         </tr>
                         </tbody>
@@ -162,9 +162,8 @@
                 $.ajax({
                     url: '/cart',
                     type: 'POST',
-                    contentType: 'application/json', // 데이터를 JSON 형식으로 전송
                     data: {
-                        menuidx: menuIdx,
+                        idx: menuIdx,
                         count: count
                     },
                     success: function (response) {

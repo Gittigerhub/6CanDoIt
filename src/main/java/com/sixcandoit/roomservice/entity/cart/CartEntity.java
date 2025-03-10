@@ -35,6 +35,12 @@ public class CartEntity extends BaseEntity {
     @OneToMany(mappedBy = "cartEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartMenuEntity> cartMenuJoin;
 
+    // 카트메뉴 생성과 동시에 FK 자동추가
+    public void addCartMenu(CartMenuEntity cartMenu) {
+        this.cartMenuJoin.add(cartMenu);
+        cartMenu.setCartEntity(this);
+    }
+
     // 예약 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "res_idx")

@@ -32,8 +32,7 @@ public class CartController {
 
     //장바구니 등록
     @PostMapping("/cart")
-    @ResponseBody
-    public ResponseEntity registerCart(Integer idx, int count, Principal principal) {
+    public ResponseEntity<?> registerCart(Integer idx, @RequestParam(value = "count", defaultValue = "0") int count, Principal principal) {
 
         System.out.println("메뉴 Idx : " + idx);
         System.out.println("메뉴 수량 : " + count);
@@ -54,6 +53,7 @@ public class CartController {
         // 값이 잘 넘어왔다면
         // 이메일로 회원을 찾고 장바구니에 메뉴 추가
         String email = principal.getName();
+        System.out.println("email 정보 : " + email);
 
         try {
             //장바구니에 추가

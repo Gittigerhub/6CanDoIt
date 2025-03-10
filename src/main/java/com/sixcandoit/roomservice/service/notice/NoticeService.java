@@ -218,6 +218,5 @@ public class NoticeService {
         NoticeDTO noticeDTO = modelMapper.map(noticeEntity, NoticeDTO.class);
 
         return noticeDTO;
-
     }
 }

@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/memberlayout}">
+      layout:decorate="~{layouts/superlayout}">
 <head>
   <meta charset="UTF-8">
   <title>공지사항 상세보기</title>
@@ -19,7 +19,7 @@
         <!--디자인-->
         <div class="card">
           <div class="card-header">
-            <h4>공지사항</h4>
+            <h2 class="text-center fs-1">공지사항</h2>
           </div>
           <div class="card-body">
             <p>번호: <span th:text="${noticeDTO.idx}"></span></p>
@@ -48,22 +48,23 @@
             <p>수정일:
               <span th:text="${#temporals.format(noticeDTO.modDate,'yyyy-MM-dd HH:mm')}"></span>
             </p>
-
-            <!-- 목록, 수정, 삭제 버튼을 카드 안에 배치하고 오른쪽 정렬 -->
-            <div class="d-flex justify-content-end mt-3">
-              <a th:href="@{/notice/list}" class="btn btn-secondary ms-2">목록</a>
-              <a th:href="@{/notice/update(idx=${noticeDTO.idx})}" class="btn btn-warning ms-2">수정</a>
-              <form th:action="@{|/notice/delete/${noticeDTO.idx}|}" method="post" style="display: inline-block;" class="ms-2"
-                    onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
-                <button type="submit" class="btn btn-danger">삭제</button>
-              </form>
-            </div>
           </div>
         </div>
-        <div class="col"></div>
-      </div><!--row끝-->
-    </div>
+
+        <!-- 목록, 수정, 삭제 버튼을 카드 밖으로 이동 -->
+        <div class="d-flex justify-content-end mt-3">
+          <a th:href="@{/notice/list}" class="btn btn-secondary ms-2">목록</a>
+          <a th:href="@{/notice/update(idx=${noticeDTO.idx})}" class="btn btn-warning ms-2">수정</a>
+          <form th:action="@{|/notice/delete/${noticeDTO.idx}|}" method="post" style="display: inline-block;" class="ms-2"
+                onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+            <button type="submit" class="btn btn-danger">삭제</button>
+          </form>
+        </div>
+
+      </div><!--col-10끝-->
+      <div class="col"></div>
+    </div><!--row끝-->
   </div>
 </div>
 </body>

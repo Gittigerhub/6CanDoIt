@@ -66,4 +66,8 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     @Query("select r from ReservationEntity r where r.memberJoin.idx = :idx and r.resStatus = '2'")
     Optional<ReservationEntity> CheckInReserv(@Param("idx") Integer idx);
 
+    // 회원 이메일로 예약 조회
+    @Query("SELECT r FROM ReservationEntity r WHERE r.memberJoin.memberEmail = :memberEmail ORDER BY r.startDate DESC")
+    List<ReservationEntity> findByMemberEmail(@Param("memberEmail") String memberEmail);
+
 }

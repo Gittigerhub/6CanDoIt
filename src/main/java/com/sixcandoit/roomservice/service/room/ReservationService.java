@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -47,73 +48,97 @@ public class ReservationService {
 
     //주어진 DTO를 Entity로 변환한 후, 데이터베이스에 저장하고 저장된 결과를 다시 DTO로 변환하여 반환
     public ReservationDTO reserveInsert(ReservationDTO reservationDTO) {
+        log.info("Inserting new reservation: {}", reservationDTO);
         // RoomEntity를 roomIdx로 조회
         Optional<RoomEntity> roomEntityOpt = roomRepository.findById(reservationDTO.getRoomIdx());
 
         if (roomEntityOpt.isPresent()) {
-            log.info("방이 존재하면...");
-            ReservationEntity reserveEntity = modelMapper
-                    .map(reservationDTO, ReservationEntity.class);
-
-            log.info("예약 기간이 겹치면...");
+            log.info("Room found, checking availability...");
             // 예약 기간이 겹치는지 확인
             if (!checkAvailability(reservationDTO.getRoomIdx(), reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
-                log.info("예약 기간 겹침......저장x");
+                log.info("Room is not available for the selected dates");
                 throw new RuntimeException("선택한 기간에 이미 예약이 존재합니다.");
             }
-            log.info("예약 기간이 겹치치 않음...");
-            // RoomEntity 설정
-            RoomEntity roomEntity = roomEntityOpt.get();
-            reserveEntity.setRoomJoin(roomEntity);  // ReservationEntity에 RoomEntity 설정
 
-            // 예약 상태 변경
+            ReservationEntity reserveEntity = new ReservationEntity();
+            
+            // 기본 정보 설정
+            reserveEntity.setStartDate(reservationDTO.getStartDate());
+            reserveEntity.setEndDate(reservationDTO.getEndDate());
             reserveEntity.setResStatus("1");  // 예약 중으로 상태 변경
 
+            // RoomEntity 설정
+            RoomEntity roomEntity = roomEntityOpt.get();
+            reserveEntity.setRoomJoin(roomEntity);
+
             // 회원 정보 설정
-            MemberEntity memberEntity = modelMapper.map(reservationDTO.getMemberDTO(), MemberEntity.class);
-            reserveEntity.setMemberJoin(memberEntity);
-            reserveEntity.setUsername(memberEntity.getMemberName());
+            if (reservationDTO.getMemberDTO() != null) {
+                MemberEntity memberEntity = modelMapper.map(reservationDTO.getMemberDTO(), MemberEntity.class);
+                reserveEntity.setMemberJoin(memberEntity);
+                // 회원 이름 설정
+                reserveEntity.setUsername(memberEntity.getMemberName());
+                log.info("Member information set: {}", memberEntity.getMemberName());
+            } else {
+                log.warn("No member information provided in reservationDTO");
+            }
 
             // ReservationEntity 저장
             ReservationEntity result = reservationRepository.save(reserveEntity);
-            ReservationDTO resultDTO = modelMapper.map(result, ReservationDTO.class);
-
-            return resultDTO;
+            log.info("Reservation saved successfully");
+            return modelMapper.map(result, ReservationDTO.class);
         }
-        // 방 정보가 없으면 null 반환
+        log.warn("Room not found with idx: {}", reservationDTO.getRoomIdx());
         return null;
     }
 
     //주어진 DTO의 ID로 데이터베이스에서 해당 데이터를 찾아 수정
     public ReservationDTO reserveUpdate(ReservationDTO reservationDTO) {
-        Optional<ReservationEntity> findData =
-                reservationRepository.findByIdx(reservationDTO.getIdx());
+        log.info("Updating reservation: {}", reservationDTO);
+        Optional<ReservationEntity> findData = reservationRepository.findByIdx(reservationDTO.getIdx());
 
         if(findData.isPresent()) {
-            // 기존 ReservationEntity를 업데이트할 때, RoomEntity 상태도 고려
-            ReservationEntity reserveEntity = modelMapper.map(reservationDTO, ReservationEntity.class);
-
-            // 예약 기간이 겹치는지 확인
-            if (!checkAvailability(reservationDTO.getRoomIdx(), reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
-                throw new RuntimeException("선택한 기간에 이미 예약이 존재합니다.");
+            ReservationEntity existingReservation = findData.get();
+            
+            // 기존 예약과 동일한 roomIdx가 아닌 경우에만 중복 체크
+            if (!existingReservation.getRoomJoin().getIdx().equals(reservationDTO.getRoomIdx())) {
+                // 예약 기간이 겹치는지 확인
+                if (!checkAvailability(reservationDTO.getRoomIdx(), reservationDTO.getStartDate(), reservationDTO.getEndDate())) {
+                    throw new RuntimeException("선택한 기간에 이미 예약이 존재합니다.");
+                }
             }
 
-            // RoomEntity를 roomIdx로 조회
+            // 기존 예약 엔티티 업데이트
+            existingReservation.setStartDate(reservationDTO.getStartDate());
+            existingReservation.setEndDate(reservationDTO.getEndDate());
+            
+            // RoomEntity 설정
             Optional<RoomEntity> roomEntityOpt = roomRepository.findByIdx(reservationDTO.getRoomIdx());
-
             if (roomEntityOpt.isPresent()) {
                 RoomEntity roomEntity = roomEntityOpt.get();
-                reserveEntity.setRoomJoin(roomEntity);  // ReservationEntity에 RoomEntity 설정
+                existingReservation.setRoomJoin(roomEntity);
             }
-            reserveEntity.setResStatus("1"); // 예약 중으로 상태 변경
 
-            // ReservationEntity 저장
-            ReservationEntity result = reservationRepository.save(reserveEntity);
-            ReservationDTO resultDTO = modelMapper.map(result, ReservationDTO.class);
+            // 예약 상태 설정
+            existingReservation.setResStatus("1"); // 예약 중으로 상태 변경
 
-            return resultDTO;
+            // 기존 회원 정보 유지
+            MemberEntity existingMember = existingReservation.getMemberJoin();
+            if (existingMember != null) {
+                log.info("Keeping existing member information: {}", existingMember.getMemberName());
+                // 기존 회원 정보와 이름 유지
+                existingReservation.setMemberJoin(existingMember);
+                existingReservation.setUsername(existingMember.getMemberName());
+            } else {
+                log.warn("No existing member information found");
+            }
+
+            // 저장 및 반환
+            ReservationEntity result = reservationRepository.save(existingReservation);
+            log.info("Successfully updated reservation with member info: {}", result.getUsername());
+            return modelMapper.map(result, ReservationDTO.class);
         }
 
+        log.warn("Reservation not found with idx: {}", reservationDTO.getIdx());
         return null;
     }
 
@@ -162,5 +187,18 @@ public class ReservationService {
         }
 
         return Arrays.asList(modelMapper.map(reserveEntities, ReservationDTO[].class));
+    }
+
+    // 사용자의 예약 목록 조회
+    public List<ReservationDTO> getUserReservations(String memberEmail) {
+        log.info("Fetching reservations for user: {}", memberEmail);
+        try {
+            List<ReservationEntity> reservations = reservationRepository.findByMemberEmail(memberEmail);
+            log.info("Found {} reservations", reservations.size());
+            return Arrays.asList(modelMapper.map(reservations, ReservationDTO[].class));
+        } catch (Exception e) {
+            log.error("Error fetching reservations for user: {}", memberEmail, e);
+            return new ArrayList<>();
+        }
     }
 }

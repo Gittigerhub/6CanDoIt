@@ -2,58 +2,475 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/memberlayout}">
 <head>
     <meta charset="UTF-8">
     <title>객실 목록</title>
+    <!-- CSRF 토큰 -->
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!--아이콘-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .room-gallery {
+            margin-bottom: 2rem;
+        }
+        .room-gallery .carousel-item img {
+            height: 400px;
+            object-fit: cover;
+        }
+        .room-thumbnails {
+            margin-top: 1rem;
+        }
+        .room-thumbnails img {
+            width: 100px;
+            height: 70px;
+            object-fit: cover;
+            cursor: pointer;
+            margin: 0 5px;
+            border-radius: 5px;
+            transition: opacity 0.3s;
+        }
+        .room-thumbnails img:hover {
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
+    <!-- 객실 사진 갤러리 -->
     <div class="container mt-5">
-        <h2 class="mb-4" th:text="${organization.organName + ' 객실 목록'}">객실 목록</h2>
-        
-        <div class="row">
-            <!-- 각 룸 카드 -->
-            <div class="col-md-4 mb-4" th:each="room : ${roomDTOS}">
-                <div class="card h-100">
-                    <!-- 대표 이미지 -->
-                    <div th:if="${repImageMap.get(room.idx)}" class="position-relative">
-                        <img th:each="image : ${imageFileMap.get(room.idx)}"
-                             th:if="${image.repimageYn == 'Y'}"
-                             th:src="@{${image.url}}"
-                             class="card-img-top"
-                             style="height: 200px; object-fit: cover;"
-                             alt="Room Image">
+        <div class="room-gallery">
+            <!-- 메인 캐러셀 -->
+            <div id="mainRoomCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div th:each="room, roomStat : ${roomDTOS}" class="carousel-item" th:classappend="${roomStat.first} ? 'active'">
+                        <div th:if="${repImageMap.get(room.idx)}" class="position-relative">
+                            <img th:each="image : ${imageFileMap.get(room.idx)}"
+                                 th:if="${image.repimageYn == 'Y'}"
+                                 th:src="@{${image.url}}"
+                                 class="d-block w-100"
+                                 alt="Room Image">
+                            <div class="carousel-caption">
+                                <h5 th:text="${room.roomName}">객실 이름</h5>
+                            </div>
+                        </div>
                     </div>
-                    <div th:unless="${repImageMap.get(room.idx)}" class="position-relative">
-                        <img src="/images/no-image.png" class="card-img-top" style="height: 200px; object-fit: cover;" alt="No Image">
-                    </div>
-                    
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${room.roomName}">룸 이름</h5>
-                        <p class="card-text">
-                            <span class="badge bg-primary" th:text="${room.roomType}">룸 타입</span>
-                            <span class="badge bg-info" th:text="${room.roomNum + '인실'}">투숙 인원</span>
-                            <span th:if="${room.roomBreakfast == 'Y'}" class="badge bg-success">조식 포함</span>
-                        </p>
-                        <p class="card-text">
-                            <i class="fas fa-bed"></i> 침대 [[${room.roomBed}]]개<br>
-                            <i class="fas fa-expand"></i> [[${room.roomSize}]]평<br>
-                            <strong class="text-primary">₩[[${#numbers.formatInteger(room.roomPrice, 0, 'COMMA')}]]</strong>/박
-                        </p>
-                        <div class="mt-3">
-                            <a th:href="@{/room/detail(idx=${room.idx})}" class="btn btn-outline-primary">상세 보기</a>
-                            <a th:href="@{/res/create}" class="btn btn-primary">예약하기</a>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#mainRoomCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#mainRoomCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <!-- 썸네일 갤러리 -->
+            <div class="room-thumbnails d-flex justify-content-center flex-wrap">
+                <div th:each="room : ${roomDTOS}" class="thumbnail">
+                    <img th:each="image : ${imageFileMap.get(room.idx)}"
+                         th:if="${image.repimageYn == 'Y'}"
+                         th:src="@{${image.url}}"
+                         th:attr="data-bs-target='#mainRoomCarousel',data-bs-slide-to=${roomStat.index}"
+                         alt="Room Thumbnail">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 객실 목록 -->
+    <div class="container mt-5">
+        <div class="p-5 bg-white rounded shadow">
+            <h2 class="mb-4" th:text="${organization.organName + ' 객실 목록'}">객실 목록</h2>
+            <div class="row">
+                <!-- 각 룸 카드 -->
+                <div class="col-md-4 mb-4" th:each="room : ${roomDTOS}">
+                    <div class="card h-100">
+                        <!-- 대표 이미지 -->
+                        <div th:if="${repImageMap.get(room.idx)}" class="position-relative">
+                            <img th:each="image : ${imageFileMap.get(room.idx)}"
+                                 th:if="${image.repimageYn == 'Y'}"
+                                 th:src="@{${image.url}}"
+                                 class="card-img-top"
+                                 style="height: 200px; object-fit: cover;"
+                                 alt="Room Image">
+                        </div>
+                        <div th:unless="${repImageMap.get(room.idx)}" class="position-relative">
+                            <img src="/images/no-image.png" class="card-img-top" style="height: 200px; object-fit: cover;" alt="No Image">
+                        </div>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${room.roomName}">룸 이름</h5>
+                            <p class="card-text">
+                                <span class="badge bg-primary" th:text="${room.roomType}">룸 타입</span>
+                                <span class="badge bg-info" th:text="${room.roomNum + '인실'}">투숙 인원</span>
+                                <span th:if="${room.roomBreakfast == 'Y'}" class="badge bg-success">조식 포함</span>
+                            </p>
+                            <p class="card-text">
+                                <i class="fas fa-bed"></i> 침대 [[${room.roomBed}]]개<br>
+                                <i class="fas fa-expand"></i> [[${room.roomSize}]]평<br>
+                                <strong class="text-primary">₩[[${#numbers.formatInteger(room.roomPrice, 0, 'COMMA')}]]</strong>/박
+                            </p>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-outline-primary" 
+                                        data-bs-toggle="modal" 
+                                        th:data-bs-target="'#roomDetailModal' + ${room.idx}">
+                                    상세 보기
+                                </button>
+                                <a th:href="@{/res/create}" class="btn btn-primary">예약하기</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- 예약 섹션 -->
+    <div class="container mt-5">
+        <div class="row p-5 bg-white rounded shadow">
+            <!-- 빈 객실 목록 검색 영역 -->
+            <h2 class="text-center mt-3 mb-4">빈 객실 조회하기</h2>
+            <div class="col-10 container mb-5 p-5" style="background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+                <form action="/res/available" method="get" class="row g-3">
+                    <div class="col-md-5">
+                        <label for="startDate" class="form-label">체크인 날짜</label>
+                        <input type="date" name="startDate" id="startDate" class="form-control" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="endDate" class="form-label">체크아웃 날짜</label>
+                        <input type="date" name="endDate" id="endDate" class="form-control" required>
+                    </div>
+                    <div class="col-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">객실 조회하기</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 내 예약 목록 -->
+            <div class="mt-5" th:if="${reservations != null and not #lists.isEmpty(reservations)}">
+                <h2 class="text-center mb-4">내 예약 목록</h2>
+                <div class="row justify-content-center">
+                    <div class="col-md-8 mb-4" th:each="reservation : ${reservations}">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="card-title mb-3" th:text="${reservation.roomName}">객실 이름</h5>
+                                        <p class="card-text mb-2">
+                                            <i class="fas fa-calendar-alt me-2"></i>
+                                            <span th:text="${#temporals.format(reservation.startDate, 'yyyy-MM-dd')}">2024-03-11</span> ~
+                                            <span th:text="${#temporals.format(reservation.endDate, 'yyyy-MM-dd')}">2024-03-12</span>
+                                        </p>
+                                        <p class="card-text mb-2">
+                                            <i class="fas fa-user me-2"></i>예약자: <span th:text="${reservation.username}"></span>
+                                        </p>
+                                        <div class="mt-2">
+                                            <span th:if="${reservation.resStatus == '1'}" class="badge bg-secondary">예약 중</span>
+                                            <span th:if="${reservation.resStatus == '2'}" class="badge bg-primary">예약 완료</span>
+                                            <span th:if="${reservation.resStatus == '3'}" class="badge bg-danger">예약 종료</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 d-flex flex-column justify-content-center">
+                                        <div class="d-grid gap-2">
+                                            <button type="button" class="btn btn-outline-primary"
+                                                    data-bs-toggle="modal"
+                                                    th:data-bs-target="'#reservationDetailModal' + ${reservation.idx}">
+                                                상세 보기
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                    data-bs-toggle="modal"
+                                                    th:data-bs-target="'#reservationUpdateModal' + ${reservation.idx}">
+                                                예약 변경
+                                            </button>
+                                            <a th:href="@{'/res/delete/' + ${reservation.idx}}"
+                                               class="btn btn-outline-danger">예약 취소</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 로그인하지 않은 사용자를 위한 안내 메시지 -->
+            <div class="mt-5" th:unless="${reservations != null}">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    예약 내역을 확인하시려면 <a href="/member/login" class="alert-link">로그인</a>해 주세요.
+                </div>
+            </div>
+
+            <!-- 예약 상세 모달 -->
+            <div th:each="reservation : ${reservations}"
+                 th:id="'reservationDetailModal' + ${reservation.idx}"
+                 class="modal fade"
+                 tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">예약 상세 정보</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="reservation-details">
+                                <h6 class="fw-bold mb-3" th:text="${reservation.roomName}">객실 이름</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        체크인: <span th:text="${#temporals.format(reservation.startDate, 'yyyy-MM-dd')}"></span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-calendar-check me-2"></i>
+                                        체크아웃: <span th:text="${#temporals.format(reservation.endDate, 'yyyy-MM-dd')}"></span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-user me-2"></i>
+                                        예약자: <span th:text="${reservation.username}"></span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-tag me-2"></i>
+                                        예약 상태:
+                                        <span th:if="${reservation.resStatus == '1'}" class="badge bg-secondary">예약 중</span>
+                                        <span th:if="${reservation.resStatus == '2'}" class="badge bg-primary">예약 완료</span>
+                                        <span th:if="${reservation.resStatus == '3'}" class="badge bg-danger">예약 종료</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                            <a th:href="@{'/res/update/' + ${reservation.idx}}" class="btn btn-primary">예약 변경</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 예약 변경 모달 -->
+            <div th:each="reservation : ${reservations}"
+                 th:id="'reservationUpdateModal' + ${reservation.idx}"
+                 class="modal fade"
+                 tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">예약 변경</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form th:id="'updateForm' + ${reservation.idx}" onsubmit="return false;">
+                            <div class="modal-body">
+                                <div class="reservation-update-form">
+                                    <h6 class="fw-bold mb-3" th:text="${reservation.roomName}">객실 이름</h6>
+                                    
+                                    <div class="mb-3">
+                                        <label for="updateStartDate" class="form-label">체크인 날짜</label>
+                                        <input type="date" class="form-control updateStartDate" id="updateStartDate" name="startDate"
+                                               th:value="${#temporals.format(reservation.startDate, 'yyyy-MM-dd')}" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="updateEndDate" class="form-label">체크아웃 날짜</label>
+                                        <input type="date" class="form-control updateEndDate" id="updateEndDate" name="endDate"
+                                               th:value="${#temporals.format(reservation.endDate, 'yyyy-MM-dd')}" required>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        변경하실 날짜를 선택해주세요.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-primary" th:onclick="'updateReservation(' + ${reservation.idx} + ')'">변경 완료</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Detail Modals -->
+    <div th:each="room : ${roomDTOS}" th:id="'roomDetailModal' + ${room.idx}" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="${room.roomName}">룸 상세 정보</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 이미지 캐러셀 -->
+                    <div th:id="'roomImageCarousel' + ${room.idx}" class="carousel slide mb-4" 
+                         data-bs-ride="carousel" data-bs-interval="3000">
+                        <div class="carousel-inner">
+                            <div th:each="image, imageStat : ${imageFileMap.get(room.idx)}" 
+                                 th:class="'carousel-item' + (${imageStat.first} ? ' active' : '')">
+                                <img th:src="@{${image.url}}" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Room Image">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" 
+                                th:data-bs-target="'#roomImageCarousel' + ${room.idx}" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" 
+                                th:data-bs-target="'#roomImageCarousel' + ${room.idx}" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+
+                    <!-- 룸 상세 정보 -->
+                    <div class="room-details">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">기본 정보</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-bed me-2"></i>침대 [[${room.roomBed}]]개</li>
+                                    <li><i class="fas fa-expand me-2"></i>객실 크기: [[${room.roomSize}]]평</li>
+                                    <li><i class="fas fa-users me-2"></i>최대 [[${room.roomNum}]]인</li>
+                                    <li><i class="fas fa-coffee me-2"></i>조식 
+                                        <span th:if="${room.roomBreakfast == 'Y'}" class="text-success">포함</span>
+                                        <span th:unless="${room.roomBreakfast == 'Y'}" class="text-danger">불포함</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">요금 정보</h6>
+                                <p class="h4 text-primary">₩[[${#numbers.formatInteger(room.roomPrice, 0, 'COMMA')}]]/박</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6 class="fw-bold">객실 타입</h6>
+                            <p>[[${room.roomType}]]</p>
+                        </div>
+
+                        <div class="mt-4">
+                            <h6 class="fw-bold">객실 설명</h6>
+                            <p th:text="${room.roomInfo}">객실 상세 설명</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <a th:href="@{/res/create}" class="btn btn-primary">예약하기</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // CSRF 토큰 설정
+        const token = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
+        const header = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
+
+        // AJAX 요청 전에 CSRF 토큰 설정 (토큰이 있을 때만)
+        if (token && header) {
+            $(document).ajaxSend(function(e, xhr, options) {
+                xhr.setRequestHeader(header, token);
+            });
+        }
+
+        // 서버에서 전달받은 예약 데이터를 JavaScript 변수로 저장
+        const reservations = /*[[${reservations}]]*/ [];
+        
+        // 예약 변경 함수
+        function updateReservation(reservationId) {
+            const form = document.getElementById('updateForm' + reservationId);
+            const startDate = form.querySelector('.updateStartDate').value;
+            const endDate = form.querySelector('.updateEndDate').value;
+
+            // 현재 예약 정보 찾기
+            const reservation = reservations.find(r => r.idx === reservationId);
+            if (!reservation) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '예약 변경 실패',
+                    text: '예약 정보를 찾을 수 없습니다.'
+                });
+                return;
+            }
+
+            const data = {
+                idx: reservationId,
+                startDate: startDate,
+                endDate: endDate,
+                roomIdx: reservation.roomIdx,
+                roomName: reservation.roomName,
+                resStatus: "1"  // 예약 중 상태
+            };
+
+            const ajaxSettings = {
+                url: '/res/update/' + reservationId,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    // 성공 시 모달 닫기
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('reservationUpdateModal' + reservationId));
+                    modal.hide();
+                    
+                    // 성공 메시지 표시
+                    Swal.fire({
+                        icon: 'success',
+                        title: '예약이 변경되었습니다',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        // 현재 URL에서 organ_idx 파라미터 가져오기
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const organIdx = urlParams.get('organ_idx');
+                        
+                        // organ_idx가 있으면 포함하여 리다이렉트
+                        if (organIdx) {
+                            window.location.href = `/room/member/list?organ_idx=${organIdx}`;
+                        } else {
+                            window.location.href = '/room/member/list';
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // 에러 메시지 표시
+                    let errorMessage = '예약 변경에 실패했습니다.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: '예약 변경 실패',
+                        text: errorMessage
+                    });
+                }
+            };
+
+            // CSRF 토큰이 있는 경우에만 헤더 추가
+            if (token && header) {
+                ajaxSettings.beforeSend = function(xhr) {
+                    xhr.setRequestHeader(header, token);
+                };
+            }
+
+            // AJAX 요청 실행
+            $.ajax(ajaxSettings);
+        }
+        /*]]>*/
+    </script>
+</th:block>
 </body>
 </html> 

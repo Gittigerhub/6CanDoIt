@@ -401,8 +401,16 @@ public class RoomController {
         // 로그인한 사용자의 예약 목록 조회
         if (principal != null) {
             try {
-                List<ReservationDTO> reservations = reservationService.getUserReservations(principal.getName());
-                log.info("Found {} reservations for user: {}", reservations.size(), principal.getName());
+                List<ReservationDTO> reservations;
+                if (organ_idx != null) {
+                    // 특정 숙소의 예약만 조회
+                    reservations = reservationService.getUserReservationsByOrganization(principal.getName(), organ_idx);
+                    log.info("Fetching reservations for user {} and organization {}", principal.getName(), organ_idx);
+                } else {
+                    // 전체 예약 조회
+                    reservations = reservationService.getUserReservations(principal.getName());
+                    log.info("Fetching all reservations for user {}", principal.getName());
+                }
                 model.addAttribute("reservations", reservations);
             } catch (Exception e) {
                 log.error("Error fetching reservations for user: {}", principal.getName(), e);

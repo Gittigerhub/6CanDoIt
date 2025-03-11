@@ -82,10 +82,10 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
 
     // 회원 이메일과 숙소로 예약 조회
     @Query("SELECT DISTINCT r FROM ReservationEntity r " +
-           "JOIN FETCH r.roomJoin room " +
-           "JOIN FETCH room.organizationJoin org " +
+           "JOIN r.roomJoin room " +
+           "JOIN room.organizationJoin org " +
            "WHERE r.memberJoin.memberEmail = :memberEmail " +
-           "AND room.organizationJoin.idx = :organ_idx " +
+           "AND org.idx = :organ_idx " +
            "ORDER BY r.startDate DESC")
     List<ReservationEntity> findByMemberEmailAndOrganization(@Param("memberEmail") String memberEmail, @Param("organ_idx") Integer organ_idx);
 

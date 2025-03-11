@@ -112,38 +112,75 @@ public class ReservationController {
         return "redirect:/res/list";
     }
 
+    // AJAX 예약 요청을 처리하는 새로운 엔드포인트
+    @PostMapping("/create/ajax")
+    @ResponseBody
+    public ResponseEntity<?> createReservationAjax(@RequestBody ReservationDTO reservationDTO,
+                                                 Principal principal) {
+        log.info("AJAX 예약 요청 처리 시작.... reservationDTO: {}", reservationDTO);
+
+        try {
+            if (principal == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "로그인이 필요합니다."));
+            }
+
+            // 현재 로그인한 사용자 정보 설정
+            MemberDTO memberDTO = memberService.read(principal.getName());
+            reservationDTO.setMemberDTO(memberDTO);
+            reservationDTO.setMemberName(memberDTO.getMemberName());
+            reservationDTO.setUsername(memberDTO.getMemberName());
+
+            ReservationDTO savedReservation = reservationService.reserveInsert(reservationDTO);
+            if (savedReservation != null) {
+                return ResponseEntity.ok(Collections.singletonMap("message", "예약이 완료되었습니다."));
+            } else {
+                return ResponseEntity.badRequest()
+                    .body(Collections.singletonMap("message", "예약 처리 중 오류가 발생했습니다."));
+            }
+        } catch (RuntimeException e) {
+            log.error("예약 처리 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                .body(Collections.singletonMap("message", e.getMessage()));
+        }
+    }
+
     // 빈 객실 목록 조회
     @GetMapping("/available")
-    public String getAvailableRooms(@RequestParam("startDate") LocalDate startDate,
-                                    @RequestParam("endDate") LocalDate endDate,
-                                    Model model) {
-        String join = "room";
+    @ResponseBody
+    public ResponseEntity<?> getAvailableRooms(
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate,
+            @RequestParam("organ_idx") Integer organ_idx) {
+        
+        log.info("빈 객실 목록 조회... organization: {}, startDate: {}, endDate: {}", organ_idx, startDate, endDate);
 
-        log.info("빈 객실 목록 조회...");
+        try {
+            // 빈 객실 목록을 조회 (organization_idx 기준)
+            List<RoomEntity> availableRooms = reservationService.getAvailableRooms(organ_idx, startDate, endDate);
+            
+            // Entity를 DTO로 변환
+            List<RoomDTO> roomDTOs = availableRooms.stream()
+                    .map(room -> modelMapper.map(room, RoomDTO.class))
+                    .collect(Collectors.toList());
 
-        // 빈 객실 목록을 조회
-        List<RoomEntity> availableRooms = reservationService.getAvailableRooms(startDate, endDate);
+            // 각 룸의 이미지 정보를 별도의 맵으로 관리
+            Map<Integer, List<ImageFileDTO>> imageMap = new HashMap<>();
+            for (RoomEntity room : availableRooms) {
+                List<ImageFileDTO> images = imageFileService.readImage(room.getIdx(), "room");
+                imageMap.put(room.getIdx(), images);
+            }
 
-        // 이미지 데이터를 담을 Map 생성 (menu의 idx를 key로 저장)
-        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
-        Map<Integer, Boolean> repImageMap = new HashMap<>();
-        for (RoomEntity roomEntity : availableRooms) {
-            // 이미지 조회
-            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(roomEntity.getIdx(), join);
-            // Map에 저장 (menu의 idx를 key로 함)
-            imageFileMap.put(roomEntity.getIdx(), imageFileDTOS);
-            // 대표 사진 여부 확인 후 저장
-            boolean hasRepImage = imageFileDTOS.stream()
-                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
-            repImageMap.put(roomEntity.getIdx(), hasRepImage);
+            // 응답 데이터 구성
+            Map<String, Object> response = new HashMap<>();
+            response.put("rooms", roomDTOs);
+            response.put("images", imageMap);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("빈 객실 조회 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "객실 조회 중 오류가 발생했습니다."));
         }
-
-        // 모델에 빈 객실 목록을 추가
-        model.addAttribute("Rooms", availableRooms);
-        model.addAttribute("imageFileMap", imageFileMap); // 룸 이미지 리스트
-        model.addAttribute("repImageMap", repImageMap); // 룸 대표 사진 여부
-
-        return "/reserve/list"; // 빈 객실 목록을 보여주는 뷰 템플릿을 렌더링
     }
 
     //목록페이지로 이동
@@ -207,24 +244,18 @@ public class ReservationController {
         return "redirect:/res/list";
     }
 
-    // 삭제 처리
-    @GetMapping("/delete/{idx}")
-    public String deletePage(@PathVariable Integer idx) {
-        log.info("삭제 처리 후 목록페이지로 이동....");
-        reservationService.reserveDelete(idx);
-
-        //redirectAttributes.addFlashAttribute("successMessage",
-        //        "삭제하였습니다.");
-        return "redirect:/res/list";
-    }
-
-    // 삭제 처리
-    @GetMapping("/deletee/{idx}")
-    public String deletePage2(@PathVariable Integer idx) {
-        log.info("삭제 처리 후 목록페이지로 이동....");
-        reservationService.reserveDelete(idx);
-
-        return "redirect:/room/reserve";
+    // 삭제 처리 (AJAX 요청 처리)
+    @PostMapping("/delete/{idx}")
+    @ResponseBody
+    public ResponseEntity<?> deleteReservation(@PathVariable Integer idx) {
+        log.info("예약 삭제 처리 시작.... idx: {}", idx);
+        try {
+            reservationService.reserveDelete(idx);
+            return ResponseEntity.ok().body(Collections.singletonMap("message", "예약이 취소되었습니다."));
+        } catch (Exception e) {
+            log.error("예약 삭제 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "예약 취소 중 오류가 발생했습니다."));
+        }
     }
 
     @PostMapping("/update/{idx}")

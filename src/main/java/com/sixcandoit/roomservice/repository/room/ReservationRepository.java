@@ -70,4 +70,14 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     @Query("SELECT r FROM ReservationEntity r WHERE r.memberJoin.memberEmail = :memberEmail ORDER BY r.startDate DESC")
     List<ReservationEntity> findByMemberEmail(@Param("memberEmail") String memberEmail);
 
+    @Query("SELECT r FROM RoomEntity r WHERE r.organizationJoin.idx = :organ_idx " +
+            "AND r.idx NOT IN (" +
+            "SELECT rr.roomJoin.idx FROM ReservationEntity rr WHERE " +
+            "(rr.startDate < :endDate AND rr.endDate > :startDate)) " +
+            "ORDER BY r.roomPrice DESC")
+    List<RoomEntity> findAvailableRoomsByOrganization(
+            @Param("organ_idx") Integer organ_idx,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
 }

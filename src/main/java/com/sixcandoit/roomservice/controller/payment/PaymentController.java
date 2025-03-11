@@ -50,18 +50,22 @@ public class PaymentController {
         List<PaymentDTO> paymentDTOList = paymentService.list();
         model.addAttribute("paymentDTOList", paymentDTOList);
         addUserInfoToModel(model);
-        return "orders/paymentlist";
+        return "orders/payment/list";
     }
 
-    // 결제 체크아웃 페이지 (새 결제)
+    // 결제 체크아웃 페이지
     @GetMapping("/orders/payment/checkout")
     public String checkout(Model model) {
-        log.info("새 결제 체크아웃 페이지를 로드합니다.");
+        log.info("결제 체크아웃 페이지를 로드합니다.");
         try {
             PaymentDTO newPayment = new PaymentDTO();
+            // 테스트용 데이터 설정
+            newPayment.setPaymentPrice(1000);
+            newPayment.setOrderId("ORDER_" + System.currentTimeMillis());
+            
             model.addAttribute("paymentDTO", newPayment);
             addUserInfoToModel(model);
-            return "orders/paymentcheckout";
+            return "orders/payment/checkout";
         } catch (Exception e) {
             log.severe("결제 페이지 로드 중 오류 발생: " + e.getMessage());
             return "redirect:/orders/payment/list";
@@ -83,33 +87,7 @@ public class PaymentController {
         }
     }
 
-    // 결제 처리
-    @PostMapping("/orders/payment/process")
-    @ResponseBody
-    public ResponseEntity<?> processPayment(@RequestBody PaymentDTO paymentDTO) {
-        log.info("결제 처리를 시작합니다.");
-        try {
-            PaymentDTO processedPayment = paymentService.processPayment(paymentDTO);
-            return ResponseEntity.ok(processedPayment);
-        } catch (Exception e) {
-            log.severe("결제 처리 중 오류 발생: " + e.getMessage());
-            return ResponseEntity.badRequest().body("결제 처리 중 오류가 발생했습니다.");
-        }
-    }
 
-    // 결제 취소
-    @PostMapping("/orders/payment/cancel/{idx}")
-    @ResponseBody
-    public ResponseEntity<?> cancelPayment(@PathVariable("idx") Integer idx) {
-        log.info("결제 취소를 요청합니다. idx: " + idx);
-        try {
-            PaymentDTO cancelledPayment = paymentService.cancelPayment(idx);
-            return ResponseEntity.ok(cancelledPayment);
-        } catch (Exception e) {
-            log.severe("결제 취소 중 오류 발생: " + e.getMessage());
-            return ResponseEntity.badRequest().body("결제 취소 중 오류가 발생했습니다.");
-        }
-    }
 
     // 결제 상세 정보 조회
     @GetMapping("/orders/payment/{idx}")
@@ -125,8 +103,6 @@ public class PaymentController {
         }
     }
 
-
-
     // 주문별 결제 내역 조회
     @GetMapping("/orders/payment/order/{orderIdx}")
     @ResponseBody
@@ -138,22 +114,6 @@ public class PaymentController {
         } catch (Exception e) {
             log.severe("주문별 결제 내역 조회 중 오류 발생: " + e.getMessage());
             return ResponseEntity.badRequest().body("주문별 결제 내역 조회 중 오류가 발생했습니다.");
-        }
-    }
-
-    // 결제 수단 변경
-    @PutMapping("/orders/payment/method/{idx}")
-    @ResponseBody
-    public ResponseEntity<?> updatePaymentMethod(
-            @PathVariable("idx") Integer idx,
-            @RequestBody PaymentDTO paymentDTO) {
-        log.info("결제 수단을 변경합니다. idx: " + idx);
-        try {
-            PaymentDTO updatedPayment = paymentService.updatePaymentMethod(idx, paymentDTO);
-            return ResponseEntity.ok(updatedPayment);
-        } catch (Exception e) {
-            log.severe("결제 수단 변경 중 오류 발생: " + e.getMessage());
-            return ResponseEntity.badRequest().body("결제 수단 변경 중 오류가 발생했습니다.");
         }
     }
 
@@ -172,24 +132,14 @@ public class PaymentController {
         }
     }
 
-
-
     // 결제 성공 처리
     @GetMapping("/orders/payment/success")
     public String paymentSuccess(
             @RequestParam("paymentKey") String paymentKey,
             @RequestParam("orderId") String orderId,
             @RequestParam("amount") Integer amount,
-            @RequestParam(value = "paymentType", required = false) String paymentType,
             Model model) {
-        log.info("결제 성공 콜백을 처리합니다. paymentKey: " + paymentKey + ", orderId: " + orderId + ", amount: " + amount + ", paymentType: " + paymentType);
-
-        // 인증 여부 확인
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || "anonymousUser".equals(auth.getName())) {
-            // 로그인되지 않은 사용자는 로그인 페이지로 리디렉션
-            return "redirect:/memberlogin";
-        }
+        log.info("결제 성공 처리를 시작합니다. paymentKey: " + paymentKey + ", orderId: " + orderId + ", amount: " + amount);
 
         try {
             // 결제 정보 처리
@@ -205,51 +155,30 @@ public class PaymentController {
 
             PaymentDTO processedPayment = paymentService.processPayment(paymentDTO);
 
-            // 결제 성공 후 페이지로 이동하면서 결제 정보 전달
-            model.addAttribute("paymentKey", paymentKey);
-            model.addAttribute("orderId", orderId);
+            // 결제 성공 페이지로 이동하면서 필요한 정보 전달
             model.addAttribute("amount", amount);
+            model.addAttribute("reservationId", orderId);
+            model.addAttribute("paymentDate", processedPayment.getRegDate());
             addUserInfoToModel(model);
-            return "orders/paymentsuccess";
+            
+            return "orders/payment/success";
         } catch (Exception e) {
             log.severe("결제 성공 처리 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
             model.addAttribute("error", "결제 처리 중 오류가 발생했습니다: " + e.getMessage());
-            addUserInfoToModel(model);
             return "redirect:/orders/payment/list?error=" + e.getMessage();
         }
     }
 
-    // 결제 확인 처리
-    @PostMapping("/confirm")
-    @ResponseBody
-    public ResponseEntity<?> confirmPayment(@RequestBody PaymentDTO paymentDTO) {
-        log.info("결제 확인을 처리합니다. orderId: " + paymentDTO.getOrderId());
-        try {
-            // 결제 정보 생성 및 처리
-            paymentDTO.setPaymentState("Y"); // 결제 완료
-            paymentDTO.setPaymentPayType("CARD"); // 토스페이먼츠는 카드결제
-            PaymentDTO processedPayment = paymentService.processPayment(paymentDTO);
-
-            if (processedPayment != null) {
-                return ResponseEntity.ok(processedPayment);
-            } else {
-                return ResponseEntity.badRequest().body("결제 처리에 실패했습니다.");
-            }
-        } catch (Exception e) {
-            log.severe("결제 확인 중 오류 발생: " + e.getMessage());
-            return ResponseEntity.badRequest().body("결제 확인 중 오류가 발생했습니다.");
-        }
-    }
 
     // 결제 실패 처리
-    @GetMapping({"/fail", "/fail.html"})
+    @GetMapping("/orders/payment/fail")
     public String paymentFail(
             @RequestParam("code") String code,
             @RequestParam("message") String message,
             @RequestParam("orderId") String orderId,
             Model model) {
-        log.info("결제 실패 콜백을 처리합니다. code: " + code + ", message: " + message + ", orderId: " + orderId);
+        log.info("결제 실패를 처리합니다. code: " + code + ", message: " + message + ", orderId: " + orderId);
 
         try {
             PaymentDTO paymentDTO = new PaymentDTO();

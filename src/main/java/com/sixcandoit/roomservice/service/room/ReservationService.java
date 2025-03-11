@@ -3,12 +3,14 @@ package com.sixcandoit.roomservice.service.room;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.entity.room.ReservationEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
+import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -46,7 +48,7 @@ public class ReservationService {
     //주어진 DTO를 Entity로 변환한 후, 데이터베이스에 저장하고 저장된 결과를 다시 DTO로 변환하여 반환
     public ReservationDTO reserveInsert(ReservationDTO reservationDTO) {
         // RoomEntity를 roomIdx로 조회
-        Optional<RoomEntity> roomEntityOpt = roomRepository.findByIdx(reservationDTO.getRoomIdx());
+        Optional<RoomEntity> roomEntityOpt = roomRepository.findById(reservationDTO.getRoomIdx());
 
         if (roomEntityOpt.isPresent()) {
             log.info("방이 존재하면...");
@@ -66,6 +68,11 @@ public class ReservationService {
 
             // 예약 상태 변경
             reserveEntity.setResStatus("1");  // 예약 중으로 상태 변경
+
+            // 회원 정보 설정
+            MemberEntity memberEntity = modelMapper.map(reservationDTO.getMemberDTO(), MemberEntity.class);
+            reserveEntity.setMemberJoin(memberEntity);
+            reserveEntity.setUsername(memberEntity.getMemberName());
 
             // ReservationEntity 저장
             ReservationEntity result = reservationRepository.save(reserveEntity);
@@ -122,13 +129,15 @@ public class ReservationService {
         List<ReservationEntity> reserveEntities;
 
         if(startDate == null) { //시작날짜가 없으면 전체 조회
-            reserveEntities = reservationRepository.findAll();
-
+            // 가격 내림차순으로 정렬하여 조회
+            reserveEntities = reservationRepository.findAll(Sort.by(Sort.Direction.DESC, "roomJoin.roomPrice"));
         } else {
             if(endDate == null) { //종료날짜가 없으면 시작날짜 다음날로 지정
                 endDate = startDate.plusDays(1);
             }
-            reserveEntities = reservationRepository.findByStartDateGreaterThanEqualAndEndDateLessThanEqual(startDate, endDate);
+            // 가격 내림차순으로 정렬하여 조회
+            reserveEntities = reservationRepository.findByStartDateGreaterThanEqualAndEndDateLessThanEqual(
+                startDate, endDate, Sort.by(Sort.Direction.DESC, "roomJoin.roomPrice"));
         }
 
         //데이터값 변환(ModelMapper DTO<->Entity), Page에 대한 변환X

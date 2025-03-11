@@ -274,4 +274,21 @@ public class RoomService {
         Page<RoomEntity> roomEntities = roomRepository.findByOrganIdx(organIdx, pageable);
         return roomEntities.map(entity -> modelMapper.map(entity, RoomDTO.class));
     }
+
+    // 사용자용 organization별 룸 목록 조회
+    public List<RoomDTO> getRoomsByOrganizationForMember(Integer organIdx) {
+        // 가격 내림차순으로 정렬
+        Sort sort = Sort.by(Sort.Direction.DESC, "roomPrice");
+        List<RoomEntity> roomEntities = roomRepository.findByOrganizationJoin_IdxOrderByRoomPriceDesc(organIdx);
+        
+        return roomEntities.stream()
+                .map(entity -> {
+                    RoomDTO dto = modelMapper.map(entity, RoomDTO.class);
+                    if (entity.getOrganizationJoin() != null) {
+                        dto.setOrgan_idx(entity.getOrganizationJoin().getIdx());
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 }

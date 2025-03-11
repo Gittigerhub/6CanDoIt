@@ -4,6 +4,7 @@ import com.sixcandoit.roomservice.entity.room.ReservationEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,7 +21,8 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     Page<ReservationEntity> findByStartDateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     // 첫번째 날짜가 시작날짜에 속하고, 두번째 날짜가 끝날짜에 속하는 값을 조회
-    List<ReservationEntity> findByStartDateGreaterThanEqualAndEndDateLessThanEqual(LocalDate startDate, LocalDate endDate);
+    List<ReservationEntity> findByStartDateGreaterThanEqualAndEndDateLessThanEqual(
+            LocalDate startDate, LocalDate endDate, Sort sort);
 
     //페이지시
     //Page<ReserveEntity> findByStartDateGreaterThanEqualAndEndDateLessThanEqual(LocalDate startDate, LocalDate endDate, Pageable pageable);
@@ -43,7 +45,8 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
 
     @Query("SELECT r FROM RoomEntity r WHERE r.idx NOT IN (" +
             "SELECT rr.roomJoin.idx FROM ReservationEntity rr WHERE " +
-            "(rr.startDate < :endDate AND rr.endDate > :startDate))")
+            "(rr.startDate < :endDate AND rr.endDate > :startDate)) " +
+            "ORDER BY r.roomPrice DESC")
     List<RoomEntity> findAvailableRooms(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     Optional<ReservationEntity> findByIdx(Integer idx);

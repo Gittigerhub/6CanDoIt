@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -47,4 +48,7 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     // 조직 idx로 방 검색
     @Query("SELECT r FROM RoomEntity r WHERE r.organizationJoin.idx = :organIdx")
     Page<RoomEntity> findByOrganIdx(@Param("organIdx") Integer organIdx, Pageable pageable);
+
+    // 조직별 룸 목록 조회 (가격 내림차순)
+    List<RoomEntity> findByOrganizationJoin_IdxOrderByRoomPriceDesc(Integer organIdx);
 }

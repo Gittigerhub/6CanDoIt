@@ -87,6 +87,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/qna/adminread").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/reply/**").hasAnyRole("ADMIN", "HO", "BO");
                     // 룸 관리, 룸 예약 페이지 접근 권한
+                    auth.requestMatchers("/room/member/list").permitAll();
                     auth.requestMatchers("/room/**", "/res/**").permitAll();
                     // 공지사항 페이지 접근 권한
                     auth.requestMatchers("/notice/**").permitAll();
@@ -159,6 +160,7 @@ public class SecurityConfig{
             auth.requestMatchers("/qna/adminread").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/reply/**").hasAnyRole("ADMIN", "HO", "BO");
             // 룸 관리, 룸 예약 페이지 접근 권한
+            auth.requestMatchers("/room/member/list").permitAll();
             auth.requestMatchers("/room/**", "/res/**").permitAll();
             // 공지사항 페이지 접근 권한
             auth.requestMatchers("/notice/**").permitAll();

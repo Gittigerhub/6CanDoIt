@@ -35,7 +35,7 @@
                                 <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Drink">음료</button>
                             </div>
                             <div class="position-relative d-inline-block ms-5">
-                                <a th:href="@{/cart/cartlist}">
+                                <a th:href="@{/member/cart/cartlist}">
                                     <i class="bi bi-cart4 align-middle" style="font-size: 24px;"></i>
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
                                         0
@@ -156,11 +156,12 @@
                 var menuIdx = $(this).data('id');
                 var count = $(this).closest('tr').find('.count').val();  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
 
+
                 console.log(menuIdx)
                 console.log(count)
 
                 $.ajax({
-                    url: '/cart',
+                    url: '/member/cart',
                     type: 'POST',
                     data: {
                         idx: menuIdx,
@@ -170,11 +171,18 @@
                         Swal.fire({
                             icon: null,
                             text: "장바구니에 추가되었습니다!",
-                            showConfirmButton: false,
-                            timer: 1500,
+                            showConfirmButton: true,
+                            confirmButtonText: '장바구니 보기',
+                            showCancelButton: true,
+                            cancelButtonText: '계속 쇼핑하기',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                //'장바구니보기'버튼 클릭시
+                                window.location.href = '/member/cart/cartlist';
+                            }
                         });
                         // 장바구니 배지 수량 증가
-                        var currentCount = parseInt($('.cart-count').text());
+                        var currentCount = parseInt($('.cart-count').text() || '0');
                         $('.cart-count').text(currentCount + 1);
                     },
                     error: function () {

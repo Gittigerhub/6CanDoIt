@@ -23,6 +23,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
+@RequestMapping("/member")
 public class CartController {
 
     private final CartService cartService;
@@ -83,12 +84,13 @@ public class CartController {
     }
 
     //변경
-    @PostMapping("/cartmenu")
+    @PostMapping("/cart/cartmenu")
     public ResponseEntity updateCartMenu(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
                                          Principal principal) {
         String memberEmail = principal.getName();
 
         log.info("수량 변경을 위해 넘어온 값 : " + cartMenuDTO);
+
         if (bindingResult.hasErrors()) {
             StringBuffer sb = new StringBuffer();
 
@@ -111,15 +113,15 @@ public class CartController {
         return new ResponseEntity<>(cartMenuDTO.getMenuidx(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/cart/cart/{cartmenuidx}")
-    public ResponseEntity deleteCartMenu(@PathVariable("cartmenuidx") Integer cartmenuidx,
+    @PostMapping("/cart/cartlist/delete/{cartmenuidx}")
+    public String deleteCartMenu(@PathVariable("cartmenuidx") Integer cartmenuidx,
                                          Principal principal) {
         if (!cartService.validateCartMenu(cartmenuidx, principal.getName())) {
-            return new ResponseEntity<String>("수정권한이 없습니다.", HttpStatus.FORBIDDEN);
+            return "redirect:/member/cart/cartlist?error";
         }
         //장바구니 메뉴 삭제
         cartService.deleteCartMenu(cartmenuidx);
-        return new ResponseEntity<Integer>(cartmenuidx, HttpStatus.OK);
+        return "redirect:/member/cart/cartlist";    //삭제 후 장바구니 목록 페이지로 리다이렉트
     }
 
     @PostMapping("/cart/cartlist")

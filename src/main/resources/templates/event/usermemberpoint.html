@@ -26,21 +26,21 @@
                     <select class="form-select" id="selectBox" name="type">
                         <option th:selected="${type==null}"></option>
                         <option value="1" th:selected="${type=='1'}">내용</option>
-                        <option value="2" th:selected="${type=='2'}">사용</option>
-                        <option value="3" th:selected="${type=='3'}">기간</option>
+                        <option value="3" th:selected="${type=='2'}">기간</option>
+                        <option value="2" th:selected="${type=='3'}">사용</option>
                     </select>
                     <th:block th:if="${type=='1' || type==null}">
                         <input type="text" class="form-control" name="keyword" th:value="${keyword}"
                                placeholder="Search">
                     </th:block>
                     <th:block th:if="${type=='2'}">
+                        <input class="startDay" name="startDate" type="datetime-local">~<input class="endDay" name="endDate" type="datetime-local">
+                    </th:block>
+                    <th:block th:if="${type=='3'}">
                         <select class="form-select" name="type">
                             <option value="N">사용가능</option>
                             <option value="Y">사용함</option>
                         </select>
-                    </th:block>
-                    <th:block th:if="${type=='3'}">
-                        <input class="startDay" type="datetime-local">~<input class="endDay" type="datetime-local">
                     </th:block>
                     <button class="btn btn-success" type="submit">검색</button>
                 </div>
@@ -195,7 +195,7 @@
     <script th:inline="javascript">
 
         $(document).ready(function () {
-            //수정버튼클릭시 대화상자 채우기
+            //자세히보기 버튼클릭시 대화상자 채우기
             $(".column").on("click", function () {
                 //alert("삭제")
                 var idx = $(this).data("id");
@@ -251,9 +251,17 @@
                 });
             });//수정버튼클릭시 대화상자 채우기 끝
 
-            $("#selectBox").on("click",function (){
+            $("#selectBox").on("change", function () {
+                let selectedValue = $("#selectBox").val(); // 선택된 값 가져오기
+                console.log("작동중!! 선택된 값:", selectedValue);
 
-                $("#selectBox").load(window.location.href + "#selectBox");
+                if (selectedValue === '1') {
+                    window.location.href = window.location.pathname + "?type=1";
+                } else if (selectedValue === '2') {
+                    window.location.href = window.location.pathname + "?type=2";
+                } else if (selectedValue === '3') {
+                    window.location.href = window.location.pathname + "?type=3";
+                }
             });
 
         });

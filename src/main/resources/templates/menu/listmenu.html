@@ -130,29 +130,26 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         $(document).ready(function() {
+            // 페이지 로드시 장바구니 개수 업데이트
+            updateCartCount();
 
-            // 카테고리 버튼 클릭 시 메뉴 목록 갱신
-            $('.category-btn').on('click', function() {
-                var category = $(this).data('category');  // 선택된 카테고리 값
-
+            // 장바구니 개수 업데이트 함수
+            function updateCartCount() {
                 $.ajax({
-                    url: '/member/menu/ajax/listmenu',  // 현재 페이지에서 처리할 주소
+                    url: '/member/cart/count',
                     type: 'GET',
-                    data: {
-                        category: category,  // 선택된 카테고리 값
+                    success: function(response) {
+                        $('.cart-count').text(response);
                     },
-                    success: function (response) {
-                        $('#menuListContainer').html(response);  // 받은 데이터를 메뉴 목록 영역에 표시
-                    },
-                    error: function () {
-                        alert("메뉴 목록을 불러오는 데 실패했습니다.");
+                    error: function(error) {
+                        console.error("장바구니 개수 조회 실패:", error);
                     }
                 });
-
-            });
+            }
 
             //장바구니에 메뉴 추가
-            $('.addCart').on('click', function() {
+            //$('.addCart').on('click', ...) 대신 $(document).on('click', '.addCart', ...)를 사용하여 이벤트 위임 구현(동적으로 추가되는 요소에서도 이벤트 작동 가능)
+            $(document).on('click', '.addCart', function() {
                 var menuIdx = $(this).data('id');
                 var count = $(this).closest('tr').find('.count').val();  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
 
@@ -194,6 +191,26 @@
                         });
                     }
                 });
+            });
+
+            // 카테고리 버튼 클릭 시 메뉴 목록 갱신
+            $('.category-btn').on('click', function() {
+                var category = $(this).data('category');  // 선택된 카테고리 값
+
+                $.ajax({
+                    url: '/member/menu/ajax/listmenu',  // 현재 페이지에서 처리할 주소
+                    type: 'GET',
+                    data: {
+                        category: category,  // 선택된 카테고리 값
+                    },
+                    success: function (response) {
+                        $('#menuListContainer').html(response);  // 받은 데이터를 메뉴 목록 영역에 표시
+                    },
+                    error: function () {
+                        alert("메뉴 목록을 불러오는 데 실패했습니다.");
+                    }
+                });
+
             });
 
             // //삭제 버튼 클릭시

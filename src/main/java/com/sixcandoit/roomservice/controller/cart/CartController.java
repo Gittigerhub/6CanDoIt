@@ -141,6 +141,16 @@ public class CartController {
 
         return new ResponseEntity<Integer>(orderidx, HttpStatus.OK);
     }
+
+    //장바구니 개수 반환하는 메서드 추가
+    @GetMapping("/cart/count")
+    @ResponseBody
+    public ResponseEntity<Integer> getCartCount(Principal principal) {
+        String email = principal.getName();
+        List<CartDetailDTO> cartList = cartService.cartDetailDTOList(email);
+        return ResponseEntity.ok(cartList.size());
+    }
+
 }
 //현재 contentType: 'application/json'으로 요청을 보내고 있어서
 //Spring이 @RequestParam이 아니라 @RequestBody로 받아야 매핑할 수 있음.

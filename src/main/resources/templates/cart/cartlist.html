@@ -62,13 +62,15 @@
                             </tbody>
                         </table>
 
-                        <h2 class="text-center"> 총 주문 금액 :
+                        <h2 class="text-center mt-3 mb-3"> 총 주문 금액 :
                             <span id="orderTotalPrice" class="text-danger menuprice">원</span>
                         </h2>
 
-                        <div class="text-center">
+                        <div class="text-center mt-3 mb-3">
                             <button type="button" class="btn btn-primary cartorders">주문하기</button>
+                            <button type="button" class="btn btn-outline-primary" th:onclick="|location.href='@{/member/menu/listmenu}'|">메뉴로 돌아가기</button>
                         </div>
+
                     </div>
                 </div>
         </div>
@@ -94,7 +96,7 @@
                 $('#orderTotalPrice').text(total.toLocaleString() + '원');
             }
 
-            //수량변경시
+            //수량 변경시
             $('.cartcount').change(function() {
                 var menuidx = $(this).siblings('.menu-idx').val();
                 var count = $(this).val();
@@ -134,47 +136,61 @@
             });
         });
 
-        //@DeleteMapping 사용으로 Ajax 요청하지 않아도됨
-        // //장바구니 메뉴 삭제 AJAX 요청
-        // function deleteCartMenu(idx) {
-        //     Swal.fire({
-        //         title: '삭제하시겠습니까?',
-        //         text: "이 항목을 장바구니에서 삭제합니다.",
-        //         icon: 'warning',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3085d6',
-        //         cancelButtonColor: '#d33',
-        //         confirmButtonText: '삭제'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             fetch(`/cartmenu/${cartMenuIdx}`, {
-        //                 method: 'DELETE',
-        //                 headers: {
-        //                     'Content-Type': 'application/json',
-        //                     'Accept': 'application/json'
-        //                 }
-        //             })
-        //                 .then(response => response.json())
-        //                 .then(data => {
-        //                     if (data) {
-        //                         Swal.fire(
-        //                             '삭제 완료!',
-        //                             '장바구니에서 메뉴가 삭제되었습니다.',
-        //                             'success'
-        //                         ).then(() => location.reload()); // 삭제 후 페이지 새로 고침
-        //                     }
-        //                 })
-        //                 .catch(error => {
-        //                     console.error('삭제 실패:', error);
-        //                     Swal.fire(
-        //                         '삭제 실패!',
-        //                         '장바구니 메뉴 삭제 중 오류가 발생했습니다.',
-        //                         'error'
-        //                     );
-        //                 });
-        //         }
-        //     });
-        // }
+        //주문하기 버튼 클릭시
+        $('.cartorders').on('click', function() {
+            //장바구니에 있는 모든 메뉴의 cartMenuIdx수집
+            let cartMenuIdxList = [];
+            $('.menu-idx').each(function() {
+                cartMenuIdxList.push({
+                    cartMenuIdx: $(this).val()
+                });
+            });
+
+            // 장바구니가 비어있는 경우 처리
+            if (cartMenuIdxList.length === 0) {
+                Swal.fire({
+                    title: '장바구니가 비어있습니다',
+                    icon: 'warning'
+                });
+                return;
+            }
+
+            //주문처리 요청
+            $.ajax({
+                url: '/member/cart/cartlist',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    ordersDTOList: cartMenuIdxList
+                }),
+                success: function(orderIdx) {
+                    console.log("주문 완료, orderIdx",orderIdx);
+                    // orderIdx는 생성된 주문의 번호
+                    Swal.fire({
+                        title : '주문이 완료되었습니다.',
+                        text: '주문 내역 페이지로 이동합니다.',
+                        icon : 'success',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: '확인'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // 주문 내역 페이지로 이동
+                            // 절대 경로 사용 및 orderIdx 추가
+                            window.location.replace('/member/orders');                        }
+                    });
+                },
+                error: function(error) {
+                    console.log("주문 처리 중 오류:", error);
+                    Swal.fire({
+                        title: '주문 처리 중 오류가 발생했습니다',
+                        text: error.responseText,
+                        icon: 'error'
+                    });
+                }
+            });
+        })
+
     </script>
 </th:block>
 </body>

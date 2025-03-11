@@ -65,11 +65,13 @@ public class MemberOrdersCotroller {
         return new ResponseEntity<String>("주문 완료", HttpStatus.OK);
     }
 
-    @GetMapping({"/orders", "orders/{page}"})
+    @GetMapping({"/orders", "/orders/{page}"})
     public String ordersHist(@PathVariable("page")Optional<Integer>page,
                              Principal principal, Model model) {
 
         log.info("진입");
+
+        //로그인 체크
         if (principal == null) {
             log.info("로그인 필요");
 
@@ -77,15 +79,17 @@ public class MemberOrdersCotroller {
         }else {
             log.info("로그인 상태");
         }
-        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 10);
 
+        // 페이지 정보 설정 (기본값: 0)
+        int pageNumber = page.orElse(0);
+        Pageable pageable = PageRequest.of(pageNumber, 10);
+        //주문 내역 조회
         String email = principal.getName();
-
         Page<OrdersHistDTO> ordersHistDTOPage
                 = ordersService.getOrderList(email, pageable);
 
+        //모델에 데이터 추가
         model.addAttribute("orders", ordersHistDTOPage);
-
         model.addAttribute("page", pageable.getPageNumber());
         model.addAttribute("maxPage",5);
 

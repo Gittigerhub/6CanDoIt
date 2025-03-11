@@ -48,24 +48,47 @@
             <p>수정일:
               <span th:text="${#temporals.format(noticeDTO.modDate,'yyyy-MM-dd HH:mm')}"></span>
             </p>
+
+            <!-- 버튼 그룹 -->
+            <div class="d-flex justify-content-end mt-4">
+              <a th:href="@{/notice/list}" class="btn btn-secondary">목록</a>
+              <a th:href="@{/notice/update(idx=${noticeDTO.idx})}" class="btn btn-warning ms-2">수정</a>
+              <form th:action="@{|/notice/delete/${noticeDTO.idx}|}" method="post" style="display: inline-block;" class="ms-2"
+                    onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+                <button type="submit" class="btn btn-danger">삭제</button>
+              </form>
+            </div>
           </div>
         </div>
-
-        <!-- 목록, 수정, 삭제 버튼을 카드 밖으로 이동 -->
-        <div class="d-flex justify-content-end mt-3">
-          <a th:href="@{/notice/list}" class="btn btn-secondary ms-2">목록</a>
-          <a th:href="@{/notice/update(idx=${noticeDTO.idx})}" class="btn btn-warning ms-2">수정</a>
-          <form th:action="@{|/notice/delete/${noticeDTO.idx}|}" method="post" style="display: inline-block;" class="ms-2"
-                onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-            <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
-            <button type="submit" class="btn btn-danger">삭제</button>
-          </form>
-        </div>
-
-      </div><!--col-10끝-->
+      </div>
       <div class="col"></div>
-    </div><!--row끝-->
+    </div>
   </div>
 </div>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- 삭제 확인 스크립트 -->
+<script th:inline="javascript">
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    Swal.fire({
+        title: '삭제 확인',
+        text: "정말로 이 공지사항을 삭제하시겠습니까?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            this.submit();
+        }
+    });
+});
+</script>
 </body>
 </html>

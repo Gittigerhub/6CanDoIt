@@ -24,9 +24,9 @@
                     <div class="input-group mb-3">
                         <select class="form-select" name="type">
                             <option th:selected="${type==null}"></option>
-                            <option value="0" th:selected="${type=='0'}">전체</option>
-                            <option value="1" th:selected="${type=='1'}">제목만</option>
-                            <option value="2" th:selected="${type=='2'}">내용만</option>
+                            <option value="all" th:selected="${type=='all'}">전체</option>
+                            <option value="title" th:selected="${type=='title'}">제목만</option>
+                            <option value="content" th:selected="${type=='content'}">내용만</option>
                         </select>
                         <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Search">
                         <button class="btn btn-success" type="submit">검색</button>
@@ -47,14 +47,19 @@
                         <th>No</th>
                         <th>제목</th>
                         <th>작성일</th>
-                        <th>수정일</th>
                         <th>조회수</th>
                     </tr>
                     </thead>
-
-
-
-
+                    <tbody>
+                    <tr th:each="notice : ${noticeDTO.content}" class="text-center">
+                        <td th:text="${notice.idx}"></td>
+                        <td class="text-start">
+                            <a th:href="@{/notice/userread(idx=${notice.idx})}" th:text="${notice.noticeTitle}"></a>
+                        </td>
+                        <td th:text="${#temporals.format(notice.insDate, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${notice.noticeHits}"></td>
+                    </tr>
+                    </tbody>
                 </table>
 
                 <!-- 페이징 -->

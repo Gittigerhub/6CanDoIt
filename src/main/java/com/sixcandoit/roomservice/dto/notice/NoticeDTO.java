@@ -36,13 +36,13 @@ public class NoticeDTO {
     private LocalDateTime insDate;  // 작성일
 
     private LocalDateTime modDate;  // 수정일
-    
+
     private MemberDTO memberDTO;
 
     public NoticeDTO setMemberDTO(MemberDTO memberDTO){
         this.memberDTO =memberDTO;
         return this;
-        
+
     }
     private String memberName;
 

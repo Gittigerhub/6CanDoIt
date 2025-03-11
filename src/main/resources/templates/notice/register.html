@@ -12,7 +12,7 @@
 <body>
 <div layout:fragment="content" class="p-5">
 
-            <h2 class="text-center fs-1">관리자 공지사항</h2>
+    <h2 class="text-center fs-1">관리자 공지사항</h2>
     <div class="container p-5 bg-white">
         <div id="row" class="row">
             <div class="col"></div>
@@ -31,6 +31,13 @@
                                 <span th:if="${#fields.hasErrors('noticeTitle')}"
                                       style="color: red;"
                                       th:errors="*{noticeTitle}"></span> <!-- 오류 메시지 출력 -->
+                            </div>
+                            <div class="mb-3 mt-3"><!--공지사항 타입-->
+                                <label for="noticeType" class="form-label">공지사항 타입:</label>
+                                <select class="form-select" id="noticeType" th:field="*{noticeType}">
+                                    <option value="ADMIN">관리자용 공지사항</option>
+                                    <option value="USER">사용자용 공지사항</option>
+                                </select>
                             </div>
                             <div class="mb-3 mt-3"><!--내용-->
                                 <label for="noticeContents">내용:</label>

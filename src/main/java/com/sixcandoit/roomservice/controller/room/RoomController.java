@@ -361,4 +361,36 @@ public class RoomController {
         roomService.updateSeason(idx, roomSeason);
         return "redirect:/room/detail?idx=" + idx; // 상세 페이지로 리다이렉트
     }
+
+    // 사용자용 룸 목록
+    @GetMapping("/room/member/list")
+    public String memberRoomList(@RequestParam Integer organ_idx, Model model) {
+        log.info("사용자용 룸 목록을 출력합니다. organ_idx: " + organ_idx);
+
+        // 해당 organization의 룸 목록 조회 (가격 내림차순)
+        List<RoomDTO> roomDTOS = roomService.getRoomsByOrganizationForMember(organ_idx);
+
+        // 이미지 정보 가져오기
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+
+        for (RoomDTO roomDTO : roomDTOS) {
+            List<ImageFileDTO> imageList = imageFileService.readImage(roomDTO.getIdx(), "room");
+            imageFileMap.put(roomDTO.getIdx(), imageList);
+
+            // 대표이미지 존재 여부 확인
+            boolean hasRepImage = imageList.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+            repImageMap.put(roomDTO.getIdx(), hasRepImage);
+        }
+
+        // 조직 정보 가져오기
+        model.addAttribute("organization", organizationService.organRead(organ_idx));
+        model.addAttribute("roomDTOS", roomDTOS);
+        model.addAttribute("imageFileMap", imageFileMap);
+        model.addAttribute("repImageMap", repImageMap);
+        model.addAttribute("organ_idx", organ_idx);
+
+        return "room/member/list";
+    }
 }

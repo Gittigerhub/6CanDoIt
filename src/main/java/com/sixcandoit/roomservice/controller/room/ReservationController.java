@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.controller.room;
 
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
+import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.room.ReservationEntity;
@@ -8,6 +9,7 @@ import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
+import com.sixcandoit.roomservice.service.member.MemberService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +38,7 @@ public class ReservationController {
     private final ModelMapper modelMapper;
     private final ReservationRepository reservationRepository;
     private final ImageFileService imageFileService;
+    private final MemberService memberService;
 
     //등록폼으로 이동
     @GetMapping("/create")
@@ -86,10 +90,17 @@ public class ReservationController {
     //등폭폼에서 입력한 내용을 저장
     @PostMapping("/create")
     public String createPage(@ModelAttribute ReservationDTO reservationDTO,
-                             RedirectAttributes redirectAttributes) {
+                             RedirectAttributes redirectAttributes,
+                             Principal principal) {
         log.info("등록 처리 후 목록페이지로 이동하는 postmapping 시작....");
 
         try {
+            // 현재 로그인한 사용자 정보 설정
+            MemberDTO memberDTO = memberService.read(principal.getName());
+            reservationDTO.setMemberDTO(memberDTO);
+            reservationDTO.setMemberName(memberDTO.getMemberName());
+            reservationDTO.setUsername(memberDTO.getMemberName());
+
             reservationService.reserveInsert(reservationDTO);
             redirectAttributes.addFlashAttribute("successMessage", "저장하였습니다.");
             log.info("등록 처리 후....");

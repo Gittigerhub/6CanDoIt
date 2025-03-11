@@ -39,6 +39,15 @@
                 <span th:if="${#fields.hasErrors('noticeTitle')}" style="color: red;" th:errors="*{noticeTitle}"></span> <!-- 오류 메시지 출력 -->
               </div>
 
+              <!-- 공지사항 타입 -->
+              <div class="mb-3 mt-3">
+                <label for="noticeType" class="form-label">공지사항 타입:</label>
+                <select class="form-select" id="noticeType" th:field="*{noticeType}">
+                    <option value="ADMIN">관리자용 공지사항</option>
+                    <option value="USER">사용자용 공지사항</option>
+                </select>
+              </div>
+
               <!-- 게시글 내용 -->
               <div class="mb-3 mt-3">
                 <label for="noticeContents" class="form-label">내용:</label>

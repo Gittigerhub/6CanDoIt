@@ -4,14 +4,18 @@ import com.sixcandoit.roomservice.dto.cart.CartDetailDTO;
 import com.sixcandoit.roomservice.entity.cart.CartMenuEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CartMenuRepository extends JpaRepository<CartMenuEntity, Integer> {
 
-    public CartMenuEntity findByCartEntity_IdxAndIdx(Integer cartIdx, Integer menuIdx);
+    // 장바구니 -> 장바구니에 넣기로 한 메뉴가 카트에 있는지 조회
+    @Query("select c from CartMenuEntity c where c.cartEntity.idx = :cartIdx and c.menuEntity.idx = :menuIdx")
+    Optional<CartMenuEntity> findByCartMenu(@Param("cartIdx") Integer cartIdx, @Param("menuIdx") Integer menuIdx);
 
     public List<CartMenuEntity> findByCartEntity_Idx(Integer cartIdx);
 

@@ -4,6 +4,7 @@ import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
+import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.service.qna.ReplyService;
@@ -15,17 +16,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -42,6 +39,7 @@ public class QnaController {
     private final ImageFileService imageFileService;
     private final ReplyService replyService;
     private final ModelMapper modelMapper;
+    private final QnaRepository qnaRepository;
 
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
     // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
@@ -400,48 +398,78 @@ public class QnaController {
     public ResponseEntity<String> adminUpdate(@ModelAttribute QnaDTO qnaDTO,
                              List<MultipartFile> imageFiles,
                              @AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("관리자용 QnA 수정 처리...");
-        
-        // 관리자 권한 체크
-        if (userDetails == null || !userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
-            return ResponseEntity.status(403).body("관리자만 수정할 수 있습니다.");
-        }
-
         try {
-            // 서비스 메서드 호출 (수정 처리)
-            qnaService.qnaUpdate(qnaDTO, "qna", imageFiles);
-            return ResponseEntity.ok("QnA가 성공적으로 수정되었습니다.");
-        } catch (RuntimeException e) {
-            log.error("QnA 수정 중 오류 발생: " + e.getMessage(), e);
-            return ResponseEntity.badRequest().body("QnA 수정 중 오류가 발생했습니다.");
+            log.info("관리자 QnA 수정 요청 시작");
+            log.info("현재 로그인한 사용자: {}", userDetails != null ? userDetails.getUsername() : "null");
+            log.info("사용자 권한: {}", userDetails != null ? userDetails.getAuthorities() : "null");
+            log.info("수정할 QnA IDX: {}", qnaDTO.getIdx());
+
+            // 관리자 권한 체크
+            if (userDetails == null) {
+                log.warn("로그인하지 않은 사용자의 접근");
+                return ResponseEntity.status(403).body("로그인이 필요합니다.");
+            }
+
+            // 권한 상세 로깅
+            userDetails.getAuthorities().forEach(auth -> {
+                log.info("사용자 권한 상세: {}", auth.getAuthority());
+                log.info("권한 매칭 시도: {}", auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
+            });
+
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(auth -> {
+                        boolean matches = auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)");
+                        log.info("권한 매칭 결과 - 권한: {}, 매칭: {}", auth.getAuthority(), matches);
+                        return matches;
+                    });
+            
+            if (!isAdmin) {
+                log.warn("관리자 권한 없음 - 사용자: {}, 권한: {}", 
+                    userDetails.getUsername(), 
+                    userDetails.getAuthorities());
+                return ResponseEntity.status(403).body("관리자만 수정할 수 있습니다.");
+            }
+
+            // 현재 로그인한 관리자 정보 설정
+            qnaDTO.setMemberName(userDetails.getMember().getMemberName());
+            qnaDTO.setMemberDTO(modelMapper.map(userDetails.getMember(), MemberDTO.class));
+
+            String join = "qna";
+            qnaService.adminQnaUpdate(qnaDTO, join, imageFiles);
+            log.info("관리자 QnA 수정 완료");
+            return ResponseEntity.ok("수정이 완료되었습니다.");
+        } catch (Exception e) {
+            log.error("관리자 QnA 수정 중 오류 발생: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body("수정 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
     // 관리자용 Qna 삭제 처리
-    @PostMapping("/qna/admindelete")
+    @PostMapping("/admindelete")
     @ResponseBody
-    public ResponseEntity<String> adminDelete(@RequestParam Integer idx,
-                        @AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("관리자용 QnA 삭제 처리...");
+    public ResponseEntity<String> admindelete(@RequestParam Integer idx,
+                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        String join = "qna";
         
         // 관리자 권한 체크
         if (userDetails == null || !userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
-            return ResponseEntity.status(403).body("관리자만 삭제할 수 있습니다.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("관리자만 삭제할 수 있습니다.");
         }
 
         try {
             // 해당 질문에 달린 답변을 먼저 삭제
             replyService.deleteRepliesByQnaIdx(idx);
 
-            // QnA 삭제
-            qnaService.qnaDelete(idx, "qna");
+            // QnA와 관련 이미지 삭제
+            qnaService.qnaDelete(idx, join);
             
-            return ResponseEntity.ok("QnA가 성공적으로 삭제되었습니다.");
+            return ResponseEntity.ok("게시글이 삭제되었습니다.");
         } catch (Exception e) {
-            log.error("QnA 삭제 중 오류 발생: " + e.getMessage(), e);
-            return ResponseEntity.badRequest().body("QnA 삭제 중 오류가 발생했습니다.");
+            log.error("게시글 삭제 중 오류 발생: " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("게시글 삭제 중 오류가 발생했습니다.");
         }
     }
 

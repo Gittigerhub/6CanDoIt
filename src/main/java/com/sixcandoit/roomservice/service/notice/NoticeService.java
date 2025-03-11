@@ -147,7 +147,7 @@ public class NoticeService {
         try {
             // 이미지 삭제
             List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
-            
+
             // 이미지가 있는 경우에만 삭제 처리
             if (imageFileDTOS != null && !imageFileDTOS.isEmpty()) {
                 log.info("이미지 삭제 시작: {} 개의 이미지", imageFileDTOS.size());
@@ -218,6 +218,24 @@ public class NoticeService {
         NoticeDTO noticeDTO = modelMapper.map(noticeEntity, NoticeDTO.class);
 
         return noticeDTO;
+    }
 
+    public Page<NoticeDTO> getNoticeListByType(Pageable page, String type, String keyword, String noticeType) {
+        Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
+        Page<NoticeEntity> noticeEntities;
+
+        if (keyword == null || keyword.isEmpty()) {
+            noticeEntities = noticeRepository.findAllByNoticeType(noticeType, pageable);
+        } else {
+            if (type.equals("title")) {
+                noticeEntities = noticeRepository.findByNoticeTitleContainingAndNoticeType(keyword, noticeType, pageable);
+            } else if (type.equals("content")) {
+                noticeEntities = noticeRepository.findByNoticeContentsContainingAndNoticeType(keyword, noticeType, pageable);
+            } else {
+                noticeEntities = noticeRepository.findAllByNoticeTypeAndTitleOrContentsContaining(noticeType, keyword, pageable);
+            }
+        }
+
+        return noticeEntities.map(notice -> modelMapper.map(notice, NoticeDTO.class));
     }
 }

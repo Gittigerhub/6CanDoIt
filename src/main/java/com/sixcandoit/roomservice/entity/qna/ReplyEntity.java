@@ -2,6 +2,7 @@ package com.sixcandoit.roomservice.entity.qna;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,11 @@ public class ReplyEntity extends BaseEntity {
     @JoinColumn(name = "qna_idx")
     @JsonBackReference
     private QnaEntity qnaJoin;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_idx")
+    @JsonBackReference
+    private AdminEntity admin;           // 답변 작성 관리자
 
     //@Column(name = "reply_hits")
     //private int replyHits;               // 조회 수

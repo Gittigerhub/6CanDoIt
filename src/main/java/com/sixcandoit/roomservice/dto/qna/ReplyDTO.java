@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.dto.qna;
 
+import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -30,4 +31,6 @@ public class ReplyDTO {
     private LocalDateTime modDate;      // 수정 일자
 
     private QnaDTO qnaDTO;
+    
+    private AdminDTO adminJoin;         // 답변 작성 관리자
 }

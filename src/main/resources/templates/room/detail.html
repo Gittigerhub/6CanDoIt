@@ -253,6 +253,14 @@
                                     <span th:if="${roomDTO.roomWifi == 'Y'}" class="badge badge-warning">무료 WiFi</span>
                                 </span>
                             </div>
+                            <!-- 객실 설명 추가 -->
+                            <div class="info-item mt-4">
+                                <i class="bi bi-info-circle"></i>
+                                <span>객실 설명:</span>
+                            </div>
+                            <div class="mt-2 p-3" style="background-color: #fff; border-radius: 5px;">
+                                <p th:text="${roomDTO.roomInfo}" style="white-space: pre-line;"></p>
+                            </div>
                         </div>
 
                         <!-- 추가 정보 (체크인/체크아웃 등) -->

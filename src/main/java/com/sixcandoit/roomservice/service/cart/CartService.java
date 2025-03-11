@@ -111,7 +111,8 @@ public class CartService {
         if (cartEntity == null) {
             cartEntity = CartEntity.createCartEntity(memberEntity, reservationEntity);
             cartRepository.save(cartEntity);
-            System.out.println("newcartEntity : " + cartEntity.toString());
+            System.out.println("newcartEntity : " + cartEntity.getIdx());
+            System.out.println("카트를 생성하였습니다.");
         } else {
             System.out.println("카트가 있습니다.");
         }
@@ -140,14 +141,11 @@ public class CartService {
             // 카트idx를 FK로 카트메뉴를 생성한다.
             CartMenuEntity createCartMenu = CartMenuEntity.createCartMenuEntity(cartEntity, menuEntity, count);
 
-            // 카트에 카트메뉴 FK 정보 추가
-            // 양방향 연관관계 편의 메서드 사용
-            cartEntity.addCartMenu(createCartMenu);
-
             // 저장
             cartMenuRepository.save(createCartMenu);
             System.out.println("저장됨!");
             System.out.println("createCartMenu : " + createCartMenu.toString());
+            System.out.println("createCartMenuList : " + cartEntity.getCartMenuJoin());
 
             return createCartMenu.getIdx();
         }

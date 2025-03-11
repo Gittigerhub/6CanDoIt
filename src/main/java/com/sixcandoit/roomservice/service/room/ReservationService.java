@@ -202,4 +202,17 @@ public class ReservationService {
             return new ArrayList<>();
         }
     }
+
+    // 사용자의 특정 숙소 예약 목록 조회
+    public List<ReservationDTO> getUserReservationsByOrganization(String memberEmail, Integer organ_idx) {
+        log.info("Fetching reservations for user: {} and organization: {}", memberEmail, organ_idx);
+        try {
+            List<ReservationEntity> reservations = reservationRepository.findByMemberEmailAndOrganization(memberEmail, organ_idx);
+            log.info("Found {} reservations", reservations.size());
+            return Arrays.asList(modelMapper.map(reservations, ReservationDTO[].class));
+        } catch (Exception e) {
+            log.error("Error fetching reservations for user: {} and organization: {}", memberEmail, organ_idx, e);
+            return new ArrayList<>();
+        }
+    }
 }

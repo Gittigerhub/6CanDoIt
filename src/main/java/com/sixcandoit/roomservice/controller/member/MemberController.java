@@ -2,7 +2,9 @@ package com.sixcandoit.roomservice.controller.member;
 
 import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.service.member.MemberService;
+import com.sixcandoit.roomservice.service.room.ReservationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/member")
@@ -19,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class MemberController {
 
     private final MemberService memberService;
+    private final ReservationService reservationService;
 
     @GetMapping("/")
     public String IndexForm(HttpSession session, MemberDTO memberDTO) {
@@ -194,6 +199,10 @@ public class MemberController {
     public String myPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         MemberDTO memberDTO = memberService.read(userDetails.getUsername());
         model.addAttribute("memberDTO", memberDTO);
+
+        // 사용자의 예약 목록 조회
+        List<ReservationDTO> reservations = reservationService.getUserReservations(userDetails.getUsername());
+        model.addAttribute("reservations", reservations);
 
         return "member/mypage";
     }

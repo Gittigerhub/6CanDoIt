@@ -185,22 +185,36 @@ public class ReservationController {
 
     //목록페이지로 이동
     @GetMapping("/list")
-    public String getAllPages(@RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
-                              @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
-                              Model model) {
+    public String getAllPages(@RequestParam(name = "organ_idx", required = false) Integer organ_idx,
+                            @RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
+                            @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
+                            Model model,
+                            Principal principal) {
         log.info("데이터 조회 후 목록페이지로 이동....");
 
         // 리다이렉트 후 전달된 성공 또는 실패 메시지를 받아옵니다.
         if (model.containsAttribute("errorMessage")) {
             model.addAttribute("errorMessage", model.getAttribute("errorMessage"));
         }
-        List<ReservationDTO> reserveDTOList = reservationService.reserveList(sdate, edate);
 
-        model.addAttribute("List", reserveDTOList);
+        // 현재 로그인한 사용자의 예약만 조회
+        if (principal != null) {
+            List<ReservationDTO> userReservations;
+            if (organ_idx != null) {
+                // 특정 숙소의 예약만 조회
+                userReservations = reservationService.getUserReservationsByOrganization(principal.getName(), organ_idx);
+            } else {
+                // 전체 예약 조회
+                userReservations = reservationService.getUserReservations(principal.getName());
+            }
+            model.addAttribute("reservations", userReservations);
+        }
+
         model.addAttribute("sdate", sdate);
         model.addAttribute("edate", edate);
+        model.addAttribute("organ_idx", organ_idx);
 
-        return "reserve/list"; // page-list.html 뷰 템플릿을 찾아서 렌더링
+        return "room/member/list"; // list.html 뷰 템플릿을 찾아서 렌더링
     }
 
     @GetMapping("/detail")

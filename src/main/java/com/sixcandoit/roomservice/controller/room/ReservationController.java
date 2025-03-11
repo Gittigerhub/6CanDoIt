@@ -203,9 +203,11 @@ public class ReservationController {
             if (organ_idx != null) {
                 // 특정 숙소의 예약만 조회
                 userReservations = reservationService.getUserReservationsByOrganization(principal.getName(), organ_idx);
+                log.info("Fetching reservations for user {} and organization {}", principal.getName(), organ_idx);
             } else {
                 // 전체 예약 조회
                 userReservations = reservationService.getUserReservations(principal.getName());
+                log.info("Fetching all reservations for user {}", principal.getName());
             }
             model.addAttribute("reservations", userReservations);
         }
@@ -214,7 +216,7 @@ public class ReservationController {
         model.addAttribute("edate", edate);
         model.addAttribute("organ_idx", organ_idx);
 
-        return "room/member/list"; // list.html 뷰 템플릿을 찾아서 렌더링
+        return "room/member/list";
     }
 
     @GetMapping("/detail")

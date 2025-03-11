@@ -209,6 +209,15 @@ public class ReservationService {
         try {
             List<ReservationEntity> reservations = reservationRepository.findByMemberEmailAndOrganization(memberEmail, organ_idx);
             log.info("Found {} reservations", reservations.size());
+            // 각 예약의 상세 정보 로깅
+            for (ReservationEntity reservation : reservations) {
+                log.info("Reservation: id={}, organization={}, room={}, dates={}-{}", 
+                    reservation.getIdx(),
+                    reservation.getRoomJoin().getOrganizationJoin().getIdx(),
+                    reservation.getRoomJoin().getRoomName(),
+                    reservation.getStartDate(),
+                    reservation.getEndDate());
+            }
             return Arrays.asList(modelMapper.map(reservations, ReservationDTO[].class));
         } catch (Exception e) {
             log.error("Error fetching reservations for user: {} and organization: {}", memberEmail, organ_idx, e);

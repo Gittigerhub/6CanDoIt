@@ -11,11 +11,11 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-
 public class CartOrdersDTO {
 
     private Integer cartMenuIdx;
 
-    private List<CartOrdersDTO> ordersDTOList;
-    //장바구니에서 여러개의 상품을 주문하기 때문에 장바구니 본인을 List로 가질 수 있도록
+    // 장바구니에서 여러개의 상품을 주문하기 때문에 장바구니 본인을 List로 가질 수 있도록
+    private List<CartOrdersDTO> cartOrdersDTOList;
+
 }

@@ -1,5 +1,8 @@
 package com.sixcandoit.roomservice.dto.orders;
 
+import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,13 +15,14 @@ import lombok.ToString;
 
 public class OrdersMenuDTO {
 
-    private Integer idx;    //저장된 주문 메뉴
+    private Integer idx;                // 기본값
 
-    private String menuName;    //메뉴 이름만
+    @Min(value = 1, message = "최소 주문 수량은 1개입니다.")
+    @Max(value = 999, message = "최대 주문 수량은 999개입니다.")
+    private int count;                  // 수량
 
-    private int orderPrice; //주문 가격
+    private OrdersDTO ordersJoin;
 
-    private int count;  //수량
+    private MenuDTO menuJoin;
 
-    private String menuImg; //대표 이미지
 }

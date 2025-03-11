@@ -9,16 +9,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
 
     //구매이력
-    @Query("select o from OrdersEntity o where o.memberJoin.memberEmail = :memberEmail order by o.ordersDate")
-    public List<OrdersEntity> findOrdersEntity(String memberEmail, Pageable pageable);
+//    @Query("select o from OrdersEntity o where o.memberJoin.memberEmail = :memberEmail order by o.ordersDate")
+//    public List<OrdersEntity> findOrdersEntity(String memberEmail, Pageable pageable);
+
     @Query("select count(o) from OrdersEntity o where o.memberJoin.memberEmail = :memberEmail")
     public Integer totalcount(String memberEmail);
 
@@ -54,11 +53,11 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
     Page<OrdersEntity> findByOrdersStatus(OrderStatus status, Pageable pageable);
 
     // 6. 특정 기간 내 주문 조회
-    @Query("SELECT o FROM OrdersEntity o WHERE o.ordersDate BETWEEN :startDate AND :endDate")
-    Page<OrdersEntity> findByOrdersDateBetween(
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate,
-            Pageable pageable);
+//    @Query("SELECT o FROM OrdersEntity o WHERE o.ordersDate BETWEEN :startDate AND :endDate")
+//    Page<OrdersEntity> findByOrdersDateBetween(
+//            @Param("startDate") Date startDate,
+//            @Param("endDate") Date endDate,
+//            Pageable pageable);
 
     // 7. 특정 상태의 주문 수 조회
     @Query("SELECT COUNT(o) FROM OrdersEntity o WHERE o.ordersStatus = :status")

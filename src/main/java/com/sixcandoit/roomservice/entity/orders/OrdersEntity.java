@@ -10,8 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,7 +30,7 @@ public class OrdersEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "orders_status")
-    private OrderStatus ordersStatus;             // 주문 상태(NEW 신규, CHECK 접수, COOKING 조리 중, CANCEL 취소, CLOSE 완료)
+    private OrderStatus ordersStatus;        // 주문 상태(NEW 신규, CHECK 접수, COOKING 조리 중, CANCEL 취소, CLOSE 완료)
 
     @Column(name = "orders_phone")
     private String ordersPhone;              // 연락받을 연락처
@@ -54,19 +52,15 @@ public class OrdersEntity extends BaseEntity {
 
     // 주문 상품과 1:N 매핑
     // mappedBy = "orders" -> ordersMenu에 있는 orders에 의해 관리
-    @OneToMany(mappedBy = "ordersEntity", cascade = CascadeType.ALL,
-    orphanRemoval = true, fetch = FetchType.LAZY)   //양방향 설정
-    private List<OrdersMenuEntity> ordersMenuEntityList = new ArrayList<>();
-
-    //주문일
-    private LocalDateTime ordersDate;
-
+    @OneToMany(mappedBy = "ordersJoin", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)   //양방향 설정
+    private List<OrdersMenuEntity> ordersMenuJoin;
 
     public void setOrdersMenuEntityList(OrdersMenuEntity ordersMenuEntity) {
-        this.ordersMenuEntityList.add(ordersMenuEntity);
+        this.ordersMenuJoin.add(ordersMenuEntity);
     }
 
     public void setOrdersMenuEntityList(List<OrdersMenuEntity> ordersMenuEntityList) {
-        this.ordersMenuEntityList = ordersMenuEntityList;
+        this.ordersMenuJoin = ordersMenuEntityList;
     }
+
 }

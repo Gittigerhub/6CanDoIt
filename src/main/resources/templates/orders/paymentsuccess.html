@@ -42,7 +42,7 @@
     <div class="payment-success text-center">
         <i class="fas fa-check-circle success-icon"></i>
         <h2 class="mb-4">결제가 성공적으로 완료되었습니다</h2>
-        
+
         <div class="payment-info">
             <p><strong>주문번호:</strong> <span th:text="${orderId}"></span></p>
             <p><strong>결제금액:</strong> <span th:text="${#numbers.formatInteger(amount, 0, 'COMMA')} + '원'"></span></p>

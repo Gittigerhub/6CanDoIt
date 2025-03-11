@@ -16,8 +16,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -74,7 +72,7 @@ public class QnaController {
         // 관리자 권한 체크
         if (userDetails == null || !userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
-            // 권한이 없는 경우 일반 사용자 목록으로 리다이렉트
+            log.warn("관리자 권한이 없는 사용자의 접근 시도");
             redirectAttributes.addFlashAttribute("sweetAlert", true);
             redirectAttributes.addFlashAttribute("alertType", "error");
             redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
@@ -82,15 +80,33 @@ public class QnaController {
             return "redirect:/qna/list";
         }
 
-        // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<QnaDTO> qnaDTOS = qnaService.qnaList(page, type, keyword);
-        // html에 필요한 페이지 정보를 받는다.
+        Page<QnaDTO> qnaDTOS;
+        
+        // 내가 답변한 게시글 필터링
+        if ("8".equals(type)) {
+            log.info("내가 답변한 게시글 필터링 시작 - 관리자 IDX: {}", userDetails.getAdmin().getIdx());
+            qnaDTOS = qnaService.getQnaListByAdmin(userDetails.getAdmin().getIdx(), page);
+            log.info("필터링된 게시글 수: {}", qnaDTOS.getTotalElements());
+            log.info("필터링된 게시글 내용:");
+            qnaDTOS.getContent().forEach(dto -> {
+                log.info("게시글 IDX: {}, 제목: {}, 작성자: {}, 답변여부: {}, 자주묻는질문여부: {}", 
+                    dto.getIdx(), dto.getQnaTitle(), dto.getMemberName(), dto.getReplyYn(), dto.getFavYn());
+            });
+            // keyword 파라미터 초기화 (검색어 무시)
+            keyword = "";
+        } else {
+            qnaDTOS = qnaService.qnaList(page, type, keyword);
+        }
+
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(qnaDTOS);
 
-        model.addAttribute("qnalist", qnaDTOS); // 데이터 전달
-        model.addAllAttributes(pageInfo); // 페이지 정보
-        model.addAttribute("type", type); //검색분류
-        model.addAttribute("keyword", keyword); // 키워드
+        log.info("모델에 데이터 추가 - 총 게시글 수: {}, 현재 페이지: {}, 시작 페이지: {}, 끝 페이지: {}", 
+            qnaDTOS.getTotalElements(), pageInfo.get("currentPage"), pageInfo.get("startPage"), pageInfo.get("endPage"));
+
+        model.addAttribute("qnalist", qnaDTOS);
+        model.addAllAttributes(pageInfo);
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
 
         return "qna/qnalist";
     }
@@ -262,64 +278,63 @@ public class QnaController {
         return "qna/adminread";
     }
 
-    // Qna의 Q 수정할 게시글 불러오기
-    @GetMapping("/qna/update")
-    public String update(@RequestParam Integer idx, Model model, 
-                        @AuthenticationPrincipal CustomUserDetails userDetails,
-                        RedirectAttributes redirectAttributes) {
-        log.info("수정할 데이터를 읽는 중입니다.");
-        QnaDTO qnaDTO = qnaService.qnaRead(idx);
-
-        // 작성자이거나 관리자인 경우에만 수정 가능
-        boolean isAdmin = userDetails != null && userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
-        boolean isAuthor = userDetails != null && qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName());
-
-        if (!isAdmin && !isAuthor) {
-            log.warn("Unauthorized access attempt to edit QnA. User: {}, QnA author: {}", 
-                userDetails != null ? userDetails.getMember().getMemberName() : "anonymous", 
-                qnaDTO.getMemberName());
-            
-            redirectAttributes.addFlashAttribute("sweetAlert", true);
-            redirectAttributes.addFlashAttribute("alertType", "error");
-            redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
-            redirectAttributes.addFlashAttribute("alertMessage", "작성자나 관리자만 수정할 수 있습니다.");
-            
-            return "redirect:/qna/list";
-        }
-
-        log.info("개별 데이터를 페이지로 전달합니다.");
-        model.addAttribute("qnaDTO", qnaDTO);
-
-        return "qna/update";
-    }
-
     // Qna의 Q 수정할 게시글 수정하기
     @PostMapping("/qna/update")
     public String updateProc(@ModelAttribute QnaDTO qnaDTO,
                              String join, List<MultipartFile> imageFiles,
                              @AuthenticationPrincipal CustomUserDetails userDetails,
                              RedirectAttributes redirectAttributes) {
-        log.info("수정된 데이터를 저장합니다.");
-        
-        try {
-            // 기존 값들 유지
-            qnaDTO.setMemberName(userDetails.getMember().getMemberName());
-            qnaDTO.setMemberDTO(modelMapper.map(userDetails.getMember(), MemberDTO.class));
-            
-            log.info("작성자 정보 설정 - 이름: {}", qnaDTO.getMemberName());
-            
-            // 서비스 메서드 호출 (수정 처리)
-            qnaService.qnaUpdate(qnaDTO, join, imageFiles);
-            return "redirect:/qna/read?idx=" + qnaDTO.getIdx();
+        log.info("수정된 데이터를 저장합니다. QnA IDX: {}", qnaDTO.getIdx());
 
-        } catch (RuntimeException e) {
-            // SweetAlert를 위한 메시지 설정
+        boolean isAdmin = false;
+        try {
+            // 관리자 권한 체크
+            isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
+
+            // 기존 QnA 데이터 조회
+            QnaDTO existingQna = qnaService.qnaRead(qnaDTO.getIdx());
+            log.info("기존 게시글 조회 완료 - 제목: {}, 작성자: {}", existingQna.getQnaTitle(), existingQna.getMemberName());
+
+            // 기존 데이터 유지
+            qnaDTO.setFavYn(existingQna.getFavYn());
+            qnaDTO.setReplyYn(existingQna.getReplyYn());
+            qnaDTO.setQnaHits(existingQna.getQnaHits());
+            qnaDTO.setMemberDTO(existingQna.getMemberDTO());
+            qnaDTO.setMemberName(existingQna.getMemberName());
+
+            // 관리자가 수정하는 경우
+            if (isAdmin) {
+                log.info("관리자에 의한 게시글 수정 시작 - 관리자: {}, QnA IDX: {}",
+                        userDetails.getUsername(), qnaDTO.getIdx());
+                qnaService.adminQnaUpdate(qnaDTO, join, imageFiles);
+                log.info("관리자에 의한 게시글 수정 완료");
+            } else {
+                // 일반 사용자가 수정하는 경우
+                if (!existingQna.getMemberName().equals(userDetails.getMember().getMemberName())) {
+                    throw new RuntimeException("자신이 작성한 게시글만 수정할 수 있습니다.");
+                }
+                log.info("작성자에 의한 게시글 수정 시작 - 작성자: {}", qnaDTO.getMemberName());
+                qnaService.qnaUpdate(qnaDTO, join, imageFiles);
+                log.info("작성자에 의한 게시글 수정 완료");
+            }
+
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "success");
+            redirectAttributes.addFlashAttribute("alertTitle", "수정 완료");
+            redirectAttributes.addFlashAttribute("alertMessage", "게시글이 수정되었습니다.");
+
+            return isAdmin ? "redirect:/qna/adminread?idx=" + qnaDTO.getIdx()
+                    : "redirect:/qna/read?idx=" + qnaDTO.getIdx();
+
+        } catch (Exception e) {
+            log.error("게시글 수정 중 오류 발생: " + e.getMessage(), e);
             redirectAttributes.addFlashAttribute("sweetAlert", true);
             redirectAttributes.addFlashAttribute("alertType", "error");
             redirectAttributes.addFlashAttribute("alertTitle", "수정 실패");
-            redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
-            return "redirect:/qna/list";
+            redirectAttributes.addFlashAttribute("alertMessage", "게시글 수정 중 오류가 발생했습니다: " + e.getMessage());
+            return isAdmin ? "redirect:/qna/adminread?idx=" + qnaDTO.getIdx()
+                    : "redirect:/qna/read?idx=" + qnaDTO.getIdx();
         }
     }
 
@@ -343,12 +358,38 @@ public class QnaController {
         // QnA 데이터 조회
         QnaDTO qnaDTO = qnaService.qnaRead(idx);
         
-        // 작성자이거나 관리자인 경우에만 삭제 가능
+        // 관리자 권한 체크
         boolean isAdmin = userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
-        boolean isAuthor = qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName());
-
-        if (!isAdmin && !isAuthor) {
+                
+        if (isAdmin) {
+            try {
+                // 관리자는 모든 게시글 삭제 가능
+                log.info("관리자에 의한 게시글 삭제 - 관리자: {}, QnA IDX: {}", 
+                    userDetails.getUsername(), idx);
+                    
+                // 해당 질문에 달린 답변을 먼저 삭제
+                replyService.deleteRepliesByQnaIdx(idx);
+                qnaService.qnaDelete(idx, join);
+                
+                redirectAttributes.addFlashAttribute("sweetAlert", true);
+                redirectAttributes.addFlashAttribute("alertType", "success");
+                redirectAttributes.addFlashAttribute("alertTitle", "삭제 완료");
+                redirectAttributes.addFlashAttribute("alertMessage", "게시글이 삭제되었습니다.");
+                
+                return "redirect:/qna/qnalist";
+            } catch (Exception e) {
+                log.error("관리자의 게시글 삭제 중 오류 발생: " + e.getMessage(), e);
+                redirectAttributes.addFlashAttribute("sweetAlert", true);
+                redirectAttributes.addFlashAttribute("alertType", "error");
+                redirectAttributes.addFlashAttribute("alertTitle", "삭제 실패");
+                redirectAttributes.addFlashAttribute("alertMessage", "게시글 삭제 중 오류가 발생했습니다.");
+                return "redirect:/qna/qnalist";
+            }
+        }
+        
+        // 일반 사용자는 자신의 게시글만 삭제 가능
+        if (!qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName())) {
             log.warn("권한 없는 사용자의 삭제 시도 - 사용자: {}, 작성자: {}", 
                 userDetails.getMember().getMemberName(), 
                 qnaDTO.getMemberName());
@@ -356,7 +397,7 @@ public class QnaController {
             redirectAttributes.addFlashAttribute("sweetAlert", true);
             redirectAttributes.addFlashAttribute("alertType", "error");
             redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
-            redirectAttributes.addFlashAttribute("alertMessage", "작성자나 관리자만 삭제할 수 있습니다.");
+            redirectAttributes.addFlashAttribute("alertMessage", "자신이 작성한 게시글만 삭제할 수 있습니다.");
             
             return "redirect:/qna/list";
         }
@@ -364,7 +405,7 @@ public class QnaController {
         try {
             // 해당 질문에 달린 답변을 먼저 삭제
             replyService.deleteRepliesByQnaIdx(idx);
-
+            
             log.info("데이터를 삭제합니다.");
             qnaService.qnaDelete(idx, join);
 
@@ -373,8 +414,7 @@ public class QnaController {
             redirectAttributes.addFlashAttribute("alertTitle", "삭제 완료");
             redirectAttributes.addFlashAttribute("alertMessage", "게시글이 삭제되었습니다.");
             
-            // 관리자가 삭제한 경우 관리자 목록으로, 작성자가 삭제한 경우 일반 목록으로 리다이렉트
-            return isAdmin ? "redirect:/qna/qnalist" : "redirect:/qna/list";
+            return "redirect:/qna/list";
         } catch (Exception e) {
             log.error("게시글 삭제 중 오류 발생: " + e.getMessage(), e);
             redirectAttributes.addFlashAttribute("sweetAlert", true);
@@ -390,87 +430,6 @@ public class QnaController {
     public String updateFavYn(@RequestParam Integer idx, @RequestParam String favYn) {
         qnaService.updateFavYn(idx, favYn);
         return "redirect:/qna/read?idx=" + idx; // 상세 페이지로 리다이렉트
-    }
-
-    // 관리자용 Qna 수정 처리
-    @PostMapping("/qna/adminupdate")
-    @ResponseBody
-    public ResponseEntity<String> adminUpdate(@ModelAttribute QnaDTO qnaDTO,
-                             List<MultipartFile> imageFiles,
-                             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        try {
-            log.info("관리자 QnA 수정 요청 시작");
-            log.info("현재 로그인한 사용자: {}", userDetails != null ? userDetails.getUsername() : "null");
-            log.info("사용자 권한: {}", userDetails != null ? userDetails.getAuthorities() : "null");
-            log.info("수정할 QnA IDX: {}", qnaDTO.getIdx());
-
-            // 관리자 권한 체크
-            if (userDetails == null) {
-                log.warn("로그인하지 않은 사용자의 접근");
-                return ResponseEntity.status(403).body("로그인이 필요합니다.");
-            }
-
-            // 권한 상세 로깅
-            userDetails.getAuthorities().forEach(auth -> {
-                log.info("사용자 권한 상세: {}", auth.getAuthority());
-                log.info("권한 매칭 시도: {}", auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
-            });
-
-            boolean isAdmin = userDetails.getAuthorities().stream()
-                    .anyMatch(auth -> {
-                        boolean matches = auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)");
-                        log.info("권한 매칭 결과 - 권한: {}, 매칭: {}", auth.getAuthority(), matches);
-                        return matches;
-                    });
-            
-            if (!isAdmin) {
-                log.warn("관리자 권한 없음 - 사용자: {}, 권한: {}", 
-                    userDetails.getUsername(), 
-                    userDetails.getAuthorities());
-                return ResponseEntity.status(403).body("관리자만 수정할 수 있습니다.");
-            }
-
-            // 현재 로그인한 관리자 정보 설정
-            qnaDTO.setMemberName(userDetails.getMember().getMemberName());
-            qnaDTO.setMemberDTO(modelMapper.map(userDetails.getMember(), MemberDTO.class));
-
-            String join = "qna";
-            qnaService.adminQnaUpdate(qnaDTO, join, imageFiles);
-            log.info("관리자 QnA 수정 완료");
-            return ResponseEntity.ok("수정이 완료되었습니다.");
-        } catch (Exception e) {
-            log.error("관리자 QnA 수정 중 오류 발생: " + e.getMessage(), e);
-            return ResponseEntity.status(500).body("수정 중 오류가 발생했습니다: " + e.getMessage());
-        }
-    }
-
-    // 관리자용 Qna 삭제 처리
-    @PostMapping("/admindelete")
-    @ResponseBody
-    public ResponseEntity<String> admindelete(@RequestParam Integer idx,
-                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        String join = "qna";
-        
-        // 관리자 권한 체크
-        if (userDetails == null || !userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("관리자만 삭제할 수 있습니다.");
-        }
-
-        try {
-            // 해당 질문에 달린 답변을 먼저 삭제
-            replyService.deleteRepliesByQnaIdx(idx);
-
-            // QnA와 관련 이미지 삭제
-            qnaService.qnaDelete(idx, join);
-            
-            return ResponseEntity.ok("게시글이 삭제되었습니다.");
-        } catch (Exception e) {
-            log.error("게시글 삭제 중 오류 발생: " + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("게시글 삭제 중 오류가 발생했습니다.");
-        }
     }
 
     // 예외 처리기 추가

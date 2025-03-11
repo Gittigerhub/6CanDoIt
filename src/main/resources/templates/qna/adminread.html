@@ -73,7 +73,7 @@
                             <!-- 수정 버튼 (모달 띄우기) -->
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#qnaUpdateModal">수정</button>
                             <!-- 삭제 버튼 -->
-                            <button id="deleteQnaBtn" class="btn btn-danger">삭제</button>
+                            <a th:href="@{'/qna/delete?idx=' + ${qnaDTO.idx}}" class="btn btn-danger">삭제</a>
                         </div>
                     </div>
 
@@ -110,35 +110,38 @@
 
                     <!-- QnA 수정 모달 -->
                     <div class="modal fade" id="qnaUpdateModal" tabindex="-1" aria-labelledby="qnaUpdateModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="qnaUpdateModalLabel">QnA 수정</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <form id="qnaUpdateForm" th:action="@{/qna/adminupdate}" method="post" enctype="multipart/form-data">
-                                    <div class="modal-body">
+                                <div class="modal-body">
+                                    <form id="qnaUpdateForm" th:action="@{/qna/update}" method="post" enctype="multipart/form-data">
                                         <input type="hidden" name="idx" th:value="${qnaDTO.idx}">
-                                        <input type="hidden" name="memberName" th:value="${qnaDTO.memberName}">
+                                        <input type="hidden" name="join" value="qna">
                                         
                                         <div class="mb-3">
                                             <label for="qnaTitle" class="form-label">제목</label>
                                             <input type="text" class="form-control" id="qnaTitle" name="qnaTitle" th:value="${qnaDTO.qnaTitle}" required>
                                         </div>
+                                        
                                         <div class="mb-3">
                                             <label for="qnaContents" class="form-label">내용</label>
-                                            <textarea class="form-control" id="qnaContents" name="qnaContents" rows="4" required th:text="${qnaDTO.qnaContents}"></textarea>
+                                            <textarea class="form-control" id="qnaContents" name="qnaContents" rows="5" required th:text="${qnaDTO.qnaContents}"></textarea>
                                         </div>
+                                        
                                         <div class="mb-3">
                                             <label for="imageFiles" class="form-label">이미지 파일</label>
-                                            <input type="file" class="form-control" id="imageFiles" name="imageFiles" multiple>
+                                            <input type="file" class="form-control" id="imageFiles" name="imageFiles" multiple accept="image/*">
                                         </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                                        <button type="submit" class="btn btn-primary">저장</button>
-                                    </div>
-                                </form>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                                            <button type="submit" class="btn btn-primary">수정</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -223,100 +226,12 @@
                 });
             }
 
-            // QnA 삭제 처리
-            $('#deleteQnaBtn').click(function() {
-                const qnaIdx = /*[[${qnaDTO.idx}]]*/ 0;
-                
-                Swal.fire({
-                    title: '정말 삭제하시겠습니까?',
-                    text: "답변을 포함한 게시글이 모두 삭제됩니다.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: '삭제',
-                    cancelButtonText: '취소'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/qna/admindelete',
-                            type: 'POST',
-                            data: { idx: qnaIdx },
-                            success: function(response) {
-                                Swal.fire({
-                                    title: '삭제 완료!',
-                                    text: '게시글이 삭제되었습니다.',
-                                    icon: 'success',
-                                    confirmButtonText: '확인'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = '/qna/qnalist';
-                                    }
-                                });
-                            },
-                            error: function(xhr, status, error) {
-                                Swal.fire({
-                                    title: '오류 발생',
-                                    text: '게시글 삭제 중 문제가 발생했습니다.',
-                                    icon: 'error',
-                                    confirmButtonText: '확인'
-                                });
-                            }
-                        });
-                    }
-                });
-            });
-
             // 모달이 닫힐 때 포커스 관리
             $('.modal').on('hidden.bs.modal', function () {
                 const triggerButton = $('[data-bs-toggle="modal"][data-bs-target="#' + $(this).attr('id') + '"]');
                 if (triggerButton.length) {
                     triggerButton.focus();
                 }
-            });
-
-            // QnA 수정 폼 제출 처리
-            $('#qnaUpdateForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(this);
-                
-                $.ajax({
-                    url: '/qna/adminupdate',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        Swal.fire({
-                            title: '성공!',
-                            text: response,
-                            icon: 'success',
-                            confirmButtonText: '확인'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload();
-                            }
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error);
-                        console.error('Status:', status);
-                        console.error('Response:', xhr.responseText);
-                        
-                        let errorMessage = 'QnA 수정 중 문제가 발생했습니다.';
-                        if (xhr.status === 403) {
-                            errorMessage = '관리자 권한이 필요합니다.';
-                        }
-                        
-                        Swal.fire({
-                            title: '오류 발생',
-                            text: errorMessage,
-                            icon: 'error',
-                            confirmButtonText: '확인'
-                        });
-                    }
-                });
             });
         });
     </script>

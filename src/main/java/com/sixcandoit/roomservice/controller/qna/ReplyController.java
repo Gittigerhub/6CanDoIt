@@ -1,12 +1,15 @@
 package com.sixcandoit.roomservice.controller.qna;
 
 import com.sixcandoit.roomservice.config.CustomUserDetails;
+import com.sixcandoit.roomservice.dto.admin.AdminDTO;
+import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.dto.qna.ReplyDTO;
 import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.service.qna.ReplyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +27,7 @@ public class ReplyController {
 
     private final ReplyService replyService;
     private final QnaService qnaService;
+    private final ModelMapper modelMapper;
 
     // Qna의 A 읽기 -> Q 상세보기에서 목록 출력
     // Qna의 A 등록 -> 모달 처리
@@ -31,6 +35,7 @@ public class ReplyController {
     public String register(@Valid @RequestParam Integer qnaIdx,
                            @ModelAttribute ReplyDTO replyDTO,
                            BindingResult bindingResult,
+                           @AuthenticationPrincipal CustomUserDetails userDetails,
                            RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("sweetAlert", true);
@@ -39,19 +44,42 @@ public class ReplyController {
             redirectAttributes.addFlashAttribute("alertMessage", "입력값이 올바르지 않습니다.");
             return "redirect:/qna/adminread?idx=" + qnaIdx;
         }
+
+        // 관리자 권한 체크
+        if (!userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"))) {
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "권한 없음");
+            redirectAttributes.addFlashAttribute("alertMessage", "관리자만 답변을 등록할 수 있습니다.");
+            return "redirect:/qna/adminread?idx=" + qnaIdx;
+        }
+
         try {
-            // 답변 등록 처리
+            // 현재 로그인한 관리자 정보 설정
+            AdminDTO adminDTO = modelMapper.map(userDetails.getAdmin(), AdminDTO.class);
+            replyDTO.setQnaIdx(qnaIdx);
+            replyDTO.setAdminJoin(adminDTO);
+            
+            // QnA에도 admin 설정
+            QnaDTO qnaDTO = qnaService.qnaRead(qnaIdx);
+            qnaDTO.setAdminJoin(adminDTO);
+            qnaService.updateAdminJoin(qnaDTO.getIdx(), userDetails.getAdmin());
+            
+            // 답변 등록
             replyService.replyRegister(replyDTO);
+            
             redirectAttributes.addFlashAttribute("sweetAlert", true);
             redirectAttributes.addFlashAttribute("alertType", "success");
             redirectAttributes.addFlashAttribute("alertTitle", "성공");
             redirectAttributes.addFlashAttribute("alertMessage", "답변이 등록되었습니다.");
+            
             return "redirect:/qna/adminread?idx=" + qnaIdx;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("sweetAlert", true);
             redirectAttributes.addFlashAttribute("alertType", "error");
             redirectAttributes.addFlashAttribute("alertTitle", "오류");
-            redirectAttributes.addFlashAttribute("alertMessage", "답변 등록에 실패했습니다.");
+            redirectAttributes.addFlashAttribute("alertMessage", "답변 등록 중 오류가 발생했습니다.");
             return "redirect:/qna/adminread?idx=" + qnaIdx;
         }
     }
@@ -121,36 +149,5 @@ public class ReplyController {
             return "redirect:/error";
         }
         return "redirect:/qna/adminread?idx=" + qnaIdx;
-    }
-
-    @PostMapping("/register")
-    public String register(@Valid @ModelAttribute ReplyDTO replyDTO,
-                          BindingResult bindingResult,
-                          @AuthenticationPrincipal CustomUserDetails userDetails,
-                          RedirectAttributes redirectAttributes) {
-        // 관리자 권한 체크
-        if (!userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
-            redirectAttributes.addFlashAttribute("sweetAlert", true);
-            redirectAttributes.addFlashAttribute("alertType", "error");
-            redirectAttributes.addFlashAttribute("alertTitle", "권한 없음");
-            redirectAttributes.addFlashAttribute("alertMessage", "관리자만 답변을 등록할 수 있습니다.");
-            return "redirect:/qna/adminread?idx=" + replyDTO.getQnaIdx();
-        }
-
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("sweetAlert", true);
-            redirectAttributes.addFlashAttribute("alertType", "error");
-            redirectAttributes.addFlashAttribute("alertTitle", "입력 오류");
-            redirectAttributes.addFlashAttribute("alertMessage", "답변 내용을 입력해주세요.");
-            return "redirect:/qna/adminread?idx=" + replyDTO.getQnaIdx();
-        }
-
-        replyService.replyRegister(replyDTO);
-        redirectAttributes.addFlashAttribute("sweetAlert", true);
-        redirectAttributes.addFlashAttribute("alertType", "success");
-        redirectAttributes.addFlashAttribute("alertTitle", "성공");
-        redirectAttributes.addFlashAttribute("alertMessage", "답변이 등록되었습니다.");
-        return "redirect:/qna/adminread?idx=" + replyDTO.getQnaIdx();
     }
 }

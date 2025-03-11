@@ -12,12 +12,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig{
+
+    private final CustomLoginSuccessHandler customLoginSuccessHandler;
+    private final AuthenticationEntryPoint customAuthenticationEntryPoint;
 
     //암호
     @Bean
@@ -109,7 +113,10 @@ public class SecurityConfig{
                 .loginPage("/admin/login")
                 .usernameParameter("adminEmail")
                 .permitAll()
-                .successHandler(new CustomLoginSuccessHandler()));
+                .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
+
 
         //CSRF 보호를 비활성화
         http.csrf(AbstractHttpConfigurer::disable);
@@ -182,7 +189,9 @@ public class SecurityConfig{
                 .loginPage("/member/login")
                 .usernameParameter("memberEmail")
                 .permitAll()
-                .successHandler(new CustomLoginSuccessHandler()));
+                .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
+        .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
 
         //CSRF 보호를 비활성화
         http.csrf(AbstractHttpConfigurer::disable);

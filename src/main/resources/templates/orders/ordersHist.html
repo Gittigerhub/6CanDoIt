@@ -42,19 +42,19 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <th style="width: 150px;">주문 번호</th>
-                                    <td th:text="${order.ordersIdx}"></td>
+                                    <td th:text="${orders.ordersIdx}"></td>
                                 </tr>
                                 <tr>
                                     <th>주문 상태</th>
                                     <td>
-                                        <span th:text="${order.orderStatus}"
-                                              th:class="'order-status status-' + ${order.orderStatus}">
+                                        <span th:text="${orders.orderStatus}"
+                                              th:class="'order-status status-' + ${orders.orderStatus}">
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>주문 일시</th>
-                                    <td th:text="${#temporals.format(order.insDate, 'yyyy-MM-dd HH:mm')}"></td>
+                                    <td th:text="${#temporals.format(orders.ordersDate, 'yyyy-MM-dd HH:mm')}"></td>
                                 </tr>
                             </table>
                         </div>
@@ -63,7 +63,7 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <th style="width: 150px;">객실 번호</th>
-                                    <td th:text="${order.roomNumber}"></td>
+                                    <!--<td th:text="${orders.roomNumber}"></td>-->
                                 </tr>
                             </table>
                         </div>
@@ -83,7 +83,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="menu : ${order.ordersMenuDTOList}">
+                                <tr th:each="menu : ${orders.ordersMenuDTOList}">
                                     <td th:text="${menu.menuName}"></td>
                                     <td class="text-center" th:text="${menu.count}"></td>
                                     <td class="text-end" th:text="${#numbers.formatInteger(menu.orderPrice, 0, 'COMMA')} + '원'"></td>
@@ -101,10 +101,10 @@
                     </div>
 
                     <!-- 주문 취소 버튼 (NEW 상태일 때만 표시) -->
-                    <div class="row" th:if="${order.orderStatus == 'NEW'}">
+                    <div class="row" th:if="${orders.orderStatus == 'NEW'}">
                         <div class="col-12 text-end">
                             <button class="btn btn-danger"
-                                    th:data-order-idx="${order.ordersIdx}"
+                                    th:data-order-idx="${orders.ordersIdx}"
                                     onclick="cancelOrder(this)">주문 취소</button>
                         </div>
                     </div>

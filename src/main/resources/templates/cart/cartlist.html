@@ -161,7 +161,7 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    ordersDTOList: cartMenuIdxList
+                    cartMenuIdxList: cartMenuIdxList
                 }),
                 success: function(orderIdx) {
                     console.log("주문 완료, orderIdx",orderIdx);

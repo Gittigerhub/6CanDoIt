@@ -20,7 +20,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +69,7 @@ public class OrdersService {
     //주문
     public Integer createOrders(OrdersDTO ordersDTO, String memberEmail) {
 
-        MenuEntity menuEntity = menuRepository.findByIdx(ordersDTO.getMenuIdx())
+        MenuEntity menuEntity = menuRepository.findByIdx(ordersDTO.getIdx())
                 .orElseThrow(EntityNotFoundException::new);
         //email을 통해 현재 로그인한 사용자 가져오기
         MemberEntity memberEntity = memberRepository.findByMemberEmail(memberEmail)
@@ -78,9 +77,7 @@ public class OrdersService {
 
         //ordersmenu 생성
         OrdersMenuEntity ordersMenuEntity = new OrdersMenuEntity();
-        ordersMenuEntity.setMenuEntity(menuEntity); //주문 메뉴
-        ordersMenuEntity.setCount(ordersDTO.getCount());    //수량
-        ordersMenuEntity.setOrderPrice(menuEntity.getMenuPrice());  //메뉴 금액
+        ordersMenuEntity.setMenuJoin(menuEntity); //주문 메뉴
 
         //주문 메뉴가 들어갈 주문 테이블 생성(주문 메뉴가 참조하는 주문)
         OrdersEntity ordersEntity = new OrdersEntity();
@@ -89,12 +86,11 @@ public class OrdersService {
         ordersEntity.setOrdersMenuEntityList(ordersMenuEntity); //주문목록 (OrdersEntity 객체 참조)
 
         ordersEntity.setOrdersStatus(OrderStatus.NEW);      //주문 상태
-        ordersEntity.setOrdersDate(LocalDateTime.now());    //주문 시간
 
         // 이렇게 만들어진 order 주문 객체를 저장하기 전에
         // orderItem에서 private Order order;를 set해줌으로써
         // 양방향이기에 같이 등록되며 같이 등록될때 pk값도 같이 참조해준다.
-        ordersMenuEntity.setOrdersEntity(ordersEntity);
+        ordersMenuEntity.setOrdersJoin(ordersEntity);
 
         // 실제 저장은 order만 하지만 order에
         // @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,
@@ -116,19 +112,16 @@ public class OrdersService {
 
         for (OrdersDTO ordersDTO : ordersDTOList) {
             MenuEntity menuEntity
-                    = menuRepository.findById(ordersDTO.getMenuIdx())
+                    = menuRepository.findById(ordersDTO.getIdx())
                     .orElseThrow(EntityNotFoundException::new);
             OrdersMenuEntity ordersMenuEntity = new OrdersMenuEntity();
-            ordersMenuEntity.setMenuEntity(menuEntity);
-            ordersMenuEntity.setOrderPrice(menuEntity.getMenuPrice());
-            ordersMenuEntity.setCount(ordersDTO.getCount());
-            ordersMenuEntity.setOrdersEntity(ordersEntity);
+            ordersMenuEntity.setMenuJoin(menuEntity);
+            ordersMenuEntity.setOrdersJoin(ordersEntity);
 
             ordersMenuEntityList.add(ordersMenuEntity);
         }
         ordersEntity.setMemberJoin(memberEntity.get());
         ordersEntity.setOrdersStatus(OrderStatus.NEW);
-        ordersEntity.setOrdersDate(LocalDateTime.now());
         ordersEntity.setOrdersMenuEntityList(ordersMenuEntityList);
 
         ordersRepository.save(ordersEntity);
@@ -137,39 +130,36 @@ public class OrdersService {
     }
 
     //주문 이력
-    public Page<OrdersHistDTO> getOrderList(String memberEmail, Pageable pageable) {
-
-        //주문 목록
-        List<OrdersEntity> ordersEntityList = ordersRepository.findOrdersEntity(memberEmail, pageable);
-
-        //페이징 처리를 위한 총 주문 목록의 수
-        Integer totalCount = ordersRepository.totalcount(memberEmail);
-
-        //주문 목록의 주문 메뉴들을 만들기 위한 List
-        List<OrdersHistDTO> ordersHistDTOList = new ArrayList<>();
-
-        // EntityToDTO //주문, 주문메뉴들, 주문메뉴들의 이미지
-        for (OrdersEntity ordersEntity : ordersEntityList) {
-            OrdersHistDTO ordersHistDTO = new OrdersHistDTO();
-            ordersHistDTO.setOrdersIdx(ordersEntity.getIdx());
-            ordersHistDTO.setOrdersDate(ordersEntity.getOrdersDate());
-            ordersHistDTO.setOrderStatus(ordersEntity.getOrdersStatus());
-
-            List<OrdersMenuEntity> ordersMenuEntityList = ordersEntity.getOrdersMenuEntityList();
-
-            for (OrdersMenuEntity ordersMenuEntity : ordersMenuEntityList) {
-                OrdersMenuDTO ordersMenuDTO = new OrdersMenuDTO();
-                ordersMenuDTO.setIdx(ordersEntity.getIdx());
-                ordersMenuDTO.setMenuName(ordersMenuEntity.getMenuEntity().getMenuName());
-                ordersMenuDTO.setOrderPrice(ordersMenuEntity.getOrderPrice());
-                ordersMenuDTO.setCount(ordersMenuEntity.getCount());
-
-                //메뉴 주문 이미지 추후 작성
-            }
-            ordersHistDTOList.add(ordersHistDTO);
-        }
-        return new PageImpl<OrdersHistDTO>(ordersHistDTOList, pageable, totalCount);
-    }
+//    public Page<OrdersHistDTO> getOrderList(String memberEmail, Pageable pageable) {
+//
+//        //주문 목록
+//        List<OrdersEntity> ordersEntityList = ordersRepository.findOrdersEntity(memberEmail, pageable);
+//
+//        //페이징 처리를 위한 총 주문 목록의 수
+//        Integer totalCount = ordersRepository.totalcount(memberEmail);
+//
+//        //주문 목록의 주문 메뉴들을 만들기 위한 List
+//        List<OrdersHistDTO> ordersHistDTOList = new ArrayList<>();
+//
+//        // EntityToDTO //주문, 주문메뉴들, 주문메뉴들의 이미지
+//        for (OrdersEntity ordersEntity : ordersEntityList) {
+//            OrdersHistDTO ordersHistDTO = new OrdersHistDTO();
+//            ordersHistDTO.setOrdersIdx(ordersEntity.getIdx());
+//            ordersHistDTO.setOrderStatus(ordersEntity.getOrdersStatus());
+//
+//            List<OrdersMenuEntity> ordersMenuEntityList = ordersEntity.getOrdersMenuJoin();
+//
+//            for (OrdersMenuEntity ordersMenuEntity : ordersMenuEntityList) {
+//                OrdersMenuDTO ordersMenuDTO = new OrdersMenuDTO();
+//                ordersMenuDTO.setIdx(ordersEntity.getIdx());
+//                ordersMenuDTO.setCount(ordersMenuEntity.getCount());
+//
+//                //메뉴 주문 이미지 추후 작성
+//            }
+//            ordersHistDTOList.add(ordersHistDTO);
+//        }
+//        return new PageImpl<OrdersHistDTO>(ordersHistDTOList, pageable, totalCount);
+//    }
 
 
     //관리자 화면
@@ -249,13 +239,11 @@ public class OrdersService {
         ordersHistDTO.setOrdersIdx(ordersEntity.getIdx());
         ordersHistDTO.setOrderStatus(ordersEntity.getOrdersStatus());
 
-        List<OrdersMenuEntity> ordersMenuEntityList = ordersEntity.getOrdersMenuEntityList();
+        List<OrdersMenuEntity> ordersMenuEntityList = ordersEntity.getOrdersMenuJoin();
 
         for (OrdersMenuEntity ordersMenuEntity : ordersMenuEntityList) {
             OrdersMenuDTO ordersMenuDTO = new OrdersMenuDTO();
             ordersMenuDTO.setIdx(ordersMenuEntity.getIdx());
-            ordersMenuDTO.setMenuName(ordersMenuEntity.getMenuEntity().getMenuName());
-            ordersMenuDTO.setOrderPrice(ordersMenuEntity.getOrderPrice());
             ordersMenuDTO.setCount(ordersMenuEntity.getCount());
             ordersHistDTO.getOrdersMenuDTOList().add(ordersMenuDTO);
         }
@@ -286,13 +274,11 @@ public class OrdersService {
             ordersHistDTO.setOrdersIdx(ordersEntity.getIdx());
             ordersHistDTO.setOrderStatus(ordersEntity.getOrdersStatus());
 
-            List<OrdersMenuEntity> ordersMenuEntityList = ordersEntity.getOrdersMenuEntityList();
+            List<OrdersMenuEntity> ordersMenuEntityList = ordersEntity.getOrdersMenuJoin();
 
             for (OrdersMenuEntity ordersMenuEntity : ordersMenuEntityList) {
                 OrdersMenuDTO ordersMenuDTO = new OrdersMenuDTO();
                 ordersMenuDTO.setIdx(ordersMenuEntity.getIdx());
-                ordersMenuDTO.setMenuName(ordersMenuEntity.getMenuEntity().getMenuName());
-                ordersMenuDTO.setOrderPrice(ordersMenuEntity.getOrderPrice());
                 ordersMenuDTO.setCount(ordersMenuEntity.getCount());
                 ordersHistDTO.getOrdersMenuDTOList().add(ordersMenuDTO);
             }

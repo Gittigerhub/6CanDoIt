@@ -126,8 +126,9 @@ public class CartController {
 
     @PostMapping("/cart/cartlist")
     public ResponseEntity orderCartMenu(@RequestBody CartOrdersDTO cartOrdersDTO, Principal principal) {
+
         log.info(cartOrdersDTO);
-        List<CartOrdersDTO> cartOrdersDTOList = cartOrdersDTO.getOrdersDTOList();
+        List<CartOrdersDTO> cartOrdersDTOList = cartOrdersDTO.getCartOrdersDTOList();
 
         if (cartOrdersDTOList == null || cartOrdersDTOList.size() == 0) {
             return new ResponseEntity<String>("주문할 메뉴를 선택해주세요.", HttpStatus.FORBIDDEN);

@@ -236,8 +236,7 @@ public class CartService {
                         .orElseThrow(EntityNotFoundException::new);
 
             OrdersDTO ordersDTO = new OrdersDTO();
-            ordersDTO.setMenuIdx(cartMenuEntity.getMenuEntity().getIdx());
-            ordersDTO.setCount(cartMenuEntity.getCount());
+            ordersDTO.setIdx(cartMenuEntity.getMenuEntity().getIdx());
 
             ordersDTOList.add(ordersDTO);
         }

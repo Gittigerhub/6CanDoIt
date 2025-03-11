@@ -2,12 +2,10 @@ package com.sixcandoit.roomservice.controller.orders;
 
 
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
-import com.sixcandoit.roomservice.dto.orders.OrdersHistDTO;
 import com.sixcandoit.roomservice.service.orders.OrdersService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -66,7 +64,7 @@ public class MemberOrdersCotroller {
     }
 
     @GetMapping({"/orders", "/orders/{page}"})
-    public String ordersHist(@PathVariable("page")Optional<Integer>page,
+    public String ordersHist(@PathVariable("page") Optional<Integer> page,
                              Principal principal, Model model) {
 
         log.info("진입");
@@ -83,13 +81,14 @@ public class MemberOrdersCotroller {
         // 페이지 정보 설정 (기본값: 0)
         int pageNumber = page.orElse(0);
         Pageable pageable = PageRequest.of(pageNumber, 10);
-        //주문 내역 조회
-        String email = principal.getName();
-        Page<OrdersHistDTO> ordersHistDTOPage
-                = ordersService.getOrderList(email, pageable);
+
+//        //주문 내역 조회
+//        String email = principal.getName();
+//        Page<OrdersHistDTO> ordersHistDTOPage
+//                = ordersService.getOrderList(email, pageable);
 
         //모델에 데이터 추가
-        model.addAttribute("orders", ordersHistDTOPage);
+//        model.addAttribute("orders", ordersHistDTOPage);
         model.addAttribute("page", pageable.getPageNumber());
         model.addAttribute("maxPage",5);
 

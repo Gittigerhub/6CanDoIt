@@ -244,6 +244,7 @@
                                 <div class="form-group form-group-default">
                                     <label>*분류 :</label>
                                     <select id="searchType" name="searchType" class="form-select" required>
+                                        <option value="ALL">전체</option>
                                         <option value="HO">본사</option>
                                         <option value="BO">지사</option>
                                         <option value="SHOP">매장</option>
@@ -353,7 +354,10 @@
 
                 // 클릭한 td의 텍스트 값 가져오기
                 var organ = $(this).text();
-                var organIdx = $(".idx").val();
+                // 클릭된 .organ-name 요소 내의 input.idx 값을 가져옵니다.
+                var organIdx = $(this).find('.idx').val();  // input 요소의 value 값을 가져옴
+                console.log(organ);
+                console.log(organIdx);
 
                 // 이전 모달 input에 organName 값 넣기
                 $("#organ").val(organ);
@@ -438,6 +442,7 @@
 
                     success: function(response) {       // Controller에서 처리가 성공하였을 경우
                         // 새로운 성공 알림창을 띄운다.
+                        console.log(response.organName);
                         Swal.fire({
                             title: "등록 완료",
                             text: "광고가 등록되었습니다.",

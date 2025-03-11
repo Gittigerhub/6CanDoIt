@@ -127,7 +127,11 @@
                                         th:data-bs-target="'#roomDetailModal' + ${room.idx}">
                                     상세 보기
                                 </button>
-                                <a th:href="@{/res/create}" class="btn btn-primary">예약하기</a>
+                                <button type="button" class="btn btn-primary"
+                                        data-bs-toggle="modal"
+                                        th:data-bs-target="'#reservationModal' + ${room.idx}">
+                                    예약하기
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -142,7 +146,8 @@
             <!-- 빈 객실 목록 검색 영역 -->
             <h2 class="text-center mt-3 mb-4">빈 객실 조회하기</h2>
             <div class="col-10 container mb-5 p-5" style="background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
-                <form action="/res/available" method="get" class="row g-3">
+                <form id="availableRoomsForm" class="row g-3">
+                    <input type="hidden" name="organ_idx" th:value="${organization.idx}">
                     <div class="col-md-5">
                         <label for="startDate" class="form-label">체크인 날짜</label>
                         <input type="date" name="startDate" id="startDate" class="form-control" required>
@@ -152,9 +157,34 @@
                         <input type="date" name="endDate" id="endDate" class="form-control" required>
                     </div>
                     <div class="col-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">객실 조회하기</button>
+                        <button type="button" onclick="searchAvailableRooms()" class="btn btn-primary w-100">객실 조회하기</button>
                     </div>
                 </form>
+            </div>
+
+            <!-- 조회된 빈 객실 목록 -->
+            <div id="availableRoomsList" class="mt-4" style="display: none;">
+                <h3 class="text-center mb-4">조회된 객실 목록</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>객실 이미지</th>
+                                <th>객실명</th>
+                                <th>객실 타입</th>
+                                <th>수용 인원</th>
+                                <th>침대</th>
+                                <th>객실 크기</th>
+                                <th>가격</th>
+                                <th>옵션</th>
+                                <th>예약</th>
+                            </tr>
+                        </thead>
+                        <tbody id="availableRoomsContainer">
+                            <!-- 여기에 동적으로 객실 행이 추가됩니다 -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- 내 예약 목록 -->
@@ -193,8 +223,10 @@
                                                     th:data-bs-target="'#reservationUpdateModal' + ${reservation.idx}">
                                                 예약 변경
                                             </button>
-                                            <a th:href="@{'/res/delete/' + ${reservation.idx}}"
-                                               class="btn btn-outline-danger">예약 취소</a>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                    th:onclick="'deleteReservation(' + ${reservation.idx} + ')'">
+                                                예약 취소
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -251,7 +283,6 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                            <a th:href="@{'/res/update/' + ${reservation.idx}}" class="btn btn-primary">예약 변경</a>
                         </div>
                     </div>
                 </div>
@@ -366,7 +397,36 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                    <a th:href="@{/res/create}" class="btn btn-primary">예약하기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 예약하기 모달 -->
+    <div th:each="room : ${roomDTOS}" th:id="'reservationModal' + ${room.idx}" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="${room.roomName + ' 예약하기'}">객실 예약</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:id="'reservationForm' + ${room.idx}" class="reservation-form">
+                        <input type="hidden" name="roomIdx" th:value="${room.idx}">
+                        <input type="hidden" name="roomName" th:value="${room.roomName}">
+                        <div class="mb-3">
+                            <label for="startDateModal" class="form-label">체크인 날짜</label>
+                            <input type="date" class="form-control" id="startDateModal" name="startDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="endDateModal" class="form-label">체크아웃 날짜</label>
+                            <input type="date" class="form-control" id="endDateModal" name="endDate" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" th:onclick="'submitReservation(' + ${room.idx} + ')'">예약하기</button>
                 </div>
             </div>
         </div>
@@ -377,97 +437,308 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         // CSRF 토큰 설정
-        const token = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
-        const header = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
+        const csrfToken = $("meta[name='_csrf']").attr("content");
+        const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+        const isAuthenticated = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
 
-        // AJAX 요청 전에 CSRF 토큰 설정 (토큰이 있을 때만)
-        if (token && header) {
-            $(document).ajaxSend(function(e, xhr, options) {
-                xhr.setRequestHeader(header, token);
-            });
-        }
+        // 예약 제출 함수
+        function submitReservation(roomIdx) {
+            if (!isAuthenticated) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '로그인이 필요합니다',
+                    text: '예약하기 위해서는 로그인이 필요합니다.',
+                    showCancelButton: true,
+                    confirmButtonText: '로그인하기',
+                    cancelButtonText: '취소'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/member/login';
+                    }
+                });
+                return;
+            }
 
-        // 서버에서 전달받은 예약 데이터를 JavaScript 변수로 저장
-        const reservations = /*[[${reservations}]]*/ [];
-        
-        // 예약 변경 함수
-        function updateReservation(reservationId) {
-            const form = document.getElementById('updateForm' + reservationId);
-            const startDate = form.querySelector('.updateStartDate').value;
-            const endDate = form.querySelector('.updateEndDate').value;
-
-            // 현재 예약 정보 찾기
-            const reservation = reservations.find(r => r.idx === reservationId);
-            if (!reservation) {
+            const form = document.getElementById('reservationForm' + roomIdx);
+            const formData = new FormData(form);
+            
+            // 날짜 유효성 검사
+            const startDate = formData.get('startDate');
+            const endDate = formData.get('endDate');
+            
+            if (!startDate || !endDate) {
                 Swal.fire({
                     icon: 'error',
-                    title: '예약 변경 실패',
-                    text: '예약 정보를 찾을 수 없습니다.'
+                    title: '날짜를 선택해주세요',
+                    text: '체크인과 체크아웃 날짜를 모두 선택해주세요.'
                 });
                 return;
             }
 
             const data = {
-                idx: reservationId,
+                roomIdx: formData.get('roomIdx'),
+                roomName: formData.get('roomName'),
                 startDate: startDate,
-                endDate: endDate,
-                roomIdx: reservation.roomIdx,
-                roomName: reservation.roomName,
-                resStatus: "1"  // 예약 중 상태
+                endDate: endDate
             };
 
-            const ajaxSettings = {
-                url: '/res/update/' + reservationId,
+            console.log('Sending reservation data:', data);
+            console.log('CSRF Token:', csrfToken);
+            console.log('CSRF Header:', csrfHeader);
+
+            const headers = {};
+            if (csrfHeader && csrfToken) {
+                headers[csrfHeader] = csrfToken;
+            }
+            headers['Content-Type'] = 'application/json';
+
+            $.ajax({
+                url: '/res/create/ajax',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
+                headers: headers,
                 success: function(response) {
-                    // 성공 시 모달 닫기
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('reservationUpdateModal' + reservationId));
-                    modal.hide();
+                    console.log('Reservation success response:', response);
+                    Swal.fire({
+                        icon: 'success',
+                        title: '예약이 완료되었습니다',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Reservation error details:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        error: error
+                    });
                     
-                    // 성공 메시지 표시
+                    let errorMessage = '예약 중 오류가 발생했습니다.';
+                    if (xhr.responseText) {
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+                        } catch (e) {
+                            console.error('Error parsing response:', e);
+                        }
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: '예약 실패',
+                        text: errorMessage
+                    });
+                }
+            });
+        }
+
+        // 빈 객실 조회 함수
+        function searchAvailableRooms() {
+            const form = document.getElementById('availableRoomsForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            
+            formData.forEach((value, key) => {
+                params.append(key, value);
+            });
+
+            // 날짜 저장
+            const startDate = formData.get('startDate');
+            const endDate = formData.get('endDate');
+
+            $.ajax({
+                url: '/res/available?' + params.toString(),
+                type: 'GET',
+                success: function(response) {
+                    const container = document.getElementById('availableRoomsContainer');
+                    container.innerHTML = '';
+                    
+                    if (response.rooms && response.rooms.length > 0) {
+                        response.rooms.forEach(room => {
+                            const images = response.images[room.idx] || [];
+                            const card = createRoomCard(room, images, startDate, endDate);
+                            container.appendChild(card);
+                        });
+                        document.getElementById('availableRoomsList').style.display = 'block';
+                    } else {
+                        container.innerHTML = '<tr><td colspan="9" class="text-center">조회된 객실이 없습니다.</td></tr>';
+                        document.getElementById('availableRoomsList').style.display = 'block';
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '조회 실패',
+                        text: '객실 조회 중 오류가 발생했습니다.'
+                    });
+                }
+            });
+        }
+
+        // 객실 행 생성 함수
+        function createRoomCard(room, images, startDate, endDate) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="width: 150px;">
+                    ${images && images.length > 0 
+                        ? `<img src="${images.find(img => img.repimageYn === 'Y')?.url || images[0].url}"
+                               style="width: 100px; height: 70px; object-fit: cover; border-radius: 5px;"
+                               alt="Room Image">`
+                        : '<img src="/images/no-image.png" style="width: 100px; height: 70px; object-fit: cover; border-radius: 5px;" alt="No Image">'}
+                </td>
+                <td>${room.roomName}</td>
+                <td><span class="badge bg-primary">${room.roomType}</span></td>
+                <td>${room.roomNum}인실</td>
+                <td>${room.roomBed}개</td>
+                <td>${room.roomSize}평</td>
+                <td>₩${room.roomPrice.toLocaleString()}</td>
+                <td>
+                    ${room.roomBreakfast === 'Y' ? '<span class="badge bg-success">조식 포함</span>' : ''}
+                    ${room.roomWifi === 'Y' ? '<span class="badge bg-info">WiFi</span>' : ''}
+                    ${room.roomTv === 'Y' ? '<span class="badge bg-secondary">TV</span>' : ''}
+                    ${room.roomAir === 'Y' ? '<span class="badge bg-secondary">에어컨</span>' : ''}
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#roomDetailModal${room.idx}">
+                            상세보기
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary"
+                                onclick="reserveRoom(${room.idx}, '${room.roomName}', '${startDate}', '${endDate}')">
+                            예약하기
+                        </button>
+                    </div>
+                </td>
+            `;
+            return row;
+        }
+
+        // 예약하기 버튼 클릭 시 처리 함수
+        function reserveRoom(roomIdx, roomName, startDate, endDate) {
+            if (!isAuthenticated) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '로그인이 필요합니다',
+                    text: '예약하기 위해서는 로그인이 필요합니다.',
+                    showCancelButton: true,
+                    confirmButtonText: '로그인하기',
+                    cancelButtonText: '취소'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/member/login';
+                    }
+                });
+                return;
+            }
+
+            // 예약 모달 열기
+            const modal = document.getElementById('reservationModal' + roomIdx);
+            const modalInstance = new bootstrap.Modal(modal);
+            
+            // 날짜 값 설정
+            const startDateInput = modal.querySelector('[name="startDate"]');
+            const endDateInput = modal.querySelector('[name="endDate"]');
+            startDateInput.value = startDate;
+            endDateInput.value = endDate;
+            
+            modalInstance.show();
+        }
+
+        // 날짜 유효성 검사
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const startDateInputs = document.querySelectorAll('[id^="startDate"]');
+            const endDateInputs = document.querySelectorAll('[id^="endDate"]');
+
+            startDateInputs.forEach(input => {
+                input.min = today;
+                input.addEventListener('change', function() {
+                    const endDate = this.form.querySelector('[id^="endDate"]');
+                    if (endDate) {
+                        endDate.min = this.value;
+                    }
+                });
+            });
+
+            endDateInputs.forEach(input => {
+                input.min = today;
+            });
+        });
+
+        // 예약 변경 함수
+        function updateReservation(idx) {
+            const form = document.getElementById('updateForm' + idx);
+            const startDate = form.querySelector('[name="startDate"]').value;
+            const endDate = form.querySelector('[name="endDate"]').value;
+
+            if (!startDate || !endDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '날짜를 선택해주세요',
+                    text: '체크인과 체크아웃 날짜를 모두 선택해주세요.'
+                });
+                return;
+            }
+
+            const data = {
+                startDate: startDate,
+                endDate: endDate
+            };
+
+            const headers = {};
+            if (csrfHeader && csrfToken) {
+                headers[csrfHeader] = csrfToken;
+            }
+            headers['Content-Type'] = 'application/json';
+
+            $.ajax({
+                url: '/res/update/' + idx,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                headers: headers,
+                success: function(response) {
+                    console.log('Update success response:', response);
                     Swal.fire({
                         icon: 'success',
                         title: '예약이 변경되었습니다',
                         showConfirmButton: false,
                         timer: 1500
                     }).then(() => {
-                        // 현재 URL에서 organ_idx 파라미터 가져오기
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const organIdx = urlParams.get('organ_idx');
-                        
-                        // organ_idx가 있으면 포함하여 리다이렉트
-                        if (organIdx) {
-                            window.location.href = `/room/member/list?organ_idx=${organIdx}`;
-                        } else {
-                            window.location.href = '/room/member/list';
-                        }
+                        location.reload();
                     });
                 },
                 error: function(xhr, status, error) {
-                    // 에러 메시지 표시
-                    let errorMessage = '예약 변경에 실패했습니다.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMessage = xhr.responseJSON.message;
+                    console.error('Update error details:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        error: error
+                    });
+                    
+                    let errorMessage = '예약 변경 중 오류가 발생했습니다.';
+                    if (xhr.responseText) {
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+                        } catch (e) {
+                            console.error('Error parsing response:', e);
+                        }
                     }
+
                     Swal.fire({
                         icon: 'error',
                         title: '예약 변경 실패',
                         text: errorMessage
                     });
                 }
-            };
-
-            // CSRF 토큰이 있는 경우에만 헤더 추가
-            if (token && header) {
-                ajaxSettings.beforeSend = function(xhr) {
-                    xhr.setRequestHeader(header, token);
-                };
-            }
-
-            // AJAX 요청 실행
-            $.ajax(ajaxSettings);
+            });
         }
         /*]]>*/
     </script>

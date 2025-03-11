@@ -35,9 +35,10 @@ public class ReservationService {
     }
 
     // 빈 객실 조회
-    public List<RoomEntity> getAvailableRooms(LocalDate startDate, LocalDate endDate) {
-        // 예약 날짜와 겹치지 않는 객실 조회
-        return reservationRepository.findAvailableRooms(startDate, endDate);
+    public List<RoomEntity> getAvailableRooms(Integer organ_idx, LocalDate startDate, LocalDate endDate) {
+        log.info("Finding available rooms for organization {}, from {} to {}", organ_idx, startDate, endDate);
+        // 예약 날짜와 겹치지 않는 객실 조회 (organization_idx 기준)
+        return reservationRepository.findAvailableRoomsByOrganization(organ_idx, startDate, endDate);
     }
 
     //주어진 ID에 해당하는 데이터를 삭제

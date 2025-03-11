@@ -226,4 +226,22 @@ public class ReservationController {
 
         return "redirect:/room/reserve";
     }
+
+    @PostMapping("/update/{idx}")
+    @ResponseBody
+    public ResponseEntity<?> updateReservation(@PathVariable Integer idx, @RequestBody ReservationDTO reservationDTO) {
+        log.info("예약 변경 처리 시작....");
+        try {
+            reservationDTO.setIdx(idx);
+            ReservationDTO updatedReservation = reservationService.reserveUpdate(reservationDTO);
+            if (updatedReservation != null) {
+                return ResponseEntity.ok().body(Collections.singletonMap("message", "예약이 변경되었습니다."));
+            } else {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("message", "예약을 찾을 수 없습니다."));
+            }
+        } catch (RuntimeException e) {
+            log.error("예약 변경 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        }
+    }
 }

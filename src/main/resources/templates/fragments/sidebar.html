@@ -37,7 +37,7 @@
         <br class="fs-9">
         <!-- 로그인된 사용자 이름 표시 -->
         <th:block th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
-            ID: <span th:text="${#authentication.principal.admin.adminName}"></span>
+            이름: <span th:text="${#authentication.principal.admin.adminName}"></span>
         </th:block>
         <!-- 로그인되지 않은 경우 -->
         <th:block th:if="${#authentication.principal == null or #authentication.principal == 'anonymousUser'}">

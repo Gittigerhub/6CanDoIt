@@ -393,7 +393,7 @@ public class RoomController {
 
         // 조직 정보 조회 (organ_idx가 있는 경우 해당 조직 정보도 조회)
         if (organ_idx != null) {
-            organizationService.read(organ_idx).ifPresent(organization -> {
+            organizationService.findById(organ_idx).ifPresent(organization -> {
                 model.addAttribute("organization", organization);
                 log.info("Found organization: {}", organization.getOrganName());
 

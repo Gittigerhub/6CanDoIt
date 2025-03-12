@@ -18,34 +18,30 @@
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; width: 100%;">
-                        <div class="col-4" style="flex: 1; text-align: left;" th:text="${eventDTORead.eventTitle}"></div>
+                    <div class="card-body">
+
+                    </div>
+                    <br>
+                    <div class="col-12" style="text-align: center;">
+                        <img th:src="${eventDTORead.eventTitleImg}" style="width: 850px; height: 600px;">
+                        <img th:src="${eventDTORead.eventImg}" style="width: 850px; height: 600px;">
+                    </div>
+                    <div class="col-12" style="display: flex; justify-content: space-between ;">
                         <th:block th:if="${eventDTORead.activeYn}=='Y'">
-                        <div class="col-4 text-bg-primary" style="flex: 1; text-align: center"><span>활성화</span></div>
+                            <div class="col-4 text-primary" style="flex: 1; text-align: left"><span>이벤트 진행중</span>
+                            </div>
                         </th:block>
                         <th:block th:if="${eventDTORead.activeYn}=='N'">
-                            <div class="col-4 text-bg-danger" style="flex: 1; text-align: center"><span>비활성화</span></div>
+                            <div class="col-4 text-danger" style="flex: 1; text-align: left"><span>이벤트 종료</span>
+                            </div>
                         </th:block>
-
                         <div class="col-4" style="flex: 1; text-align: right;"
                              th:text="${#temporals.format(eventDTORead.eventStartDate, 'yy-MM-dd')}+'~'
                     +${#temporals.format(eventDTORead.eventEndDate, 'yy-MM-dd')}"></div>
-                    </div>
-                    <div class="card-body">
-                        <div class="col-12">
-                            <div>타이틀 사진</div>
-                            <img th:src="${eventDTORead.eventTitleImg}">
-                            <hr>
-                            <div>메인 사진</div>
-                            <img th:src="${eventDTORead.eventImg}">
-                            <hr>
-                            <div>내용</div>
-                            <textarea rows="3" cols="160" th:text="${eventDTORead.eventContents}" readonly></textarea>
-                            </hr>
-                        </div>
 
                     </div>
                 </div>
+                <a style="float: right" class="btn btn-success" th:href="@{/event/userevent}" type="submit">목록</a>
             </div>
         </div>
 

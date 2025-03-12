@@ -12,7 +12,6 @@
 <body>
 <div layout:fragment="content" class="p-5">
 
-
     <!--검색 기능-->
     <form th:action="@{/event/userevent}" method="get">
         <div class="container bg-white">
@@ -22,7 +21,7 @@
                 </div>
             </div>
             <div class="col-12">
-                <div class="input-group mb-3">
+                <div class="input-group mb-3 bg-white">
                     <select class="form-select" id="selectBox" name="type">
                         <option th:selected="${type==null}"></option>
                         <option value="1" th:selected="${type=='1'}">내용</option>
@@ -35,8 +34,8 @@
                     </th:block>
                     <th:block th:if="${type=='2'}">
                         <select class="form-select" name="keyword">
-                            <option value="N">활성화 안됨</option>
-                            <option value="Y">활성화 됨</option>
+                            <option value="N">이벤트 진행중</option>
+                            <option value="Y">이벤트 종료</option>
                         </select>
                     </th:block>
                     <th:block th:if="${type=='3'}">
@@ -71,10 +70,10 @@
                         eventDTO.eventContents}"></td>
                         <td th:text="${#temporals.format(eventDTO.eventStartDate, 'yy-MM-dd')}+'~'+${#temporals.format(eventDTO.eventEndDate, 'yy-MM-dd')}"></td>
                         <th:block th:if="${eventDTO.activeYn.equals('Y')}">
-                            <td class="text-bg-primary">활성화</td>
+                            <td class="text-bg-primary">이벤트 진행중</td>
                         </th:block>
                         <th:block th:if="${eventDTO.activeYn.equals('N')}">
-                            <td class="text-bg-danger">비활성화</td>
+                            <td class="text-bg-danger">이벤트 종료</td>
                         </th:block>
                     </tr>
                     </tbody>
@@ -131,7 +130,7 @@
 
                 window.location.href = 'usereventread?idx=' + idx;
 
-            });//수정버튼클릭시 대화상자 채우기 끝
+            });
 
             $("#selectBox").on("change", function () {
                 let selectedValue = $("#selectBox").val(); // 선택된 값 가져오기

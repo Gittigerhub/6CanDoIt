@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/memberlayout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content" class="p-5">
+    <div class="container">
+        <form th:action="@{/event/eventupdate}" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col">
+                    <input type="hidden" th:value="${eventRead.idx}" name="idx">
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header" style="display: flex; justify-content: center ; width: 100%;">
+                            <div class="col-4" style="flex: 1; text-align: center;">수정 페이지</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="input-group">
+                                    <label>이벤트 제목:</label>
+                                    <input type="text" class="title" name="eventTitle">
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row" style="flex: content; justify-content: space-between ;">
+                                <div class="col-6">
+                                    <img th:src="${eventRead.eventTitleImg}" style="width: 600px; height: 350px;">
+                                </div>
+                                <div class="input-group col-6">
+                                    <label>이벤트 타이틀 사진(수정):</label>
+                                    <input type="file" class="title_img" id="title_img" name="Files">
+                                </div>
+                                <div class="col-6">
+                                    <img th:src="${eventRead.eventImg}" style="width: 600px; height: 350px;">
+                                </div>
+                                <div class="input-group col-6">
+                                    <label>이벤트 메인 사진(수정):</label>
+                                    <input type="file" class="main_img" id="main_img" name="Files">
+                                </div>
+                                <div class="input-group">
+                                    <label>이벤트 내용</label>
+                                    <textarea class="event_text" rows="3"
+                                              name="eventContents" cols="160"></textarea>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>이벤트 시작날</label>
+                                    <input type="datetime-local" class="form-select startDay" id="startDay"
+                                           name="eventStartDate">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>이벤트 종료날</label>
+                                    <input type="datetime-local" class="form-select endDay" id="endDay"
+                                           name="eventEndDate">
+                                </div>
+                            </div>
+                            <div class=" row">
+                                <div class="col-sm-6">
+                                    <label>이벤트 활성화</label>
+                                    <select id="activeYn" name="activeYn" class="form-select">
+                                        <option value="N">비활성</option>
+                                        <option value="Y">활성</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>*이벤트 상태:</label>
+                                    <select id="eventState" name="eventState" class="form-select">
+                                        <option value="N">종료</option>
+                                        <option value="Y">진행중</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button style="float: right" type="submit" class="btn btn-primary">수정</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

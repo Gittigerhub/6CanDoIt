@@ -53,7 +53,7 @@ public class EventController {
             model.addAllAttributes(pageInfo);
             model.addAttribute("type", type);
             model.addAttribute("keyword", keyword);*/
-            model.addAttribute("eventDTO", eventDTOS);
+            model.addAttribute("eventDTOS", eventDTOS);
 
             return "event/event";
         } catch (Exception e) {
@@ -106,8 +106,17 @@ public class EventController {
         response.put("eventDTO", eventDTO);
 
 
-
         return response;
+    }
+
+    @GetMapping("/eventread")
+    public String eventRead(Integer idx, Model model) {
+
+        EventDTO eventDTORead = eventService.read(idx);
+
+        model.addAttribute("eventDTORead", eventDTORead);
+
+        return "event/eventread";
     }
 
 
@@ -127,8 +136,30 @@ public class EventController {
         }
     }
 
+    @GetMapping("/eventupdate")
+    public String eventUpdateGet(Model model, Integer idx) {
+        EventDTO eventRead = eventService.read(idx);
+        if (eventRead != null) {
+            model.addAttribute("eventRead", eventRead);
+        } else {
+            System.out.println("잘못된 조회입니다.");
+        }
 
 
+        return "event/eventupdate";
+    }
+
+    @PostMapping("/eventupdate")
+    public String eventUpdatePost(@ModelAttribute EventDTO eventDTO) {
+        try {
+            eventService.update(eventDTO);
+        } catch (Exception e) {
+            System.out.println("수정 오류:" + e.getMessage());
+        }
+
+
+        return "redirect:event/event";
+    }
 
 
 }

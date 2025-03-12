@@ -45,7 +45,7 @@ public class RoomService {
             
             // organ_idx가 있다면 OrganizationEntity 설정
             if (roomDTO.getOrgan_idx() != null) {
-                OrganizationEntity organization = organizationService.findById(roomDTO.getOrgan_idx())
+                OrganizationEntity organization = organizationService.read(roomDTO.getOrgan_idx())
                         .orElseThrow(() -> new RuntimeException("Organization not found with id: " + roomDTO.getOrgan_idx()));
                 room.setOrganizationJoin(organization);
             }

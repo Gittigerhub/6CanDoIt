@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,7 +44,7 @@ public class RoomService {
             
             // organ_idx가 있다면 OrganizationEntity 설정
             if (roomDTO.getOrgan_idx() != null) {
-                OrganizationEntity organization = organizationService.read(roomDTO.getOrgan_idx())
+                OrganizationEntity organization = organizationService.findById(roomDTO.getOrgan_idx())
                         .orElseThrow(() -> new RuntimeException("Organization not found with id: " + roomDTO.getOrgan_idx()));
                 room.setOrganizationJoin(organization);
             }

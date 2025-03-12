@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
     <title>결제하기</title>
@@ -41,27 +41,34 @@
 <body>
 <div class="payment-container">
     <h2 class="mb-4">결제하기</h2>
+    
+    <!-- 결제 정보 표시 -->
+    <div class="alert alert-info mb-4">
+        <p class="mb-1">주문번호: <span th:text="${paymentDTO.orderId}"></span></p>
+        <p class="mb-0">결제금액: <span th:text="${#numbers.formatInteger(paymentDTO.paymentPrice, 0, 'COMMA')} + '원'"></span></p>
+    </div>
 
     <!-- 결제하기 버튼 -->
     <button class="button" id="payment-button">결제하기</button>
 </div>
 
-<script>
+<script th:inline="javascript">
     const clientKey = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq";
     const tossPayments = TossPayments(clientKey);
     const button = document.getElementById("payment-button");
-    const coupon = document.getElementById("coupon-box");
-    let amount = 50000;
-
-
+    
+    // 서버에서 전달받은 결제 정보
+    const amount = /*[[${paymentDTO.paymentPrice}]]*/ 0;
+    const orderId = /*[[${paymentDTO.orderId}]]*/ '';
+    const customerName = /*[[${memberName}]]*/ '';
 
     // 결제하기 버튼 클릭시 결제창 바로 열기
     button.addEventListener("click", function() {
         tossPayments.requestPayment('카드', {
             amount: amount,
-            orderId: 'Rx0sc1JU5PHnYcm8x-fOI',
-            orderName: '토스 티셔츠 외 2건',
-            customerName: '김토스',
+            orderId: orderId,
+            orderName: '객실 예약',
+            customerName: customerName,
             successUrl: window.location.origin + '/orders/paymentsuccess',
             failUrl: window.location.origin + '/orders/paymentfail'
         }).catch(function(error) {

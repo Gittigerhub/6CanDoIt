@@ -4,12 +4,15 @@ import com.sixcandoit.roomservice.constant.OrderStatus;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersHistDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersMenuDTO;
+import com.sixcandoit.roomservice.entity.cart.CartMenuEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import com.sixcandoit.roomservice.entity.orders.OrdersEntity;
 import com.sixcandoit.roomservice.entity.orders.OrdersMenuEntity;
+import com.sixcandoit.roomservice.repository.cart.CartMenuRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.repository.menu.MenuRepository;
+import com.sixcandoit.roomservice.repository.orders.OrdersMenuRepository;
 import com.sixcandoit.roomservice.repository.orders.OrdersRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -35,6 +38,8 @@ public class OrdersService {
     private final MenuRepository menuRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
+    private final CartMenuRepository cartMenuRepository;
+    private final OrdersMenuRepository ordersMenuRepository;
 
     //사용자 화면
     //본인의 주문이 맞는지 체크
@@ -66,40 +71,63 @@ public class OrdersService {
     }
 
 
-    //주문
-    public Integer createOrders(OrdersDTO ordersDTO, String memberEmail) {
+    // 주문하기
+    public Integer createOrders(List<Integer> cartMenuIdxList, String memberEmail,
+                                String ordersPhone, String ordersMemo) {
 
-        MenuEntity menuEntity = menuRepository.findByIdx(ordersDTO.getIdx())
-                .orElseThrow(EntityNotFoundException::new);
-        //email을 통해 현재 로그인한 사용자 가져오기
-        MemberEntity memberEntity = memberRepository.findByMemberEmail(memberEmail)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 회원이 없습니다."));
-
-        //ordersmenu 생성
-        OrdersMenuEntity ordersMenuEntity = new OrdersMenuEntity();
-        ordersMenuEntity.setMenuJoin(menuEntity); //주문 메뉴
-
-        //주문 메뉴가 들어갈 주문 테이블 생성(주문 메뉴가 참조하는 주문)
+        // 주문 메뉴가 들어갈 주문 테이블 생성(주문 메뉴가 참조하는 주문)
         OrdersEntity ordersEntity = new OrdersEntity();
-        ordersEntity.setMemberJoin(memberEntity);   //주문자 email로 찾아온 entity 객체
 
-        ordersEntity.setOrdersMenuEntityList(ordersMenuEntity); //주문목록 (OrdersEntity 객체 참조)
+        // email을 통해 현재 로그인한 사용자 가져오기
+        MemberEntity memberEntity = memberRepository.findByMemberEmail(memberEmail)
+                .orElse(null);
 
-        ordersEntity.setOrdersStatus(OrderStatus.NEW);      //주문 상태
+        if (memberEntity != null) {
+            System.out.println("memberEntity : " + memberEntity.getMemberEmail());
+            // 사용자 정보 주문테이블에 추가
+            ordersEntity.setMemberJoin(memberEntity);       // 회원 FK
+        } else {
+            System.out.println("조회되는 회원이 없습니다.");
+            return null;
+        }
 
-        // 이렇게 만들어진 order 주문 객체를 저장하기 전에
-        // orderItem에서 private Order order;를 set해줌으로써
-        // 양방향이기에 같이 등록되며 같이 등록될때 pk값도 같이 참조해준다.
-        ordersMenuEntity.setOrdersJoin(ordersEntity);
+        // 주문테이블 컬럼값 추가
+        ordersEntity.setOrdersStatus(OrderStatus.NEW);      // 주문 상태
+        ordersEntity.setOrdersPhone(ordersPhone);           // 연락받을 연락처
+        ordersEntity.setOrdersMemo(ordersMemo);             // 주문 요청사항
 
-        // 실제 저장은 order만 하지만 order에
-        // @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,
-        //         orphanRemoval = true, fetch = FetchType.LAZY)
-        // private List<OrderItem> orderItemList = new ArrayList<>();
-        // 이부분을 set해줬기에 둘다 저장된다.
+        // 주문메뉴 생성
+        OrdersMenuEntity ordersMenuEntity = new OrdersMenuEntity();
+
+        // 리스트로 받아온 메뉴idx로 메뉴조회
+        for (Integer cartMenuIdx : cartMenuIdxList) {
+            // 장바구니 메뉴 찾아오기
+            CartMenuEntity cartMenuEntity = cartMenuRepository.findById(cartMenuIdx)
+                    .orElseThrow(EntityNotFoundException::new);
+
+            // 메뉴 찾아오기
+            MenuEntity menuEntity = menuRepository.findById(cartMenuEntity.getMenuEntity().getIdx())
+                    .orElseThrow(EntityNotFoundException::new);
+
+
+            ordersMenuEntity.setOrdersJoin(ordersEntity);           // FK 설정
+            ordersMenuEntity.setMenuJoin(menuEntity);               // FK 설정
+            ordersMenuEntity.setCount(cartMenuEntity.getCount());   // 카트메뉴 수량 설정
+
+            // 주문메뉴 테이블 저장
+            OrdersMenuEntity ordersMenu = ordersMenuRepository.save(ordersMenuEntity);
+
+            // 주문 테이블에 주문메뉴 FK 설정
+            ordersEntity.getOrdersMenuJoin().add(ordersMenu);
+
+        }
+
+        // 주문 테이블 저장
         ordersEntity = ordersRepository.save(ordersEntity);
 
+        // 반환
         return ordersEntity.getIdx();
+
     }
 
     public Integer orders(List<OrdersDTO> ordersDTOList, String memberEmail) {

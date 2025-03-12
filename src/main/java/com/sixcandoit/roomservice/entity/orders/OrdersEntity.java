@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -53,7 +54,13 @@ public class OrdersEntity extends BaseEntity {
     // 주문 상품과 1:N 매핑
     // mappedBy = "orders" -> ordersMenu에 있는 orders에 의해 관리
     @OneToMany(mappedBy = "ordersJoin", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)   //양방향 설정
-    private List<OrdersMenuEntity> ordersMenuJoin;
+    private List<OrdersMenuEntity> ordersMenuJoin = new ArrayList<>();
+
+    // 오더생성과 동시에 오더주문 생성
+    public void addOrderMenu(OrdersMenuEntity ordersMenuJoin) {
+        this.ordersMenuJoin.add(ordersMenuJoin);
+        ordersMenuJoin.setOrdersJoin(this);
+    }
 
     public void setOrdersMenuEntityList(OrdersMenuEntity ordersMenuEntity) {
         this.ordersMenuJoin.add(ordersMenuEntity);

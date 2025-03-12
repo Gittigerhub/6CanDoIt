@@ -46,13 +46,23 @@ public class OrganizationEntity extends BaseEntity {
 
     // 본사/지사 구분을 위한 자기참조 관계 (부모)
     @OneToMany(mappedBy = "head", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrganizationEntity> branch;    // 지사 목록
+    private List<OrganizationEntity> branches;    // 지사 목록
 
     // 본사/지사 구분을 위한 자기참조 관계 (자식)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "head_id")
     @JsonBackReference
-    private OrganizationEntity head;            // 본사
+    private OrganizationEntity head;              // 본사
+
+    // 본사/지사 구분을 위한 자기참조 관계 (부모)
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrganizationEntity> shops;      // 매장 목록
+
+    // 본사/지사 구분을 위한 자기참조 관계 (자식)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    @JsonBackReference
+    private OrganizationEntity branch;           // 지사
 
     // 관리자 회원 테이블과 1:N 매핑
     @OneToMany(mappedBy = "organizationJoin")

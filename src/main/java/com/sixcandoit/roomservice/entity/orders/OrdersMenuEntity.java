@@ -8,12 +8,9 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-//@ToString(exclude = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Table(name = "orders_menu")
-
 public class OrdersMenuEntity extends BaseEntity {
 
     @Id
@@ -24,7 +21,7 @@ public class OrdersMenuEntity extends BaseEntity {
     @Column(name = "orders_menu_count")
     private int count;                  // 수량
 
-    // 회원 테이블과 N:1 매핑
+    // 주문 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orders_idx")
     private OrdersEntity ordersJoin;

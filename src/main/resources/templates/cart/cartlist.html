@@ -141,10 +141,9 @@
             //장바구니에 있는 모든 메뉴의 cartMenuIdx수집
             let cartMenuIdxList = [];
             $('.menu-idx').each(function() {
-                cartMenuIdxList.push({
-                    cartMenuIdx: $(this).val()
-                });
+                cartMenuIdxList.push($(this).val());
             });
+            console.log(cartMenuIdxList)
 
             // 장바구니가 비어있는 경우 처리
             if (cartMenuIdxList.length === 0) {
@@ -157,12 +156,12 @@
 
             //주문처리 요청
             $.ajax({
-                url: '/member/cart/cartlist',
+                url: '/member/orders',
                 type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
+                dataType: jd
+                data: {
                     cartMenuIdxList: cartMenuIdxList
-                }),
+                },
                 success: function(orderIdx) {
                     console.log("주문 완료, orderIdx",orderIdx);
                     // orderIdx는 생성된 주문의 번호

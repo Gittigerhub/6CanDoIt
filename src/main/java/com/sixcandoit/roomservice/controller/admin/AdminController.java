@@ -85,7 +85,7 @@ public class AdminController {
         log.info("호텔 정보 내놔" + organizations);
         model.addAttribute("organizations", organizations);
 
-        return "admin/register";
+        return "admin/sign";
     }
 
     @PostMapping("/register")
@@ -199,7 +199,7 @@ public class AdminController {
         adminService.modify(adminDTO);
         log.info("회원 정보를 수정해줘!!");
 
-        return "redirect:/logout";
+        return "redirect:/admin/";
     }
 
     // 비밀번호 수정

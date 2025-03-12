@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.controller.room;
 
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
@@ -363,15 +364,15 @@ public class RoomController {
         return "redirect:/room/detail?idx=" + idx; // 상세 페이지로 리다이렉트
     }
 
-    // 사용자용 룸 목록
+    // 호텔 상세 + 룸 조회 + 룸 예약
     @GetMapping("/room/member/list")
     public String memberRoomList(@RequestParam(required = false) Integer organ_idx,
-                               @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                               @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-                               Principal principal,
-                               Model model) {
+                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                 Principal principal,
+                                 Model model) {
         log.info("memberRoomList called with organ_idx: {}, principal: {}", organ_idx, principal);
-        
+
         // 객실 목록 조회
         List<RoomDTO> roomDTOS = roomService.getRoomsByOrganizationForMember(organ_idx);
         model.addAttribute("roomDTOS", roomDTOS);
@@ -390,11 +391,24 @@ public class RoomController {
         model.addAttribute("imageFileMap", imageFileMap);
         model.addAttribute("repImageMap", repImageMap);
 
-        // 조직 정보 조회
+        // 조직 정보 조회 (organ_idx가 있는 경우 해당 조직 정보도 조회)
         if (organ_idx != null) {
             organizationService.findById(organ_idx).ifPresent(organization -> {
                 model.addAttribute("organization", organization);
                 log.info("Found organization: {}", organization.getOrganName());
+
+                // 조직 상세 정보 (organDetail)도 가져와서 모델에 추가
+                OrganizationDTO organDTO = organizationService.organRead(organ_idx);
+                model.addAttribute("organDTO", organDTO);
+
+                // 조직 이미지 조회
+                List<ImageFileDTO> organImageFileDTOS = imageFileService.readImage(organ_idx, "organ");
+                model.addAttribute("imageFileDTOS", organImageFileDTOS);
+
+                // 대표 이미지 여부 확인
+                boolean hasRepImage = organImageFileDTOS.stream()
+                        .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+                model.addAttribute("hasRepImage", hasRepImage);
             });
         }
 
@@ -421,6 +435,97 @@ public class RoomController {
             log.info("No principal found - user is not logged in");
         }
 
-        return "room/member/list";
+        return "room/member/list"; // 해당 템플릿에 room과 organ 정보가 모두 포함되어 렌더링됨
     }
+
+//    // 사용자용 룸 목록
+//    @GetMapping("/room/member/list")
+//    public String memberRoomList(@RequestParam(required = false) Integer organ_idx,
+//                               @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+//                               @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+//                               Principal principal,
+//                               Model model) {
+//        log.info("memberRoomList called with organ_idx: {}, principal: {}", organ_idx, principal);
+//
+//        // 객실 목록 조회
+//        List<RoomDTO> roomDTOS = roomService.getRoomsByOrganizationForMember(organ_idx);
+//        model.addAttribute("roomDTOS", roomDTOS);
+//
+//        // 이미지 맵 생성
+//        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+//        Map<Integer, Boolean> repImageMap = new HashMap<>();
+//
+//        // 각 룸의 이미지 정보 조회
+//        for (RoomDTO roomDTO : roomDTOS) {
+//            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(roomDTO.getIdx(), "room");
+//            imageFileMap.put(roomDTO.getIdx(), imageFileDTOS);
+//            repImageMap.put(roomDTO.getIdx(), imageFileDTOS.stream().anyMatch(img -> "Y".equals(img.getRepimageYn())));
+//        }
+//
+//        model.addAttribute("imageFileMap", imageFileMap);
+//        model.addAttribute("repImageMap", repImageMap);
+//
+//        // 조직 정보 조회
+//        if (organ_idx != null) {
+//            organizationService.findById(organ_idx).ifPresent(organization -> {
+//                model.addAttribute("organization", organization);
+//                log.info("Found organization: {}", organization.getOrganName());
+//            });
+//        }
+//
+//        // 로그인한 사용자의 예약 목록 조회
+//        if (principal != null) {
+//            try {
+//                List<ReservationDTO> reservations;
+//                if (organ_idx != null) {
+//                    // 특정 숙소의 예약만 조회
+//                    reservations = reservationService.getUserReservationsByOrganization(principal.getName(), organ_idx);
+//                    log.info("Fetching reservations for user {} and organization {}", principal.getName(), organ_idx);
+//                } else {
+//                    // 전체 예약 조회
+//                    reservations = reservationService.getUserReservations(principal.getName());
+//                    log.info("Fetching all reservations for user {}", principal.getName());
+//                }
+//                model.addAttribute("reservations", reservations);
+//            } catch (Exception e) {
+//                log.error("Error fetching reservations for user: {}", principal.getName(), e);
+//                // 에러가 발생해도 페이지는 계속 로드되도록 함
+//                model.addAttribute("reservations", new ArrayList<>());
+//            }
+//        } else {
+//            log.info("No principal found - user is not logged in");
+//        }
+//
+//        return "room/member/list";
+//    }
+
+//    // 사용자용 호텔 목록
+//    @GetMapping("/room/member/list")
+//    public String memberHotelList(@RequestParam(required = false) Integer organ_idx,
+//                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+//                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+//                                 Principal principal,
+//                                 Model model) {
+//        log.info("memberHotelList called with organ_idx: {}, principal: {}", organ_idx, principal);
+//
+//        // 객실 목록 조회
+//        List<OrganizationDTO> organizationDTOS = organizationService.getAllOrganizations();
+//        model.addAttribute("organizationDTOS", organizationDTOS);
+//
+//        // 이미지 맵 생성
+//        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+//        Map<Integer, Boolean> repImageMap = new HashMap<>();
+//
+//        // 각 룸의 이미지 정보 조회
+//        for (OrganizationDTO organizationDTO : organizationDTOS) {
+//            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(organizationDTO.getIdx(), "organ");
+//            imageFileMap.put(organizationDTO.getIdx(), imageFileDTOS);
+//            repImageMap.put(organizationDTO.getIdx(), imageFileDTOS.stream().anyMatch(img -> "Y".equals(img.getRepimageYn())));
+//        }
+//
+//        model.addAttribute("imageFileMap", imageFileMap);
+//        model.addAttribute("repImageMap", repImageMap);
+//
+//        return "room/member/list";
+//    }
 }

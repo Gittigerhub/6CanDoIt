@@ -56,18 +56,5 @@ public class OrdersEntity extends BaseEntity {
     @OneToMany(mappedBy = "ordersJoin", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)   //양방향 설정
     private List<OrdersMenuEntity> ordersMenuJoin = new ArrayList<>();
 
-    // 오더생성과 동시에 오더주문 생성
-    public void addOrderMenu(OrdersMenuEntity ordersMenuJoin) {
-        this.ordersMenuJoin.add(ordersMenuJoin);
-        ordersMenuJoin.setOrdersJoin(this);
-    }
-
-    public void setOrdersMenuEntityList(OrdersMenuEntity ordersMenuEntity) {
-        this.ordersMenuJoin.add(ordersMenuEntity);
-    }
-
-    public void setOrdersMenuEntityList(List<OrdersMenuEntity> ordersMenuEntityList) {
-        this.ordersMenuJoin = ordersMenuEntityList;
-    }
 
 }

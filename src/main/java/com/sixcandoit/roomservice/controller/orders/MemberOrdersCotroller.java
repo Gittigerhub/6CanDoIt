@@ -1,12 +1,17 @@
 package com.sixcandoit.roomservice.controller.orders;
 
 
+import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
+import com.sixcandoit.roomservice.dto.orders.OrdersHistDTO;
+import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.service.cart.CartService;
 import com.sixcandoit.roomservice.service.orders.OrdersService;
+import com.sixcandoit.roomservice.util.PageNationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,8 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,6 +30,7 @@ public class MemberOrdersCotroller {
 
     private final OrdersService ordersService;
     private final CartService cartService;
+    private final PageNationUtil pageNationUtil;
 
     //주문하기
     //주문하기는 별도의 읽기페이지 제작 X
@@ -58,23 +63,29 @@ public class MemberOrdersCotroller {
 //        return new ResponseEntity<String>("주문 완료", HttpStatus.OK);
 //    }
 
-    //주문하기
-    //주문하기는 별도의 읽기페이지 제작 X
+    // 주문하기
+    // 주문하기는 별도의 읽기페이지 제작 X
+    /* -----------------------------------------------------------------------------
+        경로 : /orders
+        인수 : @RequestBody OrdersHistDTO ordersHistDTO, Principal principal
+        출력 : 주문성공 or 주문실패
+        설명 : 사용자가 장바구니에서 주문하기 버튼을 클릭했을 때 장바구니 내에 메뉴들이 지워지며 주문내역으로 넘어감
+    ----------------------------------------------------------------------------- */
     @PostMapping("/orders")
-    public ResponseEntity<?> orders(@RequestBody List<Integer> cartMenuIdxList, Principal principal,
-                                    String ordersPhone, String ordersMemo) {
+    public ResponseEntity<?> orders(@RequestBody OrdersHistDTO ordersHistDTO, Principal principal) {
 
         // 들어오는지 확인
-        System.out.println("cartMenuIdxList : " + cartMenuIdxList.toString());
+        System.out.println("ordersHistDTO : " + ordersHistDTO.toString());
         System.out.println("사용자 : " + principal.getName());
 
         //저장
         Integer result
-                = ordersService.createOrders(cartMenuIdxList, principal.getName(), ordersPhone, ordersMemo);
+                = ordersService.createOrders(ordersHistDTO.getCartMenuIdxList(), principal.getName(),
+                ordersHistDTO.getOrdersPhone(), ordersHistDTO.getOrdersMemo());
         System.out.println("저장 후");
 
         //장바구니 메뉴 삭제
-        for (Integer cartMenuIdx : cartMenuIdxList) {
+        for (Integer cartMenuIdx : ordersHistDTO.getCartMenuIdxList()) {
             cartService.deleteCartMenu(cartMenuIdx);
         }
         System.out.println("장바구니 메뉴 삭제 후");
@@ -83,11 +94,17 @@ public class MemberOrdersCotroller {
 
     }
 
-    @GetMapping({"/orders", "/orders/{page}"})
-    public String ordersHist(@PathVariable("page") Optional<Integer> page,
+    /* -----------------------------------------------------------------------------
+        경로 : /orders
+        인수 : @PageableDefault(page=1) Pageable page, Principal principal, Model model
+        출력 : 사용자 주문내역
+        설명 : 사용자가 장바구니에 주문한 내역들을 목록으로 볼 수있는 페이지 출력
+    ----------------------------------------------------------------------------- */
+    @GetMapping("/orders")
+    public String ordersHist(@PageableDefault(page=1) Pageable page,
                              Principal principal, Model model) {
 
-        log.info("진입");
+        System.out.println("진입");
 
         //로그인 체크
         if (principal == null) {
@@ -98,21 +115,25 @@ public class MemberOrdersCotroller {
             log.info("로그인 상태");
         }
 
-        // 페이지 정보 설정 (기본값: 0)
-        int pageNumber = page.orElse(0);
-        Pageable pageable = PageRequest.of(pageNumber, 10);
+        // 사용자 이메일
+        String email = principal.getName();
 
-//        //주문 내역 조회
-//        String email = principal.getName();
-//        Page<OrdersHistDTO> ordersHistDTOPage
-//                = ordersService.getOrderList(email, pageable);
+        // 서비스에 주문 내역 조회 요청
+        Page<OrdersDTO> ordersDTOS = ordersService.orderList(email, page);
+
+        // 조회결과를 이용한 페이지 처리
+        Map<String,Integer> pageInfo = pageNationUtil.Pagination(ordersDTOS);
+
+        // 사용자가 예약한 객실정보
+        RoomDTO roomDTO = ordersService.findMemberRoom(email);
 
         //모델에 데이터 추가
-//        model.addAttribute("orders", ordersHistDTOPage);
-        model.addAttribute("page", pageable.getPageNumber());
-        model.addAttribute("maxPage",5);
+        model.addAllAttributes(pageInfo);
+        model.addAttribute("orders", ordersDTOS);
+        model.addAttribute("roomDTO", roomDTO);
 
         return "orders/ordersHist";
+
     }
 
     //주문 취소

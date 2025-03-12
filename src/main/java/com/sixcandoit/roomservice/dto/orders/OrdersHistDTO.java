@@ -1,29 +1,23 @@
 package com.sixcandoit.roomservice.dto.orders;
 
-import com.sixcandoit.roomservice.constant.OrderStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-
 public class OrdersHistDTO {
 
-    private Integer ordersIdx;   //주문 아이디
+    private String ordersPhone;                      // 연락받을 연락처
 
-    private LocalDateTime ordersDate;   //주문 날짜
+    private String ordersMemo;                       // 주문 요청 사항
 
-    private OrderStatus orderStatus;    //주문 상태
-
-    private List<OrdersMenuDTO> ordersMenuDTOList
-            = new ArrayList<>();
+    private List<Integer> cartMenuIdxList;           // 카트메뉴  idx
 
 }
+// 주문목록에서 값 받아서 오는 DTO

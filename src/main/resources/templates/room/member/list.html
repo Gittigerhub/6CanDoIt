@@ -21,17 +21,17 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .room-gallery {
+        .room-gallery, .organ-gallery {
             margin-bottom: 2rem;
         }
-        .room-gallery .carousel-item img {
+        .room-gallery .carousel-item img, .organ-gallery .carousel-item img{
             height: 400px;
             object-fit: cover;
         }
-        .room-thumbnails {
+        .room-thumbnails, .organ-thumbnails {
             margin-top: 1rem;
         }
-        .room-thumbnails img {
+        .room-thumbnails img, .organ-thumbnails img {
             width: 100px;
             height: 70px;
             object-fit: cover;
@@ -40,13 +40,112 @@
             border-radius: 5px;
             transition: opacity 0.3s;
         }
-        .room-thumbnails img:hover {
+        .room-thumbnails img:hover, .organ-thumbnails img:hover {
             opacity: 0.8;
         }
     </style>
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
+
+<!--     ////////////////////////////////////////// 호텔 시작 //////////////////////////////////////////-->
+    <!-- 호텔 사진 갤러리 -->
+    <!-- 호텔 사진 갤러리 -->
+    <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <!-- 대표 이미지 -->
+            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+                <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                    <div class="carousel-item active"> <!-- 첫 번째 이미지는 active 추가 -->
+                        <div class="position-relative">
+                            <img style="width: 100%; height: 500px; object-fit: cover; margin: 10px"
+                                 th:src="@{${data.url}}"
+                                 th:alt="${data.originName}"
+                                 class="d-block w-100">
+                        </div>
+                    </div>
+                </th:block>
+            </th:block>
+
+            <!-- 그 외 이미지들 -->
+            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                    <div class="carousel-item"> <!-- 다른 이미지들은 active 없이 추가 -->
+                        <div class="position-relative">
+                            <img style="width: 100%; height: 500px; object-fit: cover; margin: 10px"
+                                 th:src="@{${data.url}}"
+                                 th:alt="${data.originName}"
+                                 class="d-block w-100">
+                        </div>
+                    </div>
+                </th:block>
+            </th:block>
+        </div>
+
+        <!-- 좌우 버튼 -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- 썸네일 갤러리 -->
+    <div class="room-thumbnails d-flex justify-content-center flex-wrap">
+        <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+            <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                <div class="thumbnail">
+                    <img style="width: 100px; height: 100px; object-fit: cover; margin: 10px"
+                         th:src="@{${data.url}}"
+                         th:alt="${data.originName}"
+                         th:attr="data-bs-target='#mainCarousel', data-bs-slide-to=${data.idx}">
+                </div>
+            </th:block>
+        </th:block>
+    </div>
+
+    <!--    <th:block th:each="data : ${imageFileDTOS}" th:if="${hasRepImage}">-->
+<!--        <div class="container mt-5">-->
+<!--            <div class="organ-gallery">-->
+<!--                &lt;!&ndash; 메인 캐러셀 &ndash;&gt;-->
+<!--                <div id="mainOrganCarousel" class="carousel slide" data-bs-ride="carousel">-->
+<!--                    <div class="carousel-inner">-->
+<!--                        &lt;!&ndash; 첫 번째 이미지를 'active'로 표시 &ndash;&gt;-->
+<!--                        <div th:each="image, imageStat : ${imageFileMap.get(data.idx)}"-->
+<!--                             th:classappend="${imageStat.index == 0} ? 'active'">-->
+<!--                            <div th:if="${image.repimageYn == 'Y'}" class="position-relative">-->
+<!--                                <img th:src="@{${image.url}}" class="d-block w-100" th:alt="${image.originName}">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <button class="carousel-control-prev" type="button" data-bs-target="#mainOrganCarousel" data-bs-slide="prev">-->
+<!--                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>-->
+<!--                        <span class="visually-hidden">Previous</span>-->
+<!--                    </button>-->
+<!--                    <button class="carousel-control-next" type="button" data-bs-target="#mainOrganCarousel" data-bs-slide="next">-->
+<!--                        <span class="carousel-control-next-icon" aria-hidden="true"></span>-->
+<!--                        <span class="visually-hidden">Next</span>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                &lt;!&ndash; 썸네일 갤러리 &ndash;&gt;-->
+<!--                <div class="organ-thumbnails d-flex justify-content-center flex-wrap">-->
+<!--                    <div th:each="image : ${imageFileMap.get(data.idx)}" class="thumbnail">-->
+<!--                        <img th:if="${image.repimageYn == 'Y'}"-->
+<!--                             th:src="@{${image.url}}"-->
+<!--                             th:attr="data-bs-target='#mainOrganCarousel',data-bs-slide-to=${imageStat.index}"-->
+<!--                             alt="Organ Thumbnail">-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </th:block>-->
+
+    <!-- ////////////////////////////////////////// 호텔 끝 ////////////////////////////////////////// -->
+    <!-- ////////////////////////////////////////// 룸 시작 ////////////////////////////////////////// -->
+
     <!-- 객실 사진 갤러리 -->
     <div class="container mt-5">
         <div class="room-gallery">
@@ -112,14 +211,22 @@
                         <div class="card-body">
                             <h5 class="card-title" th:text="${room.roomName}">룸 이름</h5>
                             <p class="card-text">
-                                <span class="badge bg-primary" th:text="${room.roomType}">룸 타입</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'STD'}">스탠다드</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'ROH'}">런 오브 하우스</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'MOD'}">모더레이트</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'SUP'}">슈페리어</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'DLX'}">디럭스</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'STU'}">스튜디오</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'JRSTE'}">쥬니어 스위트</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'STE'}">스위트</span>
+                                <span class="badge bg-primary" th:if="${room.roomType == 'PH'}">팬트하우스</span>
                                 <span class="badge bg-info" th:text="${room.roomNum + '인실'}">투숙 인원</span>
                                 <span th:if="${room.roomBreakfast == 'Y'}" class="badge bg-success">조식 포함</span>
                             </p>
                             <p class="card-text">
                                 <i class="fas fa-bed"></i> 침대 [[${room.roomBed}]]개<br>
                                 <i class="fas fa-expand"></i> [[${room.roomSize}]]평<br>
-                                <strong class="text-primary">₩[[${#numbers.formatInteger(room.roomPrice, 0, 'COMMA')}]]</strong>/박
+                                <strong class="text-primary">₩[[${#numbers.formatInteger(room.roomPrice, 0, 'COMMA')}]]</strong>/1박
                             </p>
                             <div class="mt-3">
                                 <button type="button" class="btn btn-outline-primary" 
@@ -380,13 +487,23 @@
                             </div>
                             <div class="col-md-6">
                                 <h6 class="fw-bold">요금 정보</h6>
-                                <p class="h4 text-primary">₩[[${#numbers.formatInteger(room.roomPrice, 0, 'COMMA')}]]/박</p>
+                                <p class="h4 text-primary">₩[[${#numbers.formatInteger(room.roomPrice, 0, 'COMMA')}]]/1박</p>
                             </div>
                         </div>
                         
                         <div class="mt-4">
                             <h6 class="fw-bold">객실 타입</h6>
-                            <p>[[${room.roomType}]]</p>
+                            <p>
+                                <span th:if="${room.roomType == 'STD'}">스탠다드</span>
+                                <span th:if="${room.roomType == 'ROH'}">런 오브 하우스</span>
+                                <span th:if="${room.roomType == 'MOD'}">모더레이트</span>
+                                <span th:if="${room.roomType == 'SUP'}">슈페리어</span>
+                                <span th:if="${room.roomType == 'DLX'}">디럭스</span>
+                                <span th:if="${room.roomType == 'STU'}">스튜디오</span>
+                                <span th:if="${room.roomType == 'JRSTE'}">쥬니어 스위트</span>
+                                <span th:if="${room.roomType == 'STE'}">스위트</span>
+                                <span th:if="${room.roomType == 'PH'}">팬트하우스</span>
+                            </p>
                         </div>
 
                         <div class="mt-4">

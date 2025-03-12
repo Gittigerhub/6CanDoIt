@@ -105,12 +105,8 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <button class="btn btn-outline-primary btn-sm me-2"
-                                        th:onclick="|location.href='@{/office/organ/(idx=${hotel.idx})}'|">
-                                    상세 보기
-                                </button>
-                                <button class="btn btn-primary btn-sm"
                                         th:onclick="|location.href='@{/room/member/list(organ_idx=${hotel.idx})}'|">
-                                    룸 예약
+                                    상세 보기
                                 </button>
                             </div>
 <!--                            <div class="badge bg-success" th:if="${hotel.isAvailable}">예약가능</div>-->

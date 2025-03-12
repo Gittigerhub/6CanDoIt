@@ -4,6 +4,7 @@ import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.entity.room.ReservationEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
+import com.sixcandoit.roomservice.entity.orders.PaymentEntity;
 import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import jakarta.transaction.Transactional;
@@ -222,6 +223,30 @@ public class ReservationService {
         } catch (Exception e) {
             log.error("Error fetching reservations for user: {} and organization: {}", memberEmail, organ_idx, e);
             return new ArrayList<>();
+        }
+    }
+
+    // 결제 정보 업데이트
+    @Transactional
+    public void updateReservationPayment(Integer reservationId, Integer paymentId) {
+        log.info("Updating payment information for reservation: {} with payment: {}", reservationId, paymentId);
+        try {
+            Optional<ReservationEntity> reservationOpt = reservationRepository.findByIdx(reservationId);
+            if (reservationOpt.isPresent()) {
+                ReservationEntity reservation = reservationOpt.get();
+                PaymentEntity payment = new PaymentEntity();
+                payment.setIdx(paymentId);
+                reservation.setPaymentJoin(payment);
+                reservation.setResStatus("2"); // 결제 완료 상태로 변경
+                reservationRepository.save(reservation);
+                log.info("Successfully updated payment information for reservation: {}", reservationId);
+            } else {
+                log.error("Reservation not found with id: {}", reservationId);
+                throw new RuntimeException("예약을 찾을 수 없습니다: " + reservationId);
+            }
+        } catch (Exception e) {
+            log.error("Error updating payment information for reservation: {}", reservationId, e);
+            throw new RuntimeException("결제 정보 업데이트 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 }

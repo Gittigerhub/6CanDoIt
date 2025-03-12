@@ -92,7 +92,7 @@ public class ReservationController {
     public String createPage(@ModelAttribute ReservationDTO reservationDTO,
                              RedirectAttributes redirectAttributes,
                              Principal principal) {
-        log.info("등록 처리 후 목록페이지로 이동하는 postmapping 시작....");
+        log.info("예약 처리 시작....");
 
         try {
             // 현재 로그인한 사용자 정보 설정
@@ -101,15 +101,25 @@ public class ReservationController {
             reservationDTO.setMemberName(memberDTO.getMemberName());
             reservationDTO.setUsername(memberDTO.getMemberName());
 
-            reservationService.reserveInsert(reservationDTO);
-            redirectAttributes.addFlashAttribute("successMessage", "저장하였습니다.");
-            log.info("등록 처리 후....");
+            // 예약 정보 저장
+            ReservationDTO savedReservation = reservationService.reserveInsert(reservationDTO);
+            
+            // 룸 정보 조회하여 가격 정보 가져오기
+            RoomEntity room = roomRepository.findById(reservationDTO.getRoomIdx())
+                .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
+            
+            // 결제 페이지로 리다이렉트
+            redirectAttributes.addAttribute("amount", room.getRoomPrice());
+            redirectAttributes.addAttribute("orderId", "ROOM_" + savedReservation.getIdx());
+            redirectAttributes.addAttribute("reservationId", savedReservation.getIdx());
+            
+            return "redirect:/orders/payment/checkout";
+            
         } catch (RuntimeException e) {
-            log.error("등록 예외 발생: {}", e.getMessage());  // 예외 메시지 확인 로그 추가
+            log.error("예약 처리 중 오류 발생: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/res/list";
         }
-        log.info("목록페이지로 이동...");
-        return "redirect:/res/list";
     }
 
     // AJAX 예약 요청을 처리하는 새로운 엔드포인트
@@ -132,8 +142,18 @@ public class ReservationController {
             reservationDTO.setUsername(memberDTO.getMemberName());
 
             ReservationDTO savedReservation = reservationService.reserveInsert(reservationDTO);
+            
             if (savedReservation != null) {
-                return ResponseEntity.ok(Collections.singletonMap("message", "예약이 완료되었습니다."));
+                // 룸 정보 조회하여 가격 정보 가져오기
+                RoomEntity room = roomRepository.findById(reservationDTO.getRoomIdx())
+                    .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
+                
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "예약이 완료되었습니다.");
+                response.put("reservationId", savedReservation.getIdx());
+                response.put("totalAmount", room.getRoomPrice());
+                
+                return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.badRequest()
                     .body(Collections.singletonMap("message", "예약 처리 중 오류가 발생했습니다."));

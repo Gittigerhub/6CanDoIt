@@ -34,4 +34,11 @@ public class PaymentDTO {
         this.paymentPayType = paymentPayType;
         this.paymentApproval = paymentApproval;
     }
+
+    public void setPaymentDate(LocalDateTime now) {
+    }
+
+    public Object getPaymentDate() {
+        return null;
+    }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @Log
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -135,7 +135,7 @@ public class PaymentController {
     }
 
     // 결제 성공 처리
-    @GetMapping("/orders/payment/success")
+    @GetMapping("/orders/paymentsuccess")
     public String paymentSuccess(
             @RequestParam("paymentKey") String paymentKey,
             @RequestParam("orderId") String orderId,
@@ -164,17 +164,18 @@ public class PaymentController {
             }
 
             // 결제 성공 페이지로 이동하면서 필요한 정보 전달
-            model.addAttribute("amount", amount);
-            model.addAttribute("reservationId", orderId);
+            model.addAttribute("orderId", orderId);
+            model.addAttribute("paymentAmount", amount);
+            model.addAttribute("approvalNo", paymentKey);
             model.addAttribute("paymentDate", processedPayment.getRegDate());
             addUserInfoToModel(model);
             
-            return "orders/payment/success";
+            return "orders/paymentsuccess";
         } catch (Exception e) {
             log.severe("결제 성공 처리 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
             model.addAttribute("error", "결제 처리 중 오류가 발생했습니다: " + e.getMessage());
-            return "redirect:/orders/payment/list?error=" + e.getMessage();
+            return "redirect:/orders/paymentfail";
         }
     }
 

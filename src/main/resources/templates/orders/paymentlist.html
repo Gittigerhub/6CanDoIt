@@ -1,174 +1,45 @@
+
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/memberlayout}">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>결제 목록</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      padding: 20px;
-    }
-    .payment-list {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    .payment-list h2 {
-      color: #333;
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    .payment-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .payment-table th {
-      background: #f8f9fa;
-      padding: 1rem;
-      text-align: left;
-      font-weight: 600;
-      color: #495057;
-      border-bottom: 2px solid #dee2e6;
-    }
-    .payment-table td {
-      padding: 1rem;
-      border-bottom: 1px solid #dee2e6;
-      color: #212529;
-    }
-    .payment-item {
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .payment-item:hover {
-      background-color: #f8f9fa;
-    }
-    .status-completed {
-      color: #28a745;
-      font-weight: 500;
-    }
-    .status-cancelled {
-      color: #dc3545;
-      font-weight: 500;
-    }
-    .payment-button {
-      margin-top: 2rem;
-      text-align: center;
-    }
-    .payment-button a {
-      display: inline-block;
-      padding: 1rem 2rem;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: 500;
-      transition: background-color 0.2s;
-    }
-    .payment-button a:hover {
-      background-color: #0056b3;
-      color: white;
-      text-decoration: none;
-    }
-    .alert {
-      margin-bottom: 2rem;
-      padding: 1rem;
-      border-radius: 5px;
-    }
-    .alert-danger {
-      background-color: #f8d7da;
-      border-color: #f5c6cb;
-      color: #721c24;
-    }
-    .empty-message {
-      text-align: center;
-      padding: 3rem;
-      color: #6c757d;
-    }
-  </style>
-</head>
-<body>
 
-<div layout:fragment="content" class="p-5">
-  <div class="container">
-    <div class="payment-list">
-      <h2 class="payment-title">결제 목록</h2>
+<div layout:fragment="content" class="container mt-5">
+    <h2 class="text-center mb-4">결제 내역</h2>
 
-      <!-- 에러 메시지가 있는 경우 표시 -->
-      <div th:if="${param.error}" class="alert alert-danger" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i>
-        <span th:text="${param.error}"></span>
-      </div>
-
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-          <tr>
-            <th>결제번호</th>
-            <th>결제금액</th>
-            <th>결제상태</th>
-            <th>결제수단</th>
-            <th>결제일시</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr th:if="${#lists.isEmpty(paymentDTOList)}">
-            <td colspan="5" class="empty-message">
-              <i class="fas fa-info-circle me-2"></i>결제 내역이 없습니다.
-            </td>
-          </tr>
-          <tr th:each="payment : ${paymentDTOList}"
-              th:data-payment-key="${payment.paymentApproval}"
-              th:data-order-id="${payment.orderId}"
-              th:data-amount="${payment.paymentPrice}"
-              onclick="handlePaymentClick(this)"
-              class="payment-item">
-            <td th:text="${payment.idx}"></td>
-            <td th:text="${#numbers.formatDecimal(payment.paymentPrice, 0, 'COMMA', 0, 'POINT') + '원'}"></td>
-            <td th:text="${payment.paymentState == 'Y' ? '완료' : '취소'}"
-                th:class="${payment.paymentState == 'Y' ? 'status-completed' : 'status-cancelled'}">
-            </td>
-            <td th:text="${payment.paymentPayType == 'CARD' ? '카드' :
-                            payment.paymentPayType == 'CASH' ? '현금' :
-                            payment.paymentPayType == 'DIVID' ? '분할결제' : '카드'}">
-            </td>
-            <td th:text="${#temporals.format(payment.regDate, 'yyyy-MM-dd HH:mm')}"></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 결제하기 버튼 -->
-      <div class="payment-button">
-        <a th:href="@{/orders/payment/checkout}" class="btn btn-primary">
-          <i class="fas fa-credit-card me-2"></i>결제하기
-        </a>
-      </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>결제 번호</th>
+                        <th>주문 번호</th>
+                        <th>결제 금액</th>
+                        <th>결제 수단</th>
+                        <th>결제 상태</th>
+                        <th>결제 일시</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="payment : ${paymentDTOList}">
+                        <td th:text="${payment.idx}"></td>
+                        <td th:text="${payment.orderId}"></td>
+                        <td th:text="${#numbers.formatInteger(payment.paymentPrice, 0, 'COMMA')} + '원'"></td>
+                        <td th:text="${payment.paymentPayType}"></td>
+                        <td>
+                            <span th:if="${payment.paymentState == 'Y'}" class="badge bg-success">완료</span>
+                            <span th:if="${payment.paymentState == 'N'}" class="badge bg-danger">실패</span>
+                        </td>
+                        <td th:text="${#temporals.format(payment.regDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(paymentDTOList)}">
+                        <td colspan="6" class="text-center">결제 내역이 없습니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<th:block layout:fragment="script">
-  <script th:inline="javascript">
-    function handlePaymentClick(element) {
-      const paymentKey = element.dataset.paymentKey;
-      const orderId = element.dataset.orderId;
-      const amount = element.dataset.amount;
-      const idx = element.querySelector('td:first-child').textContent;
-      location.href = /*[[@{/orders/payment/detail/}]]*/ '' + idx;
-    }
-  </script>
-</th:block>
-</body>
-</html>

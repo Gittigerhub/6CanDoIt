@@ -2,6 +2,7 @@ package com.sixcandoit.roomservice.controller.payment;
 
 import com.sixcandoit.roomservice.dto.orders.PaymentDTO;
 import com.sixcandoit.roomservice.service.orders.PaymentService;
+import com.sixcandoit.roomservice.service.room.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final ReservationService reservationService;
 
     // 사용자 정보를 모델에 추가하는 메서드
     private void addUserInfoToModel(Model model) {
@@ -50,7 +52,7 @@ public class PaymentController {
         List<PaymentDTO> paymentDTOList = paymentService.list();
         model.addAttribute("paymentDTOList", paymentDTOList);
         addUserInfoToModel(model);
-        return "orders/payment/list";
+        return "orders/paymentlist";
     }
 
     // 결제 체크아웃 페이지
@@ -65,7 +67,7 @@ public class PaymentController {
             
             model.addAttribute("paymentDTO", newPayment);
             addUserInfoToModel(model);
-            return "orders/payment/checkout";
+            return "orders/paymentcheckout";
         } catch (Exception e) {
             log.severe("결제 페이지 로드 중 오류 발생: " + e.getMessage());
             return "redirect:/orders/payment/list";
@@ -154,6 +156,12 @@ public class PaymentController {
             paymentDTO.setPaymentCashPrice(0);
 
             PaymentDTO processedPayment = paymentService.processPayment(paymentDTO);
+
+            // 예약 정보 업데이트
+            if (orderId.startsWith("ROOM_")) {
+                Integer reservationId = Integer.parseInt(orderId.substring(5));
+                reservationService.updateReservationPayment(reservationId, processedPayment.getIdx());
+            }
 
             // 결제 성공 페이지로 이동하면서 필요한 정보 전달
             model.addAttribute("amount", amount);

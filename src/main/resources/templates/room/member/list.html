@@ -500,14 +500,8 @@
                 headers: headers,
                 success: function(response) {
                     console.log('Reservation success response:', response);
-                    Swal.fire({
-                        icon: 'success',
-                        title: '예약이 완료되었습니다',
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        location.reload();
-                    });
+                    // 예약 성공 시 결제 페이지로 리다이렉션
+                    window.location.href = `/orders/payment/checkout?amount=${response.totalAmount}&orderId=ROOM_${response.reservationId}`;
                 },
                 error: function(xhr, status, error) {
                     console.error('Reservation error details:', {

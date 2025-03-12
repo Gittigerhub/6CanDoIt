@@ -92,7 +92,7 @@ public class SecurityConfig{
                     // 공지사항 페이지 접근 권한
                     auth.requestMatchers("/notice/**").permitAll();
                     // 오더 페이지 접근 권한
-                    auth.requestMatchers("/orders/**").permitAll();
+                    auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").permitAll();
                     // 메뉴 페이지 접근 권한
                     auth.requestMatchers("/menu/**").permitAll();
                     // 장바구니 페이지 접근 권한
@@ -165,7 +165,7 @@ public class SecurityConfig{
             // 공지사항 페이지 접근 권한
             auth.requestMatchers("/notice/**").permitAll();
             // 오더 페이지 접근 권한
-            auth.requestMatchers("/orders/**").permitAll();
+            auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").permitAll();
             // 메뉴 페이지 접근 권한
             auth.requestMatchers("/menu/**").permitAll();
             // 장바구니 페이지 접근 권한

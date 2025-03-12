@@ -79,7 +79,7 @@ public class SecurityConfig{
                     // 조직-매장 페이지 접근 권한
                     auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
                     // 이벤트-멤버포인트 페이지 접근 권한
-                    auth.requestMatchers("/event/**", "/event/memberpoint/**", "/event/usermemberpoint/**","event/userevent/**").permitAll();
+                    auth.requestMatchers("/event/**", "/event/memberpoint/**", "/event/usermemberpoint/**","/event/userevent/**").permitAll();
                     // QnA 페이지 접근 권한
                     auth.requestMatchers("/qna/qnalist/**").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/qna/list", "/qna/read", "/qna/register", "/qna/update", "/qna/delete").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");

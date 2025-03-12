@@ -51,4 +51,5 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
 
     // 조직별 룸 목록 조회 (가격 내림차순)
     List<RoomEntity> findByOrganizationJoin_IdxOrderByRoomPriceDesc(Integer organIdx);
+
 }

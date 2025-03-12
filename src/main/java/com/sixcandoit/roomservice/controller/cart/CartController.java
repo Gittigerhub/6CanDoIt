@@ -2,7 +2,6 @@ package com.sixcandoit.roomservice.controller.cart;
 
 import com.sixcandoit.roomservice.dto.cart.CartDetailDTO;
 import com.sixcandoit.roomservice.dto.cart.CartMenuDTO;
-import com.sixcandoit.roomservice.dto.cart.CartOrdersDTO;
 import com.sixcandoit.roomservice.service.cart.CartMenuService;
 import com.sixcandoit.roomservice.service.cart.CartService;
 import com.sixcandoit.roomservice.service.menu.MenuService;
@@ -124,24 +123,26 @@ public class CartController {
         return "redirect:/member/cart/cartlist";    //삭제 후 장바구니 목록 페이지로 리다이렉트
     }
 
-    @PostMapping("/cart/cartlist")
-    public ResponseEntity orderCartMenu(@RequestBody CartOrdersDTO cartOrdersDTO, Principal principal) {
-
-        log.info(cartOrdersDTO);
-        List<CartOrdersDTO> cartOrdersDTOList = cartOrdersDTO.getCartOrdersDTOList();
-
-        if (cartOrdersDTOList == null || cartOrdersDTOList.size() == 0) {
-            return new ResponseEntity<String>("주문할 메뉴를 선택해주세요.", HttpStatus.FORBIDDEN);
-        }
-        for (CartOrdersDTO cartOrders : cartOrdersDTOList) {
-            if (!cartService.validateCartMenu(cartOrders.getCartMenuIdx(), principal.getName())) {
-                return new ResponseEntity("주문 권한이 없습니다.", HttpStatus.FORBIDDEN);
-            }
-        }
-        Integer orderidx = cartService.orderCartMenu(cartOrdersDTOList, principal.getName());
-
-        return new ResponseEntity<Integer>(orderidx, HttpStatus.OK);
-    }
+    // 안씀
+//    @PostMapping("/cart/cartlist")
+//    public ResponseEntity orderCartMenu(@RequestBody CartOrdersDTO cartOrdersDTO, Principal principal) {
+//
+//        log.info(cartOrdersDTO);
+//        List<CartOrdersDTO> cartOrdersDTOList = cartOrdersDTO.getCartOrdersDTOList();
+//
+//        if (cartOrdersDTOList == null || cartOrdersDTOList.size() == 0) {
+//            return new ResponseEntity<String>("주문할 메뉴를 선택해주세요.", HttpStatus.FORBIDDEN);
+//        }
+//
+//        for (CartOrdersDTO cartOrders : cartOrdersDTOList) {
+//            if (!cartService.validateCartMenu(cartOrders.getCartMenuIdx(), principal.getName())) {
+//                return new ResponseEntity("주문 권한이 없습니다.", HttpStatus.FORBIDDEN);
+//            }
+//        }
+//        Integer orderidx = cartService.orderCartMenu(cartOrdersDTOList, principal.getName());
+//
+//        return new ResponseEntity<Integer>(orderidx, HttpStatus.OK);
+//    }
 
     //장바구니 개수 반환하는 메서드 추가
     @GetMapping("/cart/count")

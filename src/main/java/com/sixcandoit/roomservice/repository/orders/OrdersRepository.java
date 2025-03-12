@@ -14,12 +14,13 @@ import java.util.Optional;
 @Repository
 public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
 
-    //구매이력
-//    @Query("select o from OrdersEntity o where o.memberJoin.memberEmail = :memberEmail order by o.ordersDate")
-//    public List<OrdersEntity> findOrdersEntity(String memberEmail, Pageable pageable);
+    // 구매이력
+    // 회원 이메일과 최신생성기간 순으로 정렬하여 조회
+    @Query("select o from OrdersEntity o where o.memberJoin.memberEmail = :memberEmail order by o.insDate DESC")
+    Page<OrdersEntity> findOrdersEntity(String memberEmail, Pageable pageable);
 
     @Query("select count(o) from OrdersEntity o where o.memberJoin.memberEmail = :memberEmail")
-    public Integer totalcount(String memberEmail);
+    Integer totalcount(String memberEmail);
 
     Optional<OrdersEntity> findByIdx(Integer orderIdx);
 

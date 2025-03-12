@@ -4,6 +4,7 @@ import com.sixcandoit.roomservice.constant.OrderStatus;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -23,9 +24,9 @@ public class OrdersDTO {
 
     private String ordersMemo;               // 주문 요청 사항
 
-    private MemberDTO memberJoin;
+    private LocalDateTime insDate;           // 주문 일시
 
-    private PaymentDTO paymentJoin;
+    private MemberDTO memberJoin;
 
     private List<OrdersMenuDTO> ordersMenuJoin;
 

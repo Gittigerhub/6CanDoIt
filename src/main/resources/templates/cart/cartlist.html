@@ -136,14 +136,23 @@
             });
         });
 
-        //주문하기 버튼 클릭시
+        // 주문하기 버튼 클릭시
         $('.cartorders').on('click', function() {
-            //장바구니에 있는 모든 메뉴의 cartMenuIdx수집
+
+            // 장바구니에 있는 모든 메뉴의 cartMenuIdx수집 해서 List로 담기
             let cartMenuIdxList = [];
             $('.menu-idx').each(function() {
                 cartMenuIdxList.push($(this).val());
             });
+            // 로그
             console.log(cartMenuIdxList)
+
+            // 임시값 설정
+            var ordersPhone = "01023451234";
+            var ordersMemo = "제발되라";
+            // 로그
+            console.log(ordersPhone)
+            console.log(ordersMemo)
 
             // 장바구니가 비어있는 경우 처리
             if (cartMenuIdxList.length === 0) {
@@ -154,17 +163,18 @@
                 return;
             }
 
-            //주문처리 요청
+            // 주문처리 요청
             $.ajax({
                 url: '/member/orders',
                 type: 'POST',
-                dataType: jd
-                data: {
-                    cartMenuIdxList: cartMenuIdxList
-                },
-                success: function(orderIdx) {
-                    console.log("주문 완료, orderIdx",orderIdx);
-                    // orderIdx는 생성된 주문의 번호
+                contentType: 'application/json', // 요청 데이터 타입을 JSON으로 설정
+                data: JSON.stringify({
+                    cartMenuIdxList: cartMenuIdxList,
+                    ordersPhone: ordersPhone,
+                    ordersMemo: ordersMemo
+                }), // 객체를 JSON 문자열로 변환
+                success: function(response) {
+                    console.log("주문 완료, response",response);
                     Swal.fire({
                         title : '주문이 완료되었습니다.',
                         text: '주문 내역 페이지로 이동합니다.',

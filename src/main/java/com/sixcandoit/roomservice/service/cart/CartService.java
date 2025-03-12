@@ -2,8 +2,6 @@ package com.sixcandoit.roomservice.service.cart;
 
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.dto.cart.CartDetailDTO;
-import com.sixcandoit.roomservice.dto.cart.CartOrdersDTO;
-import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.cart.CartEntity;
 import com.sixcandoit.roomservice.entity.cart.CartMenuEntity;
@@ -221,37 +219,37 @@ public class CartService {
         cartMenuRepository.delete(cartMenuEntity);
     }
 
-
-    //장바구니에서 들어온 주문
-    public Integer orderCartMenu(List<CartOrdersDTO> cartOrdersDTOList, String memberEmail) {
-        //cartOrderDTOList cartMenuIdx가 들어있음
-
-        List<OrdersDTO> ordersDTOList = new ArrayList<>();
-
-        for (CartOrdersDTO cartOrdersDTO : cartOrdersDTOList) {
-            //cartItemIdx를 하나씩 가지고
-
-            CartMenuEntity cartMenuEntity
-                    = cartMenuRepository.findById(cartOrdersDTO.getCartMenuIdx())
-                        .orElseThrow(EntityNotFoundException::new);
-
-            OrdersDTO ordersDTO = new OrdersDTO();
-            ordersDTO.setIdx(cartMenuEntity.getMenuEntity().getIdx());
-
-            ordersDTOList.add(ordersDTO);
-        }
-        Integer ordersIdx
-                = ordersService.orders(ordersDTOList, memberEmail);   //장바구니 메뉴들 저장
-
-        //주문 생성 후 카트에서 해당 메뉴 삭제
-        for (CartOrdersDTO cartOrdersDTO : cartOrdersDTOList) {
-            CartMenuEntity cartMenuEntity
-                    = cartMenuRepository.findById(cartOrdersDTO.getCartMenuIdx())
-                    .orElseThrow(EntityNotFoundException::new);
-
-
-            cartMenuRepository.delete(cartMenuEntity);
-        }
-        return ordersIdx;   //주문 ID 반환
-    }
+//      안씀
+//    //장바구니에서 들어온 주문
+//    public Integer orderCartMenu(List<CartOrdersDTO> cartOrdersDTOList, String memberEmail) {
+//        //cartOrderDTOList cartMenuIdx가 들어있음
+//
+//        List<OrdersDTO> ordersDTOList = new ArrayList<>();
+//
+//        for (CartOrdersDTO cartOrdersDTO : cartOrdersDTOList) {
+//            //cartItemIdx를 하나씩 가지고
+//
+//            CartMenuEntity cartMenuEntity
+//                    = cartMenuRepository.findById(cartOrdersDTO.getCartMenuIdx())
+//                        .orElseThrow(EntityNotFoundException::new);
+//
+//            OrdersDTO ordersDTO = new OrdersDTO();
+//            ordersDTO.setIdx(cartMenuEntity.getMenuEntity().getIdx());
+//
+//            ordersDTOList.add(ordersDTO);
+//        }
+//        Integer ordersIdx
+//                = ordersService.orders(ordersDTOList, memberEmail);   //장바구니 메뉴들 저장
+//
+//        //주문 생성 후 카트에서 해당 메뉴 삭제
+//        for (CartOrdersDTO cartOrdersDTO : cartOrdersDTOList) {
+//            CartMenuEntity cartMenuEntity
+//                    = cartMenuRepository.findById(cartOrdersDTO.getCartMenuIdx())
+//                    .orElseThrow(EntityNotFoundException::new);
+//
+//
+//            cartMenuRepository.delete(cartMenuEntity);
+//        }
+//        return ordersIdx;   //주문 ID 반환
+//    }
 }

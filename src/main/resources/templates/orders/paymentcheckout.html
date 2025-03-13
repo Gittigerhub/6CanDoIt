@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
     <title>결제하기</title>
@@ -39,9 +39,10 @@
     </style>
 </head>
 <body>
+<div layout:fragment="content" class="p-5">
 <div class="payment-container">
     <h2 class="mb-4">결제하기</h2>
-    
+
     <!-- 결제 정보 표시 -->
     <div class="alert alert-info mb-4">
         <p class="mb-1">주문번호: <span th:text="${paymentDTO.orderId}"></span></p>
@@ -56,7 +57,7 @@
     const clientKey = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq";
     const tossPayments = TossPayments(clientKey);
     const button = document.getElementById("payment-button");
-    
+
     // 서버에서 전달받은 결제 정보
     const amount = /*[[${paymentDTO.paymentPrice}]]*/ 0;
     const orderId = /*[[${paymentDTO.orderId}]]*/ '';
@@ -80,5 +81,6 @@
         });
     });
 </script>
+</div>
 </body>
 </html>

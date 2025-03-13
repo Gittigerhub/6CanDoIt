@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.controller.payment;
 
 import com.sixcandoit.roomservice.dto.orders.PaymentDTO;
+import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.service.orders.PaymentService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -62,20 +63,20 @@ public class PaymentController {
     // 결제 체크아웃 페이지
     @GetMapping("/orders/payment/checkout")
     public String checkout(@RequestParam("amount") Integer amount,
-                          @RequestParam("orderId") String orderId,
-                          Model model) {
+                           @RequestParam("orderId") String orderId,
+                           Model model) {
         log.info("결제 체크아웃 - 금액: {}, 주문번호: {}", amount, orderId);
         try {
             PaymentDTO paymentDTO = new PaymentDTO();
             paymentDTO.setPaymentPrice(amount);
             paymentDTO.setOrderId(orderId);
-            
+
             model.addAttribute("paymentDTO", paymentDTO);
-            
+
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String memberEmail = authentication.getName();
             model.addAttribute("memberName", memberEmail);
-            
+
             return "orders/paymentcheckout";
         } catch (Exception e) {
             log.error("결제 체크아웃 처리 중 오류 발생: {}", e.getMessage());
@@ -210,18 +211,58 @@ public class PaymentController {
         }
     }
 
-    // 결제 상세 정보 페이지
-    @GetMapping("/orders/payment/detail/{idx}")
-    public String detail(@PathVariable("idx") Integer idx, Model model) {
-        log.info("결제 상세 정보 조회 - idx: {}", idx);
+
+    @GetMapping("/orders/payment/cancel/{idx}")
+    public String cancel(@PathVariable("idx") Integer idx, Model model) {
+        log.info("결제 취소 페이지 요청 - idx:{}", idx);
         try {
             PaymentDTO paymentDTO = paymentService.findByIdx(idx);
-            model.addAttribute("payment", paymentDTO);
+
+            if (paymentDTO == null) {
+                model.addAttribute("error", "결제 정보를 찾을 수 없습니다.");
+                return "redirect:/orders/payment/list";  // Corrected path with '/'
+            }
+
+            model.addAttribute("paymentDTO", paymentDTO);
             addUserInfoToModel(model);
-            return "orders/paymentdetail";
+            return "orders/paymentcancel";
         } catch (Exception e) {
-            log.error("결제 정보 조회 중 오류 발생: {}", e.getMessage());
-            return "redirect:/orders/payment/list?error=" + e.getMessage();
+            log.error("결제 취소 페이지 로딩 중 오류 발생: {}", e.getMessage());
+            model.addAttribute("error", "결제 취소 페이지 로딩 중 오류가 발생했습니다.");
+            return "redirect:/orders/payment/cancel";  // Corrected path with '/'
+        }
+    }
+
+
+    @PostMapping("/orders/payment/cancel/{idx}")
+    public String cancelPayment(@PathVariable("idx") Integer idx, Model model) {
+        log.info("결제 취소 처리 - idx: {}", idx);
+        try {
+            PaymentDTO paymentDTO = paymentService.findByIdx(idx);
+
+            if (paymentDTO == null) {
+                model.addAttribute("error", "결제 정보를 찾을 수 없습니다.");
+                return "redirect:/orders/payment/list";  // Corrected path with '/'
+            }
+
+            paymentDTO.setPaymentState("CANCELLED");
+            paymentService.processPayment(paymentDTO);
+
+            if (paymentDTO.getOrderId().startsWith("ROOM_")) {
+                Integer reservationId = Integer.parseInt(paymentDTO.getOrderId().substring(5));
+                reservationService.updateReservationPayment(reservationId, null);
+                reservationService.updateReservationStatus(reservationId, "CANCELLED");
+            }
+
+            model.addAttribute("orderId", paymentDTO.getOrderId());
+            model.addAttribute("paymentAmount", paymentDTO.getPaymentPrice());
+            model.addAttribute("paymentState", "취소됨");
+            addUserInfoToModel(model);
+            return "orders/paymentcancelled";
+        } catch (Exception e) {
+            log.error("결제 취소 처리 중 오류 발생: {}", e.getMessage());
+            model.addAttribute("error", "결제 취소 중 오류가 발생했습니다.");
+            return "redirect:/orders/payment/cancel";  // Corrected path with '/'
         }
     }
 }

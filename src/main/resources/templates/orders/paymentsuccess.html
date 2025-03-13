@@ -39,7 +39,7 @@
             margin: 10px 0;
             font-size: 16px;
         }
-        .btn-view-history {
+        .btn-view-history, .btn-member-list {
             background-color: #007bff;
             color: white;
             padding: 10px 20px;
@@ -48,29 +48,37 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-top: 20px;
         }
-        .btn-view-history:hover {
+        .btn-view-history:hover, .btn-member-list:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
 
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" >
     <div class="success-container">
         <i class="fas fa-check-circle success-icon"></i>
         <h2 class="success-title">결제가 성공적으로 완료되었습니다!</h2>
-        
+
         <div class="payment-details">
             <p><strong>주문 번호:</strong> <span th:text="${orderId}">ORDER-123</span></p>
             <p><strong>결제 금액:</strong> <span th:text="${#numbers.formatInteger(paymentAmount, 0, 'COMMA')} + '원'">₩50,000</span></p>
             <p><strong>결제 승인번호:</strong> <span th:text="${approvalNo}">AP-12345</span></p>
             <p><strong>결제 일시:</strong> <span th:text="${#temporals.format(paymentDate, 'yyyy-MM-dd HH:mm:ss')}">2024-03-21 15:30:00</span></p>
         </div>
-        
+
+        <!-- 결제 내역 보기 버튼 -->
         <a href="/orders/payment/list" class="btn btn-view-history">
             <i class="fas fa-list"></i> 결제 내역 보기
         </a>
+
+        <!-- 새로운 회원 목록 페이지로 이동하는 버튼 -->
+        <a href="http://localhost:8080/room/member/list?organ_idx=1" class="btn btn-member-list">
+            <i class="fas fa-users"></i> 예약확인
+        </a>
+
     </div>
 </div>
 

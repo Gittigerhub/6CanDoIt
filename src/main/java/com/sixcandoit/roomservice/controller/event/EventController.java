@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,27 +39,30 @@ public class EventController {
 
     //이벤트 목록
     @GetMapping("/event")
-    public String event(/*@PageableDefault(page=1) Pageable page,
-                        @RequestParam(value = "type",defaultValue = "")String type,
-                        @RequestParam(value = "keyword",defaultValue = "") String keyword,*/
-            Model model) {
-        try {
-            log.info("get에 들어옴");
-            // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-            List<EventDTO> eventDTOS = eventService.list();
-            // 해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-           /* Map<String,Integer> pageInfo = PageNationUtil.Pagination(eventDTOS);
+    public String event(@PageableDefault(page = 1) Pageable page,
+                        @RequestParam(value = "type", defaultValue = "") String type,
+                        @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                        @RequestParam(value = "startDate", defaultValue = "") LocalDateTime startDate,
+                        @RequestParam(value = "endDate", defaultValue = "") LocalDateTime endDate,
+                        Model model) {
 
-            model.addAttribute("eventDTOS", eventDTOS);
-            model.addAllAttributes(pageInfo);
-            model.addAttribute("type", type);
-            model.addAttribute("keyword", keyword);*/
-            model.addAttribute("eventDTOS", eventDTOS);
 
-            return "event/event";
-        } catch (Exception e) {
-            throw new RuntimeException("이벤트 목록 맵핑 실패: " + e.getMessage());
-        }
+
+        System.out.println("컨트롤에 들어오는 타입:"+type);
+        Page<EventDTO> eventDTOS = eventService.list(keyword, type, startDate, endDate,page);
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(eventDTOS);
+        model.addAttribute("eventDTOS", eventDTOS);
+        model.addAllAttributes(pageInfo);
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+
+
+
+
+        return "event/event";
     }
 
 
@@ -158,7 +162,7 @@ public class EventController {
         }
 
 
-        return "redirect:event/event";
+        return "redirect:/event/event";
     }
 
 

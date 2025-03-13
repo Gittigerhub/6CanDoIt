@@ -49,6 +49,11 @@
                                         <span th:text="${orders.ordersStatus}"
                                               th:class="'order-status status-' + ${orders.ordersStatus}">
                                         </span>
+                                        <span th:if="${order.ordersStatus.name() == 'NEW'}" class="badge bg-secondary">신규 주문</span>
+                                        <span th:if="${order.ordersStatus.name() == 'CHECK'}" class="badge bg-secondary">주문 확인</span>
+                                        <span th:if="${order.ordersStatus.name() == 'COOKING'}" class="badge bg-secondary">조리 진행</span>
+                                        <span th:if="${order.ordersStatus.name() == 'CANCEL'}" class="badge bg-danger">주문 취소</span>
+                                        <span th:if="${order.ordersStatus.name() == 'CLOSE'}" class="badge bg-primary">주문 완료</span>
                                     </td>
                                 </tr>
                                 <tr>

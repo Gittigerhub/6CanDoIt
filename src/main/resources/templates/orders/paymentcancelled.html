@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 취소 완료</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            margin: 20px 0;
+            font-size: 16px;
+            color: #555;
+            text-align: center;
+        }
+
+        .info strong {
+            font-weight: 500;
+            color: #2d9cdb;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            margin-top: 20px;
+            background-color: #2d9cdb;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1e8bb3;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .message {
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>결제 취소가 완료되었습니다.</h2>
+
+    <!-- 결제 취소 성공 메시지 -->
+    <div class="message">
+        <p>주문 번호 <strong>${orderId}</strong>의 결제가 취소되었습니다.</p>
+        <p>결제 금액: <strong>${paymentAmount} 원</strong></p>
+        <p>현재 결제 상태: <strong>${paymentState}</strong></p>
+    </div>
+
+    <!-- 결제 취소 완료 후 안내 메시지 -->
+    <div class="info">
+        <p>결제가 정상적으로 취소되었으며, 더 이상 결제 금액이 청구되지 않습니다.</p>
+    </div>
+
+    <!-- 결제 목록으로 돌아가기 버튼 -->
+    <a href="/orders/payment/list" class="btn">결제 목록으로 돌아가기</a>
+
+    <!-- 에러 메시지 -->
+    <div class="error">
+        <p th:if="${error}">${error}</p>
+    </div>
+</div>
+
+</body>
+</html>

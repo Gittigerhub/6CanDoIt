@@ -201,17 +201,17 @@ public class OrdersService {
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             Page<OrdersDTO> ordersDTOS =
                     ordersEntities.map(entity -> {
-                                System.out.println("변환 중: " + entity.toString());
+                        System.out.println("변환 중: " + entity.toString());
 
-                                OrdersDTO dto = new OrdersDTO();
-                                try {
-                                    dto = modelMapper.map(entity, OrdersDTO.class);
-                                } catch (Exception e) {
-                                    System.out.println("❌ modelMapper 변환 오류: " + e.getMessage());
-                                    e.printStackTrace();
-                                }
-                                return dto;
-                            });
+                        OrdersDTO dto = new OrdersDTO();
+                        try {
+                            dto = modelMapper.map(entity, OrdersDTO.class);
+                        } catch (Exception e) {
+                            System.out.println("❌ modelMapper 변환 오류: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                        return dto;
+                    });
 
             // 4. 결과값을 전달
             return ordersDTOS;
@@ -222,7 +222,7 @@ public class OrdersService {
 
     }
 
-        // 회원객실을 찾기
+    // 회원객실을 찾기
     public RoomDTO findMemberRoom(String email) {
 
         // 회원정보 찾기
@@ -400,6 +400,9 @@ public class OrdersService {
         }
     }
 
+    public Integer orders(List<OrdersDTO> ordersDTOList, String memberEmail) {
+        return 0;
+    }
 }
 
 

@@ -63,7 +63,7 @@ public class ReservationService {
             }
 
             ReservationEntity reserveEntity = new ReservationEntity();
-            
+
             // 기본 정보 설정
             reserveEntity.setStartDate(reservationDTO.getStartDate());
             reserveEntity.setEndDate(reservationDTO.getEndDate());
@@ -100,7 +100,7 @@ public class ReservationService {
 
         if(findData.isPresent()) {
             ReservationEntity existingReservation = findData.get();
-            
+
             // 기존 예약과 동일한 roomIdx가 아닌 경우에만 중복 체크
             if (!existingReservation.getRoomJoin().getIdx().equals(reservationDTO.getRoomIdx())) {
                 // 예약 기간이 겹치는지 확인
@@ -112,7 +112,7 @@ public class ReservationService {
             // 기존 예약 엔티티 업데이트
             existingReservation.setStartDate(reservationDTO.getStartDate());
             existingReservation.setEndDate(reservationDTO.getEndDate());
-            
+
             // RoomEntity 설정
             Optional<RoomEntity> roomEntityOpt = roomRepository.findByIdx(reservationDTO.getRoomIdx());
             if (roomEntityOpt.isPresent()) {
@@ -164,7 +164,7 @@ public class ReservationService {
             }
             // 가격 내림차순으로 정렬하여 조회
             reserveEntities = reservationRepository.findByStartDateGreaterThanEqualAndEndDateLessThanEqual(
-                startDate, endDate, Sort.by(Sort.Direction.DESC, "roomJoin.roomPrice"));
+                    startDate, endDate, Sort.by(Sort.Direction.DESC, "roomJoin.roomPrice"));
         }
 
         //데이터값 변환(ModelMapper DTO<->Entity), Page에 대한 변환X
@@ -185,7 +185,7 @@ public class ReservationService {
             }
             // organ_idx와 날짜 조건에 맞는 예약 조회
             reserveEntities = reservationRepository.findByRoomJoin_OrganizationJoin_IdxAndStartDateGreaterThanEqualAndEndDateLessThanEqual(
-                organ_idx, startDate, endDate);
+                    organ_idx, startDate, endDate);
         }
 
         return Arrays.asList(modelMapper.map(reserveEntities, ReservationDTO[].class));
@@ -212,12 +212,12 @@ public class ReservationService {
             log.info("Found {} reservations", reservations.size());
             // 각 예약의 상세 정보 로깅
             for (ReservationEntity reservation : reservations) {
-                log.info("Reservation: id={}, organization={}, room={}, dates={}-{}", 
-                    reservation.getIdx(),
-                    reservation.getRoomJoin().getOrganizationJoin().getIdx(),
-                    reservation.getRoomJoin().getRoomName(),
-                    reservation.getStartDate(),
-                    reservation.getEndDate());
+                log.info("Reservation: id={}, organization={}, room={}, dates={}-{}",
+                        reservation.getIdx(),
+                        reservation.getRoomJoin().getOrganizationJoin().getIdx(),
+                        reservation.getRoomJoin().getRoomName(),
+                        reservation.getStartDate(),
+                        reservation.getEndDate());
             }
             return Arrays.asList(modelMapper.map(reservations, ReservationDTO[].class));
         } catch (Exception e) {
@@ -248,5 +248,12 @@ public class ReservationService {
             log.error("Error updating payment information for reservation: {}", reservationId, e);
             throw new RuntimeException("결제 정보 업데이트 중 오류가 발생했습니다: " + e.getMessage());
         }
+    }
+
+    public void updateReservationStatus(Integer reservationId, String cancelled) {
+    }
+
+    public ReservationDTO findById(Integer reservationId) {
+        return null;
     }
 }

@@ -238,5 +238,17 @@ public class MemberController {
             return ResponseEntity.badRequest().body("이메일 발송 에러");
         }
     }
+    @PostMapping("/checkEmailCode")
+    @ResponseBody
+    public ResponseEntity<String> CheckEmailCode(@RequestParam("email") String email, @RequestParam("authenticationCode") String authenticationCode){
+        try {
+            String result = emailService.checkEmailCode(email, authenticationCode)+"";
+            return ResponseEntity.ok().body(result);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("에러 발생");
+        }
+    }
+
 
 }

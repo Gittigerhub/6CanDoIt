@@ -349,10 +349,10 @@ public class OfficeController {
                                                    List<MultipartFile> imageFiles, Integer organIdx){
         // 이미지 조회할 join
         String join = "organ";
-
+        System.out.println("체크 1");
         try {
             shopDetailService.update(shopDetailDTO, organizationDTO, join, imageFiles, organIdx);
-
+            System.out.println("체크 2");
             return  ResponseEntity.ok("수정하였습니다.");
         }catch (Exception e){
 

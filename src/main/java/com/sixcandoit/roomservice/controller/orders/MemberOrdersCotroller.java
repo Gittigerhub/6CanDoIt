@@ -1,9 +1,13 @@
 package com.sixcandoit.roomservice.controller.orders;
 
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
+import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersHistDTO;
+import com.sixcandoit.roomservice.dto.orders.OrdersMenuDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.cart.CartService;
 import com.sixcandoit.roomservice.service.orders.OrdersService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -19,6 +23,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -28,6 +35,7 @@ import java.util.Map;
 
 public class MemberOrdersCotroller {
 
+    private final ImageFileService imageFileService;
     private final OrdersService ordersService;
     private final CartService cartService;
     private final PageNationUtil pageNationUtil;
@@ -127,10 +135,50 @@ public class MemberOrdersCotroller {
         // 사용자가 예약한 객실정보
         RoomDTO roomDTO = ordersService.findMemberRoom(email);
 
+        // join값 설정
+        String join = "menu";
+
+        // DTO들 리스트 생성
+        List<MenuDTO> menu = new ArrayList<>();
+
+        // Page<OrdersDTO> ordersDTOS 에서 ordersDTO객체 가져오기
+        for (OrdersDTO ordersDTO : ordersDTOS) {
+            // OrdersMenuDTO 가져오기
+            List<OrdersMenuDTO> OrdersMenuDTO = ordersDTO.getOrdersMenuJoin();
+            for (OrdersMenuDTO ordersMenu : OrdersMenuDTO) {
+                // menuDTO 가져오기
+                MenuDTO menuDTO = ordersMenu.getMenuJoin();
+
+                // menu 가져온 menuDTO 추가
+                menu.add(menuDTO);
+            }
+
+        }
+
+        // 이미지 데이터를 담을 Map 생성 (menu의 idx를 key로 저장)
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+
+        for (MenuDTO menuDTO : menu) {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(menuDTO.getIdx(), join);
+
+            // Map에 저장 (menu의 idx를 key로 함)
+            imageFileMap.put(menuDTO.getIdx(), imageFileDTOS);
+
+            // 대표 사진 여부 확인 후 저장
+            boolean hasRepImage = imageFileDTOS.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+            repImageMap.put(menuDTO.getIdx(), hasRepImage);
+        }
+
         //모델에 데이터 추가
         model.addAllAttributes(pageInfo);
         model.addAttribute("orders", ordersDTOS);
         model.addAttribute("roomDTO", roomDTO);
+        model.addAttribute("imageFileMap", imageFileMap); // 메뉴별 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap); // 메뉴별 대표 사진 여부
 
         return "orders/ordersHist";
 

@@ -34,23 +34,36 @@ public class UserEventService {
     출력 : 목록
     설명 : 포인트 정보들을 목록을 출력할때 사용
     ---------------------------------------------------*/
-    public Page<EventDTO> list(String keyword, String type, LocalDateTime StartDate, LocalDateTime endDate, Pageable page) {
-       // List<EventEntity> eventlist = eventRepository.findAll();
-        System.out.println("Service = page: "+page+",type:"+type+",keyword:"+keyword);
+    public Page<EventDTO> list(String keyword, String type, LocalDateTime startDate, LocalDateTime endDate, Pageable page) {
+        System.out.println("Service = page: "+page+",type:"+type+",keyword:"+keyword+",StartDate:"+startDate+",endDate:"+endDate);
         //List<eventDTO> eventDTOlist = Arrays.asList(modelMapper.map(eventlist, eventDTO[].class));
         Pageable pageable= PageRequest.of(Math.max(page.getPageNumber()-1,0),10);
         System.out.println("실행중:"+pageable.getPageNumber());
         Page<EventEntity> eventEntities;
-        if(!keyword.isEmpty()){
-            if(type.equals("1")){
-                log.info("이벤트 내용으로 검색하는 중");
-                eventEntities = eventRepository.findByContents(keyword,pageable);
-            }else if(type.equals("2")){
-                log.info("이벤트 활성화로 검색하는 중");
-                eventEntities=eventRepository.findByActiveYn(keyword,pageable);
-            }else {
-                log.info("이벤트 기간으로 검색중 중");
-                eventEntities = eventRepository.findByDateRange(StartDate,endDate,pageable);
+        if(!type.isEmpty()){
+            switch (type) {
+                case "1":
+                    log.info("이벤트 내용으로 검색하는 중");
+                    if(keyword!=null){
+                    eventEntities = eventRepository.findByContents(keyword, pageable);
+                    break;
+                    }
+
+                case "2":
+                    log.info("이벤트 활성화로 검색하는 중");
+                    if(keyword!=null){
+                    eventEntities = eventRepository.findByActiveYn(keyword, pageable);
+                    break;
+                    }
+
+                case "3":
+                    log.info("이벤트 기간으로 검색중 중");
+                    if(startDate!=null&&endDate!=null) {
+                        eventEntities = eventRepository.findByDateRange(startDate, endDate, pageable);
+                        break;
+                    }
+
+                default: eventEntities = eventRepository.findByContents(keyword, pageable);
             }
         }
         else{

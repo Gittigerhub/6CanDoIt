@@ -33,14 +33,22 @@
                             <br>
                             <div class="row" style="flex: content; justify-content: space-between ;">
                                 <div class="col-6">
-                                    <img th:src="${eventRead.eventTitleImg}" style="width: 600px; height: 350px;">
+                                    <th:block th:if="${eventRead.eventTitleImg}!=null">
+                                        <img th:src="${eventRead.eventTitleImg}" style="width: 600px; height: 350px;">
+                                    </th:block>
+                                    <th:block th:if="${eventRead.eventTitleImg}==null">
+                                    </th:block>
                                 </div>
                                 <div class="input-group col-6">
                                     <label>이벤트 타이틀 사진(수정):</label>
                                     <input type="file" class="title_img" id="title_img" name="Files">
                                 </div>
                                 <div class="col-6">
-                                    <img th:src="${eventRead.eventImg}" style="width: 600px; height: 350px;">
+                                    <th:block th:if="${eventRead.eventImg}!=null">
+                                        <img th:src="${eventRead.eventImg}" style="width: 600px; height: 350px;">
+                                    </th:block>
+                                    <th:block th:if="${eventRead.eventImg}==null">
+                                    </th:block>
                                 </div>
                                 <div class="input-group col-6">
                                     <label>이벤트 메인 사진(수정):</label>
@@ -57,25 +65,27 @@
                                 <div class="col-sm-6">
                                     <label>이벤트 시작날</label>
                                     <input type="datetime-local" class="form-select startDay" id="startDay"
-                                           name="eventStartDate">
+                                           name="eventStartDate" th:value="${eventRead.eventStartDate}">
                                 </div>
                                 <div class="col-sm-6">
                                     <label>이벤트 종료날</label>
                                     <input type="datetime-local" class="form-select endDay" id="endDay"
-                                           name="eventEndDate">
+                                           name="eventEndDate" th:value="${eventRead.eventEndDate}">
                                 </div>
                             </div>
                             <div class=" row">
                                 <div class="col-sm-6">
                                     <label>이벤트 활성화</label>
-                                    <select id="activeYn" name="activeYn" class="form-select">
+                                    <select id="activeYn" name="activeYn" class="form-select"
+                                            th:value="${eventRead.activeYn}">
                                         <option value="N">비활성</option>
                                         <option value="Y">활성</option>
                                     </select>
                                 </div>
                                 <div class="col-sm-6">
                                     <label>*이벤트 상태:</label>
-                                    <select id="eventState" name="eventState" class="form-select">
+                                    <select id="eventState" name="eventState" class="form-select"
+                                            th:value="${eventRead.eventState}">
                                         <option value="N">종료</option>
                                         <option value="Y">진행중</option>
                                     </select>

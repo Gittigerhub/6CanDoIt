@@ -41,9 +41,7 @@ public interface MemberPointRepository extends JpaRepository<MemberPointEntity, 
     Page<MemberPointEntity> findByPointOperationYn(@Param("keyword") String keyword, Pageable pageable);
 
     //포인트 기간으로 검색
-    @Query("SELECT m FROM MemberPointEntity m " +
-            "WHERE m.memberPointStartDate <= :endDate " +
-            "AND m.memberPointEndDate >= :startDate")
+    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberPointStartDate >= :startDate AND m.memberPointEndDate <= :endDate ")
     Page<MemberPointEntity> findByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
 

@@ -26,10 +26,10 @@
                     <select class="form-select" id="selectBox" name="type">
                         <option th:selected="${type==null}"></option>
                         <option value="1" th:selected="${type=='1'}">내용</option>
-                        <option value="3" th:selected="${type=='2'}">기간</option>
-                        <option value="2" th:selected="${type=='3'}">사용</option>
+                        <option value="2" th:selected="${type=='2'}">기간</option>
+                        <option value="3" th:selected="${type=='3'}">사용</option>
                     </select>
-                    <th:block th:if="${type=='1' || type==null}">
+                    <th:block th:if="${type=='1'}">
                         <input type="text" class="form-control" name="keyword" th:value="${keyword}"
                                placeholder="Search">
                     </th:block>

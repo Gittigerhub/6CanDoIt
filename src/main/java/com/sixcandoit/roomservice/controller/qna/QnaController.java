@@ -279,6 +279,51 @@ public class QnaController {
     }
 
     // Qna의 Q 수정할 게시글 수정하기
+    @GetMapping("/qna/update")
+    public String update(@RequestParam Integer idx, Model model,
+                        @AuthenticationPrincipal CustomUserDetails userDetails,
+                        RedirectAttributes redirectAttributes) {
+        log.info("QnA 수정 페이지로 이동합니다.");
+
+        // 인증되지 않은 사용자 체크
+        if (userDetails == null) {
+            log.error("인증되지 않은 사용자의 접근");
+            return "redirect:/member/login";
+        }
+
+        // 기존 QnA 데이터 조회
+        QnaDTO qnaDTO = qnaService.qnaRead(idx);
+
+        // 관리자 권한 체크
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
+
+        // 관리자가 아닌 경우, 작성자 본인 확인
+        if (!isAdmin && !qnaDTO.getMemberName().equals(userDetails.getMember().getMemberName())) {
+            log.warn("작성자가 아닌 사용자의 수정 시도 - 요청자: {}, 작성자: {}", 
+                userDetails.getMember().getMemberName(), qnaDTO.getMemberName());
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "접근 제한");
+            redirectAttributes.addFlashAttribute("alertMessage", "자신이 작성한 글만 수정할 수 있습니다.");
+            return "redirect:/qna/list";
+        }
+
+        // 일반 사용자의 경우 답변이 있으면 수정 불가
+        if (!isAdmin && qnaDTO.getReplyList() != null && !qnaDTO.getReplyList().isEmpty()) {
+            log.warn("답변이 있는 글 수정 시도 - QnA IDX: {}", idx);
+            redirectAttributes.addFlashAttribute("sweetAlert", true);
+            redirectAttributes.addFlashAttribute("alertType", "error");
+            redirectAttributes.addFlashAttribute("alertTitle", "수정 불가");
+            redirectAttributes.addFlashAttribute("alertMessage", "이미 답변이 작성된 글은 수정할 수 없습니다.");
+            return "redirect:/qna/read?idx=" + idx;
+        }
+
+        model.addAttribute("qnaDTO", qnaDTO);
+        return "qna/update";
+    }
+
+    // Qna의 Q 수정 저장 처리
     @PostMapping("/qna/update")
     public String updateProc(@ModelAttribute QnaDTO qnaDTO,
                              String join, List<MultipartFile> imageFiles,
@@ -286,46 +331,41 @@ public class QnaController {
                              RedirectAttributes redirectAttributes) {
         log.info("수정된 데이터를 저장합니다. QnA IDX: {}", qnaDTO.getIdx());
 
-        boolean isAdmin = false;
         try {
-            // 관리자 권한 체크
-            isAdmin = userDetails.getAuthorities().stream()
-                    .anyMatch(auth -> auth.getAuthority().matches("ROLE_(ADMIN|HO|BO)"));
-
             // 기존 QnA 데이터 조회
             QnaDTO existingQna = qnaService.qnaRead(qnaDTO.getIdx());
             log.info("기존 게시글 조회 완료 - 제목: {}, 작성자: {}", existingQna.getQnaTitle(), existingQna.getMemberName());
+
+            // 작성자 본인 확인
+            if (!existingQna.getMemberName().equals(userDetails.getMember().getMemberName())) {
+                throw new RuntimeException("자신이 작성한 게시글만 수정할 수 있습니다.");
+            }
+
+            // 답변이 있는 경우 수정 불가
+            if (existingQna.getReplyList() != null && !existingQna.getReplyList().isEmpty()) {
+                throw new RuntimeException("이미 답변이 작성된 글은 수정할 수 없습니다.");
+            }
 
             // 기존 데이터 유지
             qnaDTO.setFavYn(existingQna.getFavYn());
             qnaDTO.setReplyYn(existingQna.getReplyYn());
             qnaDTO.setQnaHits(existingQna.getQnaHits());
-            qnaDTO.setMemberDTO(existingQna.getMemberDTO());
             qnaDTO.setMemberName(existingQna.getMemberName());
+            
+            // MemberDTO 설정
+            MemberDTO memberDTO = modelMapper.map(userDetails.getMember(), MemberDTO.class);
+            qnaDTO.setMemberDTO(memberDTO);
 
-            // 관리자가 수정하는 경우
-            if (isAdmin) {
-                log.info("관리자에 의한 게시글 수정 시작 - 관리자: {}, QnA IDX: {}",
-                        userDetails.getUsername(), qnaDTO.getIdx());
-                qnaService.adminQnaUpdate(qnaDTO, join, imageFiles);
-                log.info("관리자에 의한 게시글 수정 완료");
-            } else {
-                // 일반 사용자가 수정하는 경우
-                if (!existingQna.getMemberName().equals(userDetails.getMember().getMemberName())) {
-                    throw new RuntimeException("자신이 작성한 게시글만 수정할 수 있습니다.");
-                }
-                log.info("작성자에 의한 게시글 수정 시작 - 작성자: {}", qnaDTO.getMemberName());
-                qnaService.qnaUpdate(qnaDTO, join, imageFiles);
-                log.info("작성자에 의한 게시글 수정 완료");
-            }
+            log.info("작성자에 의한 게시글 수정 시작 - 작성자: {}", qnaDTO.getMemberName());
+            qnaService.qnaUpdate(qnaDTO, join, imageFiles);
+            log.info("작성자에 의한 게시글 수정 완료");
 
             redirectAttributes.addFlashAttribute("sweetAlert", true);
             redirectAttributes.addFlashAttribute("alertType", "success");
             redirectAttributes.addFlashAttribute("alertTitle", "수정 완료");
             redirectAttributes.addFlashAttribute("alertMessage", "게시글이 수정되었습니다.");
 
-            return isAdmin ? "redirect:/qna/adminread?idx=" + qnaDTO.getIdx()
-                    : "redirect:/qna/read?idx=" + qnaDTO.getIdx();
+            return "redirect:/qna/read?idx=" + qnaDTO.getIdx();
 
         } catch (Exception e) {
             log.error("게시글 수정 중 오류 발생: " + e.getMessage(), e);
@@ -333,8 +373,7 @@ public class QnaController {
             redirectAttributes.addFlashAttribute("alertType", "error");
             redirectAttributes.addFlashAttribute("alertTitle", "수정 실패");
             redirectAttributes.addFlashAttribute("alertMessage", "게시글 수정 중 오류가 발생했습니다: " + e.getMessage());
-            return isAdmin ? "redirect:/qna/adminread?idx=" + qnaDTO.getIdx()
-                    : "redirect:/qna/read?idx=" + qnaDTO.getIdx();
+            return "redirect:/qna/read?idx=" + qnaDTO.getIdx();
         }
     }
 
@@ -429,7 +468,7 @@ public class QnaController {
     @GetMapping("/qna/favYn/update")
     public String updateFavYn(@RequestParam Integer idx, @RequestParam String favYn) {
         qnaService.updateFavYn(idx, favYn);
-        return "redirect:/qna/read?idx=" + idx; // 상세 페이지로 리다이렉트
+        return "redirect:/qna/adminread?idx=" + idx; // 상세 페이지로 리다이렉트
     }
 
     // 예외 처리기 추가

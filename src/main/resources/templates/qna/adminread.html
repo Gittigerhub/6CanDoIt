@@ -17,6 +17,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!--알림창 스크립트-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: "Montserrat", sans-serif;
+        }
+        a {
+            text-decoration: none; /* 밑줄 없애기 */
+            color: black; /* 글자 색을 검은색으로 변경 */
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
@@ -69,8 +80,6 @@
                                class="btn btn-secondary">자주 묻는 질문 해제</a>
                             <!-- 답변 등록 버튼 (모달 띄우기) -->
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#replyModal">답변 등록</button>
-                            <!-- 수정 버튼 (모달 띄우기) -->
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#qnaUpdateModal">수정</button>
                             <!-- 삭제 버튼 -->
                             <a th:href="@{'/qna/delete?idx=' + ${qnaDTO.idx}}" class="btn btn-danger">삭제</a>
                         </div>
@@ -103,44 +112,6 @@
                                         <button type="submit" class="btn btn-primary">저장</button>
                                     </div>
                                 </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- QnA 수정 모달 -->
-                    <div class="modal fade" id="qnaUpdateModal" tabindex="-1" aria-labelledby="qnaUpdateModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="qnaUpdateModalLabel">QnA 수정</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form id="qnaUpdateForm" th:action="@{/qna/update}" method="post" enctype="multipart/form-data">
-                                        <input type="hidden" name="idx" th:value="${qnaDTO.idx}">
-                                        <input type="hidden" name="join" value="qna">
-                                        
-                                        <div class="mb-3">
-                                            <label for="qnaTitle" class="form-label">제목</label>
-                                            <input type="text" class="form-control" id="qnaTitle" name="qnaTitle" th:value="${qnaDTO.qnaTitle}" required>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <label for="qnaContents" class="form-label">내용</label>
-                                            <textarea class="form-control" id="qnaContents" name="qnaContents" rows="5" required th:text="${qnaDTO.qnaContents}"></textarea>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <label for="imageFiles" class="form-label">이미지 파일</label>
-                                            <input type="file" class="form-control" id="imageFiles" name="imageFiles" multiple accept="image/*">
-                                        </div>
-
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                                            <button type="submit" class="btn btn-primary">수정</button>
-                                        </div>
-                                    </form>
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -240,6 +240,7 @@ public class RoomController {
 
         if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
             log.info("유효성 검사 오류 발생");
+            bindingResult.getAllErrors().forEach(error -> log.error("Validation error: " + error.getDefaultMessage()));
             return "room/register"; // register로 돌아간다
         }
 
@@ -330,6 +331,7 @@ public class RoomController {
 
             if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
                 log.info("유효성 검사 오류 발생");
+                bindingResult.getAllErrors().forEach(error -> log.error("Validation error: " + error.getDefaultMessage()));
                 return "room/update"; // update로 돌아간다
             }
             // 유효성 검사 성공 시 수정 처리

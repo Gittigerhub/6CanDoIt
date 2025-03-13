@@ -93,6 +93,10 @@ public class RoomEntity extends BaseEntity {
     @JsonBackReference
     private OrganizationEntity organizationJoin;
 
+    // 예약 테이블과 1:N 매핑
+    @OneToMany(mappedBy = "roomJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationEntity> reservationJoin;
+
     // 이미지 파일 테이블과 1:N 매핑
     @OneToMany(mappedBy = "roomJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageFileEntity> imageFileJoin  = new ArrayList<>(); // null값이면 코드작동 안하기 때문에 초기화 진행

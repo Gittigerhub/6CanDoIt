@@ -17,7 +17,7 @@
     <div class="row mt-5">
         <div class="col-2"></div>
         <div class="col-8">
-            <form th:action="@{/admin/menu/registermenu}" th:object="${menuDTO}" method="post" enctype="multipart/form-data" onsubmit="validateForm(event)">
+            <form th:action="@{/admin/menu/registermenu}" method="post" enctype="multipart/form-data" onsubmit="validateForm(event)">
             <!--디자인-->
                 <div class="card">
                     <div class="card-body">
@@ -26,146 +26,150 @@
                     <!--id와 name은 DTO에 변수명으로 작업-->
                     <div class="card-body">
                         <!--현재 로그인한 관리자의 조직 정보-->
-                        <input type="text" name="organ_idx" th:value="${organization.idx}">
-                        <input type="text" name="shop_detail_idx" th:value="${shopDetailJoin.idx}">
+                        <label for="organ3" class="form-label">123</label>
+                        <input type="text" id="organ3" name="organ_idx" th:value="${organizationDTO.idx}" th:text="${organizationDTO.idx}">
+                        <label for="organ2" class="form-label">456</label>
+                        <input type="text" id="organ2" name="shop_detail_idx" th:value="${shopDetailDTO.idx}" th:text="${shopDetailDTO.idx}">
 
                         <!-- 조직 정보 표시 (읽기 전용) -->
                         <div class="form-group">
-                            <label>소속 조직</label>
-                            <input type="text" class="form-control" th:value="${organization?.organName}" readonly>
+                            <label for="organ" class="form-label">소속 조직</label>
+                            <input type="text" class="form-control" id="organ" th:value="${organizationDTO.organName}" th:text="${organizationDTO.organName}" readonly>
                         </div>
 
                         <!-- 매장 정보 표시 (읽기 전용) -->
                         <div class="form-group">
-                            <label>매장 정보</label>
-                            <input type="text" class="form-control" th:value="${shopDetail?.shopName}" readonly>
+                            <label for="organ4" class="form-label">매장 정보</label>
+                            <input type="text" class="form-control" id="organ4" th:value="${shopDetailDTO.organizationJoin.organName}" th:text="${shopDetailDTO.organizationJoin.organName}" readonly>
                         </div>
 
-                        <div class="mb-3 mt-3"><!--카테고리-->
-                            <label for="menuCategory" class="form-label">카테고리</label>
-                            <select class="form-select" th:field="*{menuCategory}" id="menuCategory" name="menuCategory">
-                                <option th:each="category : ${T(com.sixcandoit.roomservice.constant.MenuCategory).values()}"
-                                th:value="${category.name()}" th:text="${category.name()}">/option>
-                            </select>
-                            <span th:if="${#fields.hasErrors('menuCategory')}"
-                                  style="color: red;"
-                                  th:errors="*{menuCategory}">
+                        <th:block th:object="${menuDTO}">
+                            <div class="mb-3 mt-3"><!--카테고리-->
+                                <label for="menuCategory" class="form-label">카테고리</label>
+                                <select class="form-select" th:field="*{menuCategory}" id="menuCategory" name="menuCategory">
+                                    <option th:each="category : ${T(com.sixcandoit.roomservice.constant.MenuCategory).values()}"
+                                            th:value="${category.name()}" th:text="${category.name()}">/option>
+                                </select>
+                                <span th:if="${#fields.hasErrors('menuCategory')}"
+                                      style="color: red;"
+                                      th:errors="*{menuCategory}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--메뉴명-->
-                            <label for="menuName" class="form-label">메뉴명:</label>
-                            <input type="text" class="form-control" th:field="*{menuName}" id="menuName" name="menuName">
-                            <span th:if="${#fields.hasErrors('menuName')}"
-                                  style="color: red;"
-                                  th:errors="*{menuName}">
-                            </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--메뉴설명-->
-                            <label for="menuContent" class="form-label">설명:</label>
-                            <textarea class="form-control" th:field="*{menuContent}" rows="3" id="menuContent" name="menuContent"></textarea>
-                            <span th:if="${#fields.hasErrors('menuContent')}"
-                                  style="color: red;"
-                                  th:errors="*{menuContent}">
-                            </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <!--이미지 미리보기-->
-                        <div class="mb-3">
-                            <div class="imgA">
-                                <label for="menuImg" class="form-label">메뉴 이미지</label>
-                                <input type="file" class="form-control imgInput mainimg"
-                                       id="menuImg" accept="image/*" name="multipartFile" multiple onchange="previewImage(event, 'menuImg')">
-                                <div class="row main imagePreviewContainer" id="menuImagePreviewContainer"></div>
-
-                                <label for=subImg class="form-label">상세 이미지</label>
-                                <input class="form-control imgInput subimg "  id="subImg" accept="image/*" name="multipartFile" type="file" onchange="previewImage(event, 'subImg')">
                             </div>
-                            <div class="row main imagePreviewContainer" id="subImagePreviewContainer"></div>
-                        </div>
-                        <div class="mb-3"><!--메뉴 옵션-->
-                            <label for="menuOptionYn" class="form-label">메뉴 옵션</label>
-                            <select class="form-select" th:field="*{menuOptionYn}" id="menuOptionYn" name="menuOptionYn">
-                                <option value="N">없음</option>
-                                <option value="Y">있음</option>
-                            </select>
-                            <span th:if="${#fields.hasErrors('menuOptionYn')}"
-                                  style="color: red;"
-                                  th:errors="*{menuOptionYn}">
+                            <div class="mb-3"><!--메뉴명-->
+                                <label for="menuName" class="form-label">메뉴명:</label>
+                                <input type="text" class="form-control" th:field="*{menuName}" id="menuName" name="menuName">
+                                <span th:if="${#fields.hasErrors('menuName')}"
+                                      style="color: red;"
+                                      th:errors="*{menuName}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--메뉴가격-->
-                            <label for="menuPrice" class="form-label">가격:</label>
-                            <input type="number" min="0" th:field="*{menuPrice}" class="form-control" id="menuPrice" name="menuPrice">
-                            <span th:if="${#fields.hasErrors('menuPrice')}"
-                                  style="color: red;"
-                                  th:errors="*{menuPrice}">
+                            </div>
+                            <div class="mb-3"><!--메뉴설명-->
+                                <label for="menuContent" class="form-label">설명:</label>
+                                <textarea class="form-control" th:field="*{menuContent}" rows="3" id="menuContent" name="menuContent"></textarea>
+                                <span th:if="${#fields.hasErrors('menuContent')}"
+                                      style="color: red;"
+                                      th:errors="*{menuContent}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--활성화 유무-->
-                            <label for="activeYn" class="form-label">판매 상태</label>
-                            <select class="form-select" th:field="*{activeYn}" id="activeYn" name="activeYn">
-                                <option value="N">비활성</option>
-                                <option value="Y">활성</option>
-                            </select>
-                            <span th:if="${#fields.hasErrors('activeYn')}"
-                                  style="color: red;"
-                                  th:errors="*{activeYn}">
+                            </div>
+                            <!--이미지 미리보기-->
+                            <div class="mb-3">
+                                <div class="imgA">
+                                    <label for="menuImg" class="form-label">메뉴 이미지</label>
+                                    <input type="file" class="form-control imgInput mainimg"
+                                           id="menuImg" accept="image/*" name="multipartFile" multiple onchange="previewImage(event, 'menuImg')">
+                                    <div class="row main imagePreviewContainer" id="menuImagePreviewContainer"></div>
+
+                                    <label for=subImg class="form-label">상세 이미지</label>
+                                    <input class="form-control imgInput subimg "  id="subImg" accept="image/*" name="multipartFile" type="file" onchange="previewImage(event, 'subImg')">
+                                </div>
+                                <div class="row main imagePreviewContainer" id="subImagePreviewContainer"></div>
+                            </div>
+                            <div class="mb-3"><!--메뉴 옵션-->
+                                <label for="menuOptionYn" class="form-label">메뉴 옵션</label>
+                                <select class="form-select" th:field="*{menuOptionYn}" id="menuOptionYn" name="menuOptionYn">
+                                    <option value="N">없음</option>
+                                    <option value="Y">있음</option>
+                                </select>
+                                <span th:if="${#fields.hasErrors('menuOptionYn')}"
+                                      style="color: red;"
+                                      th:errors="*{menuOptionYn}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--세일 여부-->
-                            <label for="menuSalesYn" class="form-label">세일</label>
-                            <select class="form-select" th:field="*{menuSalesYn}" id="menuSalesYn" name="menuSalesYn">
-                                <option value="N">안함</option>
-                                <option value="Y">적용</option>
-                            </select>
-                            <span th:if="${#fields.hasErrors('menuSalesYn')}"
-                                  style="color: red;"
-                                  th:errors="*{menuSalesYn}">
+                            </div>
+                            <div class="mb-3"><!--메뉴가격-->
+                                <label for="menuPrice" class="form-label">가격:</label>
+                                <input type="number" min="0" th:field="*{menuPrice}" class="form-control" id="menuPrice" name="menuPrice">
+                                <span th:if="${#fields.hasErrors('menuPrice')}"
+                                      style="color: red;"
+                                      th:errors="*{menuPrice}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--할인구분-->
-                            <label for="menuSaleType" class="form-label">할인구분</label>
-                            <select class="form-select" th:field="*{menuSaleType}" id="menuSaleType" name="menuSaleType">
-                                <option value="NONE">없음</option>
-                                <option value="AMOUNT">할인액</option>
-                                <option value="PERSENT">할인율</option>
-                            </select>
-                            <span th:if="${#fields.hasErrors('menuSaleType')}"
-                                  style="color: red;"
-                                  th:errors="*{menuSaleType}">
+                            </div>
+                            <div class="mb-3"><!--활성화 유무-->
+                                <label for="activeYn" class="form-label">판매 상태</label>
+                                <select class="form-select" th:field="*{activeYn}" id="activeYn" name="activeYn">
+                                    <option value="N">비활성</option>
+                                    <option value="Y">활성</option>
+                                </select>
+                                <span th:if="${#fields.hasErrors('activeYn')}"
+                                      style="color: red;"
+                                      th:errors="*{activeYn}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--원가-->
-                            <label for="originPrice" class="form-label">원가:</label>
-                            <input type="number" min="0" th:field="*{originPrice}" class="form-control" id="originPrice" name="originPrice">
-                            <span th:if="${#fields.hasErrors('originPrice')}"
-                                  style="color: red;"
-                                  th:errors="*{originPrice}">
+                            </div>
+                            <div class="mb-3"><!--세일 여부-->
+                                <label for="menuSalesYn" class="form-label">세일</label>
+                                <select class="form-select" th:field="*{menuSalesYn}" id="menuSalesYn" name="menuSalesYn">
+                                    <option value="N">안함</option>
+                                    <option value="Y">적용</option>
+                                </select>
+                                <span th:if="${#fields.hasErrors('menuSalesYn')}"
+                                      style="color: red;"
+                                      th:errors="*{menuSalesYn}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--할인액-->
-                            <label for="menuSaleAmount" class="form-label">할인액:</label>
-                            <input type="number" min="0" th:field="*{menuSaleAmount}" class="form-control" id="menuSaleAmount" name="menuSaleAmount">
-                            <span th:if="${#fields.hasErrors('menuSaleAmount')}"
-                                  style="color: red;"
-                                  th:errors="*{menuSaleAmount}">
+                            </div>
+                            <div class="mb-3"><!--할인구분-->
+                                <label for="menuSaleType" class="form-label">할인구분</label>
+                                <select class="form-select" th:field="*{menuSaleType}" id="menuSaleType" name="menuSaleType">
+                                    <option value="NONE">없음</option>
+                                    <option value="AMOUNT">할인액</option>
+                                    <option value="PERSENT">할인율</option>
+                                </select>
+                                <span th:if="${#fields.hasErrors('menuSaleType')}"
+                                      style="color: red;"
+                                      th:errors="*{menuSaleType}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
-                        <div class="mb-3"><!--할인율-->
-                            <label for="menuSalePercent" class="form-label">할인율:</label>
-                            <input type="number" min="0" th:field="*{menuSalePercent}" class="form-control" id="menuSalePercent" name="menuSalePercent">
-                            <span th:if="${#fields.hasErrors('menuSalePercent')}"
-                                  style="color: red;"
-                                  th:errors="*{menuSalePercent}">
+                            </div>
+                            <div class="mb-3"><!--원가-->
+                                <label for="originPrice" class="form-label">원가:</label>
+                                <input type="number" min="0" th:field="*{originPrice}" class="form-control" id="originPrice" name="originPrice">
+                                <span th:if="${#fields.hasErrors('originPrice')}"
+                                      style="color: red;"
+                                      th:errors="*{originPrice}">
                             </span> <!-- 오류 메시지 출력 -->
-                        </div>
+                            </div>
+                            <div class="mb-3"><!--할인액-->
+                                <label for="menuSaleAmount" class="form-label">할인액:</label>
+                                <input type="number" min="0" th:field="*{menuSaleAmount}" class="form-control" id="menuSaleAmount" name="menuSaleAmount">
+                                <span th:if="${#fields.hasErrors('menuSaleAmount')}"
+                                      style="color: red;"
+                                      th:errors="*{menuSaleAmount}">
+                            </span> <!-- 오류 메시지 출력 -->
+                            </div>
+                            <div class="mb-3"><!--할인율-->
+                                <label for="menuSalePercent" class="form-label">할인율:</label>
+                                <input type="number" min="0" th:field="*{menuSalePercent}" class="form-control" id="menuSalePercent" name="menuSalePercent">
+                                <span th:if="${#fields.hasErrors('menuSalePercent')}"
+                                      style="color: red;"
+                                      th:errors="*{menuSalePercent}">
+                            </span> <!-- 오류 메시지 출력 -->
+                            </div>
 
 
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">등록</button>
-                            <button type="reset" class="btn btn-secondary">초기화</button>
-                            <button type="button" class="btn btn-danger"
-                                    th:onclick="|location.href='@{/admin/menu/adlistmenu}'|">목록으로</button>
-                        </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">등록</button>
+                                <button type="reset" class="btn btn-secondary">초기화</button>
+                                <button type="button" class="btn btn-danger"
+                                        th:onclick="|location.href='@{/admin/menu/adlistmenu}'|">목록으로</button>
+                            </div>
+                        </th:block>
                     </div>
                 </div>
             </form>

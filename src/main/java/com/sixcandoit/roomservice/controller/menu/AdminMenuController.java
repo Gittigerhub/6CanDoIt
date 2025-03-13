@@ -3,6 +3,7 @@ package com.sixcandoit.roomservice.controller.menu;
 import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
@@ -14,6 +15,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +48,7 @@ public class AdminMenuController {
     @Value("${imgUploadLocation}")
     public String folder;
 
+    private final ModelMapper modelMapper;
     private final MenuService menuService;
     private final ImageFileService imageFileService;
     private final ShopDetailService shopDetailService;
@@ -57,25 +60,49 @@ public class AdminMenuController {
 //            //로그인이 안되어 있으면, 접근 불가능하도록
 //            return "redirect:/login";
 //        }
+        System.out.println("이메일 : " + principal.getName());
         try {
             // SecurityContextHolder에서 현재 인증된 사용자 정보 가져오기
             Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            System.out.println("지나감 1");
 
             if (userDetails instanceof CustomUserDetails) {
                 CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
                 AdminEntity adminEntity = customUserDetails.getAdmin();
 
+                System.out.println("지나감 2");
+
                 // 관리자의 조직 정보 가져오기
                 OrganizationEntity organizationEntity = adminEntity.getOrganizationJoin();
 
-                if (organizationEntity != null) {
+                System.out.println("지나감 3");
+
+                // DTO로 변환
+                OrganizationDTO organizationDTO = modelMapper.map(organizationEntity, OrganizationDTO.class);
+
+                System.out.println("지나감 4");
+
+                if (organizationDTO != null) {
                     // 조직 정보로 매장 정보 조회
-                    ShopDetailDTO shopDetail = shopDetailService.findOrgan(organizationEntity.getIdx());
+                    ShopDetailDTO shopDetailDTO = shopDetailService.findOrgan(9);
+
+                    System.out.println("지나감 5");
+
+                    if (shopDetailDTO != null) {
+                        // 모델에 필요한 정보 추가
+                        model.addAttribute("shopDetailDTO", shopDetailDTO);
+                    }
+
+                    System.out.println("지나감 6");
 
                     // 모델에 필요한 정보 추가
-                    model.addAttribute("organization", organizationEntity);
-                    model.addAttribute("shopDetail", shopDetail);
+                    model.addAttribute("organizationDTO", organizationDTO);
+
+                } else {
+                    System.out.println("organizationDTO가 NULL이야 ");
                 }
+
             }
         } catch (Exception e) {
             log.error("관리자 정보 조회 중 오류 발생: ", e);

@@ -2,11 +2,11 @@ package com.sixcandoit.roomservice.service.member;
 
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
-import com.sixcandoit.roomservice.dto.qna.QnaDTO;
-import com.sixcandoit.roomservice.entity.event.MemberPointEntity;
+import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
-import com.sixcandoit.roomservice.entity.qna.QnaEntity;
+import com.sixcandoit.roomservice.entity.orders.OrdersEntity;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
+import com.sixcandoit.roomservice.repository.orders.OrdersRepository;
 import com.sixcandoit.roomservice.service.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +28,7 @@ import java.util.Optional;
 @Log4j2
 public class MemberService {
 
+    private final OrdersRepository ordersRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
@@ -271,5 +272,50 @@ public class MemberService {
 //
 //            return memberDTO;
 //        }
+
+    // 마이페이지 주문내역 목록조회
+    public Page<OrdersDTO> memberOrderList(String memberEmail, Pageable page) {
+
+        try {
+            // 1. 페이지정보를 재가공
+            int currentPage = page.getPageNumber() - 1;
+            int pageSize = 3;
+
+            // 기본 키로 올림차순해서 페이지 조회
+            Pageable pageable = PageRequest.of(currentPage, pageSize,
+                    Sort.by(Sort.Direction.DESC, "idx"));
+
+            // 2. 조회
+            // 주문목록 조회
+            Page<OrdersEntity> ordersEntities = ordersRepository.findOrdersEntity(memberEmail, pageable);
+
+            if (ordersEntities == null || ordersEntities.isEmpty()) {
+                System.out.println("ordersEntities가 null이거나 비어 있음!");
+            }
+
+            // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
+            Page<OrdersDTO> ordersDTOS =
+                    ordersEntities.map(entity -> {
+                        System.out.println("변환 중: " + entity.toString());
+
+                        OrdersDTO dto = new OrdersDTO();
+                        try {
+                            dto = modelMapper.map(entity, OrdersDTO.class);
+                        } catch (Exception e) {
+                            System.out.println("❌ modelMapper 변환 오류: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                        return dto;
+                    });
+
+            // 4. 결과값을 전달
+            return ordersDTOS;
+
+        } catch (Exception e) {     //오류발생시 오류 처리
+            throw new RuntimeException("조회 오류");
+        }
+
+    }
+
 }
 

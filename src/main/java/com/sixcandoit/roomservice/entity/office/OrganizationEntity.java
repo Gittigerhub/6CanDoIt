@@ -6,6 +6,7 @@ import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.event.EventEntity;
+import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -71,6 +72,10 @@ public class OrganizationEntity extends BaseEntity {
     // 매장 상세 테이블과 1:1 매핑
     @OneToOne(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private ShopDetailEntity shopDetailJoin;
+
+    // 메뉴 테이블과 1:N 매핑
+    @OneToMany(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MenuEntity> menuJoin;
 
     // 룸 테이블과 1:N 매핑
     @OneToMany(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)

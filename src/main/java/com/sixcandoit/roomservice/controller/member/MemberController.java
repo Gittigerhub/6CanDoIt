@@ -2,12 +2,16 @@ package com.sixcandoit.roomservice.controller.member;
 
 import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.service.member.MemberService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -196,13 +200,22 @@ public class MemberController {
 
     // 마이페이지
     @GetMapping("/mypage")
-    public String myPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    public String myPage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                         @PageableDefault(page=1) Pageable page, Model model) {
+
+        // 회원정보 조회
         MemberDTO memberDTO = memberService.read(userDetails.getUsername());
-        model.addAttribute("memberDTO", memberDTO);
 
         // 사용자의 예약 목록 조회
         List<ReservationDTO> reservations = reservationService.getUserReservations(userDetails.getUsername());
+
+        // 서비스에 주문 내역 조회 요청
+        Page<OrdersDTO> ordersDTOS = memberService.memberOrderList(memberDTO.getMemberEmail(), page);
+
+        // 뷰로 데이터 전달
+        model.addAttribute("memberDTO", memberDTO);
         model.addAttribute("reservations", reservations);
+        model.addAttribute("ordersDTOS", ordersDTOS);
 
         return "member/mypage";
     }

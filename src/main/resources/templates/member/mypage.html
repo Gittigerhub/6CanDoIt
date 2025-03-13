@@ -51,9 +51,6 @@
                 <div class="col-md-8">
                     <h4>예약 내역</h4>
                 </div>
-                <div class="col-md-4 text-end">
-                    <a href="/member/verify" class="btn btn-primary">더보기</a>
-                </div>
             </div>
             <div class="card-body my-3">
                 <div class="table-responsive">
@@ -100,7 +97,7 @@
                     <h4>주문 내역</h4>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="/member/verify" class="btn btn-primary">더보기</a>
+                    <a href="/member/orders" class="btn btn-primary">상세 보기</a>
                 </div>
             </div>
             <div class="card-body my-3">
@@ -112,17 +109,19 @@
                             <th>주문 일자</th>
                             <th>금액</th>
                             <th>상태</th>
-                            <th>상세보기</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="order : ${orders}">
-                            <td th:text="${order.id}">67890</td>
-                            <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd')}">2024-03-09</td>
-                            <td th:text="${#numbers.formatCurrency(order.totalAmount)}">50,000원</td>
-                            <td th:text="${order.status}">배송완료</td>
+                        <tr th:each="order : ${ordersDTOS}">
+                            <td th:text="${order.idx}">67890</td>
+                            <td th:text="${#temporals.format(order.insDate, 'yyyy-MM-dd')}">2024-03-09</td>
+                            <td th:text="${#numbers.formatCurrency(order.totalAmount)}"></td>
                             <td>
-                                <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-sm btn-info">상세보기</a>
+                                <span th:if="${order.ordersStatus == 'NEW'}" class="badge bg-secondary">신규 주문</span>
+                                <span th:if="${order.ordersStatus == 'CHECK'}" class="badge bg-primary">주문 확인</span>
+                                <span th:if="${order.ordersStatus == 'COOKING'}" class="badge bg-danger">조리 진행</span>
+                                <span th:if="${order.ordersStatus == 'CANCEL'}" class="badge bg-danger">주문 취소</span>
+                                <span th:if="${order.ordersStatus == 'CLOSE'}" class="badge bg-danger">주문 완료</span>
                             </td>
                         </tr>
                         </tbody>

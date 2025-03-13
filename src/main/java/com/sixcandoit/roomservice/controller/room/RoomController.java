@@ -60,19 +60,12 @@ public class RoomController {
                         @RequestParam(value = "keyword", defaultValue = "") String keyword,
                         @RequestParam(value = "order", defaultValue = "") String order,
                         @RequestParam(required = false) Integer organ_idx,
+                        @RequestParam(value = "roomType", defaultValue = "") String roomType,
                         Model model) {
-
         log.info("룸 목록을 출력합니다.");
 
         // 조직별 룸 목록 조회
-        Page<RoomDTO> roomDTOS;
-        if (organ_idx != null) {
-            log.info("조직별 룸 목록을 조회합니다. organ_idx: " + organ_idx);
-            roomDTOS = roomService.getRoomsByOrganization(organ_idx, page);
-        } else {
-            log.info("전체 룸 목록을 조회합니다.");
-            roomDTOS = roomService.roomList(page, type, keyword, order);
-        }
+        Page<RoomDTO> roomDTOS = roomService.roomList(page, type, keyword, order, organ_idx, roomType);
         
         // 페이지 정보 생성
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(roomDTOS);
@@ -102,6 +95,7 @@ public class RoomController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("order", order);
         model.addAttribute("organ_idx", organ_idx);
+        model.addAttribute("roomType", roomType);
 
         // 이미지 정보를 모델에 추가
         model.addAttribute("imageFileMap", imageFileMap);

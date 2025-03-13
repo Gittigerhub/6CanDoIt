@@ -169,63 +169,56 @@ public class RoomService {
     }
 
     // 객실 관리 - 룸 목록
-    public Page<RoomDTO> roomList(Pageable page, String type, String keyword, String order){
+    public Page<RoomDTO> roomList(Pageable page, String type, String keyword, String order, Integer organ_idx, String roomType){
+        int currentPage = page.getPageNumber()-1;
+        int pageLimit = 5;
 
-        int currentPage = page.getPageNumber()-1; // 화면의 페이지 번호를 db 페이지 번호로
-        int pageLimit = 5; // 한 페이지를 구성하는 레코드 수
-
-        // 지정된 내용으로 페이지 정보를 재생산, 정렬 내림차순 DESC
         Pageable pageable;
 
-        // 가격 순서 (ASC/DESC)에 따라 정렬 처리
         if ("ASC".equals(order)) {
-            pageable = PageRequest.of(currentPage, pageLimit, Sort.by(Sort.Direction.ASC, "roomPrice")); // 가격 올림차순
+            pageable = PageRequest.of(currentPage, pageLimit, Sort.by(Sort.Direction.ASC, "roomPrice"));
         } else if ("DESC".equals(order)) {
-            pageable = PageRequest.of(currentPage, pageLimit, Sort.by(Sort.Direction.DESC, "roomPrice")); // 가격 내림차순
+            pageable = PageRequest.of(currentPage, pageLimit, Sort.by(Sort.Direction.DESC, "roomPrice"));
         } else {
-            pageable = PageRequest.of(currentPage, pageLimit, Sort.by(Sort.Direction.DESC, "idx")); // 기본 정렬
+            pageable = PageRequest.of(currentPage, pageLimit, Sort.by(Sort.Direction.DESC, "idx"));
         }
 
-        // 조회한 변수를 선언
-        // type : 룸 타입(1), 룸 이름(2), 조식 있음(3), 전체(0)
         Page<RoomEntity> roomEntities;
 
-        if (type.equals("3")) { // type 분류 3, 조식 있음만 출력
-            log.info("조식 있음만 출력하는 중...");
-            roomEntities = roomRepository.searchRoomBreakfast(pageable);
-        } else if (type.equals("4")) {
-            log.info("빈 방만 출력하는 중...");
-            roomEntities = roomRepository.searchRes1(pageable);
-        } else if (type.equals("5")) {
-            log.info("예약중만 출력하는 중...");
-            roomEntities = roomRepository.searchRes2(pageable);
-        } else if (type.equals("6")) {
-            log.info("체크인만 출력하는 중...");
-            roomEntities = roomRepository.searchRes3(pageable);
-        } else if (type.equals("7")) {
-            log.info("체크아웃만 출력하는 중...");
-            roomEntities = roomRepository.searchRes4(pageable);
+        // 조직별 검색인 경우
+        if (organ_idx != null) {
+            if (type.equals("1") && roomType != null && !roomType.isEmpty()) {
+                // 객실 타입으로 검색
+                roomEntities = roomRepository.findByOrganIdxAndRoomType(organ_idx, roomType, pageable);
+            } else if (keyword != null && !keyword.isEmpty()) {
+                if (type.equals("1")) {
+                    roomEntities = roomRepository.searchRoomTypeByOrgan(keyword, organ_idx, pageable);
+                } else if (type.equals("2")) {
+                    roomEntities = roomRepository.searchRoomNameByOrgan(keyword, organ_idx, pageable);
+                } else {
+                    roomEntities = roomRepository.findByOrganIdx(organ_idx, pageable);
+                }
+            } else {
+                roomEntities = roomRepository.findByOrganIdx(organ_idx, pageable);
+            }
         } else {
-            // keyword가 존재하는 경우 검색
-            if (keyword != null && !keyword.isEmpty()) { // 검색어가 존재하면
-                log.info("검색어가 존재하면...");
-                if (type.equals("1")) { // type 분류 1, 타입으로 검색할 때
-                    log.info("타입으로 검색을 하는 중...");
+            // 기존 검색 로직
+            if (type.equals("1") && roomType != null && !roomType.isEmpty()) {
+                // 객실 타입으로 검색
+                roomEntities = roomRepository.findByRoomType(roomType, pageable);
+            } else if (keyword != null && !keyword.isEmpty()) {
+                if (type.equals("1")) {
                     roomEntities = roomRepository.searchRoomType(keyword, pageable);
-                } else if (type.equals("2")) { // type 분류 2, 이름으로 검색할 때
-                    log.info("이름으로 검색을 하는 중...");
+                } else if (type.equals("2")) {
                     roomEntities = roomRepository.searchRoomName(keyword, pageable);
-                } else { // 전체 검색 = 0
-                    log.info("전체 조회 검색 중...");
+                } else {
                     roomEntities = roomRepository.findAll(pageable);
                 }
-            } else { // 검색어가 존재하지 않으면 모두 검색
-                log.info("검색어가 존재하지 않으면 모두 검색...");
+            } else {
                 roomEntities = roomRepository.findAll(pageable);
             }
         }
 
-        // Entity를 DTO로 변환 후 저장
         Page<RoomDTO> roomDTOS = roomEntities.map(
                 data->modelMapper.map(data, RoomDTO.class));
 

@@ -29,6 +29,111 @@
             text-decoration: none; /* 밑줄 없애기 */
             color: black; /* 글자 색을 검은색으로 변경 */
         }
+        /* 테이블 스타일 추가 */
+        .table {
+            border: 1px solid #dee2e6;
+            margin-bottom: 1rem;
+            background-color: #fff;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            padding: 1rem;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 600;
+            color: #495057;
+            white-space: nowrap;  /* 헤더 텍스트가 줄바꿈되지 않도록 */
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+        }
+
+        .table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 클릭 가능한 행에 대한 스타일 */
+        .table tbody tr[onclick] {
+            cursor: pointer;
+        }
+
+        /* 버튼 스타일 개선 */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* 뱃지 스타일 개선 */
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+        }
+
+        .badge.text-bg-light {
+            color: #666 !important;
+            background-color: #f8f9fa !important;
+            border-color: #dee2e6 !important;
+        }
+
+        .badge.text-bg-light:hover {
+            background-color: #e9ecef !important;
+        }
+
+        .badge.text-bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        /* 게시글 목록 제목 스타일 */
+        .table-title {
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        /* 셀렉트 박스 스타일 */
+        .form-select {
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .form-select option {
+            padding: 8px 12px;
+        }
+
+        .form-select option:disabled {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            margin: 8px 0;
+            cursor: default;
+        }
+
+        .form-select option:not(:disabled) {
+            padding-left: 12px;
+            margin: 4px 0;
+        }
+
+        .search-select {
+            max-width: 140px;
+        }
+
+        .status-select {
+            max-width: 160px;
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -41,8 +146,9 @@
                 <div class="mb-3">
                     <h3>객실 검색</h3>
                 </div>
+                <input type="hidden" name="organ_idx" th:value="${organ_idx}">
                 <div class="col-2">
-                    <select class="form-select" name="type">
+                    <select class="form-select" name="type" onchange="this.form.submit()">
                         <option value="0" th:selected="${type == '0'}">전체</option>
                         <option value="1" th:selected="${type == '1'}">객실 타입</option>
                         <option value="2" th:selected="${type == '2'}">객실 이름</option>
@@ -54,20 +160,34 @@
                     </select>
                 </div><!--검색 분류-->
                 <div class="col-2">
+                    <select class="form-select" name="roomType" th:disabled="${type != '1' || type == null}">
+                        <option value="">타입</option>
+                        <option value="STD" th:selected="${roomType == 'STD'}">스탠다드</option>
+                        <option value="ROH" th:selected="${roomType == 'ROH'}">런 오브 하우스</option>
+                        <option value="MOD" th:selected="${roomType == 'MOD'}">모더레이트</option>
+                        <option value="SUP" th:selected="${roomType == 'SUP'}">슈페리어</option>
+                        <option value="DLX" th:selected="${roomType == 'DLX'}">디럭스</option>
+                        <option value="STU" th:selected="${roomType == 'STU'}">스튜디오</option>
+                        <option value="JRSTE" th:selected="${roomType == 'JRSTE'}">쥬니어 스위트</option>
+                        <option value="STE" th:selected="${roomType == 'STE'}">스위트</option>
+                        <option value="PH" th:selected="${roomType == 'PH'}">팬트하우스</option>
+                    </select>
+                </div><!--객실 타입 선택-->
+                <div class="col-2">
                     <select class="form-select" name="order">
                         <option value="" th:selected="${order == ''}">기본</option>
                         <option value="ASC" th:selected="${order == 'ASC'}">가격 낮은순</option>
                         <option value="DESC" th:selected="${order == 'DESC'}">가격 높은순</option>
                     </select>
                 </div><!--가격순-->
-                <div class="col-4">
+                <div class="col-2">
                     <input type="text" class="form-control" name="keyword" th:value="${keyword}">
                 </div><!--검색어-->
                 <div class="col-2">
-                    <button type="submit" class="btn btn-primary">검색</button>
+                    <button type="submit" class="btn btn-success">검색</button>
                 </div><!--검색버튼-->
-                <div class="col-1">
-                    <a th:href="@{/room/register(organ_idx=${organ_idx})}" class="btn btn-primary">등록</a>
+                <div class="col-2">
+                    <a th:href="@{/room/register(organ_idx=${organ_idx})}" class="btn btn-primary btn-lg">객실 등록</a>
                 </div><!--추가버튼-->
             </div>
         </form>  <!--검색 기능(keyword) 끝-->
@@ -79,7 +199,7 @@
             </div>
             <div class="col"></div>
             <div class="col-12">
-                <table class="table table-hover w-100">
+                <table class="table table-hover w-100 shadow-sm">
                     <thead class="table table-dark">
                     <tr>
                         <th>No</th>
@@ -94,7 +214,7 @@
                     </thead>
                     <tbody>
                     <!--Controller에서 전달받은 list로 반복처리-->
-                    <tr th:each="data : ${roomDTOS.content}">
+                    <tr th:each="data : ${roomDTOS.content}" th:onclick="'window.location.href=\'' + @{detail(idx=${data.idx})} + '\''">
                         <td th:text="${data.idx}"></td>
                         <td>
                             <!-- 대표 이미지가 없을때 나오는 이미지 -->
@@ -114,20 +234,19 @@
                             </th:block>
                         </td>
                         <td>
-                            <!--객실 타입-->
-                            <a th:href="@{detail(idx=${data.idx})}">
-                                <h5 th:if="${data.roomType == 'STD'}">스탠다드</h5>
-                                <h5 th:if="${data.roomType == 'ROH'}">런 오브 하우스</h5>
-                                <h5 th:if="${data.roomType == 'MOD'}">모더레이트</h5>
-                                <h5 th:if="${data.roomType == 'SUP'}">슈페리어</h5>
-                                <h5 th:if="${data.roomType == 'DLX'}">디럭스</h5>
-                                <h5 th:if="${data.roomType == 'STU'}">스튜디오</h5>
-                                <h5 th:if="${data.roomType == 'JRSTE'}">쥬니어 스위트</h5>
-                                <h5 th:if="${data.roomType == 'STE'}">스위트</h5>
-                                <h5 th:if="${data.roomType == 'PH'}">팬트하우스</h5>
-                                <!--객실 이름-->
-                                <h5 th:text="${data.roomName}"></h5>
-                            </a>
+                            <!--객실 타입과 이름-->
+                            <h5 style="margin: 0; display: inline-block;">
+                                <span th:if="${data.roomType == 'STD'}">스탠다드</span>
+                                <span th:if="${data.roomType == 'ROH'}">런 오브 하우스</span>
+                                <span th:if="${data.roomType == 'MOD'}">모더레이트</span>
+                                <span th:if="${data.roomType == 'SUP'}">슈페리어</span>
+                                <span th:if="${data.roomType == 'DLX'}">디럭스</span>
+                                <span th:if="${data.roomType == 'STU'}">스튜디오</span>
+                                <span th:if="${data.roomType == 'JRSTE'}">쥬니어 스위트</span>
+                                <span th:if="${data.roomType == 'STE'}">스위트</span>
+                                <span th:if="${data.roomType == 'PH'}">팬트하우스</span>
+                                <span th:text="${' ' + data.roomName}"></span>
+                            </h5>
                             <p><!--침대 타입-->
                                 <span th:if="${data.roomBed == 0}">싱글 침대</span>
                                 <span th:if="${data.roomBed == 1}">더블 침대</span>

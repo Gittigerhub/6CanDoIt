@@ -40,22 +40,34 @@ public class UserMemberPointService {
                 Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
                 System.out.println("실행중:" + pageable.getPageNumber());
                 Page<MemberPointEntity> memberPointEntities;
-                System.out.println("서비스에 들어오는 타입:"+type);
-                if (!keyword.isEmpty()) {
+                System.out.println("서비스에 들어오는 타입:" + type);
+                if (!type.isEmpty()) {
                     switch (type) {
-                        case "1" -> {
+                        case "1":
                             log.info("포인트 내용으로 검색하는 중");
-                            memberPointEntities = memberPointRepository.findByContents(keyword, pageable);
-                        }
-                        case "2" -> {
+                            if(keyword != null) {
+                                memberPointEntities = memberPointRepository.findByContents(keyword, pageable);
+                                break;
+                            }
+
+
+
+                        case "2":
                             log.info("포인트 사용기간으로 검색하는 중");
-                            memberPointEntities = memberPointRepository.findByDateRange(startDate, endDate, pageable);
-                        }
-                        case "3" -> {
+                            if(startDate != null && endDate != null) {
+                                memberPointEntities = memberPointRepository.findByDateRange(startDate, endDate, pageable);
+                                break;
+                            }
+
+                        case "3":
                             log.info("포인트 사용가능으로 검색");
-                            memberPointEntities = memberPointRepository.findByPointOperationYn(keyword, pageable);
-                        }
-                        default -> memberPointEntities = memberPointRepository.findAll(pageable);
+                            if(keyword != null) {
+                                memberPointEntities = memberPointRepository.findByPointOperationYn(keyword, pageable);
+                                break;
+                            }
+
+                        default:
+                            memberPointEntities = memberPointRepository.findAll(pageable);
                     }
                 } else {
                     log.info("모든 대상으로 검색");
@@ -117,7 +129,7 @@ public class UserMemberPointService {
     출력 : 없음
     설명 : 유저가 포인트를 자세히 보기할 때
     ---------------------------------------------------*/
-    public MemberPointDTO read (Integer idx){
+    public MemberPointDTO read(Integer idx) {
         try {
             Optional<MemberPointEntity> read = memberPointRepository.findById(idx);
             if (!read.isPresent()) {

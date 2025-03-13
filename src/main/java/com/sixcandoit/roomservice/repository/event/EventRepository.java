@@ -24,7 +24,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
     Page<EventEntity> findByActiveYn(@Param("keyword") String keyword, Pageable pageable);
 
     //포인트 기간으로 검색
-    @Query("SELECT e FROM EventEntity e WHERE e.eventStartDate <= :endDate AND e.eventEndDate >= :startDate")
+    @Query("SELECT e FROM EventEntity e WHERE e.eventEndDate <=:endDate  AND e.eventStartDate >=:startDate")
     Page<EventEntity> findByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
 

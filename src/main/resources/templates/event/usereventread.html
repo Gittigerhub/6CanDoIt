@@ -23,8 +23,16 @@
                     </div>
                     <br>
                     <div class="col-12" style="text-align: center;">
+                        <th:block th:if="${eventDTORead.eventTitleImg}!=null">
                         <img th:src="${eventDTORead.eventTitleImg}" style="width: 850px; height: 600px;">
+                        </th:block>
+                        <th:block th:if="${eventDTORead.eventTitleImg}==null">
+                        </th:block>
+                        <th:block th:if="${eventDTORead.eventImg}!=null">
                         <img th:src="${eventDTORead.eventImg}" style="width: 850px; height: 600px;">
+                        </th:block>
+                        <th:block th:if="${eventDTORead.eventImg}==null">
+                        </th:block>
                     </div>
                     <div class="col-12" style="display: flex; justify-content: space-between ;">
                         <th:block th:if="${eventDTORead.activeYn}=='Y'">

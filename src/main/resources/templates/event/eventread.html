@@ -25,10 +25,12 @@
                     <div class="card-body">
                         <div class="col-12" style="display: flex; justify-content: space-between ;">
                             <th:block th:if="${eventDTORead.activeYn}=='Y'">
-                                <div class="col-4 text-primary" style="flex: 1; text-align: left"><span>이벤트 진행중</span></div>
+                                <div class="col-4 text-primary" style="flex: 1; text-align: left"><span>이벤트 진행중</span>
+                                </div>
                             </th:block>
                             <th:block th:if="${eventDTORead.activeYn}=='N'">
-                                <div class="col-4 text-danger" style="flex: 1; text-align: left"><span>이벤트 종료</span></div>
+                                <div class="col-4 text-danger" style="flex: 1; text-align: left"><span>이벤트 종료</span>
+                                </div>
                             </th:block>
                             <div class="col-4" style="flex: 1; text-align: right;"
                                  th:text="${#temporals.format(eventDTORead.eventStartDate, 'yy-MM-dd')}+'~'
@@ -37,10 +39,18 @@
                         <br>
                         <div class="col-12" style="text-align: center;">
                             <div>타이틀 사진</div>
-                            <img th:src="${eventDTORead.eventTitleImg}" style="width: 850px; height: 600px;">
+                            <th:block th:if="${eventDTORead.eventTitleImg}!=null">
+                                <img th:src="${eventDTORead.eventTitleImg}" style="width: 850px; height: 600px;">
+                            </th:block>
+                            <th:block th:if="${eventDTORead.eventTitleImg}==null">
+                            </th:block>
                             <hr>
                             <div>메인 사진</div>
-                            <img th:src="${eventDTORead.eventImg}" style="width: 850px; height: 600px;">
+                            <th:block th:if="${eventDTORead.eventImg}!=null">
+                                <img th:src="${eventDTORead.eventImg}" style="width: 850px; height: 600px;">
+                            </th:block>
+                            <th:block th:if="${eventDTORead.eventImg}==null">
+                            </th:block>
                             <hr>
                         </div>
                         <div class="card-footer">
@@ -50,7 +60,7 @@
                     </div>
                 </div>
                 <a style="float: right" class="btn btn-success" th:href="@{/event/event}" type="submit">목록</a>
-                <a type="submit" class="btn btn-primary" th:href="@{/event/eventupdate(idx=${eventDTORead.idx})}">수정</a>
+                <a style="float: right" type="submit" class="btn btn-primary" th:href="@{/event/eventupdate(idx=${eventDTORead.idx})}">수정</a>
             </div>
         </div>
 

@@ -136,6 +136,7 @@
 
             <!-- 수정/취소 버튼 시작 -->
             <div class="d-flex justify-content-end mt-5">
+                <button type="button" class="btn btn-outline-primary mx-4 btn-adlistmenu" th:data-organ-idx="${organDTO.idx}">메뉴 관리</button>
                 <button type="button" class="btn btn-success btn-update" th:data-id="${organDTO.idx}">수정</button>
                 <button type="button" class="btn btn-danger mx-4 btn-delete">삭제</button>
                 <button type="button" class="btn btn-secondary"><a th:href="@{/office/list}" style="text-decoration: none; color: white">목록</a></button>
@@ -768,6 +769,16 @@
 
                 });
                 // 대화상자에서 수정버튼 클릭시 Controller 처리 끝
+            });
+
+            // 버튼 클릭 시 메뉴 목록으로 이동
+            document.querySelectorAll(".btn-adlistmenu").forEach(function(button) {
+                button.addEventListener("click", function() {
+                    var organIdx = this.getAttribute("data-organ-idx"); // 버튼에 설정된 organIdx 값 가져오기
+
+                // 메뉴 목록 페이지로 이동 (organIdx를 쿼리 파라미터로 넘기기)
+                    window.location.href = "/admin/menu/adlistmenu?organIdx=" + organIdx + "&page=1&type=&keyword=";
+                });
             });
             // document 끝
         </script>

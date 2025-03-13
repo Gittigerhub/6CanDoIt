@@ -114,14 +114,17 @@
                         <tbody>
                         <tr th:each="order : ${ordersDTOS}">
                             <td th:text="${order.idx}">67890</td>
-                            <td th:text="${#temporals.format(order.insDate, 'yyyy-MM-dd')}">2024-03-09</td>
-                            <td th:text="${#numbers.formatCurrency(order.totalAmount)}"></td>
+                            <td th:text="${#temporals.format(order.insDate, 'yyyy-MM-dd HH:MM')}">2024-03-09</td>
                             <td>
-                                <span th:if="${order.ordersStatus == 'NEW'}" class="badge bg-secondary">신규 주문</span>
-                                <span th:if="${order.ordersStatus == 'CHECK'}" class="badge bg-primary">주문 확인</span>
-                                <span th:if="${order.ordersStatus == 'COOKING'}" class="badge bg-danger">조리 진행</span>
-                                <span th:if="${order.ordersStatus == 'CANCEL'}" class="badge bg-danger">주문 취소</span>
-                                <span th:if="${order.ordersStatus == 'CLOSE'}" class="badge bg-danger">주문 완료</span>
+                                <span th:text="${#numbers.formatInteger(order.totalAmount, 1, 'COMMA')}"></span>
+                                <span>원</span>
+                            </td>
+                            <td>
+                                <span th:if="${order.ordersStatus.name() == 'NEW'}" class="badge bg-secondary">신규 주문</span>
+                                <span th:if="${order.ordersStatus.name() == 'CHECK'}" class="badge bg-secondary">주문 확인</span>
+                                <span th:if="${order.ordersStatus.name() == 'COOKING'}" class="badge bg-secondary">조리 진행</span>
+                                <span th:if="${order.ordersStatus.name() == 'CANCEL'}" class="badge bg-danger">주문 취소</span>
+                                <span th:if="${order.ordersStatus.name() == 'CLOSE'}" class="badge bg-primary">주문 완료</span>
                             </td>
                         </tr>
                         </tbody>

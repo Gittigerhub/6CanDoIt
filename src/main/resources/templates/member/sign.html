@@ -24,7 +24,6 @@
                 width: 80%;
                 margin: 120px auto;
             }
-
             h1 {
                 color: #333333;
                 font-size: 48px;
@@ -551,7 +550,11 @@
             <div class="input__block signup-input__block">
                 <div class="address-input">
                     <input type="email" id="memberEmail" name="memberEmail" placeholder="이메일" required>
-                    <input type="button" value="이메일 인증">
+                    <button type="button" class="btn" id="emailSendBtn">인증</button><!-- 계정 인증 이메일 발송 버튼 -->
+                </div>
+                <div class="input-group">
+                    <input type="text" class="email-input" name="emailCheck" id="authenticationCode" placeholder="이메일 인증번호">
+                    <button type="button" class="btn" id="emailCheckBtn">확인</button><!-- 계정 인증 이메일 체크 버튼 -->
                 </div>
             </div>
             <div class="input__block">
@@ -1016,6 +1019,54 @@ E-mail : himyeongsun@gmail.com
 
 <th:block layout:fragment="script">
     <script>
+
+        var emailCheckYN = 0;
+        $("#emailSendBtn").on("click", function () {
+
+            console.log("코드 발송 접근")
+            $.ajax({
+                url: '/member/sendEmailCode',
+                method: 'POST',
+                data: {'email': $("#memberEmail").val()},
+                dataType: 'text',
+                success: function (data) {
+                    console.log("메일 발송 완료" + data)
+                },
+                error(xhr, status, err) {
+
+                    console.log(xhr, status, err)
+                }
+            });
+        })
+
+        $("#emailCheckBtn").on("click", function(){
+            console.log("이메일 체크 접근")
+            $.ajax({
+                url:'/member/checkEmailCode',
+                method: 'POST',
+                dataType:'text',
+                data:{'email':$("#memberEmail").val(),
+                    'authenticationCode' : $("#authenticationCode").val()
+                },
+                success: function (data){
+                    if(data==="1"){
+                        alert("인증 성공")
+                        emailCheckYN = 1;
+                        $("#memberEmail").attr("readonly", true)
+                    }
+                    else if(data==="0"){
+                        alert("인증번호가 일치하지 않습니다.")
+                    }
+                },
+                error(xhr, status, err){
+                    console.log(xhr, status, err)
+                }
+
+
+
+            })
+
+        })
         // 폼 전환 함수
         function showLoginForm() {
             document.querySelector('.login-form').style.display = 'block';

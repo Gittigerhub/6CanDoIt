@@ -107,8 +107,9 @@
 
             <!-- 수정/취소 버튼 -->
             <div class="d-flex justify-content-end mt-5">
-                <button type="button" class="btn btn-success mx-4" id="btn-update" th:data-id="${advertisementDTO.idx}">수정</button>
-                <button type="button" class="btn btn-danger btn-delete" th:data-id="${advertisementDTO.idx}">삭제</button>
+                <button type="button" class="btn btn-success ms-2" id="btn-update" th:data-id="${advertisementDTO.idx}">수정</button>
+                <button type="button" class="btn btn-danger btn-delete ms-2" th:data-id="${advertisementDTO.idx}">삭제</button>
+                <button type="button" class="btn btn-secondary ms-2"><a th:href="@{/advertisement/list}" style="text-decoration: none; color: white">목록</a></button>
             </div>
         </div>
 
@@ -483,12 +484,12 @@
                         $('#adEndDate').val(response.advertisementDTO.adEndDate);
                         $('#adState').val(response.advertisementDTO.adState);
                         $('#adHits').val(response.advertisementDTO.adHits);
-                        $('#organName').val(response.advertisementDTO.organization.organName);
-                        $('#organType').val(response.advertisementDTO.organization.organType);
-                        $('#organAddress').val(response.advertisementDTO.organization.organAddress);
-                        $('#organIdx').val(response.advertisementDTO.organization.idx);
-                        $('#activeYn').val(response.advertisementDTO.organization.activeYn);
-                        $('#organTel').val(response.advertisementDTO.organization.organTel);
+                        $('#organName').val(response.advertisementDTO.organizationJoin.organName);
+                        $('#organType').val(response.advertisementDTO.organizationJoin.organType);
+                        $('#organAddress').val(response.advertisementDTO.organizationJoin.organAddress);
+                        $('#organIdx').val(response.advertisementDTO.organizationJoin.idx);
+                        $('#activeYn').val(response.advertisementDTO.organizationJoin.activeYn);
+                        $('#organTel').val(response.advertisementDTO.organizationJoin.organTel);
 
                         //대화창 출력
                         $('#updatemodal').modal('show');
@@ -536,7 +537,7 @@
                     organAddress: $('#organAddress').val(),
                     organTel: $('#organTel').val()
                 };
-                formData.append("organization", JSON.stringify(organization));
+                formData.append("organizationJoin", JSON.stringify(organization));
 
                 // FormData 내부 데이터 확인 (디버깅)
                 for (var pair of formData.entries()) {

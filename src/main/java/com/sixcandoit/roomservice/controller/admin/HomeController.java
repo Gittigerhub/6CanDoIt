@@ -32,4 +32,11 @@ public class HomeController {
         session.setAttribute("adminName", adminDTO.getAdminName());
         return "boindex";
     }
+
+    @GetMapping("/guest")
+    public String guestIndexForm(HttpSession session, AdminDTO adminDTO) {
+        log.info("게스트 페이지 진입");
+        session.setAttribute("adminName", adminDTO.getAdminName());
+        return "guestindex";
+    }
 }

@@ -24,7 +24,6 @@
                 width: 80%;
                 margin: 120px auto;
             }
-
             h1 {
                 color: #333333;
                 font-size: 48px;
@@ -223,30 +222,30 @@
                 width: 45%;
             }
 
-            .google__btn {
-                display: block;
-                width: 90%;
-                max-width: 680px;
-                margin: 20px auto;
-                height: 50px;
-                cursor: pointer;
-                font-size: 14px;
-                font-family: "Montserrat", sans-serif;
-                border-radius: 8px;
-                border: none;
-                line-height: 40px;
-                background: #5b90f0;
-                color: white;
-                box-shadow: 0 15px 30px rgba(91, 144, 240, 0.36);
-                transition: 0.2s linear;
-            }
-            .google__btn .fa {
-                font-size: 20px;
-                padding: 0 5px 0 0;
-            }
-            .google__btn:hover {
-                box-shadow: 0 0 0 rgba(91, 144, 240, 0);
-            }
+            /*.google__btn {*/
+            /*    display: block;*/
+            /*    width: 90%;*/
+            /*    max-width: 680px;*/
+            /*    margin: 20px auto;*/
+            /*    height: 50px;*/
+            /*    cursor: pointer;*/
+            /*    font-size: 14px;*/
+            /*    font-family: "Montserrat", sans-serif;*/
+            /*    border-radius: 8px;*/
+            /*    border: none;*/
+            /*    line-height: 40px;*/
+            /*    background: #5b90f0;*/
+            /*    color: white;*/
+            /*    box-shadow: 0 15px 30px rgba(91, 144, 240, 0.36);*/
+            /*    transition: 0.2s linear;*/
+            /*}*/
+            /*.google__btn .fa {*/
+            /*    font-size: 20px;*/
+            /*    padding: 0 5px 0 0;*/
+            /*}*/
+            /*.google__btn:hover {*/
+            /*    box-shadow: 0 0 0 rgba(91, 144, 240, 0);*/
+            /*}*/
 
             footer p {
                 text-align: center;
@@ -549,7 +548,14 @@
         <!-- 회원가입 폼 -->
         <form id="signupForm" class="signup-form" th:action="@{/member/register}" method="post" onsubmit="return validateForm() && validatePassword() && combineAddress()">
             <div class="input__block signup-input__block">
-                <input type="email" name="memberEmail" placeholder="이메일" required>
+                <div class="address-input">
+                    <input type="email" id="memberEmail" name="memberEmail" placeholder="이메일" required>
+                    <button type="button" class="btn" id="emailSendBtn">인증</button><!-- 계정 인증 이메일 발송 버튼 -->
+                </div>
+                <div class="input-group">
+                    <input type="text" class="email-input" name="emailCheck" id="authenticationCode" placeholder="이메일 인증번호">
+                    <button type="button" class="btn" id="emailCheckBtn">확인</button><!-- 계정 인증 이메일 체크 버튼 -->
+                </div>
             </div>
             <div class="input__block">
                 <input type="password" name="password" id="password" placeholder="비밀번호" required>
@@ -560,15 +566,17 @@
                 <div id="confirmPasswordValid" class="valid-feedback">비밀번호가 일치합니다.</div>
             </div>
             <div class="input__block">
-                <input type="text" name="memberName" placeholder="이름" required>
+                <input type="text" name="memberName" id="memberName" placeholder="이름" required>
             </div>
             <div class="input__block">
-                <input type="tel" name="memberPhone" placeholder="전화번호" required>
+                <input type="tel" name="memberPhone" id="memberPhone" placeholder="전화번호" required>
+                <div id="confirmPhoneFeedback" class="invalid-feedback">잘못된 전화번호 형식입니다.</div>
+                <div id="confirmPhoneValid" class="valid-feedback">올바른 전화번호 형식입니다.</div>
             </div>
             <div class="input__block">
                 <div class="radio-group with-bg">
                     <label>생년월일</label>
-                    <input type="date" name="memberBirth" required style="background: transparent;">
+                    <input type="date" name="memberBirth" id="memberBirth" style="background: transparent;" max="9999-12-31" required>
                 </div>
             </div>
             <div class="input__block">
@@ -922,16 +930,6 @@ E-mail : himyeongsun@gmail.com
                         </div>
                     </div>
                 </div>
-                <!--                <div class="terms-section collapsed">-->
-                <!--                    <h5>[선택] 마케팅 정보 수신 동의</h5>-->
-                <!--                    <div class="terms-content">-->
-                <!--                        <textarea readonly>마케팅 정보 수신에 대한 내용이 들어갑니다...</textarea>-->
-                <!--                        <div class="form-check">-->
-                <!--                            <input type="checkbox" id="marketingTerms">-->
-                <!--                            <label for="marketingTerms">마케팅 정보 수신에 동의합니다.</label>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                </div>-->
                 <div class="form-check all-terms">
                     <input type="checkbox" id="allTerms">
                     <label for="allTerms">모든 약관에 동의합니다.</label>
@@ -952,30 +950,14 @@ E-mail : himyeongsun@gmail.com
             <div id="resetMessage" style="text-align: center; margin-top: 10px;"></div>
         </form>
 
-        <div class="separator">또는</div>
+<!--        <div class="separator">또는</div>-->
 
-        <button class="google__btn">
-            <i class="fa fa-google"></i> Google로 계속하기
-        </button>
+<!--        <button class="google__btn">-->
+<!--            <i class="fa fa-google"></i> Google로 계속하기-->
+<!--        </button>-->
     </div>
-    <!-- 이메일 중복 시 띄울 모달 -->
-    <div class="modal fade" id="emailMismatchModal" tabindex="-1" aria-labelledby="emailMismatchModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="emailMismatchModalLabel">이메일 확인</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    이미 가입된 이메일입니다.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
 
     <!-- 비밀번호 불일치 시 띄울 모달 -->
     <div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel"
@@ -988,6 +970,25 @@ E-mail : himyeongsun@gmail.com
                 </div>
                 <div class="modal-body">
                     비밀번호가 일치하지 않습니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이메일 중복 시 띄울 모달 -->
+    <div class="modal fade" id="emailMismatchModal" tabindex="-1" aria-labelledby="emailMismatchModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailMismatchModalLabel">이메일 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    이미 가입된 이메일입니다.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -1018,6 +1019,54 @@ E-mail : himyeongsun@gmail.com
 
 <th:block layout:fragment="script">
     <script>
+
+        var emailCheckYN = 0;
+        $("#emailSendBtn").on("click", function () {
+
+            console.log("코드 발송 접근")
+            $.ajax({
+                url: '/member/sendEmailCode',
+                method: 'POST',
+                data: {'email': $("#memberEmail").val()},
+                dataType: 'text',
+                success: function (data) {
+                    console.log("메일 발송 완료" + data)
+                },
+                error(xhr, status, err) {
+
+                    console.log(xhr, status, err)
+                }
+            });
+        })
+
+        $("#emailCheckBtn").on("click", function(){
+            console.log("이메일 체크 접근")
+            $.ajax({
+                url:'/member/checkEmailCode',
+                method: 'POST',
+                dataType:'text',
+                data:{'email':$("#memberEmail").val(),
+                    'authenticationCode' : $("#authenticationCode").val()
+                },
+                success: function (data){
+                    if(data==="1"){
+                        alert("인증 성공")
+                        emailCheckYN = 1;
+                        $("#memberEmail").attr("readonly", true)
+                    }
+                    else if(data==="0"){
+                        alert("인증번호가 일치하지 않습니다.")
+                    }
+                },
+                error(xhr, status, err){
+                    console.log(xhr, status, err)
+                }
+
+
+
+            })
+
+        })
         // 폼 전환 함수
         function showLoginForm() {
             document.querySelector('.login-form').style.display = 'block';
@@ -1139,50 +1188,91 @@ E-mail : himyeongsun@gmail.com
             $("#signupForm").on("submit", function (event) {
                 event.preventDefault();  // 폼 제출을 막고 Ajax로 처리
 
-                var email = $("input[name='memberEmail']").val();
-                var phone = $("input[name='memberPhone']").val();
-                var isValid = true;
+                var email = $("#memberEmail").val();
+                var phone = $("#memberPhone").val();
 
-                // Promise를 사용하여 두 체크를 동시에 실행
-                Promise.all([
-                    // 이메일 중복 체크
-                    $.ajax({
-                        url: '/member/checkEmail',
-                        method: 'POST',
-                        data: { "email": email }
-                    }),
-                    // 연락처 중복 체크
-                    $.ajax({
-                        url: '/member/checkPhone',
-                        method: 'POST',
-                        data: { "phone": phone }
-                    })
-                ]).then(function(results) {
-                    const [emailResult, phoneResult] = results;
-
-                    // 이메일 중복 체크
-                    if (parseInt(emailResult) === 1) {
-                        var emailModal = new bootstrap.Modal(document.getElementById('emailMismatchModal'));
-                        emailModal.show();
-                        isValid = false;
+                // 이메일 중복 체크
+                $.ajax({
+                    url: '/member/checkEmail',
+                    method: 'POST',
+                    dataType: 'text',
+                    data: {"email": email},
+                    success: function (checkMail) {
+                        console.log("이메일 중복 확인 응답:", checkMail); // 로그 추가
+                        if (parseInt(checkMail) === 1) {
+                            // 이메일 중복 모달 띄우기
+                            var myModal = new bootstrap.Modal($("#emailMismatchModal"));
+                            myModal.show();
+                        } else {
+                            // 이메일 중복이 없으면 연락처 중복 확인
+                            $.ajax({
+                                url: '/member/checkPhone',
+                                method: 'POST',
+                                dataType: 'text',
+                                data: {"phone": phone},
+                                success: function (checkPhone) {
+                                    console.log("연락처 중복 확인 응답:", checkPhone); // 로그 추가
+                                    if (parseInt(checkPhone) === 1) {
+                                        // 연락처 중복 모달 띄우기
+                                        var myModal = new bootstrap.Modal($("#phoneMismatchModal"));
+                                        myModal.show();
+                                    } else {
+                                        console.log(checkPhone)
+                                        // 이메일과 연락처 둘 다 중복되지 않으면 폼 제출
+                                        $("#signupForm").off("submit").submit();
+                                    }
+                                },
+                                error: function () {
+                                    console.error("연락처 중복 확인 실패");
+                                }
+                            });
+                        }
+                    },
+                    error: function () {
+                        console.error("이메일 중복 확인 실패");
                     }
-
-                    // 연락처 중복 체크
-                    if (parseInt(phoneResult) === 1) {
-                        var phoneModal = new bootstrap.Modal(document.getElementById('phoneMismatchModal'));
-                        phoneModal.show();
-                        isValid = false;
-                    }
-
-                    // 둘 다 중복이 아닐 경우에만 폼 제출
-                    if (isValid) {
-                        document.getElementById("signupForm").submit();
-                    }
-                }).catch(function(error) {
-                    console.error("중복 체크 실패:", error);
-                    alert("회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
                 });
             });
+        });
+
+        // 전화번호 유효성 검사
+        document.getElementById("memberPhone").addEventListener("input", function() {
+            var phone = this.value;
+            var phoneInput = this;
+            var phoneFeedback = document.getElementById("confirmPhoneFeedback");
+            var phoneValid = document.getElementById("confirmPhoneValid");
+
+            // 전화번호 형식 검사 (000-0000-0000 또는 000-000-0000)
+            var phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;
+
+            // 입력값이 비어있는 경우
+            if (phone === "") {
+                phoneInput.classList.remove("is-invalid", "is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "none";
+                return;
+            }
+
+            if (!phonePattern.test(phone)) {
+                phoneInput.classList.remove("is-valid");
+                phoneInput.classList.add("is-invalid");
+                phoneFeedback.style.display = "block";
+                phoneValid.style.display = "none";
+            } else {
+                phoneInput.classList.remove("is-invalid");
+                phoneInput.classList.add("is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "block";
+            }
+
+            // 자동으로 하이픈 추가
+            var value = phone.replace(/[^0-9]/g, ''); // 숫자만 추출
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+            }
+            this.value = value;
         });
 
         // 주소 검색 API

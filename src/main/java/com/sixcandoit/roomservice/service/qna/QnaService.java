@@ -3,9 +3,10 @@ package com.sixcandoit.roomservice.service.qna;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
+import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.entity.qna.QnaEntity;
 import com.sixcandoit.roomservice.entity.qna.ReplyEntity;
-import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.repository.qna.ReplyRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
@@ -35,6 +36,7 @@ public class QnaService {
     private final ReplyRepository replyRepository;
     private final ModelMapper modelMapper;
     private final ImageFileService imageFileService;
+    private final ReplyService replyService;
 
     // Qna의 Q 쓰기
     public void qnaRegister(QnaDTO qnaDTO, List<MultipartFile> imageFiles) throws Exception {
@@ -302,5 +304,141 @@ public class QnaService {
             // 해당 Qna가 존재하지 않으면 예외 처리
             throw new IllegalStateException("해당 Qna가 존재하지 않습니다.");
         }
+    }
+
+    // 관리자용 Qna 수정
+    public void adminQnaUpdate(QnaDTO qnaDTO, String join, List<MultipartFile> imageFiles) {
+        try {
+            log.info("관리자 QnA 수정 서비스 시작");
+            log.info("수정할 QnA IDX: {}", qnaDTO.getIdx());
+            log.info("수정자: {}", qnaDTO.getMemberName());
+            log.info("이미지 파일 수: {}", imageFiles != null ? imageFiles.size() : 0);
+
+            // 데이터의 idx를 조회
+            QnaEntity existingQna = qnaRepository.findById(qnaDTO.getIdx())
+                .orElseThrow(() -> new RuntimeException("수정할 게시글을 찾을 수 없습니다."));
+            log.info("기존 게시글 조회 성공 - 제목: {}", existingQna.getQnaTitle());
+
+            // 기존 데이터 유지하면서 업데이트
+            existingQna.setQnaTitle(qnaDTO.getQnaTitle());
+            existingQna.setQnaContents(qnaDTO.getQnaContents());
+            existingQna.setFavYn(qnaDTO.getFavYn() != null ? qnaDTO.getFavYn() : "N");
+            existingQna.setReplyYn(qnaDTO.getReplyYn() != null ? qnaDTO.getReplyYn() : "N");
+
+            // 이미지 처리
+            if (imageFiles != null && !imageFiles.isEmpty()) {
+                log.info("새로운 이미지 처리 시작");
+                // 빈 파일 제거
+                List<MultipartFile> validImageFiles = imageFiles.stream()
+                    .filter(file -> file != null && !file.isEmpty())
+                    .collect(Collectors.toList());
+
+                if (!validImageFiles.isEmpty()) {
+                    log.info("유효한 새 이미지 수: {}", validImageFiles.size());
+                    // 기존 이미지 조회 및 삭제
+                    List<ImageFileDTO> existingImages = imageFileService.readImage(qnaDTO.getIdx(), join);
+                    for (ImageFileDTO imageFileDTO : existingImages) {
+                        imageFileService.deleteImage(imageFileDTO.getIdx());
+                    }
+
+                    // 새로운 이미지 등록
+                    List<ImageFileEntity> newImages = imageFileService.saveImages(validImageFiles);
+                    for (ImageFileEntity image : newImages) {
+                        existingQna.addImage(image);
+                    }
+                }
+            }
+
+            // QnaEntity 저장
+            qnaRepository.save(existingQna);
+            log.info("관리자 QnA 수정 완료");
+
+        } catch (Exception e) {
+            log.error("관리자 QnA 수정 중 오류 발생: " + e.getMessage(), e);
+            throw new RuntimeException("관리자 QnA 수정 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    // 관리자용 Qna 삭제
+    public void adminQnaDelete(Integer idx, String join) {
+        try {
+            log.info("관리자 QnA 삭제 서비스 시작");
+            log.info("삭제할 QnA IDX: {}", idx);
+
+            // 해당 QnA가 존재하는지 확인
+            QnaEntity qnaEntity = qnaRepository.findById(idx)
+                .orElseThrow(() -> new RuntimeException("삭제할 게시글을 찾을 수 없습니다."));
+
+            // 관련된 이미지 파일 삭제
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
+            log.info("삭제할 이미지 파일 수: {}", imageFileDTOS.size());
+            
+            for (ImageFileDTO imageFileDTO : imageFileDTOS) {
+                imageFileService.deleteImage(imageFileDTO.getIdx());
+            }
+
+            // 관련된 답변 삭제
+            replyService.deleteRepliesByQnaIdx(idx);
+            log.info("관련 답변 삭제 완료");
+
+            // QnA 삭제
+            qnaRepository.delete(qnaEntity);
+            log.info("관리자 QnA 삭제 완료");
+            
+        } catch (Exception e) {
+            log.error("관리자 QnA 삭제 중 오류 발생: " + e.getMessage(), e);
+            throw new RuntimeException("관리자 QnA 삭제 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    // adminJoin 설정 메서드
+    public void updateAdminJoin(Integer qnaIdx, AdminEntity admin) {
+        QnaEntity qnaEntity = qnaRepository.findById(qnaIdx)
+                .orElseThrow(() -> new RuntimeException("QnA를 찾을 수 없습니다."));
+        qnaEntity.setAdminJoin(admin);
+        qnaRepository.save(qnaEntity);
+    }
+
+    // 관리자가 답변한 QnA 목록 조회
+    public Page<QnaDTO> getQnaListByAdmin(Integer adminIdx, Pageable pageable) {
+        log.info("관리자가 답변한 QnA 목록을 조회합니다. 관리자 IDX: {}", adminIdx);
+        log.info("페이지 정보 - 페이지 번호: {}, 페이지 크기: {}", pageable.getPageNumber(), pageable.getPageSize());
+        
+        // 정렬 조건 추가 (자주 묻는 질문 우선, 최신순)
+        Sort sort = Sort.by(
+            Sort.Order.desc("favYn"),
+            Sort.Order.desc("idx")
+        );
+        
+        // 페이지 정보에 정렬 조건 추가 (페이지 번호를 0부터 시작하도록 조정)
+        pageable = PageRequest.of(
+            pageable.getPageNumber() - 1,
+            pageable.getPageSize(),
+            sort
+        );
+        
+        Page<QnaEntity> qnaEntities = qnaRepository.findQnasByAdminReplies(adminIdx, pageable);
+        log.info("조회된 QnA 수: {}", qnaEntities.getTotalElements());
+        
+        // 조회된 엔티티가 있는 경우에만 로깅
+        if (qnaEntities.hasContent()) {
+            log.info("조회된 QnA 목록:");
+            qnaEntities.getContent().forEach(entity -> {
+                log.info("QnA IDX: {}, 제목: {}, 작성자: {}, 답변여부: {}, 자주묻는질문여부: {}", 
+                    entity.getIdx(), entity.getQnaTitle(), entity.getMemberName(), 
+                    entity.getReplyYn(), entity.getFavYn());
+            });
+        } else {
+            log.info("조회된 QnA가 없습니다.");
+        }
+        
+        // Entity를 DTO로 변환
+        Page<QnaDTO> dtoPage = qnaEntities.map(entity -> {
+            QnaDTO dto = modelMapper.map(entity, QnaDTO.class);
+            log.info("Entity를 DTO로 변환 - IDX: {}, 제목: {}", dto.getIdx(), dto.getQnaTitle());
+            return dto;
+        });
+        
+        return dtoPage;
     }
 }

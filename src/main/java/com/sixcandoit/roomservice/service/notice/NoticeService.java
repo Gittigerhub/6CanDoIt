@@ -9,7 +9,7 @@ import com.sixcandoit.roomservice.repository.notice.NoticeRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Log4j2
 public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final ModelMapper modelMapper;
@@ -143,29 +143,40 @@ public class NoticeService {
 
     }
 
-    public void noticeDelete(Integer idx,String join){
+    public void noticeDelete(Integer idx, String join) {
         try {
-            // 이미지 조회
-            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx,join);
+            // 이미지 삭제
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
 
-            // dto = > entity 변환
-            List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
-                    .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
-                    .collect(Collectors.toList());
+            // 이미지가 있는 경우에만 삭제 처리
+            if (imageFileDTOS != null && !imageFileDTOS.isEmpty()) {
+                log.info("이미지 삭제 시작: {} 개의 이미지", imageFileDTOS.size());
+                List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                        .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                        .collect(Collectors.toList());
 
-            // DB, 저장소에서 모든 이미지 삭제
-            for(ImageFileEntity imageFileEntity : imageFileEntities){
-                imageFileService.deleteImage(imageFileEntity.getIdx());
+                // DB와 저장소에서 이미지 삭제
+                for (ImageFileEntity imageFileEntity : imageFileEntities) {
+                    try {
+                        imageFileService.deleteImage(imageFileEntity.getIdx());
+                    } catch (Exception e) {
+                        log.error("이미지 삭제 중 오류 발생 (idx: {}): {}", imageFileEntity.getIdx(), e.getMessage());
+                        // 이미지 삭제 실패해도 계속 진행
+                    }
+                }
+            } else {
+                log.info("삭제할 이미지가 없습니다. idx: {}", idx);
             }
 
-            // idx로 공지사항 조회하여 삭제
+            // 공지사항 삭제
             noticeRepository.deleteById(idx);
-
-        }catch (Exception e) {
-            throw new RuntimeException("삭제를 실패했습니다." + e.getMessage());
+            log.info("공지사항 삭제 완료: {}", idx);
+        } catch (Exception e) {
+            log.error("공지사항 삭제 실패 (idx: {}): {}", idx, e.getMessage());
+            throw new RuntimeException("공지사항 삭제 실패: " + e.getMessage());
         }
-
     }
+
 
     public Page<NoticeDTO> noticeList(Pageable page, String type, String keyword) {
         Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
@@ -207,6 +218,24 @@ public class NoticeService {
         NoticeDTO noticeDTO = modelMapper.map(noticeEntity, NoticeDTO.class);
 
         return noticeDTO;
+    }
 
+    public Page<NoticeDTO> getNoticeListByType(Pageable page, String type, String keyword, String noticeType) {
+        Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
+        Page<NoticeEntity> noticeEntities;
+
+        if (keyword == null || keyword.isEmpty()) {
+            noticeEntities = noticeRepository.findAllByNoticeType(noticeType, pageable);
+        } else {
+            if (type.equals("title")) {
+                noticeEntities = noticeRepository.findByNoticeTitleContainingAndNoticeType(keyword, noticeType, pageable);
+            } else if (type.equals("content")) {
+                noticeEntities = noticeRepository.findByNoticeContentsContainingAndNoticeType(keyword, noticeType, pageable);
+            } else {
+                noticeEntities = noticeRepository.findAllByNoticeTypeAndTitleOrContentsContaining(noticeType, keyword, pageable);
+            }
+        }
+
+        return noticeEntities.map(notice -> modelMapper.map(notice, NoticeDTO.class));
     }
 }

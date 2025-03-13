@@ -85,7 +85,7 @@ public class RoomEntity extends BaseEntity {
     private float roomCancelPee;            // 취소 수수료
 
     @Column(name = "res_status")
-    private String resStatus;          // 객실 상태(1:빈 방, 2:체크인, 3:체크 아웃)
+    private String resStatus;          // 객실 상태(1:빈방, 2:예약, 3:체크인, 4:체크아웃)
 
     // 조직 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)

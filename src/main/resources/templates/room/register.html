@@ -55,7 +55,7 @@
                             <!-- 객실 사진 추가버튼 -->
                             <div class="col-sm-12 mt-2">
                                 <div class="form-group form-group-default">
-                                    <input type="button" id="addImage" value="이미지 추가">
+                                    <input type="button" id="addImage" value="이미지 추가" class="btn btn-outline-primary">
                                 </div>
                             </div>
 
@@ -154,7 +154,7 @@
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">등록</button>
-                            <button type="reset" class="btn btn-secondary">초기화</button>
+                            <button type="reset" class="btn btn-secondary" onclick="resetImageInput()">초기화</button>
                             <button type="button" class="btn btn-danger"
                                     th:onclick="|location.href='@{/room/list}'|">취소</button>
                         </div>
@@ -165,39 +165,39 @@
         </div><!--row 끝-->
     </div>
 </div>
-<script th:inline="javascript">
-    $(document).ready(function () {
-        // 이미지 추가 버튼 클릭했을 때
-        $("#addImage").on('click', function() {
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            // 이미지 추가 버튼 클릭했을 때
+            $("#addImage").on('click', function() {
+                // 이미지 추가 함수
+                addImageInput();
+            });
 
-            // 이미지 추가 함수
-            addImageInput();
-
-        });
-
-        // 이미지 추가
-        function addImageInput() {
-            const container = document.getElementById('inputImage2');
-            const newInputDiv = document.createElement('div');
-            newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
-            container.appendChild(newInputDiv);
-        }
-
-        // 이미지 input 초기화
-        function resetImageInput() {
-            const input = document.querySelector('input[name="imageFiles"]');
-            const container2 = document.getElementById('inputImage2');
-
-            // 파일 선택 초기화
-            if (input) {
-                input.value = '';
+            // 이미지 추가
+            function addImageInput() {
+                const container = document.getElementById('inputImage2');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                container.appendChild(newInputDiv);
             }
 
-            // 이미지 추가창 제거
-            container2.innerHTML = '<label>*이미지 :</label>' +
-                '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
-        }
-    });
-</script>
+            // 이미지 input 초기화
+            function resetImageInput() {
+                const input = document.querySelector('input[name="imageFiles"]');
+                const container2 = document.getElementById('inputImage2');
+
+                // 파일 선택 초기화
+                if (input) {
+                    input.value = '';
+                }
+
+                // 이미지 추가창 제거
+                container2.innerHTML = '<label>*이미지 :</label>' +
+                    '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            }
+        });
+    </script>
+</th:block>
 </body>
 </html>

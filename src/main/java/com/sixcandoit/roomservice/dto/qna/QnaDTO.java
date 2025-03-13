@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.dto.qna;
 
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
+import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -35,10 +36,14 @@ public class QnaDTO {
 
     private MemberDTO memberDTO;       // Member 참조
 
+    private AdminDTO adminJoin;  // adminIdx 대신 adminJoin 사용
+
+    private String memberName;         // 작성자 이름
+
+    private Long replyCount;
+
     public QnaDTO setMemberDTO(MemberDTO memberDTO){
         this.memberDTO = memberDTO;
         return this;
     }
-
-    private String memberName;         // 작성자 이름
 }

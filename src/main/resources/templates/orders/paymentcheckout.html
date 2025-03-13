@@ -1,135 +1,84 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
-    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <title>결제하기</title>
+    <script src="https://js.tosspayments.com/v1"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 결제하기 버튼 파란색, 가운데 정렬 */
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .payment-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        #payment-method {
+            margin: 20px 0;
+        }
         #payment-button {
-            background-color: #007bff;  /* 파란색 */
-            color: white;  /* 텍스트 색 흰색 */
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: inline-block;
-            text-align: center;
             width: 100%;
-            max-width: 300px; /* 버튼의 최대 너비를 설정 */
-            margin: 0 auto;  /* 가운데 정렬 */
+            padding: 15px;
+            background-color: #3182f6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
-
-        /* hover 상태에서 색 변경 */
         #payment-button:hover {
-            background-color: #0056b3;  /* hover 시 색 변경 */
-        }
-
-        /* 버튼을 담고 있는 div를 가운데 정렬 */
-        .button-container {
-            text-align: center;
-            margin-top: 30px;
+            background-color: #1c64f2;
         }
     </style>
 </head>
 <body>
+<div class="payment-container">
+    <h2 class="mb-4">결제하기</h2>
+    
+    <!-- 결제 정보 표시 -->
+    <div class="alert alert-info mb-4">
+        <p class="mb-1">주문번호: <span th:text="${paymentDTO.orderId}"></span></p>
+        <p class="mb-0">결제금액: <span th:text="${#numbers.formatInteger(paymentDTO.paymentPrice, 0, 'COMMA')} + '원'"></span></p>
+    </div>
 
-<!-- 결제 UI -->
-<div id="payment-method"></div>
-
-<!-- 이용약관 UI -->
-<div id="agreement"></div>
-
-<!-- 결제하기 버튼 -->
-<div class="button-container">
-    <button id="payment-button" style="margin-top: 30px">결제하기</button>
+    <!-- 결제하기 버튼 -->
+    <button class="button" id="payment-button">결제하기</button>
 </div>
 
-<script>
-    // URL 파라미터 확인 및 디버깅
-    console.log("현재 URL:", window.location.href);
-    const urlParams = new URLSearchParams(window.location.search);
-    console.log("URL 파라미터:", Object.fromEntries(urlParams));
+<script th:inline="javascript">
+    const clientKey = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq";
+    const tossPayments = TossPayments(clientKey);
+    const button = document.getElementById("payment-button");
+    
+    // 서버에서 전달받은 결제 정보
+    const amount = /*[[${paymentDTO.paymentPrice}]]*/ 0;
+    const orderId = /*[[${paymentDTO.orderId}]]*/ '';
+    const customerName = /*[[${memberName}]]*/ '';
 
-    // 결제 완료 후 리다이렉트된 경우
-    if (urlParams.has('paymentKey')) {
-        console.log("결제 완료 감지");
-        const paymentKey = urlParams.get('paymentKey');
-        const orderId = urlParams.get('orderId');
-        const amount = urlParams.get('amount');
-        const paymentType = urlParams.get('paymentType');
-
-        console.log("결제 정보:", { paymentKey, orderId, amount, paymentType });
-
-        // success 페이지로 리다이렉트
-        const successUrl = `/orders/success?paymentKey=${paymentKey}&orderId=${orderId}&amount=${amount}&paymentType=${paymentType}`;
-        console.log("리다이렉트 URL:", successUrl);
-
-        // 리다이렉트 시도
-        try {
-            window.location.href = successUrl;
-            console.log("리다이렉트 시도 완료");
-        } catch (error) {
-            console.error("리다이렉트 실패:", error);
-            // 리다이렉트 실패 시 다시 시도
-            setTimeout(() => {
-                window.location.href = successUrl;
-            }, 1000);
-        }
-    }
-
-    main();
-
-    async function main() {
-        const button = document.getElementById("payment-button");
-
-        // ------  결제위젯 초기화 ------
-        const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-        const tossPayments = TossPayments(clientKey);
-
-        // 회원 결제
-        const customerKey = "etF3qo-v6kvgliSRvx2Lc";
-        const widgets = tossPayments.widgets({
-            customerKey,
-        });
-
-        // ------ 주문의 결제 금액 설정 (1원으로 설정) ------
-        await widgets.setAmount({
-            currency: "KRW",
-            value: 1,  // 결제 금액 1원으로 설정
-        });
-
-        await Promise.all([
-            // ------ 결제 UI 렌더링 ------
-            widgets.renderPaymentMethods({
-                selector: "#payment-method",
-                variantKey: "DEFAULT",
-            }),
-            // ------ 이용약관 UI 렌더링 ------
-            widgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
-        ]);
-
-        // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
-        button.addEventListener("click", async function () {
-            console.log("결제 버튼 클릭됨");
-            try {
-                const response = await widgets.requestPayment({
-                    orderId: "koYkl96EZNjsPFl635njt",
-                    orderName: "토스 티셔츠 외 2건",
-                    successUrl: window.location.origin + "/orders/payment/process",
-                    failUrl: window.location.origin + "/orders/payment/fail",
-                    customerEmail: "customer123@gmail.com",
-                    customerName: "김토스",
-                    customerMobilePhone: "01012341234",
-                });
-                console.log("결제 요청 성공:", response);
-            } catch (error) {
-                console.error("결제 요청 실패:", error);
+    // 결제하기 버튼 클릭시 결제창 바로 열기
+    button.addEventListener("click", function() {
+        tossPayments.requestPayment('카드', {
+            amount: amount,
+            orderId: orderId,
+            orderName: '객실 예약',
+            customerName: customerName,
+            successUrl: window.location.origin + '/orders/paymentsuccess',
+            failUrl: window.location.origin + '/orders/paymentfail'
+        }).catch(function(error) {
+            if (error.code === 'USER_CANCEL') {
+                console.log('사용자가 결제를 취소하였습니다.');
+            } else {
+                console.error('결제 실패:', error);
             }
         });
-    }
+    });
 </script>
-
 </body>
 </html>

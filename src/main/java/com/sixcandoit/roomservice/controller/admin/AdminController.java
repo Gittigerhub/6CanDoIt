@@ -8,6 +8,7 @@ import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
+import com.sixcandoit.roomservice.service.EmailService;
 import com.sixcandoit.roomservice.service.admin.AdminService;
 import com.sixcandoit.roomservice.service.member.MemberService;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
@@ -18,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +40,7 @@ public class AdminController {
     private final MemberService memberService;
     private final AdminRepository adminRepository;
     private final OrganizationService organizationService;
+    private final EmailService emailService;
 
     @GetMapping("/")
     public String IndexForm(HttpSession session, AdminDTO adminDTO) {
@@ -62,10 +65,14 @@ public class AdminController {
 
     // 로그인
     @GetMapping("/login")
-    public String showLoginPage(){
+    public String showLoginPage(Model model){
         log.info("로그인 페이지를 내놔라");
+        List<OrganizationDTO> organizations = organizationService.getAllOrganizations(); // 호텔명 리스트 가져오기
 
-        return "admin/login";
+        log.info("호텔 정보 내놔" + organizations);
+        model.addAttribute("organizations", organizations);
+
+        return "admin/sign";
     }
 
     // 로그아웃
@@ -73,7 +80,7 @@ public class AdminController {
     public String showLogoutPage(HttpSession session) {
         session.invalidate();
         log.info("로그아웃을 하자!~~");
-        return "redirect:/login";
+        return "redirect:/admin/login";
     }
 
     // 회원 가입
@@ -85,17 +92,17 @@ public class AdminController {
         log.info("호텔 정보 내놔" + organizations);
         model.addAttribute("organizations", organizations);
 
-        return "admin/register";
+        return "admin/sign";
     }
 
     @PostMapping("/register")
     public String registerProc(@ModelAttribute AdminDTO adminDTO){
 
         if (adminService.register(adminDTO) == null){
-            return "redirect:admin/register";
+            return "redirect:/admin/login";
         }
 
-        return "redirect:/";
+        return "redirect:/admin/login";
     }
 
     // 이메일 중복 확인
@@ -122,6 +129,34 @@ public class AdminController {
         return result;  // 응답 반환
     }
 
+    @PostMapping("/sendEmailCode")
+    @ResponseBody
+    public ResponseEntity<String> sendEmail(@RequestParam("email") String email){
+        log.info("이메일 발송 컨트롤러 진입");
+
+        try {
+            emailService.codeEmailSending(email, 1);
+            //admin과 member를 구분하기 위해(admin = 1, member = 2)
+            return ResponseEntity.status(200).body(email);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("이메일 발송 에러");
+        }
+    }
+
+
+    @PostMapping("/checkEmailCode")
+    @ResponseBody
+    public ResponseEntity<String> CheckEmailCode(@RequestParam("email") String email, @RequestParam("authenticationCode") String authenticationCode){
+        try {
+            String result = emailService.checkEmailCode(email, authenticationCode)+"";
+            return ResponseEntity.ok().body(result);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("에러 발생");
+        }
+    }
+
     // 회원 수정 전 비밀번호 확인 페이지
     @GetMapping("/verify")
     public String ShowPasswordVerificationPage(HttpSession session, Model model){
@@ -130,6 +165,7 @@ public class AdminController {
 
         if (adminEmail == null) {
             log.warn("세션에 adminEmail 없음! 로그인 확인 필요");
+            return "redirect:/admin/login";
         }
 
         model.addAttribute("adminEmail",adminEmail );
@@ -198,7 +234,7 @@ public class AdminController {
         adminService.modify(adminDTO);
         log.info("회원 정보를 수정해줘!!");
 
-        return "redirect:/logout";
+        return "redirect:/admin/";
     }
 
     // 비밀번호 수정
@@ -254,7 +290,7 @@ public class AdminController {
     // 임시비밀번호 발급
     @GetMapping("/password")
     public String showPasswordPage(){
-        return "admin/password";
+        return "admin/sign";
     }
 
     @PostMapping("/password")

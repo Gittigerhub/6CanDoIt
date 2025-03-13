@@ -5,6 +5,7 @@ import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.cart.CartEntity;
+import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -61,6 +62,12 @@ public class MenuEntity extends BaseEntity {
 
     @Column(name = "menu_sale_percent")
     private int menuSalePercent;         // 할인율
+
+    // 조직 테이블과 N:1 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organ_idx")
+    @JsonBackReference
+    private OrganizationEntity organizationJoin;
 
     // 매장 상세 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)

@@ -26,27 +26,23 @@ public interface MemberPointRepository extends JpaRepository<MemberPointEntity, 
     @Query("SELECT m FROM MemberPointEntity m WHERE m.memberJoin.memberName LIKE %:keyword")
     Page<MemberPointEntity> findByName(@Param("keyword") String keyword, Pageable pageable);
 
-    /*  여기는 userMemberpoint   */
+
     //회원 이름 또는 내용으로 검색
     @Query("SELECT m FROM MemberPointEntity m WHERE m.memberJoin.memberEmail LIKE %:keyword OR  m.memberJoin.memberName LIKE %:keyword")
     Page<MemberPointEntity> findByNameOrEmail(@Param("keyword") String keyword, Pageable pageable);
 
+    /*  여기는 userMemberpoint   */
     //포인트 내용으로 검색 
     @Query("SELECT m FROM MemberPointEntity m WHERE m.memberPointContents LIKE CONCAT('%', :keyword, '%')")
     Page<MemberPointEntity> findByContents(@Param("keyword") String keyword, Pageable pageable);
 
     //포인트 사용여부로 검색
-    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberPointOperationYn LIKE %:buttonValue")
-    Page<MemberPointEntity> findByPointOperationYn(@Param("buttonValue") String buttonValue, Pageable pageable);
-    
+    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberPointOperationYn LIKE %:keyword")
+    Page<MemberPointEntity> findByPointOperationYn(@Param("keyword") String keyword, Pageable pageable);
+
     //포인트 기간으로 검색
-    @Query("SELECT m FROM MemberPointEntity m where m.memberPointStartDate BETWEEN :startDatee AND :endDate")
-    Page<MemberPointEntity> findByStartDate(@Param("date") LocalDateTime startDate, @Param("data") LocalDateTime endDate, Pageable pageable);
-
-
-
-
-
+    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberPointStartDate >= :startDate AND m.memberPointEndDate <= :endDate ")
+    Page<MemberPointEntity> findByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
 
 }

@@ -37,7 +37,7 @@
         <br class="fs-9">
         <!-- 로그인된 사용자 이름 표시 -->
         <th:block th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
-            ID: <span th:text="${#authentication.principal.admin.adminName}"></span>
+            이름: <span th:text="${#authentication.principal.admin.adminName}"></span>
         </th:block>
         <!-- 로그인되지 않은 경우 -->
         <th:block th:if="${#authentication.principal == null or #authentication.principal == 'anonymousUser'}">
@@ -115,7 +115,13 @@
             }
         }
 
-        // 하위 메뉴 상태 복원 (페이지 로딩 시)
+        // 페이지 로딩 시 모든 하위 메뉴 닫기
+        const submenusLoding = document.querySelectorAll('.submenu');
+        submenusLoding.forEach(submenu => {
+            submenu.style.display = "none"; // 모든 하위 메뉴 기본적으로 닫기
+        });
+
+        // 하위 메뉴 상태 복원 (페이지 로딩 시, 세션 스토리지에서 저장된 하위 메뉴 상태 가져오기)
         const submenuState = JSON.parse(sessionStorage.getItem('submenuState')) || {};
         Object.keys(submenuState).forEach(linkId => {
             const submenu = document.getElementById(linkId)?.nextElementSibling;

@@ -31,7 +31,7 @@ public class UserMemberPointService {
     출력 : list
     설명 : 유져가 포인트 목록 볼때 사용
     ---------------------------------------------------*/
-    public Page<MemberPointDTO> memberlist(Integer idx, Pageable page, String type, String keyword, LocalDateTime start, LocalDateTime end) {
+    public Page<MemberPointDTO> memberlist(Integer idx, Pageable page, String type, String keyword, LocalDateTime startDate, LocalDateTime endDate) {
 
         try {
             List<MemberPointEntity> memberPointlist = memberPointRepository.findByMemberJoinIdx(idx);
@@ -40,16 +40,34 @@ public class UserMemberPointService {
                 Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
                 System.out.println("실행중:" + pageable.getPageNumber());
                 Page<MemberPointEntity> memberPointEntities;
-                if (!keyword.isEmpty()) {
-                    if (type.equals("1")) {
-                        log.info("포인트 내용으로 검색하는 중");
-                        memberPointEntities = memberPointRepository.findByContents(keyword, pageable);
-                    } else if (type.equals("2")) {
-                        log.info("포인트 사용기간으로 검색하는 중");
-                        memberPointEntities = memberPointRepository.findByStartDate(start, end, pageable);
-                    } else{
-                      log.info("포인트 사용가능으로 검색");
-                      memberPointEntities = memberPointRepository.findByPointOperationYn(keyword, pageable);
+                System.out.println("서비스에 들어오는 타입:" + type);
+                if (!type.isEmpty()) {
+                    switch (type) {
+                        case "1":
+                            log.info("포인트 내용으로 검색하는 중");
+                            if(keyword != null) {
+                                memberPointEntities = memberPointRepository.findByContents(keyword, pageable);
+                                break;
+                            }
+
+
+
+                        case "2":
+                            log.info("포인트 사용기간으로 검색하는 중");
+                            if(startDate != null && endDate != null) {
+                                memberPointEntities = memberPointRepository.findByDateRange(startDate, endDate, pageable);
+                                break;
+                            }
+
+                        case "3":
+                            log.info("포인트 사용가능으로 검색");
+                            if(keyword != null) {
+                                memberPointEntities = memberPointRepository.findByPointOperationYn(keyword, pageable);
+                                break;
+                            }
+
+                        default:
+                            memberPointEntities = memberPointRepository.findAll(pageable);
                     }
                 } else {
                     log.info("모든 대상으로 검색");
@@ -111,18 +129,18 @@ public class UserMemberPointService {
     출력 : 없음
     설명 : 유저가 포인트를 자세히 보기할 때
     ---------------------------------------------------*/
-        public MemberPointDTO read (Integer idx){
-            try {
-                Optional<MemberPointEntity> read = memberPointRepository.findById(idx);
-                if (!read.isPresent()) {
-                    throw new RuntimeException("포인트 개별 조회 실패");
-                } else {
-                    MemberPointDTO memberPointDTO = modelMapper.map(read, MemberPointDTO.class);
-                    return memberPointDTO;
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("포인트 개별 조회 실패: " + e.getMessage());
+    public MemberPointDTO read(Integer idx) {
+        try {
+            Optional<MemberPointEntity> read = memberPointRepository.findById(idx);
+            if (!read.isPresent()) {
+                throw new RuntimeException("포인트 개별 조회 실패");
+            } else {
+                MemberPointDTO memberPointDTO = modelMapper.map(read, MemberPointDTO.class);
+                return memberPointDTO;
             }
+        } catch (Exception e) {
+            throw new RuntimeException("포인트 개별 조회 실패: " + e.getMessage());
         }
-
     }
+
+}

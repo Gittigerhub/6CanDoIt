@@ -26,4 +26,5 @@ public class ShopDetailDTO {
     private String activeYn;              // 매장 활성화(N:비활성화, Y:활성화)
     private float dayFee;                // 매장 일별 수수료
     private float dayFeePercent;         // 매장 일별 수수료 %
+    private OrganizationDTO organizationJoin;   // 조직 정보
 }

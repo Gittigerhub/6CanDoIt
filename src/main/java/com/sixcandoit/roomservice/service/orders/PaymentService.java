@@ -313,14 +313,14 @@ public class PaymentService {
         entity.setOrderId(dto.getOrderId());
         entity.setErrorCode(dto.getErrorCode());
         entity.setErrorMessage(dto.getErrorMessage());
-        
+
         // 새로운 결제인 경우 현재 시간으로 설정
         if (dto.getRegDate() == null) {
             entity.setRegDate(LocalDateTime.now());
         } else {
             entity.setRegDate(dto.getRegDate());
         }
-        
+
         return entity;
     }
 }

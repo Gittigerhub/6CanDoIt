@@ -3,6 +3,7 @@ package com.sixcandoit.roomservice.entity.room;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
+import com.sixcandoit.roomservice.entity.orders.PaymentEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,4 +48,10 @@ public class ReservationEntity extends BaseEntity {
     @JoinColumn(name = "room_idx")
     @JsonBackReference
     private RoomEntity roomJoin;
+
+    // 결제 테이블과 1:1 매핑
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_idx")
+    @JsonBackReference
+    private PaymentEntity paymentJoin;
 }

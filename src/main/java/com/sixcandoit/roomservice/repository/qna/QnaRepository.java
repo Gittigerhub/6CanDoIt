@@ -11,43 +11,40 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface QnaRepository extends JpaRepository<QnaEntity, Integer> {
 
-    // 제목만
-    @Query("SELECT u FROM QnaEntity u WHERE "+
-            " u.qnaTitle like %:keyword%")
+    // 관리자가 답변한 QnA 목록 조회
+    @Query(value = "SELECT DISTINCT q FROM QnaEntity q INNER JOIN q.replyList r WHERE r.admin.idx = :adminIdx ORDER BY q.favYn DESC, q.idx DESC",
+           countQuery = "SELECT COUNT(DISTINCT q) FROM QnaEntity q INNER JOIN q.replyList r WHERE r.admin.idx = :adminIdx")
+    Page<QnaEntity> findQnasByAdminReplies(@Param("adminIdx") Integer adminIdx, Pageable page);
+
+    // 제목으로 검색
+    @Query("SELECT q FROM QnaEntity q WHERE q.qnaTitle LIKE %:keyword%")
     Page<QnaEntity> searchQnaTitle(@Param("keyword") String keyword, Pageable page);
 
-    // 내용만
-    @Query("SELECT u FROM QnaEntity u WHERE "+
-            " u.qnaContents like %:keyword%")
+    // 내용으로 검색
+    @Query("SELECT q FROM QnaEntity q WHERE q.qnaContents LIKE %:keyword%")
     Page<QnaEntity> searchQnaContents(@Param("keyword") String keyword, Pageable page);
 
-    // 제목+내용
-    @Query("SELECT u FROM QnaEntity u WHERE "+
-            " u.qnaTitle like %:keyword% or u.qnaContents like %:keyword%")
+    // 제목+내용으로 검색
+    @Query("SELECT q FROM QnaEntity q WHERE q.qnaTitle LIKE %:keyword% OR q.qnaContents LIKE %:keyword%")
     Page<QnaEntity> searchQnaAll(@Param("keyword") String keyword, Pageable page);
 
-    // 답변만
-    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyList r WHERE "+
-            " r.replyTitle like %:keyword% or r.replyContents like %:keyword%")
+    // 답변만 검색
+    @Query("SELECT q FROM QnaEntity q JOIN q.replyList r WHERE r.replyContents LIKE %:keyword%")
     Page<QnaEntity> searchReplyAll(@Param("keyword") String keyword, Pageable page);
 
-    // 모든 항목에서
-    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyList r WHERE "+
-            " (q.qnaTitle LIKE %:keyword% OR q.qnaContents LIKE %:keyword%) "+
-            " OR (r.replyTitle LIKE %:keyword% OR r.replyContents LIKE %:keyword%)")
-    Page<QnaEntity> searchQnaAndReply(@Param("keyword") String keyword, Pageable page);
-
-    // 자주 묻는 질문
-    @Query("SELECT q FROM QnaEntity q LEFT JOIN q.replyList r WHERE " +
-            "(q.favYn = 'Y')")
+    // 자주 묻는 질문만 검색
+    @Query("SELECT q FROM QnaEntity q WHERE q.favYn = 'Y'")
     Page<QnaEntity> searchFavYn(Pageable page);
 
-    // 미답변 QnA 검색
+    // 미답변만 검색
     @Query("SELECT q FROM QnaEntity q WHERE q.replyYn = 'N'")
     Page<QnaEntity> searchUnreplied(Pageable page);
 
-    // 답변완료 QnA 검색
+    // 답변완료만 검색
     @Query("SELECT q FROM QnaEntity q WHERE q.replyYn = 'Y'")
     Page<QnaEntity> searchReplied(Pageable page);
 
+    // 전체 검색
+    @Query("SELECT DISTINCT q FROM QnaEntity q LEFT JOIN q.replyList r WHERE q.qnaTitle LIKE %:keyword% OR q.qnaContents LIKE %:keyword% OR r.replyContents LIKE %:keyword%")
+    Page<QnaEntity> searchQnaAndReply(@Param("keyword") String keyword, Pageable page);
 }

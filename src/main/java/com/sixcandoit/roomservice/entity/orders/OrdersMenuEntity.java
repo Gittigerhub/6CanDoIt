@@ -8,32 +8,27 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-//@ToString(exclude = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Table(name = "orders_menu")
-
 public class OrdersMenuEntity extends BaseEntity {
 
     @Id
     @Column(name = "orders_menu_idx")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idx;
+    private Integer idx;                // 기본값
 
-    // 회원 테이블과 1:1 매핑
+    @Column(name = "orders_menu_count")
+    private int count;                  // 수량
+
+    // 주문 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_idx")
-    private OrdersEntity ordersEntity;
+    @JoinColumn(name = "orders_idx")
+    private OrdersEntity ordersJoin;
 
-    // 메뉴 테이블과 1:1 매핑
+    // 메뉴 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_idx")
-    private MenuEntity menuEntity;
+    private MenuEntity menuJoin;
 
-    //주문 가격
-    private int orderPrice;
-
-    //수량
-    private int count;
 }

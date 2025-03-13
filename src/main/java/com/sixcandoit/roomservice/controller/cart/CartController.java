@@ -2,7 +2,6 @@ package com.sixcandoit.roomservice.controller.cart;
 
 import com.sixcandoit.roomservice.dto.cart.CartDetailDTO;
 import com.sixcandoit.roomservice.dto.cart.CartMenuDTO;
-import com.sixcandoit.roomservice.dto.cart.CartOrdersDTO;
 import com.sixcandoit.roomservice.service.cart.CartMenuService;
 import com.sixcandoit.roomservice.service.cart.CartService;
 import com.sixcandoit.roomservice.service.menu.MenuService;
@@ -23,6 +22,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
+@RequestMapping("/member")
 public class CartController {
 
     private final CartService cartService;
@@ -32,8 +32,7 @@ public class CartController {
 
     //장바구니 등록
     @PostMapping("/cart")
-    @ResponseBody
-    public ResponseEntity registerCart(Integer idx, int count, Principal principal) {
+    public ResponseEntity<?> registerCart(Integer idx, @RequestParam(value = "count", defaultValue = "0") int count, Principal principal) {
 
         System.out.println("메뉴 Idx : " + idx);
         System.out.println("메뉴 수량 : " + count);
@@ -54,6 +53,7 @@ public class CartController {
         // 값이 잘 넘어왔다면
         // 이메일로 회원을 찾고 장바구니에 메뉴 추가
         String email = principal.getName();
+        System.out.println("email 정보 : " + email);
 
         try {
             //장바구니에 추가
@@ -83,12 +83,13 @@ public class CartController {
     }
 
     //변경
-    @PostMapping("/cartmenu")
+    @PostMapping("/cart/cartmenu")
     public ResponseEntity updateCartMenu(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
                                          Principal principal) {
         String memberEmail = principal.getName();
 
         log.info("수량 변경을 위해 넘어온 값 : " + cartMenuDTO);
+
         if (bindingResult.hasErrors()) {
             StringBuffer sb = new StringBuffer();
 
@@ -111,34 +112,47 @@ public class CartController {
         return new ResponseEntity<>(cartMenuDTO.getMenuidx(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/cart/cart/{cartmenuidx}")
-    public ResponseEntity deleteCartMenu(@PathVariable("cartmenuidx") Integer cartmenuidx,
+    @PostMapping("/cart/cartlist/delete/{cartmenuidx}")
+    public String deleteCartMenu(@PathVariable("cartmenuidx") Integer cartmenuidx,
                                          Principal principal) {
         if (!cartService.validateCartMenu(cartmenuidx, principal.getName())) {
-            return new ResponseEntity<String>("수정권한이 없습니다.", HttpStatus.FORBIDDEN);
+            return "redirect:/member/cart/cartlist?error";
         }
         //장바구니 메뉴 삭제
         cartService.deleteCartMenu(cartmenuidx);
-        return new ResponseEntity<Integer>(cartmenuidx, HttpStatus.OK);
+        return "redirect:/member/cart/cartlist";    //삭제 후 장바구니 목록 페이지로 리다이렉트
     }
 
-    @PostMapping("/cart/cartlist")
-    public ResponseEntity orderCartMenu(@RequestBody CartOrdersDTO cartOrdersDTO, Principal principal) {
-        log.info(cartOrdersDTO);
-        List<CartOrdersDTO> cartOrdersDTOList = cartOrdersDTO.getOrdersDTOList();
+    // 안씀
+//    @PostMapping("/cart/cartlist")
+//    public ResponseEntity orderCartMenu(@RequestBody CartOrdersDTO cartOrdersDTO, Principal principal) {
+//
+//        log.info(cartOrdersDTO);
+//        List<CartOrdersDTO> cartOrdersDTOList = cartOrdersDTO.getCartOrdersDTOList();
+//
+//        if (cartOrdersDTOList == null || cartOrdersDTOList.size() == 0) {
+//            return new ResponseEntity<String>("주문할 메뉴를 선택해주세요.", HttpStatus.FORBIDDEN);
+//        }
+//
+//        for (CartOrdersDTO cartOrders : cartOrdersDTOList) {
+//            if (!cartService.validateCartMenu(cartOrders.getCartMenuIdx(), principal.getName())) {
+//                return new ResponseEntity("주문 권한이 없습니다.", HttpStatus.FORBIDDEN);
+//            }
+//        }
+//        Integer orderidx = cartService.orderCartMenu(cartOrdersDTOList, principal.getName());
+//
+//        return new ResponseEntity<Integer>(orderidx, HttpStatus.OK);
+//    }
 
-        if (cartOrdersDTOList == null || cartOrdersDTOList.size() == 0) {
-            return new ResponseEntity<String>("주문할 메뉴를 선택해주세요.", HttpStatus.FORBIDDEN);
-        }
-        for (CartOrdersDTO cartOrders : cartOrdersDTOList) {
-            if (!cartService.validateCartMenu(cartOrders.getCartMenuIdx(), principal.getName())) {
-                return new ResponseEntity("주문 권한이 없습니다.", HttpStatus.FORBIDDEN);
-            }
-        }
-        Integer orderidx = cartService.orderCartMenu(cartOrdersDTOList, principal.getName());
-
-        return new ResponseEntity<Integer>(orderidx, HttpStatus.OK);
+    //장바구니 개수 반환하는 메서드 추가
+    @GetMapping("/cart/count")
+    @ResponseBody
+    public ResponseEntity<Integer> getCartCount(Principal principal) {
+        String email = principal.getName();
+        List<CartDetailDTO> cartList = cartService.cartDetailDTOList(email);
+        return ResponseEntity.ok(cartList.size());
     }
+
 }
 //현재 contentType: 'application/json'으로 요청을 보내고 있어서
 //Spring이 @RequestParam이 아니라 @RequestBody로 받아야 매핑할 수 있음.

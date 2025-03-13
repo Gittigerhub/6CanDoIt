@@ -1,5 +1,6 @@
 package com.sixcandoit.roomservice.dto.room;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -39,4 +41,5 @@ public class RoomDTO {
     private String resStatus;          // 예약 상태
     private LocalDateTime regDate;     // 등록일
     private LocalDateTime modDate;     // 수정일
+    private List<ImageFileDTO> imageFiles; // 객실 이미지 파일 목록
 }

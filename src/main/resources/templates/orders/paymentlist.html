@@ -149,16 +149,9 @@
         </table>
       </div>
 
-      <!-- 결제하기 버튼 -->
-      <div class="payment-button">
-        <a th:href="@{/orders/payment/checkout}" class="btn btn-primary">
-          <i class="fas fa-credit-card me-2"></i>결제하기
-        </a>
-      </div>
     </div>
   </div>
 </div>
-
 <th:block layout:fragment="script">
   <script th:inline="javascript">
     function handlePaymentClick(element) {

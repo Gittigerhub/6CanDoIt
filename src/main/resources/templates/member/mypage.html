@@ -8,6 +8,8 @@
     <title>마이페이지</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
@@ -49,9 +51,6 @@
                 <div class="col-md-8">
                     <h4>예약 내역</h4>
                 </div>
-                <div class="col-md-4 text-end">
-                    <a href="/member/verify" class="btn btn-primary">더보기</a>
-                </div>
             </div>
             <div class="card-body my-3">
                 <div class="table-responsive">
@@ -66,11 +65,22 @@
                         </thead>
                         <tbody>
                         <tr th:each="reservation : ${reservations}">
-                            <td th:text="${reservation.id}">12345</td>
-                            <td th:text="${#temporals.format(reservation.date, 'yyyy-MM-dd')}">2024-03-09</td>
-                            <td th:text="${reservation.status}">확정</td>
+                            <td th:text="${reservation.idx}"></td>
                             <td>
-                                <a th:href="@{/reservation/{id}(id=${reservation.id})}" class="btn btn-sm btn-info">상세보기</a>
+                                <span th:text="${#temporals.format(reservation.startDate, 'yyyy-MM-dd')}"></span> ~
+                                <span th:text="${#temporals.format(reservation.endDate, 'yyyy-MM-dd')}"></span>
+                            </td>
+                            <td>
+                                <span th:if="${reservation.resStatus == '1'}" class="badge bg-secondary">예약 중</span>
+                                <span th:if="${reservation.resStatus == '2'}" class="badge bg-primary">예약 완료</span>
+                                <span th:if="${reservation.resStatus == '3'}" class="badge bg-danger">예약 종료</span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        th:data-bs-target="'#reservationDetailModal' + ${reservation.idx}">
+                                    상세 보기
+                                </button>
                             </td>
                         </tr>
                         </tbody>
@@ -87,7 +97,7 @@
                     <h4>주문 내역</h4>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="/member/verify" class="btn btn-primary">더보기</a>
+                    <a href="/member/orders" class="btn btn-primary">상세 보기</a>
                 </div>
             </div>
             <div class="card-body my-3">
@@ -99,17 +109,22 @@
                             <th>주문 일자</th>
                             <th>금액</th>
                             <th>상태</th>
-                            <th>상세보기</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="order : ${orders}">
-                            <td th:text="${order.id}">67890</td>
-                            <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd')}">2024-03-09</td>
-                            <td th:text="${#numbers.formatCurrency(order.totalAmount)}">50,000원</td>
-                            <td th:text="${order.status}">배송완료</td>
+                        <tr th:each="order : ${ordersDTOS}">
+                            <td th:text="${order.idx}">67890</td>
+                            <td th:text="${#temporals.format(order.insDate, 'yyyy-MM-dd HH:MM')}">2024-03-09</td>
                             <td>
-                                <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-sm btn-info">상세보기</a>
+                                <span th:text="${#numbers.formatInteger(order.totalAmount, 1, 'COMMA')}"></span>
+                                <span>원</span>
+                            </td>
+                            <td>
+                                <span th:if="${order.ordersStatus.name() == 'NEW'}" class="badge bg-secondary">신규 주문</span>
+                                <span th:if="${order.ordersStatus.name() == 'CHECK'}" class="badge bg-secondary">주문 확인</span>
+                                <span th:if="${order.ordersStatus.name() == 'COOKING'}" class="badge bg-secondary">조리 진행</span>
+                                <span th:if="${order.ordersStatus.name() == 'CANCEL'}" class="badge bg-danger">주문 취소</span>
+                                <span th:if="${order.ordersStatus.name() == 'CLOSE'}" class="badge bg-primary">주문 완료</span>
                             </td>
                         </tr>
                         </tbody>
@@ -119,6 +134,50 @@
         </div>
         <!-- 주문 내역 끝 -->
 
+    </div>
+
+    <!-- 예약 상세 모달 -->
+    <div th:each="reservation : ${reservations}"
+         th:id="'reservationDetailModal' + ${reservation.idx}"
+         class="modal fade"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">예약 상세 정보</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="reservation-details">
+                        <h6 class="fw-bold mb-3" th:text="${reservation.roomName}">객실 이름</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                체크인: <span th:text="${#temporals.format(reservation.startDate, 'yyyy-MM-dd')}"></span>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-calendar-check me-2"></i>
+                                체크아웃: <span th:text="${#temporals.format(reservation.endDate, 'yyyy-MM-dd')}"></span>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-user me-2"></i>
+                                예약자: <span th:text="${reservation.username}"></span>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-tag me-2"></i>
+                                예약 상태:
+                                <span th:if="${reservation.resStatus == '1'}" class="badge bg-secondary">예약 중</span>
+                                <span th:if="${reservation.resStatus == '2'}" class="badge bg-primary">예약 완료</span>
+                                <span th:if="${reservation.resStatus == '3'}" class="badge bg-danger">예약 종료</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

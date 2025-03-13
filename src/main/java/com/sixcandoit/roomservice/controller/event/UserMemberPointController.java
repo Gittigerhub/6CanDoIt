@@ -41,8 +41,8 @@ public class UserMemberPointController {
     public String UserPointGet(@PageableDefault(page = 1) Pageable page,
                                @RequestParam(value = "type", defaultValue = "") String type,
                                @RequestParam(value = "keyword", defaultValue = "") String keyword,
-                               @RequestParam(value = "start", defaultValue = "") LocalDateTime start,
-                               @RequestParam(value = "end", defaultValue = "") LocalDateTime end,
+                               @RequestParam(value = "startDate", defaultValue = "") LocalDateTime startDate,
+                               @RequestParam(value = "endDate", defaultValue = "") LocalDateTime endDate,
                                Model model, Principal principal) {
 
         Optional<MemberEntity> memberEntity = memberRepository.findByMemberEmail(principal.getName());
@@ -50,15 +50,15 @@ public class UserMemberPointController {
         if (memberEntity.isEmpty()) {
             throw new RuntimeException("회원이 없습니다.");
         } else {
-
-            Page<MemberPointDTO> memberPointDTO = userMemberPointService.memberlist(memberEntity.get().getIdx(), page, type, keyword, start, end);
+            System.out.println("컨트롤에 들어오는 타입:"+type);
+            Page<MemberPointDTO> memberPointDTO = userMemberPointService.memberlist(memberEntity.get().getIdx(), page, type, keyword, startDate, endDate);
             Map<String, Integer> pageInfo = PageNationUtil.Pagination(memberPointDTO);
             model.addAttribute("memberPointDTO", memberPointDTO);
             model.addAllAttributes(pageInfo);
             model.addAttribute("type", type);
             model.addAttribute("keyword", keyword);
-            model.addAttribute("start", start);
-            model.addAttribute("end", end);
+            model.addAttribute("startDate", startDate);
+            model.addAttribute("endDate", endDate);
 
 
         }

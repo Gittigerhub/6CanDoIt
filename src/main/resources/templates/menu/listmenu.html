@@ -13,9 +13,61 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--아이콘 CSS-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- 캐러셀 스타일 -->
+    <style>
+        .hotel-gallery {
+            margin-bottom: 2rem;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+
+        .carousel-caption {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .carousel-caption h3 {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="content" class="container-fluid">
+
+    <div class="container mt-5">
+        <div class="hotel-gallery">
+            <!--메인 캐러셀 추가-->
+            <div id="mainMenuCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <!-- 지사별 매장 정보 표시 -->
+                    <div th:each="branch : ${branchOrganizations}" class="carousel-item" th:classappend="${branch.first} ? 'active'">
+                        <div th:each="shop : ${branch.shops}" class="position-relative">
+                            <img th:src="${shop.imageUrl}" class="d-block w-100" style="height: 400px; object-fit: cover" alt="Shop Image">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h3 class="text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);" th:text="${shop.organName}"></h3>
+                                <p class="text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">메뉴 목록</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#mainMenuCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#mainMenuCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="row mt-5">
         <div class="col-2"></div>
         <div class="col-8">
@@ -35,7 +87,7 @@
                                 <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Drink">음료</button>
                             </div>
                             <div class="position-relative d-inline-block ms-5">
-                                <a th:href="@{/cart/cartlist}">
+                                <a th:href="@{/member/cart/cartlist}">
                                     <i class="bi bi-cart4 align-middle" style="font-size: 24px;"></i>
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
                                         0
@@ -87,10 +139,10 @@
                             <td style="vertical-align: middle; text-align: center;" th:text="${menu.menuContent}"></td>
                             <td style="vertical-align: middle; text-align: center;" th:text="${#numbers.formatInteger(menu.menuPrice, 0, 'COMMA')} + '원'"></td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <input class="form-control mx-auto" name="count" style="width: 70px" th:type="Number" th:value="${1}">
+                                <input class="form-control mx-auto count" name="count" style="width: 70px" th:type="Number" th:value="${1}">
                             </td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <i class="bi bi-cart-plus-fill addCart" th:data-id="${menu.idx}" th:data-name="${menu.menuName}" th:data-price="${menu.menuPrice}" style="font-size: 24px"></i>
+                                <i class="bi bi-cart-plus-fill addCart" th:data-id="${menu.idx}" style="font-size: 24px"></i>
                             </td>
                         </tr>
                         </tbody>
@@ -101,22 +153,22 @@
                     <div class="mt-3 d-flex justify-content-center">
                         <ul class="pagination">
                             <li class="page-item" th:unless="${startPage>1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
-                                <a class="page-link" th:href="@{/member/menu/listmenu(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                                <a class="page-link" th:href="@{/member/menu/listmenu(page=1, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}">≪</a>
                             </li>
                             <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
-                                <a class="page-link" th:href="@{/member/menu/listmenu(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                                <a class="page-link" th:href="@{/member/menu/listmenu(page=${prevPage}, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}">＜</a>
                             </li>
                             <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}"><!--숫자 카운터-->
                                 <li class="page-item">
-                                    <a class="page-link" th:href="@{/member/menu/listmenu(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                                    <a class="page-link" th:href="@{/member/menu/listmenu(page=${page}, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}" th:text="${page}"></a>
                                 </li>
                             </span>
                             <!--11,12,13,14,15 다음 마지막(15)-->
                             <li class="page-item" th:unless="${currentPage>=endPage}">
-                                <a class="page-link" th:href="@{/member/menu/listmenu(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                                <a class="page-link" th:href="@{/member/menu/listmenu(page=${nextPage}, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}">＞</a>
                             </li>
                             <li class="page-item" th:unless="${currentPage>endPage}">
-                                <a class="page-link" th:href="@{/member/menu/listmenu(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                                <a class="page-link" th:href="@{/member/menu/listmenu(page=${endPage}, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}">≫</a>
                             </li>
                         </ul>
                     </div><!--페이징 끝-->
@@ -130,10 +182,74 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         $(document).ready(function() {
+            // 페이지 로드시 장바구니 개수 업데이트
+            updateCartCount();
+
+            // 장바구니 개수 업데이트 함수
+            function updateCartCount() {
+                $.ajax({
+                    url: '/member/cart/count',
+                    type: 'GET',
+                    success: function(response) {
+                        $('.cart-count').text(response);
+                    },
+                    error: function(error) {
+                        console.error("장바구니 개수 조회 실패:", error);
+                    }
+                });
+            }
+
+            //장바구니에 메뉴 추가
+            //$('.addCart').on('click', ...) 대신 $(document).on('click', '.addCart', ...)를 사용하여 이벤트 위임 구현(동적으로 추가되는 요소에서도 이벤트 작동 가능)
+            $(document).on('click', '.addCart', function() {
+                var menuIdx = $(this).data('id');
+                var count = $(this).closest('tr').find('.count').val();  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
+
+
+                console.log(menuIdx)
+                console.log(count)
+
+                $.ajax({
+                    url: '/member/cart',
+                    type: 'POST',
+                    data: {
+                        idx: menuIdx,
+                        count: count
+                    },
+                    success: function (response) {
+                        Swal.fire({
+                            icon: null,
+                            text: "장바구니에 추가되었습니다!",
+                            showConfirmButton: true,
+                            confirmButtonText: '장바구니 보기',
+                            showCancelButton: true,
+                            cancelButtonText: '계속 쇼핑하기',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                //'장바구니보기'버튼 클릭시
+                                window.location.href = '/member/cart/cartlist';
+                            }
+                        });
+                        // 장바구니 배지 수량 증가
+                        var currentCount = parseInt($('.cart-count').text() || '0');
+                        $('.cart-count').text(currentCount + 1);
+                    },
+                    error: function () {
+                        console.error("Error:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            text: "장바구니 추가에 실패하였습니다. 예약 확인 후 다시 시도해주세요.",
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                });
+            });
 
             // 카테고리 버튼 클릭 시 메뉴 목록 갱신
             $('.category-btn').on('click', function() {
                 var category = $(this).data('category');  // 선택된 카테고리 값
+                var organIdx = new URLSearchParams(window.location.search).get('organIdx'); //URL에서 organIdx를 가져온다
 
                 $.ajax({
                     url: '/member/menu/ajax/listmenu',  // 현재 페이지에서 처리할 주소
@@ -149,44 +265,6 @@
                     }
                 });
 
-            });
-
-            //장바구니에 메뉴 추가
-            $('.addCart').on('click', function() {
-                var menuIdx = $(this).data('id');
-                var count = $(this).closest('tr').find('.count').val();  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
-
-                console.log(menuIdx)
-                console.log(count)
-
-                $.ajax({
-                    url: '/cart',
-                    type: 'POST',
-                    contentType: 'application/json', // 데이터를 JSON 형식으로 전송
-                    data: {
-                        menuidx: menuIdx,
-                        count: count
-                    },
-                    success: function (response) {
-                        Swal.fire({
-                            icon: null,
-                            text: "장바구니에 추가되었습니다!",
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                        // 장바구니 배지 수량 증가
-                        var currentCount = parseInt($('.cart-count').text());
-                        $('.cart-count').text(currentCount + 1);
-                    },
-                    error: function () {
-                        Swal.fire({
-                            icon: null,
-                            text: "장바구니 추가에 실패하였습니다!",
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                    }
-                });
             });
 
             // //삭제 버튼 클릭시

@@ -106,20 +106,20 @@
                         호텔 전체 사진
                     </h5>
                     <div class="row g-3">
-                        <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+        <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
                             <div class="col-md-3 col-6">
                                 <img th:src="@{${data.url}}"
-                                     th:alt="${data.originName}"
+                         th:alt="${data.originName}"
                                      class="img-fluid rounded hotel-image"
                                      style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
                                      data-bs-toggle="modal"
                                      data-bs-target="#imageModal"
                                      th:data-image-url="${data.url}">
-                            </div>
-                        </th:block>
+                </div>
+        </th:block>
                     </div>
                 </div>
-            </div>
+    </div>
 
             <h2 class="mb-4" th:text="${organization.organName}">호텔 상세 정보</h2>
             <div class="row">

@@ -52,4 +52,20 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     // 조직별 룸 목록 조회 (가격 내림차순)
     List<RoomEntity> findByOrganizationJoin_IdxOrderByRoomPriceDesc(Integer organIdx);
 
+    // 조직별 룸 타입 검색
+    @Query("SELECT r FROM RoomEntity r WHERE r.organizationJoin.idx = :organIdx AND r.roomType LIKE %:keyword%")
+    Page<RoomEntity> searchRoomTypeByOrgan(@Param("keyword") String keyword, @Param("organIdx") Integer organIdx, Pageable pageable);
+
+    // 조직별 룸 이름 검색
+    @Query("SELECT r FROM RoomEntity r WHERE r.organizationJoin.idx = :organIdx AND r.roomName LIKE %:keyword%")
+    Page<RoomEntity> searchRoomNameByOrgan(@Param("keyword") String keyword, @Param("organIdx") Integer organIdx, Pageable pageable);
+
+    // 객실 타입으로 검색
+    @Query("SELECT r FROM RoomEntity r WHERE r.roomType = :roomType")
+    Page<RoomEntity> findByRoomType(@Param("roomType") String roomType, Pageable pageable);
+
+    // 조직별 객실 타입으로 검색
+    @Query("SELECT r FROM RoomEntity r WHERE r.organizationJoin.idx = :organIdx AND r.roomType = :roomType")
+    Page<RoomEntity> findByOrganIdxAndRoomType(@Param("organIdx") Integer organIdx, @Param("roomType") String roomType, Pageable pageable);
+
 }

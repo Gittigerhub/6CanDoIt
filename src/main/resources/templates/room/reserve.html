@@ -8,11 +8,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!--JQuery 반드시 추가-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--Jquery를 이용한 드래그 앤 드롭, 리사이즈, 애니메이션 등 인터랙티브 기능을 구현-->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!--부트스트랩 아이콘-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--알림창 스크립트-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        body {
+            font-family: "Montserrat", sans-serif;
+        }
         .card {
             border: 1px solid #ddd;
             background-color: #f9f9f9;
@@ -68,11 +80,11 @@
         }
 
         /* 체크인 카드만 예쁘게 변경 ^^ */
-         .checkin-card {
-             background-color: #fcf8e3; /* 예쁜 노란색 */
-             color: #000; /* 글자색을 검정으로 */
-             border: 1px solid #ffcd39; /* 경계선 색상 */
-         }
+        .checkin-card {
+            background-color: #fcf8e3; /* 예쁜 노란색 */
+            color: #000; /* 글자색을 검정으로 */
+            border: 1px solid #ffcd39; /* 경계선 색상 */
+        }
         .checkin-card:hover {
             background-color: #ffecb5; /* 체크인 카드에 마우스를 올렸을 때 밝은 노란색 */
             border-color: #ffcd39;
@@ -155,27 +167,27 @@
         <a href="javascript:void(0)" data-status="3">체크아웃</a>
     </div>
 
-<div class="container">
-    <!-- 객실 목록 -->
-    <div class="row p-5 bg-white">
-        <h2 class="text-center">객실 목록 현황</h2>
-        <div class="col-sm-6 mt-4 col-md-4 col-lg-3 mb-4" th:each="data : ${roomDTOList}">
-            <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;" th:onclick="|showContextMenu(event, ${data.idx})|"
-                 th:classappend="${data.resStatus == '2' ? ' checkin-card' : ''}">
-                <div class="card-body text-center">
-                    <p class="card-text" style="font-size: 12px">
-                        <strong>번호:</strong> <span th:text="${data.idx}">1</span>
-                    </p>
-                    <p class="card-title" th:text="${data.roomName}" style="font-size: 27px">방 이름</p>
-                    <i class="bi bi-tags-fill"></i>
-                    <p class="badge rounded-pill text-bg-secondary" style="font-size: 13px" th:if="${data.resStatus == '1'}">빈 방</p>
-                    <p class="badge rounded-pill text-bg-primary" style="font-size: 13px" th:if="${data.resStatus == '2'}">체크인</p>
-                    <p class="badge rounded-pill text-bg-danger" style="font-size: 13px" th:if="${data.resStatus == '3'}">체크아웃</p>
+    <div class="container">
+        <!-- 객실 목록 -->
+        <div class="row p-5 bg-white">
+            <h2 class="text-center">객실 목록 현황</h2>
+            <div class="col-sm-6 mt-4 col-md-4 col-lg-3 mb-4" th:each="data : ${roomDTOList}">
+                <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;" th:onclick="|showContextMenu(event, ${data.idx})|"
+                     th:classappend="${data.resStatus == '2' ? ' checkin-card' : ''}">
+                    <div class="card-body text-center">
+                        <p class="card-text" style="font-size: 12px">
+                            <strong>번호:</strong> <span th:text="${data.idx}">1</span>
+                        </p>
+                        <p class="card-title" th:text="${data.roomName}" style="font-size: 27px">방 이름</p>
+                        <i class="bi bi-tags-fill"></i>
+                        <p class="badge rounded-pill text-bg-secondary" style="font-size: 13px" th:if="${data.resStatus == '1'}">빈 방</p>
+                        <p class="badge rounded-pill text-bg-primary" style="font-size: 13px" th:if="${data.resStatus == '2'}">체크인</p>
+                        <p class="badge rounded-pill text-bg-danger" style="font-size: 13px" th:if="${data.resStatus == '3'}">체크아웃</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
     <script>
         function showContextMenu2(event, idx) {
@@ -245,63 +257,123 @@
     <div id="contextMenu2" style="display: none;">
         <a href="javascript:void(0)" data-status="1">예약 중</a>
         <a href="javascript:void(0)" data-status="2">예약 완료</a>
-        <a href="javascript:void(0)" data-status="3">예약 종료</a>
+        <a href="javascript:void(0)" data-status="3">체크인</a>
+        <a href="javascript:void(0)" data-status="4">체크아웃</a>
     </div>
 
     <div class="container mt-5">
-    <div class="row p-5 bg-white">
+        <div class="row p-5 bg-white">
             <div class="col-lg-2"></div>
             <div class="col-lg-8">
                 <h2 class="text-center">예약 목록 현황</h2>
                 <!-- 검색 영역 -->
                 <form th:action="@{/room/reserve}" method="get">
                     <div class="input-group mb-3 mt-3">
-                        <input type="date" class="form-control" name="sdate" th:value="${sdate}"> <!--예약시작일-->
-                        <input type="date" class="form-control" name="edate" th:value="${edate}"> <!--예약종료일-->
+                        <input type="date" class="form-control" name="sdate" th:value="${sdate}">
+                        <input type="date" class="form-control" name="edate" th:value="${edate}">
+                        <input type="hidden" name="organ_idx" th:value="${organ_idx}">
                         <button type="submit" class="btn btn-primary">검색</button>
-                        <button type="reset" class="btn btn-secondary">지우기</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetSearch()">지우기</button>
                     </div>
                 </form>
                 <!-- 검색 영역 끝 -->
             </div>
             <div class="col-lg-2"></div>
-        <!-- 데이터 목록 -->
-        <div class="row mt-5">
-            <div class="col-sm-6 col-md-4 col-lg-3 mb-4" th:each="data : ${reserveDTOList}">
-                <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;">
-                    <div class="card-body text-center" th:onclick="|showContextMenu2(event, ${data.idx})|"
-                         th:classappend="${data.resStatus == '2' ? ' res-card' : ''}">
-                        <p class="card-text" style="font-size: 12px">
-                            <strong>번호:</strong> <span th:text="${data.idx}">1</span>
-                        </p>
-                        <p class="card-title" th:text="${data.roomName}">방 이름</p>
-                        <p>
-                            <strong>예약자:</strong> <span th:text="${data.username}"></span>
-                        </p>
-                        <p style="font-size: 12px">
-                            <span th:text="${#temporals.format(data.startDate, 'yyyy-MM-dd')}">2024-01-21</span> ~
-                            <span th:text="${#temporals.format(data.endDate, 'yyyy-MM-dd')}">2024-01-21</span>
-                        </p>
-                        <i class="bi bi-tags-fill"></i>
-                        <p class="badge rounded-pill text-bg-secondary" style="font-size: 13px" th:if="${data.resStatus == '1'}">예약 중</p>
-                        <p class="badge rounded-pill text-bg-primary" style="font-size: 13px" th:if="${data.resStatus == '2'}">예약 완료</p>
-                        <p class="badge rounded-pill text-bg-danger" style="font-size: 13px" th:if="${data.resStatus == '3'}">예약 종료</p>
-                    </div>
-                    <div class="card-footer">
-                        <div class="d-flex justify-content-center">
-                            <a th:href="@{'/res/update/' + ${data.idx}}" class="btn btn-outline-primary btn-sm mx-2">예약 변경</a>
-                            <a th:href="@{'/res/deletee/' + ${data.idx}}" class="btn btn-outline-danger btn-sm mx-2">예약 취소</a>
+            <!-- 데이터 목록 -->
+            <div class="row mt-5">
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4" th:each="data : ${reserveDTOList}">
+                    <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                        <div class="card-body text-center" th:onclick="|showContextMenu2(event, ${data.idx})|"
+                             th:classappend="${data.resStatus == '2' ? ' res-card' : ''}">
+                            <p class="card-text" style="font-size: 12px">
+                                <strong>번호:</strong> <span th:text="${data.idx}">1</span>
+                            </p>
+                            <p class="card-title" th:text="${data.roomName}">방 이름</p>
+                            <p>
+                                <strong>예약자:</strong> <span th:text="${data.username}"></span>
+                            </p>
+                            <p style="font-size: 12px">
+                                <span th:text="${#temporals.format(data.startDate, 'yyyy-MM-dd')}">2024-01-21</span> ~
+                                <span th:text="${#temporals.format(data.endDate, 'yyyy-MM-dd')}">2024-01-21</span>
+                            </p>
+                            <i class="bi bi-tags-fill"></i>
+                            <p class="badge rounded-pill text-bg-secondary" style="font-size: 13px" th:if="${data.resStatus == '1'}">예약 중</p>
+                            <p class="badge rounded-pill text-bg-primary" style="font-size: 13px" th:if="${data.resStatus == '2'}">예약 완료</p>
+                            <p class="badge rounded-pill text-bg-danger" style="font-size: 13px" th:if="${data.resStatus == '3'}">체크인</p>
+                            <p class="badge rounded-pill text-bg-danger" style="font-size: 13px" th:if="${data.resStatus == '4'}">체크아웃</p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-center">
+                                <button th:if="${data.resStatus == '1' || data.resStatus == '2'}"
+                                        class="btn btn-sm btn-danger"
+                                        th:onclick="'deleteReservation(' + ${data.idx} + ')'">
+                                    예약 취소
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- 데이터 목록 끝 -->
         </div>
-        <!-- 데이터 목록 끝 -->
-    </div>
     </div>
 </div>
-<script th:inline="javascript">
-</script>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const organ_idx = /*[[${organ_idx}]]*/ null;
+        const csrfToken = $("meta[name='_csrf']").attr("content");
+        const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+        function resetSearch() {
+            window.location.href = '/room/reserve' + (organ_idx ? '?organ_idx=' + organ_idx : '');
+        }
+
+        function deleteReservation(idx) {
+            Swal.fire({
+                title: '예약을 취소하시겠습니까?',
+                text: "이 작업은 되돌릴 수 없습니다!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '네, 취소합니다',
+                cancelButtonText: '아니요'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const headers = {};
+                    if (csrfHeader && csrfToken) {
+                        headers[csrfHeader] = csrfToken;
+                    }
+
+                    $.ajax({
+                        url: '/res/cancel/' + idx,
+                        type: 'POST',
+                        headers: headers,
+                        success: function(response) {
+                            Swal.fire({
+                                title: '취소 완료!',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                title: '오류!',
+                                text: xhr.responseJSON.message || '예약 취소 중 오류가 발생했습니다.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+</th:block>
 
 </body>
 </html>

@@ -18,7 +18,7 @@
         <div class="col-2"></div>
         <div class="col-8">
             <form th:action="@{/admin/menu/registermenu}" method="post" enctype="multipart/form-data" onsubmit="validateForm(event)">
-            <!--디자인-->
+                <!--디자인-->
                 <div class="card">
                     <div class="card-body">
                         <h2>메뉴 등록</h2>
@@ -167,7 +167,9 @@
                                 <button type="submit" class="btn btn-primary">등록</button>
                                 <button type="reset" class="btn btn-secondary">초기화</button>
                                 <button type="button" class="btn btn-danger"
-                                        th:onclick="|location.href='@{/admin/menu/adlistmenu}'|">목록으로</button>
+                                        th:data-organ-idx="${shopDetailDTO.organizationJoin.idx}"
+                                        th:onclick="|location.href='/admin/menu/adlistmenu?organIdx=' + ${shopDetailDTO.organizationJoin.idx}|">
+                                    목록으로</button>
                             </div>
                         </th:block>
                     </div>

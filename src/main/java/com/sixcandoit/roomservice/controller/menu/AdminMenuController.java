@@ -56,10 +56,10 @@ public class AdminMenuController {
     //아이템 등록
     @GetMapping("/menu/registermenu")
     public String registerMenu(Model model, Principal principal) {
-//        if (principal == null) {
-//            //로그인이 안되어 있으면, 접근 불가능하도록
-//            return "redirect:/login";
-//        }
+        if (principal == null) {
+            //로그인이 안되어 있으면, 접근 불가능하도록
+            return "redirect:/login";
+        }
         System.out.println("이메일 : " + principal.getName());
         try {
             // SecurityContextHolder에서 현재 인증된 사용자 정보 가져오기
@@ -143,7 +143,7 @@ public class AdminMenuController {
 
                 if (contentType == null || !contentType.startsWith("image")) {
                     model.addAttribute("msg", "이미지 파일만 업로드 가능합니다.");
-                            return "/menu/registermenu";  //이미지 파일이 아니라면 다시 처음으로 돌아감
+                    return "/menu/registermenu";  //이미지 파일이 아니라면 다시 처음으로 돌아감
                 }
             }
         }
@@ -221,6 +221,7 @@ public class AdminMenuController {
     public String listMenu(@PageableDefault(page = 1) Pageable page, //페이지 정보
                            @RequestParam(value = "type", defaultValue = "") String type, //검색 대상
                            @RequestParam(value = "keyword", defaultValue = "") String keyword, //키워드
+                           @RequestParam(value = "organIdx") Integer organIdx, //매장 상세
                            Model model){
 
         String join = "menu";
@@ -264,6 +265,7 @@ public class AdminMenuController {
         model.addAttribute("bucket", bucket);
         model.addAttribute("region", region);
         model.addAttribute("folder", folder);
+        model.addAttribute("organIdx", organIdx);  // organIdx 추가
 
         return "menu/adlistmenu";
 

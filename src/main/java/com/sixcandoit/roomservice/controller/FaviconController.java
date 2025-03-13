@@ -11,7 +11,7 @@ public class FaviconController {
 
     @GetMapping("favicon.ico")
     public ResponseEntity<Resource> favicon(){
-        Resource res = new ClassPathResource("/static/assets/favicon.ico");
+        Resource res = new ClassPathResource("/static/favicon.ico");
         return ResponseEntity.ok().body(res);
 
     }

@@ -96,6 +96,7 @@
             width: 100%;
             height: auto;
             overflow: hidden;
+            min-height: 800px; /* 최소 높이 설정 (필요에 따라 조정 가능) */
         }
         .wrap:after {
             content: "";
@@ -136,12 +137,10 @@
             margin: 0 auto;
             padding-top: 40px;
             width: 100%;
-            height: 100vh;
+            height: auto; /* 높이를 자동으로 조정 */
+            min-height: 900px; /* 최소 높이 설정 (필요에 따라 조정 가능) */
             overflow: auto;
             background: #252934;
-            /*background: #252D40; purpleish */
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
             box-shadow: none;
             border-radius: 0;
             overflow-x: hidden;
@@ -777,42 +776,56 @@
         .valid-feedback {
             color: #28a745;
         }
+
+        /* TERMS */
+        .terms {
+            height: 100vh; /* 전체 화면 높이로 설정 */
+            overflow-y: auto; /* 수직 스크롤 추가 */
+            background: #fff; /* 배경색 설정 */
+        }
+
+        /* RECOVERY */
+        .recovery {
+            height: 100vh; /* 전체 화면 높이로 설정 */
+            overflow-y: auto; /* 수직 스크롤 추가 */
+            background: #fff; /* 배경색 설정 */
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 로그인 모듈 -->
-        <div class="login">
-            <div class="wrap">
+<div class="container">
+    <!-- 로그인 모듈 -->
+    <div class="login">
+        <div class="wrap">
 
-                <!-- 로그인 폼 -->
-                <div class="user">
-                    <!-- ACTIONS
-                    <div class="actions">
-                        <a class="help" href="#signup-tab-content">Sign Up</a><a class="faq" href="#login-tab-content">Login</a>
-                    </div>
-                    -->
-                    <!-- 로고 -->
-                    <div class="logo">
-                        <a href="#"><img src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/6CanDoIt%EB%A1%9C%EA%B3%A0.png" alt=""></a>
-                    </div>
-                    <!-- 토글 -->
-                    <div id="toggle-wrap">
-                        <div id="toggle-terms">
-                            <div id="cross">
-                                <span></span>
-                                <span></span>
-                            </div>
+            <!-- 로그인 폼 -->
+            <div class="user">
+                <!-- ACTIONS
+                <div class="actions">
+                    <a class="help" href="#signup-tab-content">Sign Up</a><a class="faq" href="#login-tab-content">Login</a>
+                </div>
+                -->
+                <!-- 로고 -->
+                <div class="logo">
+                    <a href="#"><img src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/6CanDoIt%EB%A1%9C%EA%B3%A0.png" alt=""></a>
+                </div>
+                <!-- 토글 -->
+                <div id="toggle-wrap">
+                    <div id="toggle-terms">
+                        <div id="cross">
+                            <span></span>
+                            <span></span>
                         </div>
                     </div>
+                </div>
 
-                    <!-- 동의 내용 -->
-                    <div class="terms">
-                        <div class="terms-agreement">
-                            <h2>이용약관 및 정보수집 동의</h2>
-                            <div class="terms-section collapsed">
-                                <h4>[필수] 서비스 이용약관 동의</h4>
-                                <div class="terms-content">
+                <!-- 동의 내용 -->
+                <div class="terms">
+                    <div class="terms-agreement">
+                        <h2>이용약관 및 정보수집 동의</h2>
+                        <div class="terms-section collapsed">
+                            <h4>[필수] 서비스 이용약관 동의</h4>
+                            <div class="terms-content">
                                     <textarea readonly>
 제1조(목적) 이 약관은 OO 회사(전자상거래 사업자)가 운영하는 6candoit(이하 "몰"이라 한다)에서 제공하는 인터넷 관련 서비스(이하 "서비스"라 한다)를 이용함에 있어 사이버 몰과 이용자의 권리․의무 및 책임사항을 규정함을 목적으로 합니다.
 
@@ -1053,15 +1066,15 @@
   ① "몰"과 이용자 간에 발생한 전자상거래 분쟁에 관한 소송은 제소 당시의 이용자의 주소에 의하고, 주소가 없는 경우에는 거소를 관할하는 지방법원의 전속관할로 합니다. 다만, 제소 당시 이용자의 주소 또는 거소가 분명하지 않거나 외국 거주자의 경우에는 민사소송법상의 관할법원에 제기합니다.
 
   ② "몰"과 이용자 간에 제기된 전자상거래 소송에는 한국법을 적용합니다.</textarea>
-                                    <div class="form-check">
-                                        <input type="checkbox" id="serviceTerms" required>
-                                        <label for="serviceTerms">서비스 이용약관에 동의합니다.</label>
-                                    </div>
+                                <div class="form-check">
+                                    <input type="checkbox" id="serviceTerms" required>
+                                    <label for="serviceTerms">서비스 이용약관에 동의합니다.</label>
                                 </div>
                             </div>
-                            <div class="terms-section collapsed">
-                                <h4>[필수] 개인정보 수집 및 이용 동의</h4>
-                                <div class="terms-content">
+                        </div>
+                        <div class="terms-section collapsed">
+                            <h4>[필수] 개인정보 수집 및 이용 동의</h4>
+                            <div class="terms-content">
                                     <textarea readonly>
 개인정보 수집 및 활용 동의서
 
@@ -1111,405 +1124,405 @@ E-mail : himyeongsun@gmail.com
 
 이상의 개인정보 보호정책은 2025년 3월 1일부로 시행됩니다.
                         </textarea>
-                                    <div class="form-check">
-                                        <input type="checkbox" id="privacyTerms" required>
-                                        <label for="privacyTerms">개인정보 수집 및 이용에 동의합니다.</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-check all-terms">
-                                <input type="checkbox" id="allTerms">
-                                <label for="allTerms">모든 약관에 동의합니다.</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 임시 비밀번호 발급 -->
-                    <div class="recovery">
-                        <h2>임시 비밀번호 발급</h2>
-                        <p><strong>이메일</strong>과 <strong>이름</strong>을 입력 후, <strong>비밀번호 재발급</strong> 버튼을 클릭해주세요.<br>
-                            입력하신 이메일로 임시 비밀번호가 발급됩니다.<br></p>
-                        <p>임시비밀번호 로그인한 후에는 <strong>반드시 비밀번호를 변경</strong>해주세요.</p>
-                        <form id="passswordResetForm" class="recovery-form" th:action="@{/admin/password}" method="post" onsubmit="return validatePasswordReset()">
-                            <input type="email" class="input" name="adminEmail" placeholder="이메일">
-                            <input type="text" class="input" name="adminName" placeholder="이름">
-                            <input type="submit" class="button" value="비밀번호 재발급">
-                        </form>
-                        <p class="mssg">이메일로 임시 비밀번호가 전송되었습니다.</p>
-                    </div>
-
-
-                    <!-- 폼 -->
-                    <div class="form-wrap">
-                        <!-- 탭 -->
-                        <div class="tabs">
-                            <h3 class="login-tab"><a class="log-in active" href="#login-tab-content"><span>로그인</span></a></h3>
-                            <h3 class="signup-tab"><a class="sign-up" href="#signup-tab-content"><span>회원가입</span></a></h3>
-                        </div>
-                        <!-- 탭 내용 -->
-                        <div class="tabs-content">
-                            <!-- 로그인 -->
-                            <div id="login-tab-content" class="active">
-                                <form id="sign-in" class="login-form" th:action="@{/admin/login}" method="post">
-                                    <div>
-                                        <input type="email" class="input" name="adminEmail" placeholder="이메일" required>
-                                    </div>
-                                    <div>
-                                        <input type="password" class="input" name="password" placeholder="비밀번호" required>
-                                    </div>
-                                    <!--                                    <input type="checkbox" class="checkbox" checked id="remember_me">-->
-                                    <!--                                    <label for="remember_me">이메일 기억하기</label>-->
-                                    <input type="submit" class="button" value="로그인">
-                                </form>
-                                <div class="help-action">
-                                    <p><i class="fa fa-arrow-left" aria-hidden="true"></i><a class="forgot" href="#">비밀번호를 잊으셨나요?</a></p>
-                                </div>
-                            </div>
-                            <!-- 회원 가입 -->
-                            <div id="signup-tab-content">
-                                <form id="sign-up" class="signup-form" th:action="@{/admin/register}" method="post" onsubmit="return validateForm() && validatePassword()">
-                                    <div>
-                                        <input type="email" class="input" id="adminEmail" name="adminEmail" autocomplete="off" placeholder="이메일">
-                                        <input type="button" class="button" value="이메일 인증">
-                                    </div>
-                                    <div>
-                                        <input type="password" class="input" id="password" autocomplete="off" placeholder="비밀번호">
-                                    </div>
-                                    <div>
-                                        <input type="password" class="input" id="confirmPassword" name="confirmPassword" autocomplete="off" placeholder="비밀번호 확인">
-                                        <div id="confirmPasswordFeedback" class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
-                                        <div id="confirmPasswordValid" class="valid-feedback">비밀번호가 일치합니다.</div>
-                                    </div>
-                                    <div>
-                                        <label for="organization" class="form-label">호텔명</label>
-                                        <select class="form-select" id="organization" name="organization" required>
-                                            <option th:if="${#lists.isEmpty(organizations)}" value="" disabled>등록된 호텔이 없습니다.</option>
-                                            <option th:each="org : ${organizations}"
-                                                    th:value="${org.idx}"
-                                                    th:text="${org.organName}"
-                                                    th:selected="${adminDTO != null && adminDTO.organDTO != null && adminDTO.organDTO.idx == org.idx}">
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <input type="text" class="input" id="adminName" name="adminName" autocomplete="off" placeholder="이름">
-                                    </div>
-                                    <div>
-                                        <input type="tel" class="input" name="adminPhone" id="adminPhone" placeholder="전화번호" required>
-                                        <div id="confirmPhoneFeedback" class="invalid-feedback">잘못된 전화번호 형식입니다.</div>
-                                        <div id="confirmPhoneValid" class="valid-feedback">올바른 전화번호 형식입니다.</div>
-                                    </div>
-                                    <input type="submit" class="button" value="회원가입">
-                                </form>
-                                <div class="help-action">
-                                    <p>회원가입을 하시려면 이용약관에 동의해주세요.</p>
-                                    <p><i class="fa fa-arrow-left" aria-hidden="true"></i><a class="agree" href="#">약관 동의</a></p>
+                                <div class="form-check">
+                                    <input type="checkbox" id="privacyTerms" required>
+                                    <label for="privacyTerms">개인정보 수집 및 이용에 동의합니다.</label>
                                 </div>
                             </div>
                         </div>
+                        <div class="form-check all-terms">
+                            <input type="checkbox" id="allTerms">
+                            <label for="allTerms">모든 약관에 동의합니다.</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 임시 비밀번호 발급 -->
+                <div class="recovery">
+                    <h2>임시 비밀번호 발급</h2>
+                    <p><strong>이메일</strong>과 <strong>이름</strong>을 입력 후, <strong>비밀번호 재발급</strong> 버튼을 클릭해주세요.<br>
+                        입력하신 이메일로 임시 비밀번호가 발급됩니다.<br></p>
+                    <p>임시비밀번호 로그인한 후에는 <strong>반드시 비밀번호를 변경</strong>해주세요.</p>
+                    <form id="passswordResetForm" class="recovery-form" th:action="@{/admin/password}" method="post" onsubmit="return validatePasswordReset()">
+                        <input type="email" class="input" name="adminEmail" placeholder="이메일">
+                        <input type="text" class="input" name="adminName" placeholder="이름">
+                        <input type="submit" class="button" value="비밀번호 재발급">
+                    </form>
+                    <p class="mssg">이메일로 임시 비밀번호가 전송되었습니다.</p>
+                </div>
+
+
+                <!-- 폼 -->
+                <div class="form-wrap">
+                    <!-- 탭 -->
+                    <div class="tabs">
+                        <h3 class="login-tab"><a class="log-in active" href="#login-tab-content"><span>로그인</span></a></h3>
+                        <h3 class="signup-tab"><a class="sign-up" href="#signup-tab-content"><span>회원가입</span></a></h3>
+                    </div>
+                    <!-- 탭 내용 -->
+                    <div class="tabs-content">
+                        <!-- 로그인 -->
+                        <div id="login-tab-content" class="active">
+                            <form id="sign-in" class="login-form" th:action="@{/admin/login}" method="post">
+                                <div>
+                                    <input type="email" class="input" name="adminEmail" placeholder="이메일" required>
+                                </div>
+                                <div>
+                                    <input type="password" class="input" name="password" placeholder="비밀번호" required>
+                                </div>
+                                <!--                                    <input type="checkbox" class="checkbox" checked id="remember_me">-->
+                                <!--                                    <label for="remember_me">이메일 기억하기</label>-->
+                                <input type="submit" class="button" value="로그인">
+                            </form>
+                            <div class="help-action">
+                                <p><i class="fa fa-arrow-left" aria-hidden="true"></i><a class="forgot" href="#">비밀번호를 잊으셨나요?</a></p>
+                            </div>
+                        </div>
+                        <!-- 회원 가입 -->
+                        <div id="signup-tab-content">
+                            <form id="sign-up" class="signup-form" th:action="@{/admin/register}" method="post" onsubmit="return validateForm() && validatePassword()">
+                                <div>
+                                    <input type="email" class="input" name="adminEmail" placeholder="이메일" required>
+                                    <button class="email-verify-button">이메일 인증</button> <!-- 이메일 인증 버튼 -->
+                                </div>
+                                <div>
+                                    <input type="password" class="input" id="password" autocomplete="off" placeholder="비밀번호">
+                                </div>
+                                <div>
+                                    <input type="password" class="input" id="confirmPassword" name="confirmPassword" autocomplete="off" placeholder="비밀번호 확인">
+                                    <div id="confirmPasswordFeedback" class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+                                    <div id="confirmPasswordValid" class="valid-feedback">비밀번호가 일치합니다.</div>
+                                </div>
+                                <div>
+                                    <label for="organization" class="form-label">호텔명</label>
+                                    <select class="form-select" id="organization" name="organization" required>
+                                        <option th:if="${#lists.isEmpty(organizations)}" value="" disabled>등록된 호텔이 없습니다.</option>
+                                        <option th:each="org : ${organizations}"
+                                                th:value="${org.idx}"
+                                                th:text="${org.organName}"
+                                                th:selected="${adminDTO != null && adminDTO.organDTO != null && adminDTO.organDTO.idx == org.idx}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <input type="text" class="input" id="adminName" name="adminName" autocomplete="off" placeholder="이름">
+                                </div>
+                                <div>
+                                    <input type="tel" class="input" name="adminPhone" id="adminPhone" placeholder="전화번호" required>
+                                    <div id="confirmPhoneFeedback" class="invalid-feedback">잘못된 전화번호 형식입니다.</div>
+                                    <div id="confirmPhoneValid" class="valid-feedback">올바른 전화번호 형식입니다.</div>
+                                </div>
+                                <input type="submit" class="button" value="회원가입">
+                            </form>
+                            <div class="help-action">
+                                <p>회원가입을 하시려면 이용약관에 동의해주세요.</p>
+                                <p><i class="fa fa-arrow-left" aria-hidden="true"></i><a class="agree" href="#">약관 동의</a></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- 비밀번호 불일치 시 띄울 모달 -->
-    <div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="passwordMismatchModalLabel">비밀번호 불일치</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    비밀번호가 일치하지 않습니다.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
+<!-- 비밀번호 불일치 시 띄울 모달 -->
+<div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passwordMismatchModalLabel">비밀번호 불일치</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                비밀번호가 일치하지 않습니다.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- 이메일 중복 시 띄울 모달 -->
-    <div class="modal fade" id="emailMismatchModal" tabindex="-1" aria-labelledby="emailMismatchModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="emailMismatchModalLabel">이메일 확인</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    이미 가입된 이메일입니다.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
+<!-- 이메일 중복 시 띄울 모달 -->
+<div class="modal fade" id="emailMismatchModal" tabindex="-1" aria-labelledby="emailMismatchModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="emailMismatchModalLabel">이메일 확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                이미 가입된 이메일입니다.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- 연락처 중복 시 띄울 모달 -->
-    <div class="modal fade" id="phoneMismatchModal" tabindex="-1" aria-labelledby="phoneMismatchModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="phoneMismatchModalLabel">연락처 확인</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    이미 가입된 연락처입니다.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
+<!-- 연락처 중복 시 띄울 모달 -->
+<div class="modal fade" id="phoneMismatchModal" tabindex="-1" aria-labelledby="phoneMismatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="phoneMismatchModalLabel">연락처 확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                이미 가입된 연락처입니다.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // 로그인 탭
-        $(function() {
-            tab = $('.tabs h3 a');
-            tab.on('click', function(event) {
-                event.preventDefault();
-                tab.removeClass('active');
-                $(this).addClass('active');
-                tab_content = $(this).attr('href');
-                $('div[id$="tab-content"]').removeClass('active');
-                $(tab_content).addClass('active');
-            });
+<script>
+    // 로그인 탭
+    $(function() {
+        tab = $('.tabs h3 a');
+        tab.on('click', function(event) {
+            event.preventDefault();
+            tab.removeClass('active');
+            $(this).addClass('active');
+            tab_content = $(this).attr('href');
+            $('div[id$="tab-content"]').removeClass('active');
+            $(tab_content).addClass('active');
         });
+    });
 
-        // 슬라이드쇼
-        $(function() {
-            $('#slideshow > div:gt(0)').hide();
-            setInterval(function() {
-                $('#slideshow > div:first')
-                    .fadeOut(1000)
-                    .next()
-                    .fadeIn(1000)
-                    .end()
-                    .appendTo('#slideshow');
-            }, 3850);
-        });
+    // 슬라이드쇼
+    $(function() {
+        $('#slideshow > div:gt(0)').hide();
+        setInterval(function() {
+            $('#slideshow > div:first')
+                .fadeOut(1000)
+                .next()
+                .fadeIn(1000)
+                .end()
+                .appendTo('#slideshow');
+        }, 3850);
+    });
 
-        // 클래스를 교체하는 jquery 함수
-        (function($) {
-            'use strict';
-            $.fn.swapClass = function(remove, add) {
-                this.removeClass(remove).addClass(add);
-                return this;
-            };
-        }(jQuery));
+    // 클래스를 교체하는 jquery 함수
+    (function($) {
+        'use strict';
+        $.fn.swapClass = function(remove, add) {
+            this.removeClass(remove).addClass(add);
+            return this;
+        };
+    }(jQuery));
 
-        // 보기 및 숨기기
-        $(function() {
-            $('.agree, .forgot, #toggle-terms, .log-in, .sign-up').on('click', function(event) {
-                event.preventDefault();
-                var user = $('.user'),terms = $('.terms'),form = $('.form-wrap'),recovery = $('.recovery'),close = $('#toggle-terms'),arrow = $('.tabs-content .fa');
-                if ($(this).hasClass('agree') || $(this).hasClass('log-in') || ($(this).is('#toggle-terms')) && terms.hasClass('open')) {
-                    if (terms.hasClass('open')) {
-                        form.swapClass('open', 'closed');
-                        terms.swapClass('open', 'closed');
-                        close.swapClass('open', 'closed');
-                    } else {
-                        if ($(this).hasClass('log-in')) {
-                            return;
-                        }
-                        form.swapClass('closed', 'open');
-                        terms.swapClass('closed', 'open').scrollTop(0);
-                        close.swapClass('closed', 'open');
-                        user.addClass('overflow-hidden');
+    // 보기 및 숨기기
+    $(function() {
+        $('.agree, .forgot, #toggle-terms, .log-in, .sign-up').on('click', function(event) {
+            event.preventDefault();
+            var user = $('.user'),terms = $('.terms'),form = $('.form-wrap'),recovery = $('.recovery'),close = $('#toggle-terms'),arrow = $('.tabs-content .fa');
+            if ($(this).hasClass('agree') || $(this).hasClass('log-in') || ($(this).is('#toggle-terms')) && terms.hasClass('open')) {
+                if (terms.hasClass('open')) {
+                    form.swapClass('open', 'closed');
+                    terms.swapClass('open', 'closed');
+                    close.swapClass('open', 'closed');
+                } else {
+                    if ($(this).hasClass('log-in')) {
+                        return;
                     }
+                    form.swapClass('closed', 'open');
+                    terms.swapClass('closed', 'open').scrollTop(0);
+                    close.swapClass('closed', 'open');
+                    user.addClass('overflow-hidden');
                 }
-                else if ($(this).hasClass('forgot') || $(this).hasClass('sign-up') || $(this).is('#toggle-terms')) {
-                    if (recovery.hasClass('open')) {
-                        form.swapClass('open', 'closed');
-                        recovery.swapClass('open', 'closed');
-                        close.swapClass('open', 'closed');
-                    } else {
-                        if ($(this).hasClass('sign-up')) {
-                            return;
-                        }
-                        form.swapClass('closed', 'open');
-                        recovery.swapClass('closed', 'open');
-                        close.swapClass('closed', 'open');
-                        user.addClass('overflow-hidden');
+            }
+            else if ($(this).hasClass('forgot') || $(this).hasClass('sign-up') || $(this).is('#toggle-terms')) {
+                if (recovery.hasClass('open')) {
+                    form.swapClass('open', 'closed');
+                    recovery.swapClass('open', 'closed');
+                    close.swapClass('open', 'closed');
+                } else {
+                    if ($(this).hasClass('sign-up')) {
+                        return;
                     }
+                    form.swapClass('closed', 'open');
+                    recovery.swapClass('closed', 'open');
+                    close.swapClass('closed', 'open');
+                    user.addClass('overflow-hidden');
                 }
-            });
+            }
         });
+    });
 
-        // 메세지
-        $(function() {
-            $('.recovery .button').on('click', function(event) {
-                event.preventDefault();
-                $('.recovery .mssg').addClass('animate');
-                setTimeout(function() {
-                    $('.form-wrap').swapClass('open', 'closed');
-                    $('.recovery').swapClass('open', 'closed');
-                    $('#toggle-terms').swapClass('open', 'closed');
-                    $('.tabs-content .fa').swapClass('active', 'inactive');
-                    $('.recovery .mssg').removeClass('animate');
-                }, 2500);
-            });
+    // 메세지
+    $(function() {
+        $('.recovery .button').on('click', function(event) {
+            event.preventDefault();
+            $('.recovery .mssg').addClass('animate');
+            setTimeout(function() {
+                $('.form-wrap').swapClass('open', 'closed');
+                $('.recovery').swapClass('open', 'closed');
+                $('#toggle-terms').swapClass('open', 'closed');
+                $('.tabs-content .fa').swapClass('active', 'inactive');
+                $('.recovery .mssg').removeClass('animate');
+            }, 2500);
         });
+    });
 
-        // // 제출 거부
-        // $(function() {
-        //     $('.button').on('click', function(event) {
-        //         $(this).stop();
-        //         event.preventDefault();
-        //         return false;
-        //     });
-        // });
+    // // 제출 거부
+    // $(function() {
+    //     $('.button').on('click', function(event) {
+    //         $(this).stop();
+    //         event.preventDefault();
+    //         return false;
+    //     });
+    // });
 
-        // 에러 메시지가 있으면 표시
-        const errorMessage = /*[[${errorMessage}]]*/ null;
-        if (errorMessage) {
-            alert(errorMessage);
+    // 에러 메시지가 있으면 표시
+    const errorMessage = /*[[${errorMessage}]]*/ null;
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+
+    // 비밀번호 확인
+    document.getElementById("password").addEventListener("input", checkPasswordMatch);
+    document.getElementById("confirmPassword").addEventListener("input", checkPasswordMatch);
+
+    function checkPasswordMatch() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirmPassword").value;
+        var confirmPasswordInput = document.getElementById("confirmPassword");
+        var confirmPasswordFeedback = document.getElementById("confirmPasswordFeedback");
+        var confirmPasswordValid = document.getElementById("confirmPasswordValid");
+
+        // 비밀번호 입력 필드가 비어있는지 체크
+        if (password === "" || confirmPassword === "") {
+            confirmPasswordInput.classList.remove("is-invalid", "is-valid");
+            confirmPasswordFeedback.style.display = "none";
+            confirmPasswordValid.style.display = "none";
+            return; // 비밀번호가 비어있으면 아무것도 표시하지 않음
         }
 
-        // 비밀번호 확인
-        document.getElementById("password").addEventListener("input", checkPasswordMatch);
-        document.getElementById("confirmPassword").addEventListener("input", checkPasswordMatch);
-
-        function checkPasswordMatch() {
-            var password = document.getElementById("password").value;
-            var confirmPassword = document.getElementById("confirmPassword").value;
-            var confirmPasswordInput = document.getElementById("confirmPassword");
-            var confirmPasswordFeedback = document.getElementById("confirmPasswordFeedback");
-            var confirmPasswordValid = document.getElementById("confirmPasswordValid");
-
-            // 비밀번호 입력 필드가 비어있는지 체크
-            if (password === "" || confirmPassword === "") {
-                confirmPasswordInput.classList.remove("is-invalid", "is-valid");
-                confirmPasswordFeedback.style.display = "none";
-                confirmPasswordValid.style.display = "none";
-                return; // 비밀번호가 비어있으면 아무것도 표시하지 않음
-            }
-
-            if (password !== confirmPassword) {
-                confirmPasswordInput.classList.remove("is-valid");
-                confirmPasswordInput.classList.add("is-invalid");
-                confirmPasswordFeedback.style.display = "block";
-                confirmPasswordValid.style.display = "none";
-            } else {
-                confirmPasswordInput.classList.remove("is-invalid");
-                confirmPasswordInput.classList.add("is-valid");
-                confirmPasswordFeedback.style.display = "none";
-                confirmPasswordValid.style.display = "block";
-            }
+        if (password !== confirmPassword) {
+            confirmPasswordInput.classList.remove("is-valid");
+            confirmPasswordInput.classList.add("is-invalid");
+            confirmPasswordFeedback.style.display = "block";
+            confirmPasswordValid.style.display = "none";
+        } else {
+            confirmPasswordInput.classList.remove("is-invalid");
+            confirmPasswordInput.classList.add("is-valid");
+            confirmPasswordFeedback.style.display = "none";
+            confirmPasswordValid.style.display = "block";
         }
+    }
 
-        // 비밀번호 일치 체크 함수 (회원가입 폼 제출 전에 실행)
-        function validatePassword() {
-            var password = document.getElementById("password").value;
-            var confirmPassword = document.getElementById("confirmPassword").value;
+    // 비밀번호 일치 체크 함수 (회원가입 폼 제출 전에 실행)
+    function validatePassword() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirmPassword").value;
 
-            if (password !== confirmPassword) {
-                // 모달 띄우기
-                var myModal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
-                myModal.show();
-                return false; // 폼 제출 막기
-            }
-            return true; // 비밀번호 일치 시 폼 제출
+        if (password !== confirmPassword) {
+            // 모달 띄우기
+            var myModal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
+            myModal.show();
+            return false; // 폼 제출 막기
         }
+        return true; // 비밀번호 일치 시 폼 제출
+    }
 
-        // 이메일, 연락처 중복 체크 함수
-        $(function () {
-            $("#signupForm").on("submit", function (event) {
-                event.preventDefault();  // 폼 제출을 막고 Ajax로 처리
+    // 이메일, 연락처 중복 체크 함수
+    $(function () {
+        $("#signupForm").on("submit", function (event) {
+            event.preventDefault();  // 폼 제출을 막고 Ajax로 처리
 
-                var email = $("#adminEmail").val();
-                var phone = $("#adminPhone").val();
+            var email = $("#adminEmail").val();
+            var phone = $("#adminPhone").val();
 
-                // 이메일 중복 체크
-                $.ajax({
-                    url: '/admin/checkEmail',
-                    method: 'POST',
-                    dataType: 'text',
-                    data: {"email": email},
-                    success: function (checkMail) {
-                        console.log("이메일 중복 확인 응답:", checkMail); // 로그 추가
-                        if (parseInt(checkMail) === 1) {
-                            // 이메일 중복 모달 띄우기
-                            var myModal = new bootstrap.Modal($("#emailMismatchModal"));
-                            myModal.show();
-                        } else {
-                            // 이메일 중복이 없으면 연락처 중복 확인
-                            $.ajax({
-                                url: '/admin/checkPhone',
-                                method: 'POST',
-                                dataType: 'text',
-                                data: {"phone": phone},
-                                success: function (checkPhone) {
-                                    console.log("연락처 중복 확인 응답:", checkPhone); // 로그 추가
-                                    if (parseInt(checkPhone) === 1) {
-                                        // 연락처 중복 모달 띄우기
-                                        var myModal = new bootstrap.Modal($("#phoneMismatchModal"));
-                                        myModal.show();
-                                    } else {
-                                        console.log(checkPhone)
-                                        // 이메일과 연락처 둘 다 중복되지 않으면 폼 제출
-                                        $("#signupForm").off("submit").submit();
-                                    }
-                                },
-                                error: function () {
-                                    console.error("연락처 중복 확인 실패");
+            // 이메일 중복 체크
+            $.ajax({
+                url: '/admin/checkEmail',
+                method: 'POST',
+                dataType: 'text',
+                data: {"email": email},
+                success: function (checkMail) {
+                    console.log("이메일 중복 확인 응답:", checkMail); // 로그 추가
+                    if (parseInt(checkMail) === 1) {
+                        // 이메일 중복 모달 띄우기
+                        var myModal = new bootstrap.Modal($("#emailMismatchModal"));
+                        myModal.show();
+                    } else {
+                        // 이메일 중복이 없으면 연락처 중복 확인
+                        $.ajax({
+                            url: '/admin/checkPhone',
+                            method: 'POST',
+                            dataType: 'text',
+                            data: {"phone": phone},
+                            success: function (checkPhone) {
+                                console.log("연락처 중복 확인 응답:", checkPhone); // 로그 추가
+                                if (parseInt(checkPhone) === 1) {
+                                    // 연락처 중복 모달 띄우기
+                                    var myModal = new bootstrap.Modal($("#phoneMismatchModal"));
+                                    myModal.show();
+                                } else {
+                                    console.log(checkPhone)
+                                    // 이메일과 연락처 둘 다 중복되지 않으면 폼 제출
+                                    $("#signupForm").off("submit").submit();
                                 }
-                            });
-                        }
-                    },
-                    error: function () {
-                        console.error("이메일 중복 확인 실패");
+                            },
+                            error: function () {
+                                console.error("연락처 중복 확인 실패");
+                            }
+                        });
                     }
-                });
+                },
+                error: function () {
+                    console.error("이메일 중복 확인 실패");
+                }
             });
         });
+    });
 
-        // 전화번호 유효성 검사
-        document.getElementById("adminPhone").addEventListener("input", function() {
-            var phone = this.value;
-            var phoneInput = this;
-            var phoneFeedback = document.getElementById("confirmPhoneFeedback");
-            var phoneValid = document.getElementById("confirmPhoneValid");
+    // 전화번호 유효성 검사
+    document.getElementById("adminPhone").addEventListener("input", function() {
+        var phone = this.value;
+        var phoneInput = this;
+        var phoneFeedback = document.getElementById("confirmPhoneFeedback");
+        var phoneValid = document.getElementById("confirmPhoneValid");
 
-            // 전화번호 형식 검사 (000-0000-0000 또는 000-000-0000)
-            var phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;
+        // 전화번호 형식 검사 (000-0000-0000 또는 000-000-0000)
+        var phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;
 
-            // 입력값이 비어있는 경우
-            if (phone === "") {
-                phoneInput.classList.remove("is-invalid", "is-valid");
-                phoneFeedback.style.display = "none";
-                phoneValid.style.display = "none";
-                return;
-            }
+        // 입력값이 비어있는 경우
+        if (phone === "") {
+            phoneInput.classList.remove("is-invalid", "is-valid");
+            phoneFeedback.style.display = "none";
+            phoneValid.style.display = "none";
+            return;
+        }
 
-            if (!phonePattern.test(phone)) {
-                phoneInput.classList.remove("is-valid");
-                phoneInput.classList.add("is-invalid");
-                phoneFeedback.style.display = "block";
-                phoneValid.style.display = "none";
-            } else {
-                phoneInput.classList.remove("is-invalid");
-                phoneInput.classList.add("is-valid");
-                phoneFeedback.style.display = "none";
-                phoneValid.style.display = "block";
-            }
+        if (!phonePattern.test(콜)) {
+            phoneInput.classList.remove("is-valid");
+            phoneInput.classList.add("is-invalid");
+            phoneFeedback.style.display = "block";
+            phoneValid.style.display = "none";
+        } else {
+            phoneInput.classList.remove("is-invalid");
+            phoneInput.classList.add("is-valid");
+            phoneFeedback.style.display = "none";
+            phoneValid.style.display = "block";
+        }
 
-            // 자동으로 하이픈 추가
-            var value = phone.replace(/[^0-9]/g, ''); // 숫자만 추출
-            if (value.length > 3 && value.length <= 7) {
-                value = value.slice(0, 3) + '-' + value.slice(3);
-            } else if (value.length > 7) {
-                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
-            }
-            this.value = value;
-        });
-    </script>
+        // 자동으로 하이픈 추가
+        var value = phone.replace(/[^0-9]/g, ''); // 숫자만 추출
+        if (value.length > 3 && value.length <= 7) {
+            value = value.slice(0, 3) + '-' + value.slice(3);
+        } else if (value.length > 7) {
+            value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+        }
+        this.value = value;
+    });
+</script>
 </body>
 </html>

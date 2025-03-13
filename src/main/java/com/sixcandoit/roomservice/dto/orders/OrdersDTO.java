@@ -30,4 +30,13 @@ public class OrdersDTO {
 
     private List<OrdersMenuDTO> ordersMenuJoin;
 
+    // ordersMenuJoin의 주문금액 총액을 구하기 위한 메서드
+    public int getTotalAmount() {
+        return ordersMenuJoin != null ?
+                ordersMenuJoin.stream()
+                        .mapToInt(menu -> menu.getMenuJoin().getMenuPrice() * menu.getCount())
+                        .sum()
+                : 0;
+    }
+
 }

@@ -303,65 +303,65 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
 
-    $(document).ready(function () {
-        // 이미지 삭제버튼을 클릭했을 때
-        $(".deleteBtn").on('click', function () {
+        $(document).ready(function () {
+            // 이미지 삭제버튼을 클릭했을 때
+            $(".deleteBtn").on('click', function () {
 
-            var idx = this.value;
+                var idx = this.value;
 
-            $.ajax({
-                url: "/images/delete",
-                type: 'GET',
-                data: {
-                    idx: idx                        // 전달값 : 값
-                },
-                success: function (response) {      // 작업 성공시
-                    Swal.fire({
-                        icon: null,
-                        text: "이미지를 삭제하였습니다",
-                        customClass: {
-                            container: 'bootstrap-swal-container',
-                            popup: 'card shadow-sm',
-                            title: 'h4 text-success',
-                            content: 'text-dark',
-                        },
-                        showConfirmButton: false,
-                        timer: 2000,
-                        willOpen: () => {
-                            Swal.showLoading();
-                        },
-                        buttonsStyling: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false
-                    }).then(() => {
-                        location.reload();          // 현재 목록페이지를 다시 읽어온다.
-                    });
-                },
-                error: function () {                // 작업 실패시
-                    Swal.fire({
-                        icon: null,
-                        text: "이미지 삭제를 실패하였습니다",
-                        customClass: {
-                            container: 'bootstrap-swal-container',
-                            popup: 'card shadow-sm',
-                            title: 'h4 text-success',
-                            content: 'text-dark',
-                        },
-                        showConfirmButton: false,
-                        timer: 2000,
-                        willOpen: () => {
-                            Swal.showLoading();
-                        },
-                        buttonsStyling: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false
-                    });
-                }
+                $.ajax({
+                    url: "/images/delete",
+                    type: 'GET',
+                    data: {
+                        idx: idx                        // 전달값 : 값
+                    },
+                    success: function (response) {      // 작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "이미지를 삭제하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        }).then(() => {
+                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function () {                // 작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "이미지 삭제를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
             });
         });
-    });
     </script>
 </th:block>
 </body>

@@ -66,7 +66,7 @@ public class RoomController {
 
         // 조직별 룸 목록 조회
         Page<RoomDTO> roomDTOS = roomService.roomList(page, type, keyword, order, organ_idx, roomType);
-        
+
         // 페이지 정보 생성
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(roomDTOS);
 
@@ -192,7 +192,7 @@ public class RoomController {
         if (organ_idx != null) {
             roomDTO.setOrgan_idx(organ_idx);
         }
-        
+
         model.addAttribute("roomDTO", roomDTO);
         model.addAttribute("organ_idx", organ_idx);
 

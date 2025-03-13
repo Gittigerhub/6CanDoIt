@@ -62,8 +62,12 @@ public class AdminController {
 
     // 로그인
     @GetMapping("/login")
-    public String showLoginPage(){
+    public String showLoginPage(Model model){
         log.info("로그인 페이지를 내놔라");
+        List<OrganizationDTO> organizations = organizationService.getAllOrganizations(); // 호텔명 리스트 가져오기
+
+        log.info("호텔 정보 내놔" + organizations);
+        model.addAttribute("organizations", organizations);
 
         return "admin/sign";
     }

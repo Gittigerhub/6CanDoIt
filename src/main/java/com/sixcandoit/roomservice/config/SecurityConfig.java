@@ -65,7 +65,7 @@ public class SecurityConfig{
         //사용권한
         http//.addFilterBefore(userAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .securityMatcher("/admin/**").authorizeHttpRequests((auth)-> {
-                    auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico").permitAll();
+                    auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico","/error").permitAll();
                     auth.requestMatchers("/h2-console/**").permitAll();
                     auth.requestMatchers("/admin/login").permitAll();
                     auth.requestMatchers("/admin/updateRole").permitAll();
@@ -138,7 +138,7 @@ public class SecurityConfig{
     public SecurityFilterChain filterChain2(HttpSecurity http) throws Exception {
         //사용권한
         http.authorizeHttpRequests((auth)-> {
-            auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico").permitAll();
+            auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico","/error").permitAll();
             auth.requestMatchers("/h2-console/**").permitAll();
             auth.requestMatchers("/admin/updateRole").permitAll();
 

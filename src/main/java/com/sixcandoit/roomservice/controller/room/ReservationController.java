@@ -311,4 +311,33 @@ public class ReservationController {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         }
     }
+
+    // 예약 취소 처리 (AJAX)
+    @PostMapping("/cancel/{idx}")
+    @ResponseBody
+    public ResponseEntity<?> cancelReservation(@PathVariable Integer idx) {
+        try {
+            // 예약 정보 조회
+            ReservationDTO reservationDTO = reservationService.reserveRead(idx);
+            if (reservationDTO == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "예약을 찾을 수 없습니다."));
+            }
+
+            // 예약 취소 처리
+            reservationService.reserveDelete(idx);
+
+            // 룸 상태 업데이트
+            RoomEntity room = roomRepository.findById(reservationDTO.getRoomIdx())
+                .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
+            room.setResStatus("1"); // 빈 방으로 상태 변경
+            roomRepository.save(room);
+
+            return ResponseEntity.ok(Collections.singletonMap("message", "예약이 취소되었습니다."));
+        } catch (Exception e) {
+            log.error("예약 취소 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Collections.singletonMap("message", "예약 취소 중 오류가 발생했습니다."));
+        }
+    }
 }

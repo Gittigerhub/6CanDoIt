@@ -143,7 +143,7 @@ public class AdminMenuController {
 
                 if (contentType == null || !contentType.startsWith("image")) {
                     model.addAttribute("msg", "이미지 파일만 업로드 가능합니다.");
-                            return "/menu/registermenu";  //이미지 파일이 아니라면 다시 처음으로 돌아감
+                    return "/menu/registermenu";  //이미지 파일이 아니라면 다시 처음으로 돌아감
                 }
             }
         }

@@ -776,7 +776,7 @@
                 button.addEventListener("click", function() {
                     var organIdx = this.getAttribute("data-organ-idx"); // 버튼에 설정된 organIdx 값 가져오기
 
-                // 메뉴 목록 페이지로 이동 (organIdx를 쿼리 파라미터로 넘기기)
+                    // 메뉴 목록 페이지로 이동 (organIdx를 쿼리 파라미터로 넘기기)
                     window.location.href = "/admin/menu/adlistmenu?organIdx=" + organIdx + "&page=1&type=&keyword=";
                 });
             });

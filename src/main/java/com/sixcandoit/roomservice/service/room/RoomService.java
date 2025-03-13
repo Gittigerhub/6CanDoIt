@@ -41,14 +41,14 @@ public class RoomService {
         try {
             // DTO로 Entity 변환
             RoomEntity room = modelMapper.map(roomDTO, RoomEntity.class);
-            
+
             // organ_idx가 있다면 OrganizationEntity 설정
             if (roomDTO.getOrgan_idx() != null) {
                 OrganizationEntity organization = organizationService.findById(roomDTO.getOrgan_idx())
                         .orElseThrow(() -> new RuntimeException("Organization not found with id: " + roomDTO.getOrgan_idx()));
                 room.setOrganizationJoin(organization);
             }
-            
+
             // 룸 기본 값:
             room.setRoomView("N"); // 창문 없음
             room.setRoomSeason("off"); // 비성수기
@@ -260,9 +260,9 @@ public class RoomService {
     public Page<RoomDTO> getRoomsByOrganization(Integer organIdx, Pageable page) {
         int currentPage = page.getPageNumber()-1;
         int pageLimit = 5;
-        
+
         Pageable pageable = PageRequest.of(currentPage, pageLimit, Sort.by(Sort.Direction.DESC, "idx"));
-        
+
         Page<RoomEntity> roomEntities = roomRepository.findByOrganIdx(organIdx, pageable);
         return roomEntities.map(entity -> modelMapper.map(entity, RoomDTO.class));
     }
@@ -272,7 +272,7 @@ public class RoomService {
         // 가격 내림차순으로 정렬
         Sort sort = Sort.by(Sort.Direction.DESC, "roomPrice");
         List<RoomEntity> roomEntities = roomRepository.findByOrganizationJoin_IdxOrderByRoomPriceDesc(organIdx);
-        
+
         return roomEntities.stream()
                 .map(entity -> {
                     RoomDTO dto = modelMapper.map(entity, RoomDTO.class);

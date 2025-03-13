@@ -8,6 +8,7 @@ import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
+import com.sixcandoit.roomservice.service.EmailService;
 import com.sixcandoit.roomservice.service.admin.AdminService;
 import com.sixcandoit.roomservice.service.member.MemberService;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
@@ -18,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +40,7 @@ public class AdminController {
     private final MemberService memberService;
     private final AdminRepository adminRepository;
     private final OrganizationService organizationService;
+    private final EmailService emailService;
 
     @GetMapping("/")
     public String IndexForm(HttpSession session, AdminDTO adminDTO) {
@@ -124,6 +127,34 @@ public class AdminController {
         log.info("연락처가 있어? " + phone + exists);
 
         return result;  // 응답 반환
+    }
+
+    @PostMapping("/sendEmailCode")
+    @ResponseBody
+    public ResponseEntity<String> sendEmail(@RequestParam("email") String email){
+        log.info("이메일 발송 컨트롤러 진입");
+
+        try {
+            emailService.codeEmailSending(email, 1);
+            //admin과 member를 구분하기 위해(admin = 1, member = 2)
+            return ResponseEntity.status(200).body(email);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("이메일 발송 에러");
+        }
+    }
+
+
+    @PostMapping("/checkEmailCode")
+    @ResponseBody
+    public ResponseEntity<String> CheckEmailCode(@RequestParam("email") String email, @RequestParam("authenticationCode") String authenticationCode){
+        try {
+            String result = emailService.checkEmailCode(email, authenticationCode)+"";
+            return ResponseEntity.ok().body(result);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("에러 발생");
+        }
     }
 
     // 회원 수정 전 비밀번호 확인 페이지
@@ -259,7 +290,7 @@ public class AdminController {
     // 임시비밀번호 발급
     @GetMapping("/password")
     public String showPasswordPage(){
-        return "admin/password";
+        return "admin/sign";
     }
 
     @PostMapping("/password")

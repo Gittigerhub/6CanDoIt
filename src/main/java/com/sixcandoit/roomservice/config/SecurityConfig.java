@@ -71,7 +71,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/admin/updateRole").permitAll();
                     //ajax 허용
 
-                    auth.requestMatchers("/member/checkEmail", "/admin/checkEmail").permitAll();
+                    auth.requestMatchers("/member/checkEmail", "/admin/checkEmail", "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode", "/admin/checkEmailCode").permitAll();
                     auth.requestMatchers("/member/checkPhone", "/admin/checkPhone").permitAll();
                     auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
                     auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "HO","BO", "MEMBER");
@@ -104,7 +104,7 @@ public class SecurityConfig{
                     // ho, bo 권한 설정
                     auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
                     auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
-
+                    auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
                 });
 
         //관리자회원 로그인
@@ -144,7 +144,7 @@ public class SecurityConfig{
 
             auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
             //ajax 허용
-            auth.requestMatchers("/member/checkPhone", "/admin/checkPhone").permitAll();
+            auth.requestMatchers("/member/checkPhone", "/admin/checkPhone", "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode", "/admin/checkEmailCode").permitAll();
 
             auth.requestMatchers("/member/checkEmail", "/admin/checkEmail").permitAll();
             auth.requestMatchers("/member/**").hasAnyRole("ADMIN","HO","BO", "MEMBER");
@@ -174,9 +174,10 @@ public class SecurityConfig{
             auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
             // 이미지 컨트롤러 접근 권한
             auth.requestMatchers("/images/**").permitAll();
-            // ho, bo 권한 설정
+            // ho, bo, guest 권한 설정
             auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
             auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
+            auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
 
             });
 

@@ -4,6 +4,7 @@ import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
+import com.sixcandoit.roomservice.service.EmailService;
 import com.sixcandoit.roomservice.service.member.MemberService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import jakarta.servlet.http.HttpSession;
@@ -12,6 +13,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +30,8 @@ public class MemberController {
 
     private final MemberService memberService;
     private final ReservationService reservationService;
+    private final EmailService email;
+    private final EmailService emailService;
 
     @GetMapping("/")
     public String IndexForm(HttpSession session, MemberDTO memberDTO) {
@@ -218,6 +222,21 @@ public class MemberController {
         model.addAttribute("ordersDTOS", ordersDTOS);
 
         return "member/mypage";
+    }
+
+    @PostMapping("/sendEmailCode")
+    @ResponseBody
+    public ResponseEntity<String> sendEmail(@RequestParam("email") String email){
+        log.info("이메일 발송 컨트롤러 진입");
+
+        try {
+            emailService.codeEmailSending(email, 2);
+            //admin과 member를 구분하기 위해(admin = 1, member = 2)
+            return ResponseEntity.status(200).body(email);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("이메일 발송 에러");
+        }
     }
 
 }

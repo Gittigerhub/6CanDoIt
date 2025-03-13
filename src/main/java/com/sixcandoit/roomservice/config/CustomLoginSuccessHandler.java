@@ -60,7 +60,9 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 targetUrl = "/ho";      // HO 관리자 페이지
             } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_BO"))) {
                 targetUrl = "/bo";      // BO 관리자 페이지
-            } else {
+            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_GUEST"))) {
+                targetUrl = "/guest";      // 관리자 승인 대기 페이지
+            }else {
                 targetUrl = "/member/"; // 일반 사용자
             }
 

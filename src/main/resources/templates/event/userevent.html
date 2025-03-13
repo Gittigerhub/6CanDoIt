@@ -88,7 +88,7 @@
             <ul class="pagination">
                 <li class="page-item" th:unless="${startPage <= 1}">
                     <a class="page-link"
-                       th:href="@{/event/usermemberpoint(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                       th:href="@{/event/userevent(page=1, type=${type}, keyword=${keyword})}">≪</a>
                 </li>
                 <li class="page-item" th:unless="${currentPage <= 1}">
                     <a class="page-link"
@@ -97,17 +97,17 @@
                 <th:block th:each="page:${#numbers.sequence(startPage,endPage,1)}">
                     <li class="page-item">
                         <a class="page-link"
-                           th:href="@{/event/usermemberpoint(page=${page}, type=${type}, keyword=${keyword})}"
+                           th:href="@{/event/userevent(page=${page}, type=${type}, keyword=${keyword})}"
                            th:text="${page}"></a>
                     </li>
                 </th:block>
                 <li class="page-item" th:unless="${currentPage>=endPage}">
                     <a class="page-link"
-                       th:href="@{/event/usermemberpoint(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                       th:href="@{/event/userevent(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
                 </li>
                 <li class="page-item" th:unless="${currentPage >= endPage}">
                     <a class="page-link"
-                       th:href="@{/event/usermemberpoint(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                       th:href="@{/event/userevent(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
                 </li>
 
             </ul>

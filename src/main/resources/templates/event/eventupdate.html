@@ -27,37 +27,37 @@
                             <div class="row">
                                 <div class="input-group">
                                     <label>이벤트 제목:</label>
-                                    <input type="text" class="title" name="eventTitle">
+                                    <input type="text" class="title" name="eventTitle" th:value="${eventRead.eventTitle}">
                                 </div>
                             </div>
                             <br>
                             <div class="row" style="flex: content; justify-content: space-between ;">
                                 <div class="col-6">
                                     <th:block th:if="${eventRead.eventTitleImg}!=null">
-                                        <img th:src="${eventRead.eventTitleImg}" style="width: 600px; height: 350px;">
+                                        <img th:src="${eventRead.eventTitleImg}" style="width: 600px; height: 350px;" >
                                     </th:block>
                                     <th:block th:if="${eventRead.eventTitleImg}==null">
                                     </th:block>
                                 </div>
                                 <div class="input-group col-6">
                                     <label>이벤트 타이틀 사진(수정):</label>
-                                    <input type="file" class="title_img" id="title_img" name="Files">
+                                    <input type="file" class="title_img" id="title_img" name="Files" th:value="${eventRead.eventTitleImg}">
                                 </div>
                                 <div class="col-6">
                                     <th:block th:if="${eventRead.eventImg}!=null">
-                                        <img th:src="${eventRead.eventImg}" style="width: 600px; height: 350px;">
+                                        <img th:src="${eventRead.eventImg}" style="width: 600px; height: 350px;" >
                                     </th:block>
                                     <th:block th:if="${eventRead.eventImg}==null">
                                     </th:block>
                                 </div>
                                 <div class="input-group col-6">
                                     <label>이벤트 메인 사진(수정):</label>
-                                    <input type="file" class="main_img" id="main_img" name="Files">
+                                    <input type="file" class="main_img" id="main_img" name="Files" th:value="${eventRead.eventImg}">
                                 </div>
                                 <div class="input-group">
                                     <label>이벤트 내용</label>
                                     <textarea class="event_text" rows="3"
-                                              name="eventContents" cols="160"></textarea>
+                                              name="eventContents" cols="160" th:value="${eventRead.eventContents}"></textarea>
                                 </div>
                             </div>
                             <br>

@@ -16,9 +16,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -269,18 +273,53 @@ public class EventService {
     }
 
     /*-------------------------------------------------
-    함수명 : list(Pageable page)
-    인수 : Pageable
+    함수명 : list(String keyword, String type, LocalDateTime startDate, LocalDateTime endDate, Pageable page)
+    인수 :  keyword, type, startDate, endDate, page
     출력 : 목록
     설명 : 포인트 정보들을 목록을 출력할때 사용
     ---------------------------------------------------*/
-    public List<EventDTO> list() {
-        List<EventEntity> eventlist = eventRepository.findAll();
+    public Page<EventDTO> list(String keyword, String type, LocalDateTime startDate, LocalDateTime endDate, Pageable page) {
+        System.out.println("Service = page: "+page+",type:"+type+",keyword:"+keyword+",StartDate:"+startDate+",endDate:"+endDate);
+        //List<eventDTO> eventDTOlist = Arrays.asList(modelMapper.map(eventlist, eventDTO[].class));
+        Pageable pageable= PageRequest.of(Math.max(page.getPageNumber()-1,0),10);
+        System.out.println("실행중:"+pageable.getPageNumber());
+        Page<EventEntity> eventEntities;
+        if(!type.isEmpty()){
+            switch (type) {
+                case "1":
+                    log.info("이벤트 내용으로 검색하는 중");
+                    if(keyword!=null){
+                        eventEntities = eventRepository.findByContents(keyword, pageable);
+                        break;
+                    }
 
-        List<EventDTO> eventDTOlist = Arrays.asList(modelMapper.map(eventlist, EventDTO[].class));
+                case "2":
+                    log.info("이벤트 활성화로 검색하는 중");
+                    if(keyword!=null){
+                        eventEntities = eventRepository.findByActiveYn(keyword, pageable);
+                        break;
+                    }
 
-        return eventDTOlist;
+                case "3":
+                    log.info("이벤트 기간으로 검색중 중");
+                    if(startDate!=null&&endDate!=null) {
+                        eventEntities = eventRepository.findByDateRange(startDate, endDate, pageable);
+                        break;
+                    }
+
+                default: eventEntities = eventRepository.findByContents(keyword, pageable);
+            }
+        }
+        else{
+            log.info("모든 대상으로 검색");
+            eventEntities=eventRepository.findAll(pageable);
+        }
+        Page<EventDTO> eventDTOS=eventEntities.map(entity -> modelMapper.map(entity,EventDTO.class));
+        System.out.println("실행중2:"+eventDTOS.getSize());
+
+        return eventDTOS;
     }
+
 
     
     /*-------------------------------------------------

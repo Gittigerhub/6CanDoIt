@@ -12,6 +12,43 @@
 <body>
 <div layout:fragment="content" class="p-5">
     <h2>이벤트 관리 페이지</h2>
+
+    <!--검색 기능-->
+    <form th:action="@{/event/event}" method="get">
+        <div class="container bg-white">
+            <div class>
+                <div class="row-6">
+                    <h3>게시글 검색</h3>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="input-group mb-3 bg-white">
+                    <select class="form-select" id="selectBox" name="type">
+                        <option th:selected="${type==null}"></option>
+                        <option value="1" th:selected="${type=='1'}">내용</option>
+                        <option value="2" th:selected="${type=='2'}">활성화</option>
+                        <option value="3" th:selected="${type=='3'}">기간</option>
+                    </select>
+                    <th:block th:if="${type=='1'}">
+                        <input type="text" class="form-control" name="keyword" th:value="${keyword}"
+                               placeholder="Search">
+                    </th:block>
+                    <th:block th:if="${type=='2'}">
+                        <select class="form-select" name="keyword">
+                            <option value="Y">이벤트 진행중</option>
+                            <option value="N">이벤트 종료</option>
+                        </select>
+                    </th:block>
+                    <th:block th:if="${type=='3'}">
+                        <input name="startDate" type="datetime-local">~<input name="endDate" type="datetime-local">
+                    </th:block>
+                    <button class="btn btn-success" type="submit">검색</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!--검색 끝-->
+
     <div class="container">
         <div class="row">
             <div class="col mt-2">
@@ -20,8 +57,9 @@
                     <tr>
                         <th style="width: 5%">번호</th>
                         <th style="width: 10%">이벤트 제목</th>
-                        <th style="width: 35%">이벤트 내용</th>
+                        <th style="width: 25%">이벤트 내용</th>
                         <th style="width: 30%">날짜</th>
+                        <th style="width: 10%">활성화 상태</th>
                         <th style="width: 20%">상세보기</th>
                     </tr>
                     </thead>
@@ -31,10 +69,17 @@
                         <td class="column" th:text="${events.eventTitle}" th:data-id="${events.idx}">John</td>
                         <td class="contents column" th:text="${#strings.length(events.eventContents)>30 ? #strings.substring(events.eventContents,0,30)+'...':
                         events.eventContents}" th:data-id="${events.idx}"></td>
-                        <td class="column" th:text="${#temporals.format(events.eventStartDate,'yy-MM-dd')}+'~'+${#temporals.format(events.eventEndDate,'yy-MM-dd')}"
+                        <td class="column"
+                            th:text="${#temporals.format(events.eventStartDate,'yy-MM-dd')}+'~'+${#temporals.format(events.eventEndDate,'yy-MM-dd')}"
                             th:data-id="${events.idx}">
                             john@example.com
                         </td>
+                        <th:block th:if="${events.activeYn.equals('Y')}">
+                            <td class="text-bg-primary">이벤트 진행중</td>
+                        </th:block>
+                        <th:block th:if="${events.activeYn.equals('N')}">
+                            <td class="text-bg-danger">이벤트 종료</td>
+                        </th:block>
                         <td class="button_and_image">
                             <button type="button" class="btn btn-primary eventEdit" th:data-id="${events.idx}">수정
                             </button>
@@ -52,28 +97,38 @@
             </div>
 
 
-            <!--<div class="container mt-3">
+            <!--페이징-->
+            <div class="mt-3 d-flex justify-content-center">
                 <ul class="pagination">
-                    <li class="page-item" th:unless="${startPage>1}">
-                        <a class="page-link" th:href="@{/event/list(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                    <li class="page-item" th:unless="${startPage <= 1}">
+                        <a class="page-link"
+                           th:href="@{/event/event(page=1, type=${type}, keyword=${keyword})}">≪</a>
                     </li>
-                    <li class="page-item" th:unless="${currentPage==1}">
-                        <a class="page-link" th:href="@{/event/list(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                    <li class="page-item" th:unless="${currentPage <= 1}">
+                        <a class="page-link"
+                           th:href="@{/event/event(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
                     </li>
-                    <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}">
+                    <th:block th:each="page:${#numbers.sequence(startPage,endPage,1)}">
                         <li class="page-item">
-                            <a class="page-link" th:href="@{/event/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                            <a class="page-link"
+                               th:href="@{/event/event(page=${page}, type=${type}, keyword=${keyword})}"
+                               th:text="${page}"></a>
                         </li>
-                    </span>
-
+                    </th:block>
                     <li class="page-item" th:unless="${currentPage>=endPage}">
-                        <a class="page-link" th:href="@{/event/list(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                        <a class="page-link"
+                           th:href="@{/event/event(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
                     </li>
-                    <li class="page-item" th:unless="${currentPage>endPage}">
-                        <a class="page-link" th:href="@{/event/list(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                    <li class="page-item" th:unless="${currentPage >= endPage}">
+                        <a class="page-link"
+                           th:href="@{/event/event(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
                     </li>
+
                 </ul>
-            </div>-->
+
+            </div>
+            <!--페이징 끝-->
+
 
             <div class="modal" id="eventModal">
                 <div class="modal-dialog">
@@ -100,7 +155,7 @@
                                 <div class="row mt-2">
                                     <div class="col-sm-12">
                                         <div class="form-group form-group-default">
-                                            <label>* 이벤트 내용:</label>
+                                            <label>*이벤트 내용:</label>
                                             <textarea id="eventContents" name="eventContents" cols="60"
                                                       rows="3"></textarea>
                                         </div>
@@ -216,7 +271,7 @@
                 var idx = $(this).data("id");
                 console.log(idx);
 
-                window.location.href = 'eventread?idx='+idx;
+                window.location.href = 'eventread?idx=' + idx;
 
             });
 
@@ -559,7 +614,18 @@
                 //console.log("모달 정보:" + $(this).find('form')[0])
             });//모달 정보 초기화
 
+            $("#selectBox").on("change", function () {
+                let selectedValue = $("#selectBox").val(); // 선택된 값 가져오기
+                console.log("작동중!! 선택된 값:", selectedValue);
 
+                if (selectedValue === '1') {
+                    window.location.href = window.location.pathname + "?type=1";
+                } else if (selectedValue === '2') {
+                    window.location.href = window.location.pathname + "?type=2";
+                } else if (selectedValue === '3') {
+                    window.location.href = window.location.pathname + "?type=3";
+                }
+            });
         });
 
 

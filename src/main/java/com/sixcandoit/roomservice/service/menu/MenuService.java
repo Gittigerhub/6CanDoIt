@@ -3,10 +3,16 @@ package com.sixcandoit.roomservice.service.menu;
 import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
+import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
+import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
 import com.sixcandoit.roomservice.repository.menu.MenuRepository;
+import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
+import com.sixcandoit.roomservice.repository.office.ShopDetailRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
+import com.sixcandoit.roomservice.service.office.ShopDetailService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,17 +36,35 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final ModelMapper modelMapper;
+    private final OrganizationRepository organizationRepository;
+    private final ShopDetailRepository shopDetailRepository;
 
     //이미지 등록할 menuImgService 의존성 추가
     private final ImageFileService imageFileService;
+    private final ShopDetailService shopDetailService;
 
 
     //메뉴 등록
-    public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> multipartFiles) throws Exception {
+    public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> multipartFiles,
+                                Integer hotelsId, Integer shopDetailIdx) throws Exception {
 
         try {
+
             // MenuDTO -> MenuEntity로 변환
             MenuEntity menuEntity = modelMapper.map(menuDTO, MenuEntity.class);
+
+            // 매장 정보 조회
+            ShopDetailDTO shopDetailDTO = shopDetailService.read(shopDetailIdx);
+            ShopDetailEntity shopDetailEntity = modelMapper.map(shopDetailDTO, ShopDetailEntity.class);
+
+            // 본사/지사(hotels_id) 조직 정보 조회
+            OrganizationEntity hotelOrganization = organizationRepository.findById(hotelsId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당 본사/지사를 찾을 수 없습니다: " + hotelsId));
+
+            // 매장과 본사/지사 정보 설정
+            menuEntity.setShopDetailJoin(shopDetailEntity);
+            menuEntity.setOrganizationJoin(hotelOrganization);  // hotels_id에 해당하는 조직으로 설정
+
 
             // 이미지 등록
             List<ImageFileEntity> images = imageFileService.saveImages(multipartFiles);

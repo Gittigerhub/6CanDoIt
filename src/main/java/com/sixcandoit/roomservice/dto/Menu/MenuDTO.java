@@ -3,6 +3,7 @@ package com.sixcandoit.roomservice.dto.Menu;
 import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
+import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,6 +49,8 @@ public class MenuDTO {
     private int menuSalePercent;                // 할인율
 
     private OrganizationDTO organizationJoin;   // 조직 정보
+
+    private ShopDetailDTO shopDetailJoin;       // 매장 정보
 
     private List<MenuOptionDTO> menuOptionDTOList;
 

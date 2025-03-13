@@ -1,9 +1,14 @@
 package com.sixcandoit.roomservice.controller.menu;
 
+import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
+import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.menu.MenuService;
+import com.sixcandoit.roomservice.service.office.ShopDetailService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -15,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,6 +48,7 @@ public class AdminMenuController {
 
     private final MenuService menuService;
     private final ImageFileService imageFileService;
+    private final ShopDetailService shopDetailService;
 
     //아이템 등록
     @GetMapping("/menu/registermenu")
@@ -50,9 +57,29 @@ public class AdminMenuController {
 //            //로그인이 안되어 있으면, 접근 불가능하도록
 //            return "redirect:/login";
 //        }
-        if (principal != null) {
-            log.info("현재 로그인 한 사람");
-            log.info(principal.getName());
+        try {
+            // SecurityContextHolder에서 현재 인증된 사용자 정보 가져오기
+            Object userDetails = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            if (userDetails instanceof CustomUserDetails) {
+                CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+                AdminEntity adminEntity = customUserDetails.getAdmin();
+
+                // 관리자의 조직 정보 가져오기
+                OrganizationEntity organizationEntity = adminEntity.getOrganizationJoin();
+
+                if (organizationEntity != null) {
+                    // 조직 정보로 매장 정보 조회
+                    ShopDetailDTO shopDetail = shopDetailService.findOrgan(organizationEntity.getIdx());
+
+                    // 모델에 필요한 정보 추가
+                    model.addAttribute("organization", organizationEntity);
+                    model.addAttribute("shopDetail", shopDetail);
+                }
+            }
+        } catch (Exception e) {
+            log.error("관리자 정보 조회 중 오류 발생: ", e);
+
         }
         model.addAttribute("menuDTO", new MenuDTO());
         return "/menu/registermenu";
@@ -61,9 +88,14 @@ public class AdminMenuController {
     //아이템 등록
     @PostMapping("/menu/registermenu")
     public String registerMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult,
-                                   List<MultipartFile> multipartFile, Model model) {
+                                   List<MultipartFile> multipartFile,
+                                   @RequestParam("organ_idx") Integer organIdx,
+                                   @RequestParam("shop_detail_idx") Integer shopDetailIdx,
+                                   Model model) {
         //들어오는 값을 확인
         log.info("들어오는 값 확인 " + menuDTO);
+        log.info("조직 ID: " + organIdx);
+        log.info("매장 ID: " + shopDetailIdx);
 
         if (multipartFile.get(0).isEmpty()){
             model.addAttribute("msg", "대표이미지 등록은 필수입니다.");
@@ -97,8 +129,7 @@ public class AdminMenuController {
         }
         try {
 
-            Integer savedMenuidx
-                    = menuService.menuRegister(menuDTO, multipartFile);
+            menuService.menuRegister(menuDTO, multipartFile, organIdx, shopDetailIdx);
 
             log.info("상품 등록 완료!");
 

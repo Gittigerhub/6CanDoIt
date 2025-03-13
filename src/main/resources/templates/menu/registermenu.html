@@ -25,6 +25,22 @@
                     </div>
                     <!--id와 name은 DTO에 변수명으로 작업-->
                     <div class="card-body">
+                        <!--현재 로그인한 관리자의 조직 정보-->
+                        <input type="text" name="organ_idx" th:value="${organization.idx}">
+                        <input type="text" name="shop_detail_idx" th:value="${shopDetailJoin.idx}">
+
+                        <!-- 조직 정보 표시 (읽기 전용) -->
+                        <div class="form-group">
+                            <label>소속 조직</label>
+                            <input type="text" class="form-control" th:value="${organization?.organName}" readonly>
+                        </div>
+
+                        <!-- 매장 정보 표시 (읽기 전용) -->
+                        <div class="form-group">
+                            <label>매장 정보</label>
+                            <input type="text" class="form-control" th:value="${shopDetail?.shopName}" readonly>
+                        </div>
+
                         <div class="mb-3 mt-3"><!--카테고리-->
                             <label for="menuCategory" class="form-label">카테고리</label>
                             <select class="form-select" th:field="*{menuCategory}" id="menuCategory" name="menuCategory">

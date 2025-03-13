@@ -249,4 +249,7 @@ public class ReservationService {
             throw new RuntimeException("결제 정보 업데이트 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
+    public void updateReservationStatus(Integer reservationId, String cancelled) {
+    }
 }

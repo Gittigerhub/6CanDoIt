@@ -548,13 +548,17 @@
         <!-- 회원가입 폼 -->
         <form id="signupForm" class="signup-form" th:action="@{/member/register}" method="post" onsubmit="return validateForm() && validatePassword() && combineAddress()">
             <div class="input__block signup-input__block">
-                <div class="address-input">
-                    <input type="email" id="memberEmail" name="memberEmail" placeholder="이메일" required>
-                    <button type="button" class="btn" id="emailSendBtn">인증</button><!-- 계정 인증 이메일 발송 버튼 -->
+                <div class="input__block">
+                    <div class="address-input">
+                        <input type="email" id="memberEmail" name="memberEmail" placeholder="이메일" required>
+                        <input type="button" class="btn" id="emailSendBtn" value="이메일 인증"> <!-- 계정 인증 이메일 발송 버튼 -->
+                    </div>
                 </div>
-                <div class="input-group">
-                    <input type="text" class="email-input" name="emailCheck" id="authenticationCode" placeholder="이메일 인증번호">
-                    <button type="button" class="btn" id="emailCheckBtn">확인</button><!-- 계정 인증 이메일 체크 버튼 -->
+                <div class="input__block">
+                    <div class="address-input">
+                        <input type="text" class="email-input" name="emailCheck" id="authenticationCode" placeholder="이메일 인증번호">
+                        <input type="button" class="btn" id="emailCheckBtn" value="인증 확인"> <!-- 계정 인증 이메일 체크 버튼 -->
+                    </div>
                 </div>
             </div>
             <div class="input__block">
@@ -1019,7 +1023,7 @@ E-mail : himyeongsun@gmail.com
 
 <th:block layout:fragment="script">
     <script>
-
+        // 이메일 인증
         var emailCheckYN = 0;
         $("#emailSendBtn").on("click", function () {
 

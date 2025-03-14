@@ -161,7 +161,7 @@ public class MemberService {
         return memberDTO;
     }
 
-    //임시비밀번호 발급(아이디, 회원명, 전화번호를 입력받아서 일치하면 해당 메일(아이디)로 임시비밀번호를 전송)
+    //임시비밀번호 발급(아이디, 회원명을 입력받아서 일치하면 해당 메일(아이디)로 임시비밀번호를 전송)
     public boolean passwordSend(MemberDTO memberDTO) {
         try { //서버가 멈추는 것을 예방
             Optional<MemberEntity> read = memberRepository.findByMemberEmail(memberDTO.getMemberEmail()); //조회
@@ -170,7 +170,7 @@ public class MemberService {
                 throw new IllegalStateException("일치하는 회원이 존재하지 않습니다.");
             }
             if (!read.get().getMemberName().equals(memberDTO.getMemberName())) { //이름이 일치하지 않으면
-                log.info("dpfj2");
+                log.info("에러2");
                 throw new IllegalStateException("회원이름이 일치하지 않습니다.");
             }
             

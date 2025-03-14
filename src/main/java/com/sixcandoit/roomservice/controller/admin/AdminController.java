@@ -25,6 +25,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.awt.font.LayoutPath;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -288,17 +289,12 @@ public class AdminController {
     }
 
     // 임시비밀번호 발급
-    @GetMapping("/password")
-    public String showPasswordPage(){
-        return "admin/sign";
-    }
-
     @PostMapping("/password")
-    public String modifyPassword(@ModelAttribute AdminDTO adminDTO){
-        adminService.passwordSend(adminDTO);
-        //스크립트로 출력할 메세지를 전달
-
-        return "redirect:/login";
+    @ResponseBody
+    public String modifyPassword(@RequestBody AdminDTO adminDTO){
+        log.info("임시비밀번호를 발급해줘~!~");
+        boolean result = adminService.passwordSend(adminDTO);
+        return result ? "success" : "fail";
     }
 
     // 회원 삭제 (일반 회원)

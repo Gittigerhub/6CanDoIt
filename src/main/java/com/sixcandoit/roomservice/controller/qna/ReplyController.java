@@ -29,6 +29,14 @@ public class ReplyController {
     private final QnaService qnaService;
     private final ModelMapper modelMapper;
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /reply/register
+       인수 : Integer qnaIdx, ReplyDTO replyDTO, BindingResult bindingResult,
+             CustomUserDetails userDetails, RedirectAttributes redirectAttributes
+       출력 : 답변 등록 처리 후 리다이렉트
+       설명 : 답변을 등록하고, 관리자 권한을 체크한 후 알림 메시지를 설정하여 리다이렉트
+   ----------------------------------------------------------------------------- */
     // Qna의 A 읽기 -> Q 상세보기에서 목록 출력
     // Qna의 A 등록 -> 모달 처리
     @PostMapping("/reply/register")
@@ -84,6 +92,14 @@ public class ReplyController {
         }
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /reply/update
+       인수 : Integer qnaIdx, ReplyDTO replyDTO, BindingResult bindingResult,
+             CustomUserDetails userDetails, Model model, RedirectAttributes redirectAttributes
+       출력 : 답변 수정 처리 후 리다이렉트
+       설명 : 답변을 수정하고 관리자 권한을 체크한 후 수정된 내용을 저장하고 리다이렉트
+   ----------------------------------------------------------------------------- */
     // Qna의 A 수정 처리
     @PostMapping("/reply/update")
     public String update(@Valid @RequestParam Integer qnaIdx,
@@ -116,6 +132,13 @@ public class ReplyController {
         return "redirect:/qna/adminread?idx=" + qnaIdx;
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /reply/delete
+       인수 : Integer idx, Integer qnaIdx, CustomUserDetails userDetails, RedirectAttributes redirectAttributes
+       출력 : 답변 삭제 후 리다이렉트
+       설명 : 답변을 삭제하고 관리자 권한을 체크하여 삭제 후 질문 페이지로 리다이렉트
+   ----------------------------------------------------------------------------- */
     // Qna의 A 삭제
     @GetMapping("/reply/delete")
     public String delete(@RequestParam Integer idx, 

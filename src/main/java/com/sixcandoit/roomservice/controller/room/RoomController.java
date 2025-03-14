@@ -44,6 +44,12 @@ public class RoomController {
     private final ImageFileService imageFileService;
     private final OrganizationService organizationService;
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/main
+       인수 : Integer organ_idx, Model model
+       출력 : room/main 페이지로 이동
+       설명 : 룸 관리 메인 페이지를 반환
+    ----------------------------------------------------------------------------- */
     // 룸 관리 메인 페이지
     @GetMapping("/room/main")
     public String main(@RequestParam(required = false) Integer organ_idx, Model model) {
@@ -53,6 +59,12 @@ public class RoomController {
         return "room/main";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/list
+       인수 : Pageable page, String type, String keyword, String order, Integer organ_idx, String roomType, Model model
+       출력 : room/list 페이지로 이동
+       설명 : 룸 목록을 조회하고 페이지에 데이터를 전달하여 반환
+    ----------------------------------------------------------------------------- */
     // 룸 전체 목록
     @GetMapping("/room/list")
     private String list(@PageableDefault(page = 1) Pageable page,
@@ -104,6 +116,12 @@ public class RoomController {
         return "room/list";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/reserve
+       인수 : LocalDate sdate, LocalDate edate, Integer organ_idx, Model model
+       출력 : room/reserve 페이지로 이동
+       설명 : 예약 목록을 조회하여 페이지로 전달
+    ----------------------------------------------------------------------------- */
     //관리자용 예약 목록 리스트
     @GetMapping("/room/reserve")
     public String reslist(@RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
@@ -148,6 +166,12 @@ public class RoomController {
         return "room/reserve";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/updateStatus/{idx}
+       인수 : Integer idx, Map<String, String> requestBody
+       출력 : JSON 응답
+       설명 : 특정 방의 상태를 업데이트
+    ----------------------------------------------------------------------------- */
     @PostMapping("/room/updateStatus/{idx}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateRoomStatus(@PathVariable Integer idx, @RequestBody Map<String, String> requestBody) {
@@ -169,6 +193,12 @@ public class RoomController {
         return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/register
+       인수 : Integer organ_idx, Model model
+       출력 : room/register 페이지로 이동
+       설명 : 룸 등록 페이지로 이동하며 초기 룸 DTO를 모델에 추가
+    ----------------------------------------------------------------------------- */
     // 룸 등록
     @GetMapping("/room/register")
     public String register(@RequestParam(required = false) Integer organ_idx, Model model){
@@ -199,6 +229,12 @@ public class RoomController {
         return "room/register";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/register
+       인수 : RoomDTO roomDTO, BindingResult bindingResult, List<MultipartFile> imageFiles
+       출력 : room/list 페이지로 리다이렉트
+       설명 : 새로운 룸을 등록 처리하고, 등록이 완료된 후 룸 목록으로 리다이렉트
+    ----------------------------------------------------------------------------- */
     // 룸 등록 저장 처리
     @PostMapping("/room/register")
     public String registerProc(@Valid @ModelAttribute RoomDTO roomDTO,
@@ -248,6 +284,12 @@ public class RoomController {
         return "redirect:/room/list";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/detail
+       인수 : Integer idx, Model model
+       출력 : room/detail 페이지로 이동
+       설명 : 특정 룸의 상세 정보를 조회하여 페이지에 전달
+    ----------------------------------------------------------------------------- */
     // 룸 상세보기
     @GetMapping("/room/detail")
     public String detail(@RequestParam Integer idx, Model model){
@@ -274,6 +316,12 @@ public class RoomController {
         return "room/detail";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/update
+       인수 : Integer idx, Model model
+       출력 : room/update 페이지로 이동
+       설명 : 특정 룸의 데이터를 수정하기 위해 해당 데이터를 페이지로 전달
+    ----------------------------------------------------------------------------- */
     // 룸 수정 불러오기
     @GetMapping("/room/update")
     public String update(@RequestParam Integer idx, Model model){
@@ -286,6 +334,12 @@ public class RoomController {
         return "room/update";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/update
+       인수 : RoomDTO roomDTO, BindingResult bindingResult, List<MultipartFile> imageFiles
+       출력 : room/detail 페이지로 리다이렉트
+       설명 : 수정된 룸 데이터를 저장하고, 저장 후 상세 페이지로 리다이렉트
+    ----------------------------------------------------------------------------- */
     // 룸 수정 수정하기
     @PostMapping("/room/update")
     public String updateProc(@Valid @ModelAttribute RoomDTO roomDTO,
@@ -340,6 +394,12 @@ public class RoomController {
         }
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/delete
+       인수 : Integer idx
+       출력 : room/list 페이지로 리다이렉트
+       설명 : 특정 룸 데이터를 삭제하고, 룸 목록 페이지로 리다이렉트
+    ----------------------------------------------------------------------------- */
     // 룸 삭제
     @GetMapping("/room/delete")
     public String delete(@RequestParam Integer idx){
@@ -353,6 +413,12 @@ public class RoomController {
         return "redirect:/room/list";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/roomSeason/update
+       인수 : Integer idx, String roomSeason
+       출력 : room/detail 페이지로 리다이렉트
+       설명 : 룸의 성수기를 등록하거나 해제하며, 완료 후 룸 상세 페이지로 리다이렉트
+    ----------------------------------------------------------------------------- */
     // 성수기 등록 및 해제
     @GetMapping("/room/roomSeason/update")
     public String updateSeason(@RequestParam Integer idx, @RequestParam String roomSeason){
@@ -360,6 +426,12 @@ public class RoomController {
         return "redirect:/room/detail?idx=" + idx; // 상세 페이지로 리다이렉트
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /room/member/list
+       인수 : Integer organ_idx, LocalDate startDate, LocalDate endDate, Principal principal, Model model
+       출력 : room/member/list 페이지로 이동
+       설명 : 특정 조직의 룸 목록과 예약을 조회하여 회원 페이지에 전달
+    ----------------------------------------------------------------------------- */
     // 호텔 상세 + 룸 조회 + 룸 예약
     @GetMapping("/room/member/list")
     public String memberRoomList(@RequestParam(required = false) Integer organ_idx,
@@ -433,95 +505,4 @@ public class RoomController {
 
         return "room/member/list"; // 해당 템플릿에 room과 organ 정보가 모두 포함되어 렌더링됨
     }
-
-//    // 사용자용 룸 목록
-//    @GetMapping("/room/member/list")
-//    public String memberRoomList(@RequestParam(required = false) Integer organ_idx,
-//                               @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-//                               @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-//                               Principal principal,
-//                               Model model) {
-//        log.info("memberRoomList called with organ_idx: {}, principal: {}", organ_idx, principal);
-//
-//        // 객실 목록 조회
-//        List<RoomDTO> roomDTOS = roomService.getRoomsByOrganizationForMember(organ_idx);
-//        model.addAttribute("roomDTOS", roomDTOS);
-//
-//        // 이미지 맵 생성
-//        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
-//        Map<Integer, Boolean> repImageMap = new HashMap<>();
-//
-//        // 각 룸의 이미지 정보 조회
-//        for (RoomDTO roomDTO : roomDTOS) {
-//            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(roomDTO.getIdx(), "room");
-//            imageFileMap.put(roomDTO.getIdx(), imageFileDTOS);
-//            repImageMap.put(roomDTO.getIdx(), imageFileDTOS.stream().anyMatch(img -> "Y".equals(img.getRepimageYn())));
-//        }
-//
-//        model.addAttribute("imageFileMap", imageFileMap);
-//        model.addAttribute("repImageMap", repImageMap);
-//
-//        // 조직 정보 조회
-//        if (organ_idx != null) {
-//            organizationService.findById(organ_idx).ifPresent(organization -> {
-//                model.addAttribute("organization", organization);
-//                log.info("Found organization: {}", organization.getOrganName());
-//            });
-//        }
-//
-//        // 로그인한 사용자의 예약 목록 조회
-//        if (principal != null) {
-//            try {
-//                List<ReservationDTO> reservations;
-//                if (organ_idx != null) {
-//                    // 특정 숙소의 예약만 조회
-//                    reservations = reservationService.getUserReservationsByOrganization(principal.getName(), organ_idx);
-//                    log.info("Fetching reservations for user {} and organization {}", principal.getName(), organ_idx);
-//                } else {
-//                    // 전체 예약 조회
-//                    reservations = reservationService.getUserReservations(principal.getName());
-//                    log.info("Fetching all reservations for user {}", principal.getName());
-//                }
-//                model.addAttribute("reservations", reservations);
-//            } catch (Exception e) {
-//                log.error("Error fetching reservations for user: {}", principal.getName(), e);
-//                // 에러가 발생해도 페이지는 계속 로드되도록 함
-//                model.addAttribute("reservations", new ArrayList<>());
-//            }
-//        } else {
-//            log.info("No principal found - user is not logged in");
-//        }
-//
-//        return "room/member/list";
-//    }
-
-//    // 사용자용 호텔 목록
-//    @GetMapping("/room/member/list")
-//    public String memberHotelList(@RequestParam(required = false) Integer organ_idx,
-//                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-//                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-//                                 Principal principal,
-//                                 Model model) {
-//        log.info("memberHotelList called with organ_idx: {}, principal: {}", organ_idx, principal);
-//
-//        // 객실 목록 조회
-//        List<OrganizationDTO> organizationDTOS = organizationService.getAllOrganizations();
-//        model.addAttribute("organizationDTOS", organizationDTOS);
-//
-//        // 이미지 맵 생성
-//        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
-//        Map<Integer, Boolean> repImageMap = new HashMap<>();
-//
-//        // 각 룸의 이미지 정보 조회
-//        for (OrganizationDTO organizationDTO : organizationDTOS) {
-//            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(organizationDTO.getIdx(), "organ");
-//            imageFileMap.put(organizationDTO.getIdx(), imageFileDTOS);
-//            repImageMap.put(organizationDTO.getIdx(), imageFileDTOS.stream().anyMatch(img -> "Y".equals(img.getRepimageYn())));
-//        }
-//
-//        model.addAttribute("imageFileMap", imageFileMap);
-//        model.addAttribute("repImageMap", repImageMap);
-//
-//        return "room/member/list";
-//    }
 }

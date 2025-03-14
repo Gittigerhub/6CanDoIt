@@ -69,7 +69,7 @@
                             th:data-id="${events.idx}"></td>
                         <td class="column" style="text-align: center" th:text="${events.eventTitle}"
                             th:data-id="${events.idx}"></td>
-                        <td class="contents column" style="text-align: center"  th:text="${#strings.length(events.eventContents)>30 ? #strings.substring(events.eventContents,0,30)+'...':
+                        <td class="contents column" style="text-align: center" th:text="${#strings.length(events.eventContents)>30 ? #strings.substring(events.eventContents,0,30)+'...':
                         events.eventContents}" th:data-id="${events.idx}"></td>
                         <td class="column" style="text-align: center"
                             th:text="${#temporals.format(events.eventStartDate,'yy-MM-dd')}+'~'+${#temporals.format(events.eventEndDate,'yy-MM-dd')}"
@@ -134,20 +134,20 @@
     </div>
     <!--페이징 끝-->
 
-<!--모달시작
+<!--모달 시작-->
     <div class="modal" id="eventModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                Modal Header
+
                 <div class="modal-header">
                     <h4 id="title" class="modal-title"></h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="eventForm" enctype="multipart/form-data">
                     <input type="hidden" id="idx" name="idx">
-                     Modal body
+
                     <div class="modal-body">
-                        매장 시작 시간, 매장 끝나는 시간
+
                         <div class="row mt-2">
                             <div class="col-sm-12">
                                 <div class="form-group form-group-default">
@@ -246,7 +246,7 @@
                         </th:block>
 
 
-                       Modal footer
+
                         <div class="modal-footer">
                             <button id="register" class="btn btn-primary" type="button">이벤트등록</button>
                             <button id="update" class="btn btn-secondary" type="button">이벤트수정</button>
@@ -255,8 +255,9 @@
                 </form>
             </div>
         </div>
-        폼 끝
-    </div>모달 끝-->
+
+    </div>
+    <!--모달 끝-->
 
 
 </div>

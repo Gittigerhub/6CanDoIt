@@ -7,8 +7,7 @@
     <title>Sign In / Sign Up</title>
     <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <th:block layout:fragment="css">
-        <style>
+    <style>
             @import url(https://fonts.googleapis.com/css?family=Raleway:400,100,200,300);
             /* GENERAL RESETS */
             * {
@@ -32,7 +31,7 @@
             }
 
             a:hover {
-                color: #4FDA8C;
+                color: #0d6efd;
             }
 
             /* BODY */
@@ -77,7 +76,7 @@
             }
 
             a.button:hover {
-                border-color: #04B5B5;
+                border-color: #0b5ed7;
                 color: #fff;
                 padding: 1.0rem 3.2rem;
             }
@@ -187,15 +186,15 @@
                 box-shadow: 0px 0px 27px -9px rgba(0, 0, 0, 0.75);
             }
 
-            .user .actions a:last-child {
-                color: #fff;
-                border-radius: 0 30px 30px 0;
-                background-color: #28A55F;
-                background: -moz-linear-gradient(270deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);
-                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(105, 221, 201, 1)), color-stop(100%, rgba(78, 193, 182, 1)));
-                background: -webkit-linear-gradient(270deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);
-                background: linear-gradient(180deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);
-            }
+            /*.user .actions a:last-child {*/
+            /*    color: #fff;*/
+            /*    border-radius: 0 30px 30px 0;*/
+            /*    background-color: #28A55F;*/
+            /*    background: -moz-linear-gradient(270deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);*/
+            /*    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(105, 221, 201, 1)), color-stop(100%, rgba(78, 193, 182, 1)));*/
+            /*    background: -webkit-linear-gradient(270deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);*/
+            /*    background: linear-gradient(180deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);*/
+            /*}*/
 
             /* TERMS */
             @keyframes show_terms {
@@ -306,7 +305,7 @@
                 font-size: 1.1em; /* 글자 크기를 약간 줄임 */
                 border-radius: 5px; /* 버튼 모서리를 둥글게 */
                 display: block;
-                background-color: #04BEBD;
+                background-color: #0d6efd;
                 border: none;
                 color: #fff;
                 cursor: pointer;
@@ -315,11 +314,11 @@
             }
 
             .recovery form .button:hover {
-                background-color: #04B5B5;
+                background-color: #0b5ed7;
             }
 
             .form-wrap form .button:hover {
-                background-color: #04B5B5;
+                background-color: #0b5ed7;
             }
 
             .recovery p.mssg {
@@ -561,7 +560,7 @@
             .form-wrap a {
                 color: #ccc;
                 padding-bottom: 4px;
-                border-bottom: 1px solid #04BEBD;
+                border-bottom: 1px solid #0d6efd;
             }
 
             .form-wrap a:hover {
@@ -599,7 +598,7 @@
 
             .form-wrap .tabs h3 a.active span {
                 padding-bottom: 4px;
-                border-bottom: 1px solid #04BEBD;
+                border-bottom: 1px solid #0d6efd;
             }
 
             .form-wrap .tabs-content {
@@ -644,7 +643,7 @@
                 font-size: 1.1em; /* 글자 크기를 약간 줄임 */
                 border-radius: 5px; /* 버튼 모서리를 둥글게 */
                 display: block;
-                background-color: #04BEBD;
+                background-color: #0d6efd;
                 border: none;
                 color: #fff;
                 cursor: pointer;
@@ -653,7 +652,7 @@
             }
 
             .form-wrap form .button:hover {
-                background-color: #04B5B5;
+                background-color: #0b5ed7;
             }
 
             .form-wrap form .checkbox {
@@ -695,7 +694,7 @@
             /*    opacity: 0;*/
             /*    content: '';*/
             /*    background-color: transparent;*/
-            /*    border: solid #04BEBD;*/
+            /*    border: solid #0d6efd;*/
             /*    border-width: 0 0 3px 3px;*/
             /*    -webkit-transform: rotate(-45deg);*/
             /*    -moz-transform: rotate(-45deg);*/
@@ -889,7 +888,7 @@
             .btn {
                 padding: 12px 15px;
                 margin-left: 10px;
-                background-color: #04BEBD;
+                background-color: #0d6efd;
                 color: white;
                 border: none;
                 border-radius: 4px;
@@ -899,7 +898,7 @@
             }
 
             .btn:hover {
-                background-color: #04B5B5;
+                background-color: #0b5ed7;
             }
 
             /* 이메일 입력창 */
@@ -931,7 +930,7 @@
                 font-size: 1.1em; /* 글자 크기를 약간 줄임 */
                 border-radius: 5px; /* 버튼 모서리를 둥글게 */
                 display: block;
-                background-color: #04BEBD;
+                background-color: #0d6efd;
                 border: none;
                 color: #fff;
                 cursor: pointer;
@@ -940,7 +939,7 @@
             }
 
             .recovery .button:hover {
-                background-color: #04B5B5;
+                background-color: #0b5ed7;
             }
             /* 드롭다운 */
             .custom-dropdown {
@@ -964,7 +963,6 @@
             }
 
         </style>
-    </th:block>
 </head>
 <body>
 <div>
@@ -1415,8 +1413,7 @@ E-mail : himyeongsun@gmail.com
     </div>
 </div>
 
-    <th:block layout:fragment="script">
-    <script>
+<script>
         // 이메일 인증
         var emailCheckYN = 0;
         $("#emailSendBtn").on("click", function () {
@@ -1772,6 +1769,6 @@ E-mail : himyeongsun@gmail.com
             return false; // 폼 기본 제출 방지
         }
         </script>
-    </th:block>
+
 </body>
 </html>

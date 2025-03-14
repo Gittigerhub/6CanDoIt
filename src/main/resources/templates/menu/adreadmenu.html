@@ -21,6 +21,12 @@
                     <div class="card-body">
                         <h2>메뉴 세부</h2>
                     </div>
+
+                    <!-- menuIdx와 organIdx 값을 담는 hidden input -->
+                    <input type="hidden" id="menuIdxInput" name="menuIdx" th:value="${menuDTO.idx}">
+                    <input type="hidden" id="organIdxInput" name="organIdx" th:value="${organIdx}"> <!-- organIdx를 추가 -->
+
+
                     <!--id와 name은 DTO에 변수명으로 작업-->
                     <div class="card-body">
                         <div class="mb-3">
@@ -131,8 +137,7 @@
                         <div class="col-12">
                             <button type="button" class="btn btn-warning"
                                     th:onclick="|location.href='/admin/menu/updatemenu?idx='+ ${menuDTO.idx}|">수정</button>
-                            <button type="button" class="btn btn-primary"
-                                    th:onclick="|location.href='/admin/menu/adlistmenu'|">목록</button>
+                            <a type="button" class="btn btn-primary" href="#" id="moveButton">목록으로</a>
                         </div>
                     </div>
                 </div>
@@ -143,6 +148,36 @@
 </th:block>
 <th:block layout:fragment="script">
     <script th:inline="javascript">
+
+        // 등록 버튼 클릭 시 동작하는 함수
+        document.getElementById('moveButton').addEventListener('click', function(event) {
+            event.preventDefault();  // 기본 링크 이동을 막음 (동적으로 href를 설정하기 위해)
+
+            // input 값 읽어오기
+            const organIdx = document.getElementById('organIdxInput').value;
+
+            // 만약 input 값이 비어 있지 않다면, 해당 값을 링크의 href에 추가
+            if (organIdx) {
+                const newUrl = `/admin/menu/adlistmenu?organIdx=${encodeURIComponent(organIdx)}`;
+                window.location.href = newUrl;  // 페이지 이동
+            } else {
+                alert('값을 입력해주세요!');
+            }
+        });
+
+        // ========================
+
+        // 현재 페이지 URL에서 쿼리 파라미터를 가져오는 코드
+        const urlParams = new URLSearchParams(window.location.search);
+        const organIdx = urlParams.get('organIdx');  // 쿼리 파라미터 'idx' 값을 가져옴
+        const menuIdx = urlParams.get('menuIdx');  // 쿼리 파라미터 'idx' 값을 가져옴
+
+        // 'organIdx' 값을 input 태그에 자동으로 채움
+        if (organIdx) {
+            document.getElementById('organIdxInput').value = organIdx;
+            document.getElementById('menuIdxInput').value = menuIdx;
+        }
+
 
         // let menuid = [[${menuDTO.idx}]];
         // console.log(menuid);  // 이 값이 잘 들어오는지

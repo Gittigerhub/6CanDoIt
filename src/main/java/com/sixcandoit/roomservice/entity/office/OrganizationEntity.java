@@ -51,7 +51,7 @@ public class OrganizationEntity extends BaseEntity {
 
     // 본사/지사 구분을 위한 자기참조 관계 (자식)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "head_id")
+    @JoinColumn(name = "head_idx")
     @JsonBackReference
     private OrganizationEntity head;              // 본사
 
@@ -61,7 +61,7 @@ public class OrganizationEntity extends BaseEntity {
 
     // 본사/지사와 매장을 구분을 위한 자기참조 관계 (자식)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hotels_id")
+    @JoinColumn(name = "hotels_idx")
     @JsonBackReference
     private OrganizationEntity hotels;           // 본사 + 지사
 

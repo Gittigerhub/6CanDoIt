@@ -31,4 +31,8 @@ public class ReservationDTO {
     private String resStatus;          // 예약 상태(1:예약중, 2:예약완료, 3:예약종료)
 
     private MemberDTO memberDTO;    // 회원 정보
+
+    public Object getPrice() {
+        return null;
+    }
 }

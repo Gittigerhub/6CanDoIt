@@ -256,4 +256,8 @@ public class ReservationService {
     public ReservationDTO findById(Integer reservationId) {
         return null;
     }
+
+    public ReservationDTO getReservationById(Integer reservationId) {
+        return null;
+    }
 }

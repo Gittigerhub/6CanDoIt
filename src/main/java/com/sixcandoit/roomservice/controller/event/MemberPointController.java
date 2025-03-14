@@ -61,7 +61,7 @@ public class MemberPointController {
     //포인트 등록
     @PostMapping("/memberpoint/register")
     @ResponseBody
-    public ResponseEntity<String> MemberPointRegister(@ModelAttribute MemberPointDTO memberPointDTO){
+    public ResponseEntity<String> memberPointRegister(@ModelAttribute MemberPointDTO memberPointDTO){
         try {
 
             memberPointService.register(memberPointDTO);
@@ -78,7 +78,7 @@ public class MemberPointController {
     //포인트 삭제
     @GetMapping("/memberpoint/delete")
     @ResponseBody
-    public ResponseEntity<String> MemberPointDelete(@RequestParam Integer idx){
+    public ResponseEntity<String> memberPointDelete(@RequestParam Integer idx){
        // System.out.println("삭제");
        // System.out.println(idx);
         try {
@@ -93,7 +93,7 @@ public class MemberPointController {
     //포인트 수정
     @GetMapping("/memberpoint/read")
     @ResponseBody
-    public Map<String, Object> MemberPointRead(@RequestParam Integer idx){
+    public Map<String, Object> memberPointRead(@RequestParam Integer idx){
         MemberPointDTO memberPointDTO = memberPointService.read(idx);
         Map<String,Object> response = new HashMap<>();
         response.put("memberPointDTO",memberPointDTO);
@@ -103,7 +103,7 @@ public class MemberPointController {
 
     @PostMapping("/memberpoint/update")
     @ResponseBody
-    public ResponseEntity<String> MemberPointUpdate(@ModelAttribute MemberPointDTO memberPointDTO){
+    public ResponseEntity<String> memberPointUpdate(@ModelAttribute MemberPointDTO memberPointDTO){
         //System.out.println(memberPointDTO.toString());
         try {
             memberPointService.update(memberPointDTO);

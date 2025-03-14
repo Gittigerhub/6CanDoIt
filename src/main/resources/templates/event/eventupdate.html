@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/memberlayout}">
+      layout:decorate="~{layouts/superlayout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,9 +20,6 @@
                 </div>
                 <div class="col">
                     <div class="card">
-                        <div class="card-header" style="display: flex; justify-content: center ; width: 100%;">
-                            <div class="col-4" style="flex: 1; text-align: center;">수정 페이지</div>
-                        </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="input-group">
@@ -57,7 +54,7 @@
                                 <div class="input-group">
                                     <label>이벤트 내용</label>
                                     <textarea class="event_text" rows="3"
-                                              name="eventContents" cols="160" th:value="${eventRead.eventContents}"></textarea>
+                                              name="eventContents" cols="160" th:text="${eventRead.eventContents}"></textarea>
                                 </div>
                             </div>
                             <br>

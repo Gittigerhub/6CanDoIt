@@ -104,7 +104,7 @@ public class EventController {
     //이벤트 자세히 보기
     @PostMapping("/event/read")
     @ResponseBody
-    public Map<String, Object> EventRead(@RequestParam Integer idx) {
+    public Map<String, Object> eventRead(@RequestParam Integer idx) {
         EventDTO eventDTO = eventService.read(idx);
         Map<String, Object> response = new HashMap<>();
         response.put("eventDTO", eventDTO);
@@ -114,7 +114,7 @@ public class EventController {
     }
 
     @GetMapping("/eventread")
-    public String eventRead(Integer idx, Model model) {
+    public String read(Integer idx, Model model) {
 
         EventDTO eventDTORead = eventService.read(idx);
 

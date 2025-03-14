@@ -25,6 +25,8 @@
                     <div th:if="${param.organidx}">
                         <p>Shop Index: <span th:text="${param.organidx}"></span></p>
                     </div>
+                    <!-- url에서 가져온 organIdx값을 담아둘 input태그 -->
+                    <input type="hidden" id="organIdxInput" name="organ.idx">
 
                     <div class="col-12">
                         <!-- 카테고리 선택 UI -->
@@ -39,7 +41,7 @@
                                 </div>
                                 <div class="position-relative d-inline-block ms-3">
                                     <div class="w-75">
-                                        <a th:href="@{/admin/menu/registermenu}" class="btn btn-sm btn-primary px-3 py-2" style="white-space: nowrap;">등록</a>
+                                        <a href="#" id="moveButton" class="btn btn-sm btn-primary px-3 py-2" style="white-space: nowrap;">등록</a>
                                     </div><!--추가버튼-->
                                 </div>
                             </div>
@@ -137,6 +139,33 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         $(document).ready(function() {
+
+            // 등록 버튼 클릭 시 동작하는 함수
+            document.getElementById('moveButton').addEventListener('click', function(event) {
+                event.preventDefault();  // 기본 링크 이동을 막음 (동적으로 href를 설정하기 위해)
+
+                // input 값 읽어오기
+                const organIdx = document.getElementById('organIdxInput').value;
+
+                // 만약 input 값이 비어 있지 않다면, 해당 값을 링크의 href에 추가
+                if (organIdx) {
+                    const newUrl = `/admin/menu/registermenu?organIdx=${encodeURIComponent(organIdx)}`;
+                    window.location.href = newUrl;  // 페이지 이동
+                } else {
+                    alert('값을 입력해주세요!');
+                }
+            });
+
+            // ========================
+
+            // 현재 페이지 URL에서 쿼리 파라미터를 가져오는 코드
+            const urlParams = new URLSearchParams(window.location.search);
+            const organIdx = urlParams.get('organIdx');  // 쿼리 파라미터 'idx' 값을 가져옴
+
+            // 'organIdx' 값을 input 태그에 자동으로 채움
+            if (organIdx) {
+                document.getElementById('organIdxInput').value = organIdx;
+            }
 
             // 카테고리 버튼 클릭 시 메뉴 목록 갱신
             $('.category-btn').on('click', function() {

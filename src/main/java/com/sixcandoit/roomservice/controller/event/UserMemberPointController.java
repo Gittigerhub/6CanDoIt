@@ -38,7 +38,7 @@ public class UserMemberPointController {
 
     //유저 맴버 리스트
     @GetMapping("/usermemberpoint")
-    public String UserPointGet(@PageableDefault(page = 1) Pageable page,
+    public String userPointGet(@PageableDefault(page = 1) Pageable page,
                                @RequestParam(value = "type", defaultValue = "") String type,
                                @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                @RequestParam(value = "startDate", defaultValue = "") LocalDateTime startDate,
@@ -71,7 +71,7 @@ public class UserMemberPointController {
     //유저 맴버 읽기
     @GetMapping("/usermemberpoint/read")
     @ResponseBody
-    public Map<String, Object> UserPointRead(@RequestParam Integer idx) {
+    public Map<String, Object> userPointRead(@RequestParam Integer idx) {
         MemberPointDTO userPoint = userMemberPointService.read(idx);
         Map<String, Object> response = new HashMap<>();
         response.put("userPoint", userPoint);

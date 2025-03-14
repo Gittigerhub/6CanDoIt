@@ -19,7 +19,7 @@ public class ImageFileController {
 
     private final ImageFileService imageFileService;
 
-    // 조직 삭제
+    // 이미지 삭제
     @GetMapping("/delete")
     @ResponseBody
     public ResponseEntity<String> MemberPointDelete(@RequestParam Integer idx){

@@ -218,6 +218,7 @@ public class OfficeController {
 
     }
 
+    // 모달로 조직 등록
     @PostMapping("/organ/register")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
     public ResponseEntity<String> register(@ModelAttribute OrganizationDTO organizationDTO, List<MultipartFile> imageFiles) {
@@ -268,6 +269,7 @@ public class OfficeController {
 
     }
 
+    // 조직 상세보기
     @GetMapping("/organ")
     public String organDetail(Integer idx, Model model) {
 

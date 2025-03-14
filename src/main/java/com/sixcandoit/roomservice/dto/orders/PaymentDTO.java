@@ -26,13 +26,25 @@ public class PaymentDTO {
     private String errorMessage;    // Error message
     private LocalDateTime regDate;  // Registration date
 
-    // Getters and Setters
 
-    public void setPaymentDate(LocalDateTime now) {
-        this.regDate = now;
+    // Setters for paymentState and paymentType with validation
+    public void setPaymentState(String paymentState) {
+        if (!paymentState.equals("Y") && !paymentState.equals("N")) {
+            throw new IllegalArgumentException("Invalid payment state: " + paymentState);
+        }
+        this.paymentState = paymentState;
     }
 
-    public LocalDateTime getPaymentDate() {
-        return regDate;
+    public void setPaymentType(Integer paymentType) {
+        if (paymentType != 0 && paymentType != 1) {
+            throw new IllegalArgumentException("Invalid payment type: " + paymentType);
+        }
+        this.paymentType = paymentType;
+    }
+
+    // Utility method to set error information
+    public void setError(String errorCode, String errorMessage) {
+        this.errorCode = errorCode;
+        this.errorMessage = errorMessage;
     }
 }

@@ -197,7 +197,7 @@ public class PaymentService {
     }
 
     // 환불 처리 (구현 필요)
-    private void processRefund(PaymentEntity paymentEntity) {
+    public void processRefund(PaymentEntity paymentEntity) {
         // TODO: 실제 환불 처리 로직 구현
         log.info("환불 처리를 시작합니다. paymentIdx: " + paymentEntity.getIdx());
     }

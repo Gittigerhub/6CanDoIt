@@ -21,9 +21,18 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <th:block layout:fragment="css"></th:block>
 </head>
-<body>
 <style>
+    @font-face {
+        font-family: 'Pretendard-Regular';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+        font-weight: 400;
+        font-style: normal;
+    }
+    /* 'Pretendard-Regular' 폰트를 body에 적용 */
     body {
+        font-family: 'Pretendard-Regular', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
         background-color: #f0f0f0 ; /* 강제로 배경색 적용 */
     }
 
@@ -46,6 +55,7 @@
     }
 
 </style>
+<body>
 
 <div class="d-flex">
     <div id="hosidebar">

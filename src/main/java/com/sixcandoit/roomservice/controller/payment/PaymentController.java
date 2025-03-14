@@ -2,8 +2,12 @@ package com.sixcandoit.roomservice.controller.payment;
 
 import com.sixcandoit.roomservice.dto.orders.PaymentDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
+import com.sixcandoit.roomservice.entity.orders.PaymentEntity;
+import com.sixcandoit.roomservice.repository.orders.PaymentRepository;
 import com.sixcandoit.roomservice.service.orders.PaymentService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -22,6 +27,7 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final ReservationService reservationService;
+    private final PaymentRepository paymentRepository;
 
     // 사용자 정보를 모델에 추가하는 메서드
     private void addUserInfoToModel(Model model) {
@@ -183,7 +189,7 @@ public class PaymentController {
     }
 
     // 결제 실패 처리
-    @GetMapping("/orders/paymentfail")
+    @GetMapping("/orders/payment/fail")
     public String paymentFail(
             @RequestParam("code") String code,
             @RequestParam("message") String message,
@@ -211,9 +217,8 @@ public class PaymentController {
         }
     }
 
-
     @GetMapping("/orders/payment/cancel/{idx}")
-    public String cancel(@PathVariable("idx") Integer idx, Model model) {
+    public String cancel(@PathVariable("idx") Integer idx, Model model, RedirectAttributes redirectAttributes) {
         log.info("결제 취소 페이지 요청 - idx:{}", idx);
         try {
             PaymentDTO paymentDTO = paymentService.findByIdx(idx);
@@ -223,46 +228,47 @@ public class PaymentController {
                 return "redirect:/orders/payment/list";  // Corrected path with '/'
             }
 
+            // idx를 RedirectAttributes에 추가
+            redirectAttributes.addAttribute("idx", idx);
             model.addAttribute("paymentDTO", paymentDTO);
             addUserInfoToModel(model);
             return "orders/paymentcancel";
         } catch (Exception e) {
             log.error("결제 취소 페이지 로딩 중 오류 발생: {}", e.getMessage());
             model.addAttribute("error", "결제 취소 페이지 로딩 중 오류가 발생했습니다.");
-            return "redirect:/orders/payment/cancel";  // Corrected path with '/'
+            return "redirect:/orders/paymentcancel";  // Corrected path with '/'
         }
     }
 
 
-    @PostMapping("/orders/payment/cancel/{idx}")
-    public String cancelPayment(@PathVariable("idx") Integer idx, Model model) {
-        log.info("결제 취소 처리 - idx: {}", idx);
-        try {
-            PaymentDTO paymentDTO = paymentService.findByIdx(idx);
+    // 결제 취소 처리
+    @PostMapping("/orders/payment/cancel")
+    public String cancelPayment(@RequestParam("idx") Integer idx, RedirectAttributes redirectAttributes) {
+        log.info("결제 취소를 처리합니다. idx: {}", idx);
 
-            if (paymentDTO == null) {
-                model.addAttribute("error", "결제 정보를 찾을 수 없습니다.");
-                return "redirect:/orders/payment/list";  // Corrected path with '/'
-            }
+        PaymentEntity paymentEntity = paymentRepository.findById(idx)
+                .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다. idx: " + idx));
 
-            paymentDTO.setPaymentState("CANCELLED");
-            paymentService.processPayment(paymentDTO);
-
-            if (paymentDTO.getOrderId().startsWith("ROOM_")) {
-                Integer reservationId = Integer.parseInt(paymentDTO.getOrderId().substring(5));
-                reservationService.updateReservationPayment(reservationId, null);
-                reservationService.updateReservationStatus(reservationId, "CANCELLED");
-            }
-
-            model.addAttribute("orderId", paymentDTO.getOrderId());
-            model.addAttribute("paymentAmount", paymentDTO.getPaymentPrice());
-            model.addAttribute("paymentState", "취소됨");
-            addUserInfoToModel(model);
-            return "orders/paymentcancelled";
-        } catch (Exception e) {
-            log.error("결제 취소 처리 중 오류 발생: {}", e.getMessage());
-            model.addAttribute("error", "결제 취소 중 오류가 발생했습니다.");
-            return "redirect:/orders/payment/cancel";  // Corrected path with '/'
+        // 결제 상태 검증
+        if ("Y".equals(paymentEntity.getPaymentState())) {
+            throw new IllegalStateException("이미 결제 완료된 결제는 취소할 수 없습니다.");
         }
+
+        paymentEntity.setPaymentState("N"); // 결제 취소 상태로 설정
+        paymentEntity.setPaymentApproval(null); // 승인번호 초기화
+
+        // 환불 처리 (구현 필요)
+        paymentService.processRefund(paymentEntity);
+
+        // 결제 취소 정보 저장
+        PaymentEntity savedEntity = paymentRepository.save(paymentEntity);
+
+        // 취소된 결제 정보를 리다이렉트 URL에 쿼리 파라미터로 전달
+        redirectAttributes.addAttribute("orderId", savedEntity.getOrderId());
+        redirectAttributes.addAttribute("paymentAmount", savedEntity.getPaymentPrice());
+        redirectAttributes.addAttribute("paymentState", savedEntity.getPaymentState()); // "N"으로 설정됨
+
+        // 결제 취소 완료 페이지로 리다이렉트
+        return "redirect:/orders/paymentcancelled";
     }
 }

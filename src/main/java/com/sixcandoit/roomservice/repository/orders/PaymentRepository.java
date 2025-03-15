@@ -6,10 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer> {
     List<PaymentEntity> findByOrdersJoin(OrdersEntity ordersEntity);
     List<PaymentEntity> findByOrdersJoinAndPaymentPayType(OrdersEntity ordersEntity, String paymentPayType);
     List<PaymentEntity> findByPaymentState(String paymentState);
+    Optional<PaymentEntity> findByOrderId(String orderId);
 }

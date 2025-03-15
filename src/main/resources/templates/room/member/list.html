@@ -50,6 +50,8 @@
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
+    <!-- 예약 취소 버튼 -->
+    <button onclick="deleteReservation(1)">예약 취소</button>
 
 <!--     ////////////////////////////////////////// 호텔 시작 //////////////////////////////////////////-->
     <!-- 호텔 사진 갤러리 -->
@@ -447,11 +449,12 @@
                                         <h5 class="card-title mb-3" th:text="${reservation.roomName}">객실 이름</h5>
                                         <p class="card-text mb-2">
                                             <i class="fas fa-calendar-alt me-2"></i>
-                                            <span th:text="${#temporals.format(reservation.startDate, 'yyyy-MM-dd')}">2024-03-11</span> ~
-                                            <span th:text="${#temporals.format(reservation.endDate, 'yyyy-MM-dd')}">2024-03-12</span>
+                                            체크인: <span th:text="${#temporals.format(reservation.startDate, 'yyyy-MM-dd')}"></span> ~
+                                            체크아웃: <span th:text="${#temporals.format(reservation.endDate, 'yyyy-MM-dd')}"></span>
                                         </p>
                                         <p class="card-text mb-2">
-                                            <i class="fas fa-user me-2"></i>예약자: <span th:text="${reservation.username}"></span>
+                                            <i class="fas fa-user me-2"></i>
+                                            예약자: <span th:text="${reservation.username}"></span>
                                         </p>
                                         <div class="mt-2">
                                             <span th:if="${reservation.resStatus == '1'}" class="badge bg-secondary">예약 중</span>
@@ -572,7 +575,9 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                                <button type="button" class="btn btn-primary" th:onclick="'updateReservation(' + ${reservation.idx} + ')'">변경 완료</button>
+                                <button type="button" class="btn btn-primary" th:onclick="'updateReservation(' + ${reservation.idx} + ')'">
+                                    변경 완료
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -689,6 +694,64 @@
             </div>
         </div>
     </div>
+
+    <!-- 결제 취소창으로 연결하는 코드 추가 -->
+    <script th:inline="javascript">
+        function deleteReservation(reservationIdx) {
+            Swal.fire({
+                title: '예약을 취소하시겠습니까?',
+                text: "취소된 예약은 복구할 수 없습니다.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '예약 취소',
+                cancelButtonText: '돌아가기'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const headers = {};
+                    if (csrfHeader && csrfToken) {
+                        headers[csrfHeader] = csrfToken;
+                    }
+
+                    $.ajax({
+                        url: '/res/delete/' + reservationIdx,
+                        type: 'POST',
+                        headers: headers,
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '예약이 취소되었습니다',
+                                text: '결제 취소 페이지로 이동합니다.',
+                                showConfirmButton: true,
+                                confirmButtonText: '확인'
+                            }).then(() => {
+                                // 결제 취소 페이지로 리다이렉트
+                                window.location.href = `/orders/payment/cancel/${reservationIdx}`;
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            let errorMessage = '예약 취소 중 오류가 발생했습니다.';
+                            if (xhr.responseText) {
+                                try {
+                                    const errorResponse = JSON.parse(xhr.responseText);
+                                    errorMessage = errorResponse.message || errorMessage;
+                                } catch (e) {
+                                    console.error('Error parsing response:', e);
+                                }
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: '예약 취소 실패',
+                                text: errorMessage
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
 </div>
 
 <th:block layout:fragment="script">
@@ -948,78 +1011,6 @@
                         icon: 'error',
                         title: '예약 변경 실패',
                         text: errorMessage
-                    });
-                }
-            });
-        }
-        // 예약 취소 함수
-        function deleteReservation(idx) {
-            Swal.fire({
-                title: '예약을 취소하시겠습니까?',
-                text: "취소된 예약은 복구할 수 없습니다.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: '예약 취소',
-                cancelButtonText: '돌아가기'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const headers = {};
-                    if (csrfHeader && csrfToken) {
-                        headers[csrfHeader] = csrfToken;
-                    }
-
-                    $.ajax({
-                        url: '/res/delete/' + idx,
-                        type: 'POST',
-                        headers: headers,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: '예약이 취소되었습니다',
-                                showConfirmButton: false,
-                                timer: 1500
-                            }).then(() => {
-                                // ***여기서 예약 취소 후 결제 취소 확인 팝업 추가***
-                                Swal.fire({
-                                    title: '예약 취소 후 결제 취소를 진행하시겠습니까?',
-                                    icon: 'info',
-                                    showCancelButton: true,
-                                    confirmButtonText: '결제 취소',
-                                    cancelButtonText: '취소'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        // 결제 취소 페이지로 리다이렉트
-                                        window.location.href = '/orders/payment/cancel/' + idx; // 결제 취소 페이지로 이동
-                                    }
-                                });
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Delete error details:', {
-                                status: xhr.status,
-                                statusText: xhr.statusText,
-                                responseText: xhr.responseText,
-                                error: error
-                            });
-
-                            let errorMessage = '예약 취소 중 오류가 발생했습니다.';
-                            if (xhr.responseText) {
-                                try {
-                                    const errorResponse = JSON.parse(xhr.responseText);
-                                    errorMessage = errorResponse.message || errorMessage;
-                                } catch (e) {
-                                    console.error('Error parsing response:', e);
-                                }
-                            }
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: '예약 취소 실패',
-                                text: errorMessage
-                            });
-                        }
                     });
                 }
             });

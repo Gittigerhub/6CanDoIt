@@ -1414,6 +1414,8 @@ E-mail : himyeongsun@gmail.com
 </div>
 
 <script>
+    var privacyTerms = $("#privacyTerms");
+    var serviceTerms = $("#serviceTerms");
         // 이메일 인증
         var emailCheckYN = 0;
         $("#emailSendBtn").on("click", function () {
@@ -1583,16 +1585,15 @@ E-mail : himyeongsun@gmail.com
                 });
         });
 
+
         // 회원가입 폼 제출 시 필수 약관 확인
         function validateForm() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password !== confirmPassword) {
-                alert('비밀번호가 일치하지 않습니다.');
-                return false;
+            if(serviceTerms.is(":checked")&&privacyTerms.is(":checked")){
+                return true
             }
-            return true;
+            alert('약관 동의는 필수 입니다.');
+
+            return false;
         }
         // 비밀번호 확인
         document.getElementById("password").addEventListener("input", checkPasswordMatch);
@@ -1633,6 +1634,7 @@ E-mail : himyeongsun@gmail.com
 
             if (password !== confirmPassword) {
                 alert('비밀번호가 일치하지 않습니다.');
+
                 return false; // 폼 제출 막기
             }
             return true; // 비밀번호 일치 시 폼 제출

@@ -249,6 +249,7 @@ public class MemberController {
     @ResponseBody
     public ResponseEntity<String> CheckEmailCode(@RequestParam("email") String email, @RequestParam("authenticationCode") String authenticationCode){
         try {
+            log.info("123");
             String result = emailService.checkEmailCode(email, authenticationCode)+"";
             return ResponseEntity.ok().body(result);
         }

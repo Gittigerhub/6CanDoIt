@@ -33,7 +33,10 @@
                     <h2 th:text="${exists}"></h2>
                 </div>
                 <div class="col-3">
-                    <input type="radio" class="form-check-input" id="HO" name="type" th:value="${'HO'}" checked>본사
+                    <input type="radio" class="form-check-input" id="ALL" name="type" th:value="${'ALL'}" checked>전체
+                    <label class="form-check-label" for="ALL"></label>
+
+                    <input type="radio" class="form-check-input" id="HO" name="type" th:value="${'HO'}">본사
                     <label class="form-check-label" for="HO"></label>
 
                     <input type="radio" class="form-check-input" id="BO" name="type" th:value="${'BO'}">지사

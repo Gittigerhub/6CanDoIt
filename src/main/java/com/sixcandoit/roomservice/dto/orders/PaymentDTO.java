@@ -47,4 +47,11 @@ public class PaymentDTO {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
+
+    public String getReservationIdx() {
+        return null;
+    }
+
+    public void setMemberEmail(String memberEmail) {
+    }
 }

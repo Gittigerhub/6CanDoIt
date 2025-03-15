@@ -97,10 +97,7 @@
                 // 이미지 추가 함수
                 addImageInput();
             });
-            $("#submitBtn").on('click', function () {
-                //연속 클릭 방지 함수
-                handleClick()
-            })
+
 
             // 이미지 추가
             function addImageInput() {
@@ -125,15 +122,7 @@
                     '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
             }
 
-            function handleClick() {
-                let button = document.getElementById("submitBtn");
-                button.disabled = true; // 버튼 비활성화
 
-                // 실제 게시물 등록 요청 (예: AJAX 요청)
-                setTimeout(() => {
-                    button.disabled = false; // 일정 시간 후 버튼 활성화
-                }, 2000); // 2초 후 다시 활성화
-            }
 
         });
     </script>

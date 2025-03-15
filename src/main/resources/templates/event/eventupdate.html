@@ -83,20 +83,20 @@
                                         <span>글 제목: <input class="form-control" type="text" name="eventTitle"
                                                            th:value="${eventRead.eventTitle}"></span>
                                     </div>
-                                    <div class="info-item">
+                                    <div class="info-item col-sm-6">
                                         <i class="bi bi-calendar"></i>
                                         <span>이벤트 기간:
-                                    <input class="form-control" type="datetime-local"
+                                    <input class="form-control col-6" type="datetime-local"
                                            name="eventStartDate"
-                                           th:value="${eventRead.eventStartDate}">
-                                    ~<input class="form-control" type="datetime-local"
-                                            name="eventEndDate"
-                                            th:value="${eventRead.eventEndDate}"></span>
+                                           th:value="${eventRead.eventStartDate}"> ~
+                                            <input class="form-control col-6" style="float: right" type="datetime-local"
+                                                   name="eventEndDate"
+                                                   th:value="${eventRead.eventEndDate}">
+                                        </span>
                                     </div>
                                     <div class="info-item">
                                         <i class="bi bi-activity"></i>
-                                        <span>이벤트 상태:<select name="eventState" th:value="${eventRead.eventState}"
-                                                             class="form-select">
+                                        <span>이벤트 상태:<select name="eventState" th:field="${eventRead.eventState}" class="form-select">
                                         <option value="N">종료</option>
                                         <option value="Y">진행중</option>
                                         </select>
@@ -104,8 +104,7 @@
                                     </div>
                                     <div class="info-item">
                                         <i class="bi bi-skip-start-circle"></i>
-                                        <span>이밴트 활성 : <select name="activeYn" th:value="${eventRead.activeYn}"
-                                                               class="form-select">
+                                        <span>이밴트 활성 : <select name="activeYn" th:field="${eventRead.activeYn}" class="form-select">
                                         <option value="N">비활성화</option>
                                         <option value="Y">활성화</option>
                                         </select>
@@ -117,13 +116,12 @@
                                         이벤트 내용:
                                         <textarea class="form-control" name="eventContents"
                                                   style="white-space: pre-line;" rows="3"
-                                                  cols="160" th:value="${eventRead.eventContents}"></textarea>
-
+                                                  cols="160" th:text="${eventRead.eventContents}"></textarea>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button style="float: right" type="submit" class="btn btn-primary">수정</button>
+                        <button style="float: right" type="submit" class="btn btn-outline-secondary">수정</button>
                     </div>
                 </div>
             </div>

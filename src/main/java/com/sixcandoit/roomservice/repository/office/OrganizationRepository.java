@@ -15,6 +15,10 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
 
     // 조직 검색
 
+    // 전체
+    @Query("SELECT o FROM OrganizationEntity o")
+    Page<OrganizationEntity> searchALL(Pageable pageable);
+
     // 본사
     @Query("SELECT o FROM OrganizationEntity o WHERE o.organType = 'HO'")
     Page<OrganizationEntity> searchHO(Pageable pageable);
@@ -26,6 +30,10 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     // 매장
     @Query("SELECT o FROM OrganizationEntity o WHERE o.organType = 'SHOP'")
     Page<OrganizationEntity> searchSHOP(Pageable pageable);
+
+    // 전체 + 조직명
+    @Query("SELECT o FROM OrganizationEntity o WHERE o.organName like %:keyword%")
+    Page<OrganizationEntity> searchALLName(@Param("keyword") String keyword, Pageable pageable);
 
     // 본사 + 조직명
     @Query("SELECT o FROM OrganizationEntity o WHERE o.organName like %:keyword% and o.organType = 'HO'")

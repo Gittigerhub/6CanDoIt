@@ -165,7 +165,9 @@ public class OrganizationService {
                     organizationEntities = organizationRepository.searchBO(pageable);     // 타입에 해당하는 데이터 조회
                 } else if (type.equals("SHOP")) {
                     organizationEntities = organizationRepository.searchSHOP(pageable);   // 타입에 해당하는 데이터 조회
-                } else {
+                } else if (type.equals("ALL")) {
+                    organizationEntities = organizationRepository.searchALL(pageable);    // 타입에 해당하는 데이터 조회
+                }else {
                     organizationEntities = organizationRepository.findAll(pageable);      // 모든 데이터를 대상으로 조회
                 }
             } else {                                          // 검색어와 타입이 존재한다면
@@ -175,6 +177,8 @@ public class OrganizationService {
                     organizationEntities = organizationRepository.searchBOName(keyword, pageable);      // 검색어에 해당하는 데이터 조회
                 } else if (type.equals("SHOP")) {
                     organizationEntities = organizationRepository.searchSHOPName(keyword, pageable);    // 검색어에 해당하는 데이터 조회
+                }else if (type.equals("ALL")) {
+                    organizationEntities = organizationRepository.searchALLName(keyword, pageable);     // 검색어에 해당하는 데이터 조회
                 } else {
                     organizationEntities = organizationRepository.findAll(pageable);                    // 모든 데이터를 대상으로 조회
                 }

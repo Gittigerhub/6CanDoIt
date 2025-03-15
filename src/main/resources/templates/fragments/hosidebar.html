@@ -52,6 +52,13 @@
             </th:block>
         </br>
     </a>
+
+    <!-- 로그인일경우 로그아웃 보이기 -->
+    <th:block th:if="${#authentication.principal != null and #authentication.principal != 'anonymousUser'}">
+        <br>
+        <span><a style="text-decoration: none" href="/admin/logout">로그아웃</a></span>
+    </th:block>
+
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">

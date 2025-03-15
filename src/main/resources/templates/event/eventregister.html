@@ -27,59 +27,61 @@
                                 </div>
 
 
-
-                            <!-- 이벤트 이미지 사진 추가버튼 -->
-                            <div class="col-sm-12 mt-2">
-                                <div class="form-group form-group-default">
-                                    <input type="button" id="addImage" name="Files" value="이미지 추가" class="btn btn-outline-primary">
-                                </div>
-                            </div>
-                            <br>
-                            <div class="card-body bg-light text-dark">
-                                <div class="eventUpdate-info-card mt-4">
-                                    <h5>이벤트 정보</h5>
-                                    <div class="info-item">
-                                        <i class="bi bi-bookmark-fill"></i> <!-- 아이콘 -->
-                                        <span>글 제목: <input class="form-control" type="text" name="eventTitle"></span>
+                                <!-- 이벤트 이미지 사진 추가버튼 -->
+                                <div class="col-sm-12 mt-2">
+                                    <div class="form-group form-group-default">
+                                        <input type="button" id="addImage" name="Files" value="이미지 추가"
+                                               class="btn btn-outline-primary">
                                     </div>
-                                    <div class="info-item">
-                                        <i class="bi bi-calendar"></i>
-                                        <span>이벤트 기간:
+                                </div>
+                                <br>
+                                <div class="card-body bg-light text-dark">
+                                    <div class="eventUpdate-info-card mt-4">
+                                        <h5>이벤트 정보</h5>
+                                        <div class="info-item">
+                                            <i class="bi bi-bookmark-fill"></i> <!-- 아이콘 -->
+                                            <span>글 제목: <input class="form-control" type="text"
+                                                               name="eventTitle"></span>
+                                        </div>
+                                        <div class="info-item">
+                                            <i class="bi bi-calendar"></i>
+                                            <span>이벤트 기간:
                                     <input class="form-control" type="datetime-local"
                                            name="eventStartDate">
                                     ~<input class="form-control" type="datetime-local"
                                             name="eventEndDate"></span>
-                                    </div>
-                                    <div class="info-item">
-                                        <i class="bi bi-activity"></i>
-                                        <span>이벤트 상태:<select name="eventState" class="form-select">
+                                        </div>
+                                        <div class="info-item">
+                                            <i class="bi bi-activity"></i>
+                                            <span>이벤트 상태:<select name="eventState" class="form-select">
                                         <option value="N">종료</option>
                                         <option value="Y">진행중</option>
                                         </select>
                                     </span>
-                                    </div>
-                                    <div class="info-item">
-                                        <i class="bi bi-skip-start-circle"></i>
-                                        <span>이밴트 활성 : <select name="activeYn" class="form-select">
+                                        </div>
+                                        <div class="info-item">
+                                            <i class="bi bi-skip-start-circle"></i>
+                                            <span>이밴트 활성 : <select name="activeYn" class="form-select">
                                         <option value="N">비활성화</option>
                                         <option value="Y">활성화</option>
                                         </select>
                                     </span>
-                                    </div>
-                                    <!-- 객실 설명 추가 -->
-                                    <div class="info-item mt-4">
-                                        <i class="bi bi-body-text"></i>
-                                        이벤트 내용:
-                                        <textarea class="form-control" name="eventContents"
-                                                  style="white-space: pre-line;" rows="3"
-                                                  cols="160" ></textarea>
+                                        </div>
+                                        <!-- 객실 설명 추가 -->
+                                        <div class="info-item mt-4">
+                                            <i class="bi bi-body-text"></i>
+                                            이벤트 내용:
+                                            <textarea class="form-control" name="eventContents"
+                                                      style="white-space: pre-line;" rows="3"
+                                                      cols="160"></textarea>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <button style="float: right" type="submit" id="submitBtn" class="btn btn-outline-secondary">등록</button>
                     </div>
-                    <button style="float: right" type="submit" class="btn btn-primary">등록</button>
                 </div>
             </div>
         </form>
@@ -95,6 +97,10 @@
                 // 이미지 추가 함수
                 addImageInput();
             });
+            $("#submitBtn").on('click', function () {
+                //연속 클릭 방지 함수
+                handleClick()
+            })
 
             // 이미지 추가
             function addImageInput() {
@@ -117,6 +123,16 @@
                 // 이미지 추가창 제거
                 container2.innerHTML = '<label>*이미지 :</label>' +
                     '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            }
+
+            function handleClick() {
+                let button = document.getElementById("submitBtn");
+                button.disabled = true; // 버튼 비활성화
+
+                // 실제 게시물 등록 요청 (예: AJAX 요청)
+                setTimeout(() => {
+                    button.disabled = false; // 일정 시간 후 버튼 활성화
+                }, 2000); // 2초 후 다시 활성화
             }
 
         });

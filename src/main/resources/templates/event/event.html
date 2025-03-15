@@ -77,20 +77,16 @@
                             john@example.com
                         </td>
                         <th:block th:if="${events.activeYn.equals('Y')}">
-                            <td class="text-bg-primary" style="text-align: center">이벤트 진행중</td>
+                            <td class="text-bg-primary" style="text-align: center"><i class="bi bi-activity"></i></td>
                         </th:block>
                         <th:block th:if="${events.activeYn.equals('N')}">
-                            <td class="text-bg-danger" style="text-align: center">이벤트 종료</td>
+                            <td class="text-bg-danger" style="text-align: center"><i class="bi bi-calendar-x-fill"></i></td>
                         </th:block>
                         <td class="button_and_image">
                             <button type="button" style="text-align: center;" class="btn btn-primary eventRead" th:data-id="${events.idx}">보기
                             </button>
                             <button type="button" style="text-align: center;" class="btn btn-secondary eventDelete" th:data-id="${events.idx}">삭제
                             </button>
-                            <input type="hidden" id="event_title_img" class="event_Title_Img" name="eventTitleImg"
-                                   th:value="${events.eventTitleImg}">
-                            <input type="hidden" id="event_img" class="event_Img" name="eventImg"
-                                   th:value="${events.eventImg}">
                         </td>
                     </tr>
                     </tbody>
@@ -134,7 +130,7 @@
     </div>
     <!--페이징 끝-->
 
-<!--모달 시작-->
+<!--모달 시작
     <div class="modal" id="eventModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -257,7 +253,9 @@
         </div>
 
     </div>
-    <!--모달 끝-->
+    모달 끝-->
+
+
 
 
 </div>
@@ -281,9 +279,13 @@
 
 
             $('#register-btn').on('click', function () {
+
+               window.location.href='eventregister';
+
+
                 //alert("등록확인");
                 //입력폼 초기화
-                var form = $('#eventForm')[0];
+                /*var form = $('#eventForm')[0];
                 form.reset();
                 $('#title').text("이벤트 등록");
 
@@ -303,18 +305,20 @@
                 //대화창 출력
                 $('#eventModal').modal('show')
 
+                 */
+
 
             });
 
-            $("#register").on("click", function () {
+            /*$("#register").on("click", function () {
                 var form = $("#eventForm")[0]
                 var formData = new FormData(form);
 
                 //파일 다중 저장
-                /*var files = $("#Files")[0].files;
+                var files = $("#Files")[0].files;
                 for (let i = 0; i < files.length; i++) {
                     formData.append("files", files[i]);
-                }*/
+                }
 
                 //폼 검증 수행
                 if (form.checkValidity() === false) {
@@ -380,6 +384,8 @@
 
 
             });//등록 끝
+
+             */
 
            /* $(".eventEdit").on("click", function () {
                 //alert("삭제")

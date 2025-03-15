@@ -3,9 +3,11 @@ package com.sixcandoit.roomservice.controller.member;
 import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
+import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.service.EmailService;
 import com.sixcandoit.roomservice.service.member.MemberService;
+import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final ReservationService reservationService;
+    private final QnaService qnaService;
     private final EmailService email;
     private final EmailService emailService;
 
@@ -216,10 +219,14 @@ public class MemberController {
         // 서비스에 주문 내역 조회 요청
         Page<OrdersDTO> ordersDTOS = memberService.memberOrderList(memberDTO.getMemberEmail(), page);
 
+        // 최근 문의 내역 3개 조회
+        List<QnaDTO> recentQnas = qnaService.getRecentQnasByMember(memberDTO.getIdx());
+
         // 뷰로 데이터 전달
         model.addAttribute("memberDTO", memberDTO);
         model.addAttribute("reservations", reservations);
         model.addAttribute("ordersDTOS", ordersDTOS);
+        model.addAttribute("recentQnas", recentQnas);
 
         return "member/mypage";
     }

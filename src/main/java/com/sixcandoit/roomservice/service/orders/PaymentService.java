@@ -205,7 +205,7 @@ public class PaymentService {
     }
 
     // Entity를 DTO로 변환
-    private PaymentDTO convertToDTO(PaymentEntity entity) {
+    public PaymentDTO convertToDTO(PaymentEntity entity) {
         PaymentDTO dto = new PaymentDTO();
         dto.setIdx(entity.getIdx());
         dto.setPaymentPrice(entity.getPaymentPrice());

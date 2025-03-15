@@ -221,54 +221,65 @@ public class PaymentController {
     public String cancel(@PathVariable("idx") Integer idx, Model model, RedirectAttributes redirectAttributes) {
         log.info("결제 취소 페이지 요청 - idx:{}", idx);
         try {
-            PaymentDTO paymentDTO = paymentService.findByIdx(idx);
+            PaymentDTO paymentDTO;
+            
+            // 예약 번호로 들어온 경우 (ROOM_로 시작하는 orderId를 가진 결제 찾기)
+            String orderId = "ROOM_" + idx;
+            PaymentEntity paymentEntity = paymentRepository.findByOrderId(orderId)
+                    .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다."));
+            paymentDTO = paymentService.convertToDTO(paymentEntity);
 
             if (paymentDTO == null) {
                 model.addAttribute("error", "결제 정보를 찾을 수 없습니다.");
-                return "redirect:/orders/payment/list";  // Corrected path with '/'
+                return "redirect:/orders/payment/list";
             }
 
-            // idx를 RedirectAttributes에 추가
-            redirectAttributes.addAttribute("idx", idx);
             model.addAttribute("paymentDTO", paymentDTO);
             addUserInfoToModel(model);
             return "orders/paymentcancel";
         } catch (Exception e) {
             log.error("결제 취소 페이지 로딩 중 오류 발생: {}", e.getMessage());
             model.addAttribute("error", "결제 취소 페이지 로딩 중 오류가 발생했습니다.");
-            return "redirect:/orders/paymentcancel";  // Corrected path with '/'
+            return "redirect:/orders/payment/list";
         }
     }
-
 
     // 결제 취소 처리
     @PostMapping("/orders/payment/cancel")
     public String cancelPayment(@RequestParam("idx") Integer idx, RedirectAttributes redirectAttributes) {
         log.info("결제 취소를 처리합니다. idx: {}", idx);
 
-        PaymentEntity paymentEntity = paymentRepository.findById(idx)
-                .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다. idx: " + idx));
+        try {
+            PaymentEntity paymentEntity = paymentRepository.findById(idx)
+                    .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다. idx: " + idx));
 
-        // 결제 상태 검증
-        if ("Y".equals(paymentEntity.getPaymentState())) {
-            throw new IllegalStateException("이미 결제 완료된 결제는 취소할 수 없습니다.");
+            // 결제 상태 검증
+            if ("N".equals(paymentEntity.getPaymentState())) {
+                throw new IllegalStateException("이미 취소된 결제입니다.");
+            }
+
+            paymentEntity.setPaymentState("N"); // 결제 취소 상태로 설정
+            paymentEntity.setPaymentApproval(null); // 승인번호 초기화
+
+            // 환불 처리 (구현 필요)
+            paymentService.processRefund(paymentEntity);
+
+            // 결제 취소 정보 저장
+            PaymentEntity savedEntity = paymentRepository.save(paymentEntity);
+
+            // 예약 상태도 취소로 변경
+            if (savedEntity.getOrderId() != null && savedEntity.getOrderId().startsWith("ROOM_")) {
+                Integer reservationId = Integer.parseInt(savedEntity.getOrderId().substring(5));
+                reservationService.updateReservationStatus(reservationId, "0");
+            }
+
+            // 취소 완료 메시지와 함께 리다이렉트
+            redirectAttributes.addAttribute("success", true);
+            return "redirect:/orders/paymentcancelled";
+        } catch (Exception e) {
+            log.error("결제 취소 처리 중 오류 발생: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/orders/payment/list";
         }
-
-        paymentEntity.setPaymentState("N"); // 결제 취소 상태로 설정
-        paymentEntity.setPaymentApproval(null); // 승인번호 초기화
-
-        // 환불 처리 (구현 필요)
-        paymentService.processRefund(paymentEntity);
-
-        // 결제 취소 정보 저장
-        PaymentEntity savedEntity = paymentRepository.save(paymentEntity);
-
-        // 취소된 결제 정보를 리다이렉트 URL에 쿼리 파라미터로 전달
-        redirectAttributes.addAttribute("orderId", savedEntity.getOrderId());
-        redirectAttributes.addAttribute("paymentAmount", savedEntity.getPaymentPrice());
-        redirectAttributes.addAttribute("paymentState", savedEntity.getPaymentState()); // "N"으로 설정됨
-
-        // 결제 취소 완료 페이지로 리다이렉트
-        return "redirect:/orders/paymentcancelled";
     }
 }

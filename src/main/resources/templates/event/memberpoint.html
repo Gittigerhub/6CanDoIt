@@ -12,18 +12,18 @@
 <body>
 <div layout:fragment="content" class="p-5">
 
-
+    <h3>포인트 상세</h3>
 
     <!--검색 기능-->
     <form th:action="@{/event/memberpoint}" method="get">
         <div class="container p-5 bg-white">
             <div>
-                <h3>포인트 상세</h3>
+                <h3>게시글 검색</h3>
             </div>
             <div class="col-12">
                 <div class="input-group mb-3">
                     <select class="form-select" name="type">
-                        <option th:selected="${type==null}">선택안함</option>
+                        <option th:selected="${type==null}"></option>
                         <option value="0" th:selected="${type=='0'}">전체</option>
                         <option value="1" th:selected="${type=='1'}">이메일</option>
                         <option value="2" th:selected="${type=='2'}">이름</option>
@@ -136,7 +136,8 @@
                             <div class="col-sm-6">
                                 <div class="form-group form-group-default">
                                     <label>*회원 이메일 :</label>
-                                    <input id="memberEmail" name="memberJoin.memberEmail" type="text" class="form-control" required/>
+                                    <input id="memberEmail" name="memberJoin.memberEmail" type="text"
+                                           class="form-control" required/>
                                 </div>
                             </div>
                             <div class="col-sm-6">

@@ -71,10 +71,10 @@
                         memberPoint.memberPointContents}"></td>
                         <td th:text="${#temporals.format(memberPoint.memberPointStartDate, 'yy-MM-dd')}+'~'+${#temporals.format(memberPoint.memberPointEndDate, 'yy-MM-dd')}"></td>
                         <th:block th:if="${memberPoint.memberPointOperationYn.equals('N')}">
-                            <td class="text-bg-primary">사용가능</td>
+                            <td class="text-bg-primary"><i class="bi bi-circle"></i></td>
                         </th:block>
                         <th:block th:if="${memberPoint.memberPointOperationYn.equals('Y')}">
-                            <td class="text-bg-danger">사용함</td>
+                            <td class="text-bg-danger"><i class="bi bi-backspace-reverse"></i></td>
                         </th:block>
 
                     </tr>

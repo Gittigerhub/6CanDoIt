@@ -1,12 +1,17 @@
 package com.sixcandoit.roomservice.controller.event;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.event.EventDTO;
+import com.sixcandoit.roomservice.entity.event.EventEntity;
+import com.sixcandoit.roomservice.repository.event.EventRepository;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.event.EventService;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -17,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,6 +42,8 @@ public class EventController {
     private final ModelMapper modelMapper;
     private final PageNationUtil pageNationUtil;
     private final EventService eventService;
+    private final ImageFileService imageFileService;
+    private final EventRepository eventRepository;
 
 
     //이벤트 목록
@@ -48,9 +56,8 @@ public class EventController {
                         Model model) {
 
 
-
-        System.out.println("컨트롤에 들어오는 타입:"+type);
-        Page<EventDTO> eventDTOS = eventService.list(keyword, type, startDate, endDate,page);
+        System.out.println("컨트롤에 들어오는 타입:" + type);
+        Page<EventDTO> eventDTOS = eventService.list(keyword, type, startDate, endDate, page);
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(eventDTOS);
         model.addAttribute("eventDTOS", eventDTOS);
         model.addAllAttributes(pageInfo);
@@ -60,13 +67,11 @@ public class EventController {
         model.addAttribute("endDate", endDate);
 
 
-
-
-
         return "event/event";
     }
 
 
+    /*
     //이벤트 등록
     @PostMapping("/event/register")
     @ResponseBody
@@ -83,6 +88,35 @@ public class EventController {
             System.out.println("저장실패");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("등록을 실패 하였습니다.");
         }
+    }
+     */
+
+    //이벤트 등록
+    @GetMapping("/eventregister")
+    public String eventRegisterGet() {
+
+
+        return "event/eventregister";
+    }
+
+    @PostMapping("/eventregister")
+    public String eventRegisterPost(@Valid @ModelAttribute EventDTO eventDTO, Model model,
+                                    BindingResult bindingResult, List<MultipartFile> Files) {
+
+
+        if (bindingResult.hasErrors()) {
+            System.out.println("유효성 검사 중 오류");
+            bindingResult.getAllErrors().forEach(error -> log.error(error.getDefaultMessage()));
+            return "event/eventregister";
+
+        }
+        EventEntity eventEntity = modelMapper.map(eventDTO, EventEntity.class);
+
+        //등록 하기
+        eventService.register(eventDTO,Files);
+
+
+        return "redirect:/event/event";
     }
 
 
@@ -102,6 +136,7 @@ public class EventController {
 
     }
 
+    /*
     //이벤트 자세히 보기
     @PostMapping("/event/read")
     @ResponseBody
@@ -113,18 +148,24 @@ public class EventController {
 
         return response;
     }
-
+     */
     @GetMapping("/eventread")
     public String read(Integer idx, Model model) {
 
         EventDTO eventDTORead = eventService.read(idx);
+        List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(idx, "event");
+        boolean hasRepImage = imageFileDTOList.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
 
         model.addAttribute("eventDTORead", eventDTORead);
+        model.addAttribute("imageFileDTOList", imageFileDTOList);
+        model.addAttribute("hasRepImage", hasRepImage);
 
         return "event/eventread";
     }
 
-
+    /*
     //이벤트 수정
     @PostMapping("/event/update")
     @ResponseBody
@@ -140,12 +181,20 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정을 실패 하였습니다.");
         }
     }
+     */
 
     @GetMapping("/eventupdate")
     public String eventUpdateGet(Model model, Integer idx) {
         EventDTO eventRead = eventService.read(idx);
         if (eventRead != null) {
+            List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(idx, "event");
+            boolean hasRepImage = imageFileDTOList.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+
             model.addAttribute("eventRead", eventRead);
+            model.addAttribute("imageFileDTOList", imageFileDTOList);
+            model.addAttribute("hasRepImage", hasRepImage);
         } else {
             System.out.println("잘못된 조회입니다.");
         }
@@ -155,9 +204,11 @@ public class EventController {
     }
 
     @PostMapping("/eventupdate")
-    public String eventUpdatePost(@ModelAttribute EventDTO eventDTO ,List<MultipartFile> Files) {
+    public String eventUpdatePost(@ModelAttribute EventDTO eventDTO, List<MultipartFile> Files, Model model) {
         try {
-            eventService.update(eventDTO,Files);
+
+
+            eventService.update(eventDTO, Files);
         } catch (Exception e) {
             System.out.println("수정 오류:" + e.getMessage());
         }

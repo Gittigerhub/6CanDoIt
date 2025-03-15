@@ -4,7 +4,9 @@ import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
+import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
+import com.sixcandoit.roomservice.repository.room.RoomRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final ModelMapper modelMapper;
     private final ImageFileService imageFileService;
+    private final RoomRepository roomRepository;
 
 
     /* -----------------------------------------------------------------------------
@@ -165,7 +168,9 @@ public class OrganizationService {
                     organizationEntities = organizationRepository.searchBO(pageable);     // 타입에 해당하는 데이터 조회
                 } else if (type.equals("SHOP")) {
                     organizationEntities = organizationRepository.searchSHOP(pageable);   // 타입에 해당하는 데이터 조회
-                } else {
+                } else if (type.equals("ALL")) {
+                    organizationEntities = organizationRepository.searchALL(pageable);    // 타입에 해당하는 데이터 조회
+                }else {
                     organizationEntities = organizationRepository.findAll(pageable);      // 모든 데이터를 대상으로 조회
                 }
             } else {                                          // 검색어와 타입이 존재한다면
@@ -175,6 +180,8 @@ public class OrganizationService {
                     organizationEntities = organizationRepository.searchBOName(keyword, pageable);      // 검색어에 해당하는 데이터 조회
                 } else if (type.equals("SHOP")) {
                     organizationEntities = organizationRepository.searchSHOPName(keyword, pageable);    // 검색어에 해당하는 데이터 조회
+                }else if (type.equals("ALL")) {
+                    organizationEntities = organizationRepository.searchALLName(keyword, pageable);     // 검색어에 해당하는 데이터 조회
                 } else {
                     organizationEntities = organizationRepository.findAll(pageable);                    // 모든 데이터를 대상으로 조회
                 }
@@ -203,26 +210,40 @@ public class OrganizationService {
     public void organDelete(Integer idx, String join) {
 
         try {
-            // 이미지 조회
-            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
+            // 조직 조회
+            Optional<OrganizationEntity> organizationOpt = organizationRepository.findById(idx);
+            if (!organizationOpt.isPresent()) {
+                throw new RuntimeException("조직을 찾을 수 없습니다.");
+            }
+            OrganizationEntity organization = organizationOpt.get();
 
-            // dto => entity
+            // 연관된 룸 삭제
+            List<RoomEntity> rooms = roomRepository.findByOrganizationJoin_IdxOrderByRoomPriceDesc(idx);
+            for (RoomEntity room : rooms) {
+                // 룸 이미지 삭제
+                List<ImageFileDTO> roomImageDTOs = imageFileService.readImage(room.getIdx(), "room");
+                for (ImageFileDTO imageDTO : roomImageDTOs) {
+                    imageFileService.deleteImage(imageDTO.getIdx());
+                }
+                // 룸 삭제
+                roomRepository.delete(room);
+            }
+
+            // 조직 이미지 삭제
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
             List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
                     .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
                     .collect(Collectors.toList());
-
-            // 모든 이미지 삭제
             for (ImageFileEntity imageFileEntity : imageFileEntities) {
                 imageFileService.deleteImage(imageFileEntity.getIdx());
             }
 
-            // idx로 조회하여 삭제
+            // 조직 삭제
             organizationRepository.deleteById(idx);
 
         } catch (Exception e) {
             throw new RuntimeException("삭제를 실패했습니다." + e.getMessage());
         }
-
     }
 
     public List<OrganizationDTO> getAllOrganizations() {

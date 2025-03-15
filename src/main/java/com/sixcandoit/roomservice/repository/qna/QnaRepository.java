@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface QnaRepository extends JpaRepository<QnaEntity, Integer> {
 
@@ -38,7 +40,7 @@ public interface QnaRepository extends JpaRepository<QnaEntity, Integer> {
 
     // 미답변만 검색
     @Query("SELECT q FROM QnaEntity q WHERE q.replyYn = 'N'")
-    Page<QnaEntity> searchUnreplied(Pageable page);
+    Page<QnaEntity> searchNoReply(Pageable page);
 
     // 답변완료만 검색
     @Query("SELECT q FROM QnaEntity q WHERE q.replyYn = 'Y'")
@@ -47,4 +49,8 @@ public interface QnaRepository extends JpaRepository<QnaEntity, Integer> {
     // 전체 검색
     @Query("SELECT DISTINCT q FROM QnaEntity q LEFT JOIN q.replyList r WHERE q.qnaTitle LIKE %:keyword% OR q.qnaContents LIKE %:keyword% OR r.replyContents LIKE %:keyword%")
     Page<QnaEntity> searchQnaAndReply(@Param("keyword") String keyword, Pageable page);
+
+    // 회원의 최근 문의 3개 조회
+    @Query("SELECT q FROM QnaEntity q WHERE q.memberJoin.idx = :memberIdx ORDER BY q.insDate DESC")
+    List<QnaEntity> findTop3ByMemberJoinIdxOrderByInsDateDesc(@Param("memberIdx") Integer memberIdx, Pageable pageable);
 }

@@ -202,27 +202,41 @@ public class RoomService {
                 roomEntities = roomRepository.findByOrganIdx(organ_idx, pageable);
             }
         } else {
-            // 기존 검색 로직
+            // 전체 검색인 경우
             if (type.equals("1") && roomType != null && !roomType.isEmpty()) {
                 // 객실 타입으로 검색
                 roomEntities = roomRepository.findByRoomType(roomType, pageable);
+            } else if (type.equals("2") && keyword != null && !keyword.isEmpty()) {
+                // 객실 이름으로 검색
+                roomEntities = roomRepository.searchRoomName(keyword, pageable);
+            } else if (type.equals("3")) {
+                // 조식 있음 검색
+                roomEntities = roomRepository.searchRoomBreakfast(pageable);
+            } else if (type.equals("4")) {
+                // 빈 방 검색
+                roomEntities = roomRepository.searchRes1(pageable);
+            } else if (type.equals("5")) {
+                // 체크인 검색
+                roomEntities = roomRepository.searchRes2(pageable);
+            } else if (type.equals("6")) {
+                // 체크아웃 검색
+                roomEntities = roomRepository.searchRes3(pageable);
             } else if (keyword != null && !keyword.isEmpty()) {
-                if (type.equals("1")) {
-                    roomEntities = roomRepository.searchRoomType(keyword, pageable);
-                } else if (type.equals("2")) {
-                    roomEntities = roomRepository.searchRoomName(keyword, pageable);
-                } else {
-                    roomEntities = roomRepository.findAll(pageable);
-                }
+                // 기본 검색
+                roomEntities = roomRepository.searchRoomName(keyword, pageable);
             } else {
+                // 검색 조건이 없는 경우 전체 조회
                 roomEntities = roomRepository.findAll(pageable);
             }
         }
 
-        Page<RoomDTO> roomDTOS = roomEntities.map(
-                data->modelMapper.map(data, RoomDTO.class));
-
-        return roomDTOS;
+        return roomEntities.map(entity -> {
+            RoomDTO dto = modelMapper.map(entity, RoomDTO.class);
+            if (entity.getOrganizationJoin() != null) {
+                dto.setOrgan_idx(entity.getOrganizationJoin().getIdx());
+            }
+            return dto;
+        });
     }
 
     // 룸 상세보기

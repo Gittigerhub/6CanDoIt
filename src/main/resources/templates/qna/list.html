@@ -82,6 +82,7 @@
                         <th>작성일</th>
                         <th>수정일</th>
                         <th>조회수</th>
+                        <th>답변여부</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -99,6 +100,10 @@
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd')}"></td>
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd')}"></td>
                         <td th:text="${data.qnaHits}"></td>
+                        <td>
+                            <span th:if="${data.replyYn == 'Y'}" class="badge bg-success">답변완료</span>
+                            <span th:unless="${data.replyYn == 'Y'}" class="badge bg-secondary">답변대기</span>
+                        </td>
                     </tr>
                     <tr th:each="data:${qnalist}" th:unless="${data.favYn == 'Y'}">
                         <td th:text="${data.idx}"></td>
@@ -113,6 +118,10 @@
                         <td th:text="${#temporals.format(data.insDate, 'yyyy-MM-dd')}"></td>
                         <td th:text="${#temporals.format(data.modDate, 'yyyy-MM-dd')}"></td>
                         <td th:text="${data.qnaHits}"></td>
+                        <td>
+                            <span th:if="${data.replyYn == 'Y'}" class="badge bg-success">답변완료</span>
+                            <span th:unless="${data.replyYn == 'Y'}" class="badge bg-secondary">답변대기</span>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

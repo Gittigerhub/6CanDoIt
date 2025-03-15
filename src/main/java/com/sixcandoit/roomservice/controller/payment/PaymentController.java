@@ -56,9 +56,22 @@ public class PaymentController {
     public String list(Model model) {
         log.info("결제 목록을 조회합니다.");
         try {
-            List<PaymentDTO> paymentDTOList = paymentService.list();
+            // 현재 로그인한 사용자 정보 가져오기
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String memberEmail = "게스트";
+
+            List<PaymentDTO> paymentDTOList;
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+                memberEmail = auth.getName();
+                // 로그인한 사용자의 결제 목록만 조회
+                paymentDTOList = paymentService.listByMember(memberEmail);
+            } else {
+                // 비로그인 사용자는 빈 목록 반환
+                paymentDTOList = List.of();
+            }
+
             model.addAttribute("paymentDTOList", paymentDTOList);
-            addUserInfoToModel(model);
+            model.addAttribute("memberName", memberEmail);
             return "orders/paymentlist";
         } catch (Exception e) {
             log.error("결제 목록 조회 중 오류 발생: {}", e.getMessage());
@@ -157,6 +170,13 @@ public class PaymentController {
         log.info("결제 성공 처리 - paymentKey: {}, orderId: {}, amount: {}", paymentKey, orderId, amount);
 
         try {
+            // 현재 로그인한 사용자 정보 가져오기
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                throw new IllegalStateException("로그인이 필요합니다.");
+            }
+            String memberEmail = auth.getName();
+
             PaymentDTO paymentDTO = new PaymentDTO();
             paymentDTO.setPaymentPrice(amount);
             paymentDTO.setPaymentState("Y");
@@ -167,7 +187,7 @@ public class PaymentController {
             paymentDTO.setPaymentCardPrice(amount);
             paymentDTO.setPaymentCashPrice(0);
 
-            PaymentDTO processedPayment = paymentService.processPayment(paymentDTO);
+            PaymentDTO processedPayment = paymentService.processPayment(paymentDTO, memberEmail);
 
             if (orderId.startsWith("ROOM_")) {
                 Integer reservationId = Integer.parseInt(orderId.substring(5));
@@ -178,7 +198,7 @@ public class PaymentController {
             model.addAttribute("paymentAmount", amount);
             model.addAttribute("approvalNo", paymentKey);
             model.addAttribute("paymentDate", processedPayment.getRegDate());
-            addUserInfoToModel(model);
+            model.addAttribute("memberName", memberEmail);
 
             return "orders/paymentsuccess";
         } catch (Exception e) {
@@ -198,6 +218,13 @@ public class PaymentController {
         log.info("결제 실패 처리 - code: {}, message: {}, orderId: {}", code, message, orderId);
 
         try {
+            // 현재 로그인한 사용자 정보 가져오기
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                throw new IllegalStateException("로그인이 필요합니다.");
+            }
+            String memberEmail = auth.getName();
+
             PaymentDTO paymentDTO = new PaymentDTO();
             paymentDTO.setPaymentState("N");
             paymentDTO.setOrderId(orderId);
@@ -206,9 +233,9 @@ public class PaymentController {
             paymentDTO.setPaymentType(0);
             paymentDTO.setPaymentPayType("CARD");
 
-            paymentService.processPayment(paymentDTO);
+            paymentService.processPayment(paymentDTO, memberEmail);
             model.addAttribute("error", message);
-            addUserInfoToModel(model);
+            model.addAttribute("memberName", memberEmail);
             return "orders/paymentfail";
         } catch (Exception e) {
             log.error("결제 실패 처리 중 오류 발생: {}", e.getMessage());
@@ -221,12 +248,25 @@ public class PaymentController {
     public String cancel(@PathVariable("idx") Integer idx, Model model, RedirectAttributes redirectAttributes) {
         log.info("결제 취소 페이지 요청 - idx:{}", idx);
         try {
+            // 현재 로그인한 사용자 정보 가져오기
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                throw new IllegalStateException("로그인이 필요합니다.");
+            }
+            String memberEmail = auth.getName();
+            
             PaymentDTO paymentDTO;
             
             // 예약 번호로 들어온 경우 (ROOM_로 시작하는 orderId를 가진 결제 찾기)
             String orderId = "ROOM_" + idx;
             PaymentEntity paymentEntity = paymentRepository.findByOrderId(orderId)
                     .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다."));
+            
+            // 본인의 결제인지 확인
+            if (!memberEmail.equals(paymentEntity.getMemberJoin().getMemberEmail())) {
+                throw new IllegalStateException("본인의 결제만 취소할 수 있습니다.");
+            }
+            
             paymentDTO = paymentService.convertToDTO(paymentEntity);
 
             if (paymentDTO == null) {
@@ -235,11 +275,11 @@ public class PaymentController {
             }
 
             model.addAttribute("paymentDTO", paymentDTO);
-            addUserInfoToModel(model);
+            model.addAttribute("memberName", memberEmail);
             return "orders/paymentcancel";
         } catch (Exception e) {
             log.error("결제 취소 페이지 로딩 중 오류 발생: {}", e.getMessage());
-            model.addAttribute("error", "결제 취소 페이지 로딩 중 오류가 발생했습니다.");
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/orders/payment/list";
         }
     }
@@ -250,8 +290,20 @@ public class PaymentController {
         log.info("결제 취소를 처리합니다. idx: {}", idx);
 
         try {
+            // 현재 로그인한 사용자 정보 가져오기
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                throw new IllegalStateException("로그인이 필요합니다.");
+            }
+            String memberEmail = auth.getName();
+
             PaymentEntity paymentEntity = paymentRepository.findById(idx)
                     .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다. idx: " + idx));
+
+            // 본인의 결제인지 확인
+            if (!memberEmail.equals(paymentEntity.getMemberJoin().getMemberEmail())) {
+                throw new IllegalStateException("본인의 결제만 취소할 수 있습니다.");
+            }
 
             // 결제 상태 검증
             if ("N".equals(paymentEntity.getPaymentState())) {

@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.entity.orders;
 
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
+import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,10 @@ public class PaymentEntity extends BaseEntity {
     @Column(name = "payment_idx")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;                      // 기본 키
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_idx")
+    private MemberEntity memberJoin;          // 회원 정보
 
     @Column(name = "payment_price")
     private Integer paymentPrice;                 // 총 결제 금액

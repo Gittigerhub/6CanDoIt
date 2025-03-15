@@ -7,6 +7,7 @@ import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.entity.orders.PaymentEntity;
 import com.sixcandoit.roomservice.repository.room.ReservationRepository;
 import com.sixcandoit.roomservice.repository.room.RoomRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -250,7 +251,24 @@ public class ReservationService {
         }
     }
 
-    public void updateReservationStatus(Integer reservationId, String cancelled) {
+    @Transactional
+    public void updateReservationStatus(Integer reservationId, String status) {
+        log.info("Updating reservation status: {} to {}", reservationId, status);
+        try {
+            Optional<ReservationEntity> reservationOpt = reservationRepository.findByIdx(reservationId);
+            if (reservationOpt.isPresent()) {
+                ReservationEntity reservation = reservationOpt.get();
+                reservation.setResStatus("0"); // 예약 취소 상태로 변경
+                reservationRepository.save(reservation);
+                log.info("Successfully updated reservation status for id: {}", reservationId);
+            } else {
+                log.error("Reservation not found with id: {}", reservationId);
+                throw new RuntimeException("예약을 찾을 수 없습니다: " + reservationId);
+            }
+        } catch (Exception e) {
+            log.error("Error updating reservation status: {}", reservationId, e);
+            throw new RuntimeException("예약 상태 업데이트 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     public ReservationDTO findById(Integer reservationId) {
@@ -259,5 +277,11 @@ public class ReservationService {
 
     public ReservationDTO getReservationById(Integer reservationId) {
         return null;
+    }
+
+    // 예약 정보 조회
+    public ReservationEntity getReservationByIdx(Integer idx) {
+        return reservationRepository.findByIdx(idx)
+                .orElseThrow(() -> new EntityNotFoundException("예약 정보를 찾을 수 없습니다. idx: " + idx));
     }
 }

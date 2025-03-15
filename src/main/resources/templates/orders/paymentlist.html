@@ -101,19 +101,23 @@
 <body>
 
 <div layout:fragment="content" class="p-5">
-  <div class="container">
+
+  <div class="row mt-5 p-5 bg-white">
+    <div class="col"></div>
+    <div class="col-11">
+      <div class="mb-3 mt-3">
     <div class="payment-list">
       <h2 class="payment-title">결제 목록</h2>
-
+    </div>
       <!-- 에러 메시지가 있는 경우 표시 -->
       <div th:if="${param.error}" class="alert alert-danger" role="alert">
         <i class="fas fa-exclamation-circle me-2"></i>
         <span th:text="${param.error}"></span>
       </div>
 
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
+        <table class="table table-hover" border="1px">
+          <thead class="table-light">
+
           <tr>
             <th>결제번호</th>
             <th>결제금액</th>
@@ -137,8 +141,8 @@
             <td th:text="${payment.idx}"></td>
             <td th:text="${#numbers.formatDecimal(payment.paymentPrice, 0, 'COMMA', 0, 'POINT') + '원'}"></td>
             <td>
-                <span th:if="${payment.paymentState == 'Y'}" class="badge bg-success">결제 완료</span>
-                <span th:if="${payment.paymentState == 'N'}" class="badge bg-danger">결제 취소</span>
+              <span th:if="${payment.paymentState == 'Y'}" class="badge bg-success">결제 완료</span>
+              <span th:if="${payment.paymentState == 'N'}" class="badge bg-danger">결제 취소</span>
             </td>
             <td th:text="${payment.paymentPayType == 'CARD' ? '카드' :
                             payment.paymentPayType == 'CASH' ? '현금' :

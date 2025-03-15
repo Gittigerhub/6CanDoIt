@@ -51,7 +51,7 @@ public class EventService {
     출력 : 없음
     설명 : 이벤트를 등록할때 사용
     ---------------------------------------------------*/
-    public void register(EventDTO eventDTO) {
+    public void register(EventDTO eventDTO, List<MultipartFile>files ) {
 
 
         try {
@@ -60,7 +60,7 @@ public class EventService {
             EventEntity eventEntity = modelMapper.map(eventDTO, EventEntity.class);
 
             // 이미지 등록
-            List<ImageFileEntity> images = imageFileService.saveImages(eventDTO.getFiles());
+            List<ImageFileEntity> images = imageFileService.saveImages(files);
             System.out.println("S3 이미지 등록 완료");
 
             System.out.println("for문 들어오기전 검사:" + images);
@@ -103,8 +103,9 @@ public class EventService {
                 EventDTO eventDTO = modelMapper.map(read, EventDTO.class);
                 //System.out.println("체크2:" + eventDTO.getIdx());
                 //System.out.println("체크3:" + imageFileService.readImage(eventDTO.getIdx(), "event"));
-                List<ImageFileDTO> imageFileDTO = imageFileService.readImage(eventDTO.getIdx(), "event");
+                //List<ImageFileDTO> imageFileDTO = imageFileService.readImage(eventDTO.getIdx(), "event");
 
+                /*
                 //이미지 돌리기 판단
                 for (ImageFileDTO image : imageFileDTO) {
 
@@ -128,7 +129,10 @@ public class EventService {
                         //log.info("체크7:끝");
 
                     }
-                }
+
+
+
+                }*/
 
 
                 return eventDTO;
@@ -240,8 +244,6 @@ public class EventService {
                 System.out.println("게시글 저장중1");
 
 
-
-
                 System.out.println("게시글 저장 완료");
             }
 
@@ -263,7 +265,7 @@ public class EventService {
         try {
 
             List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(idx, "event");
-
+            /*
             if (!imageFileDTOList.isEmpty()) {
                 imageFileService.deleteImage(imageFileDTOList.getFirst().getIdx());
                 imageFileService.deleteImage(imageFileDTOList.getLast().getIdx());
@@ -283,7 +285,22 @@ public class EventService {
                 System.out.println("사진삭제2");
                 eventRepository.deleteById(idx);
                 System.out.println("게시글삭제");
+
             }
+             */
+
+            // dto => entity
+            List<ImageFileEntity> imageFileEntities = imageFileDTOList.stream()
+                    .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                    .collect(Collectors.toList());
+
+            // 모든 이미지 삭제
+            for (ImageFileEntity imageFileEntity : imageFileEntities) {
+                imageFileService.deleteImage(imageFileEntity.getIdx());
+            }
+
+            eventRepository.deleteById(idx);
+            System.out.println("게시글삭제");
 
 
         } catch (Exception e) {
@@ -298,43 +315,43 @@ public class EventService {
     설명 : 포인트 정보들을 목록을 출력할때 사용
     ---------------------------------------------------*/
     public Page<EventDTO> list(String keyword, String type, LocalDateTime startDate, LocalDateTime endDate, Pageable page) {
-        System.out.println("Service = page: "+page+",type:"+type+",keyword:"+keyword+",StartDate:"+startDate+",endDate:"+endDate);
+        System.out.println("Service = page: " + page + ",type:" + type + ",keyword:" + keyword + ",StartDate:" + startDate + ",endDate:" + endDate);
         //List<eventDTO> eventDTOlist = Arrays.asList(modelMapper.map(eventlist, eventDTO[].class));
-        Pageable pageable= PageRequest.of(Math.max(page.getPageNumber()-1,0),10);
-        System.out.println("실행중:"+pageable.getPageNumber());
+        Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
+        System.out.println("실행중:" + pageable.getPageNumber());
         Page<EventEntity> eventEntities;
-        if(!type.isEmpty()){
+        if (!type.isEmpty()) {
             switch (type) {
                 case "1":
                     log.info("이벤트 내용으로 검색하는 중");
-                    if(keyword!=null){
+                    if (keyword != null) {
                         eventEntities = eventRepository.findByContents(keyword, pageable);
                         break;
                     }
 
                 case "2":
                     log.info("이벤트 활성화로 검색하는 중");
-                    if(keyword!=null){
+                    if (keyword != null) {
                         eventEntities = eventRepository.findByActiveYn(keyword, pageable);
                         break;
                     }
 
                 case "3":
                     log.info("이벤트 기간으로 검색중 중");
-                    if(startDate!=null&&endDate!=null) {
+                    if (startDate != null && endDate != null) {
                         eventEntities = eventRepository.findByDateRange(startDate, endDate, pageable);
                         break;
                     }
 
-                default: eventEntities = eventRepository.findByContents(keyword, pageable);
+                default:
+                    eventEntities = eventRepository.findByContents(keyword, pageable);
             }
-        }
-        else{
+        } else {
             log.info("모든 대상으로 검색");
-            eventEntities=eventRepository.findAll(pageable);
+            eventEntities = eventRepository.findAll(pageable);
         }
-        Page<EventDTO> eventDTOS=eventEntities.map(entity -> modelMapper.map(entity,EventDTO.class));
-        System.out.println("실행중2:"+eventDTOS.getSize());
+        Page<EventDTO> eventDTOS = eventEntities.map(entity -> modelMapper.map(entity, EventDTO.class));
+        System.out.println("실행중2:" + eventDTOS.getSize());
 
         return eventDTOS;
     }

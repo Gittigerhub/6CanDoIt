@@ -1,9 +1,11 @@
 package com.sixcandoit.roomservice.controller.event;
 
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.event.EventDTO;
 import com.sixcandoit.roomservice.dto.event.MemberPointDTO;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.event.EventRepository;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.event.EventService;
 import com.sixcandoit.roomservice.service.event.UserEventService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -35,6 +37,7 @@ public class UserEventController {
     private final ModelMapper modelMapper;
     private final EventService eventService;
     private final EventRepository eventRepository;
+    private final ImageFileService imageFileService;
 
 
     //유저 맴버 리스트
@@ -69,9 +72,14 @@ public class UserEventController {
     public String userEventRead(Integer idx,Model model) {
 
         EventDTO eventDTORead = eventService.read(idx);
+        List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(idx, "event");
+        boolean hasRepImage = imageFileDTOList.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
 
         model.addAttribute("eventDTORead", eventDTORead);
-
+        model.addAttribute("imageFileDTOList", imageFileDTOList);
+        model.addAttribute("hasRepImage", hasRepImage);
         return "event/usereventread";
     }
 

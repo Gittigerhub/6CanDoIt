@@ -38,29 +38,47 @@
                         </div>
                         <br>
                         <div class="col-12" style="text-align: center;">
-                            <div>타이틀 사진</div>
-                            <th:block th:if="${eventDTORead.eventTitleImg}!=null">
-                                <img th:src="${eventDTORead.eventTitleImg}" style="width: 850px; height: 600px;">
+                            <th:block th:if="${!hasRepImage}">
+                                <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px"
+                                     src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg"
+                                     alt="noimage">
                             </th:block>
-                            <th:block th:if="${eventDTORead.eventTitleImg}==null">
+                        </div>
+                        <!-- 대표 이미지 -->
+                        <th:block th:each="data:${imageFileDTOList}" th:if="${hasRepImage}">
+                            <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                                <div class="img-item">
+                                    <img class="titleImg" width="1000" height="1200" th:src="${data.url}" th:alt="${data.originName}">
+                                </div>
                             </th:block>
-                            <hr>
-                            <div>메인 사진</div>
-                            <th:block th:if="${eventDTORead.eventImg}!=null">
-                                <img th:src="${eventDTORead.eventImg}" style="width: 850px; height: 600px;">
+                        </th:block>
+                        <div class="img-gallery">
+                            <!-- 이미지들 (대표 이미지를 제외한 나머지 이미지들) -->
+                            <th:block th:each="data:${imageFileDTOList}" th:if="${!hasRepImage}">
+                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                    <div class="mainImg">
+                                        <img th:src="${data.url}" width="1000" height="1200" th:alt="${data.originName}">
+                                    </div>
+                                </th:block>
                             </th:block>
-                            <th:block th:if="${eventDTORead.eventImg}==null">
+
+                            <th:block th:each="data:${imageFileDTOList}" th:if="${hasRepImage}">
+                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                    <div class="mainImg">
+                                        <img th:src="${data.url}" width="1000" height="1200" th:alt="${data.originName}">
+                                    </div>
+                                </th:block>
                             </th:block>
-                            <hr>
                         </div>
                         <div class="card-footer">
                             <div>내용</div>
-                            <textarea rows="3" cols="160" th:text="${eventDTORead.eventContents}" readonly></textarea>
+                            <textarea rows="3" cols="160" class="form-control" th:text="${eventDTORead.eventContents}" readonly></textarea>
                         </div>
                     </div>
                 </div>
                 <a style="float: right" class="btn btn-success" th:href="@{/event/event}" type="submit">목록</a>
-                <a style="float: right" type="submit" class="btn btn-primary" th:href="@{/event/eventupdate(idx=${eventDTORead.idx})}">수정</a>
+                <a style="float: right" type="submit" class="btn btn-primary"
+                   th:href="@{/event/eventupdate(idx=${eventDTORead.idx})}">수정</a>
             </div>
         </div>
 

@@ -22,99 +22,207 @@
     <style>
         body {
             font-family: "Montserrat", sans-serif;
+            background-color: #f8f9fa;
         }
         a {
-            text-decoration: none; /* 밑줄 없애기 */
-            color: black; /* 글자 색을 검은색으로 변경 */
+            text-decoration: none;
+            color: inherit;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: 2px solid #f8f9fa;
+            padding: 1.5rem;
+        }
+        .card-header h4 {
+            margin: 0;
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .card-footer {
+            background-color: #fff;
+            border-top: 1px solid #f8f9fa;
+            padding: 1rem 1.5rem;
+        }
+        .meta-info {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        .content-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #212529;
+        }
+        .btn {
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+        .btn-group {
+            gap: 0.5rem;
+        }
+        .image-container {
+            margin: 1.5rem 0;
+        }
+        .image-container img {
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .answer-card {
+            margin-top: 2rem;
+        }
+        .answer-card .card-header {
+            background-color: #f8f9fa;
+        }
+        .answer-card .card-header h4 {
+            color: #198754;
         }
     </style>
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
     <div class="container">
-    <div class="container p-5 bg-white">
-        <div id="row" class="row">
-            <div class="col"></div>
-            <div class="col-10"><!--입력폼 제거-->
-                <!--디자인-->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- 질문 카드 -->
                 <div class="card">
-                    <div class="card-header">
-                        <h4>Q</h4>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">
+                                <i class="bi bi-question-circle-fill me-2"></i>
+                                문의사항
+                            </h4>
+                        </div>
+                        <div class="meta-info">
+                            <span class="me-3">No. <span th:text="${qnaDTO.idx}"></span></span>
+                            <span th:if="${qnaDTO.favYn == 'Y'}" class="badge bg-warning">자주 묻는 질문</span>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <p>번호:<span th:text="${qnaDTO.idx}"></span></p>
-                        <p>제목:<span th:text="${qnaDTO.qnaTitle}"></span></p>
-                        <p>내용:<span th:text="${qnaDTO.qnaContents}"></span></p>
-
-                        <!-- 대표 이미지가 없을때 나오는 이미지 -->
-                        <div style="flex-basis: 100%; text-align: left">
-                            <th:block th:if="${!hasRepImage}">
-                                <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                        <h5 class="card-title mb-4" th:text="${qnaDTO.qnaTitle}"></h5>
+                        <div class="content-text mb-4" th:text="${qnaDTO.qnaContents}"></div>
+                        
+                        <!-- 이미지 영역 -->
+                        <div class="image-container text-center">
+                            <!-- 대표 이미지가 없을 때 -->
+                            <div th:if="${!hasRepImage}">
+                                <img class="img-fluid" style="max-width: 500px;" 
+                                     src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" 
+                                     alt="noimage">
+                            </div>
+                            <!-- 대표 이미지가 있을 때 -->
+                            <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
+                                <div th:if="${data.getRepimageYn()} == 'Y'">
+                                    <img class="img-fluid" style="max-width: 500px;" 
+                                         th:src="${data.url}" th:alt="${data.originName}">
+                                </div>
                             </th:block>
                         </div>
 
-                        <th:block th:each="data:${imageFileDTOS}" th:if="${hasRepImage}">
-                            <!-- 대표 이미지 -->
-                            <th:block th:if="${data.getRepimageYn()} == 'Y'">
-                                <div style="flex-basis: 100%; text-align: left">
-                                    <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                        <div class="meta-info mt-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        작성자: <span th:text="${qnaDTO.memberName}"></span>
+                                    </p>
                                 </div>
-                            </th:block>
-                        </th:block>
-
-                        <p>등록일:
-                            <span th:text="${#temporals.format(qnaDTO.insDate, 'yyyy-MM-dd HH:mm')}"></span>
-                        </p>
-                        <p>수정일:
-                            <span th:text="${#temporals.format(qnaDTO.modDate, 'yyyy-MM-dd HH:mm')}"></span>
-                        </p>
+                                <div class="col-md-6 text-md-end">
+                                    <p class="mb-1">
+                                        <i class="bi bi-calendar3 me-2"></i>
+                                        등록일: <span th:text="${#temporals.format(qnaDTO.insDate, 'yyyy-MM-dd HH:mm')}"></span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="bi bi-pencil-square me-2"></i>
+                                        수정일: <span th:text="${#temporals.format(qnaDTO.modDate, 'yyyy-MM-dd HH:mm')}"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-footer">
-                        <a th:href="@{/qna/update(idx=${qnaDTO.idx})}" 
-                           class="btn btn-primary"
-                           th:if="${currentUser != null and currentUser == qnaDTO.memberName}"
-                           th:onclick="${qnaDTO.replyList != null and not #lists.isEmpty(qnaDTO.replyList)} ? 'event.preventDefault(); showUpdateAlert();' : ''">수정</a>
-                        <a th:href="@{/qna/delete(idx=${qnaDTO.idx})}" 
-                           class="btn btn-danger"
-                           th:if="${currentUser != null and currentUser == qnaDTO.memberName}"
-                           onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a th:href="@{/qna/list}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>목록
+                            </a>
+                            <div class="btn-group" th:if="${currentUser != null and currentUser == qnaDTO.memberName}">
+                                <a th:href="@{/qna/update(idx=${qnaDTO.idx})}" 
+                                   class="btn btn-outline-primary btn-update">
+                                   <i class="bi bi-pencil me-2"></i>수정
+                                </a>
+                                <a th:href="@{/qna/delete(idx=${qnaDTO.idx})}" 
+                                   class="btn btn-outline-danger"
+                                   onclick="return confirm('정말 삭제하시겠습니까?');">
+                                   <i class="bi bi-trash me-2"></i>삭제
+                                </a>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
 
-                <!-- 답변 목록 -->
-                <div th:each="reply : ${qnaDTO.replyList}" class="card mt-3">
+                <!-- 답변 카드 -->
+                <div th:each="reply : ${qnaDTO.replyList}" class="card answer-card">
                     <div class="card-header">
-                        <h4>A</h4>
+                        <h4 class="mb-0">
+                            <i class="bi bi-chat-right-text-fill me-2"></i>
+                            답변
+                        </h4>
                     </div>
                     <div class="card-body">
-                        <p>제목:<span th:text="${reply.replyTitle}"></span></p>
-                        <p>내용:<span th:text="${reply.replyContents}"></span></p>
-                        <p>등록일:
-                            <span th:text="${#temporals.format(reply.insDate, 'yyyy-MM-dd HH:mm')}"></span>
-                        </p>
-                        <p>수정일:
-                            <span th:text="${#temporals.format(reply.modDate, 'yyyy-MM-dd HH:mm')}"></span>
-                        </p>
+                        <h5 class="card-title mb-4" th:text="${reply.replyTitle}"></h5>
+                        <div class="content-text mb-4" th:text="${reply.replyContents}"></div>
+                        
+                        <div class="meta-info">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        답변자: <span th:text="${reply.adminJoin != null ? reply.adminJoin.adminName : '관리자'}"></span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <p class="mb-1">
+                                        <i class="bi bi-calendar3 me-2"></i>
+                                        등록일: <span th:text="${#temporals.format(reply.insDate, 'yyyy-MM-dd HH:mm')}"></span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="bi bi-pencil-square me-2"></i>
+                                        수정일: <span th:text="${#temporals.format(reply.modDate, 'yyyy-MM-dd HH:mm')}"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div><!-- 답변 목록 끝 -->
-                <a th:href="@{/qna/list}" class="btn btn-secondary mt-3">목록</a>
+                </div>
             </div>
-            <div class="col"></div>
-        </div><!--row끝-->
-    </div>
+        </div>
     </div>
 </div>
 <th:block layout:fragment="script">
     <script th:inline="javascript">
-        function showUpdateAlert() {
-            Swal.fire({
-                title: '수정 불가',
-                text: '이미 답변이 작성된 글은 수정할 수 없습니다.',
-                icon: 'warning',
-                confirmButtonText: '확인'
+        /*<![CDATA[*/
+        $(document).ready(function() {
+            const hasReply = /*[[${qnaDTO.replyList != null and not #lists.isEmpty(qnaDTO.replyList)}]]*/ false;
+            
+            $('.btn-update').on('click', function(e) {
+                if (hasReply) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: '수정 불가',
+                        text: '이미 답변이 작성된 글은 수정할 수 없습니다.',
+                        icon: 'warning',
+                        confirmButtonText: '확인'
+                    });
+                }
             });
-        }
+        });
+        /*]]>*/
     </script>
 </th:block>
 </body>

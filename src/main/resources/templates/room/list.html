@@ -151,9 +151,8 @@
                         <option value="2" th:selected="${type == '2'}">객실 이름</option>
                         <option value="3" th:selected="${type == '3'}">조식 있음</option>
                         <option value="4" th:selected="${type == '4'}">빈 방</option>
-                        <option value="5" th:selected="${type == '5'}">예약중</option>
-                        <option value="6" th:selected="${type == '6'}">체크인</option>
-                        <option value="7" th:selected="${type == '7'}">체크아웃</option>
+                        <option value="5" th:selected="${type == '5'}">체크인</option>
+                        <option value="6" th:selected="${type == '6'}">체크아웃</option>
                     </select>
                 </div><!--검색 분류-->
                 <div class="col-2">
@@ -287,9 +286,8 @@
                         <!--예약 상태 여부-->
                         <td>
                             <button th:if="${data.resStatus == '1'}" class="btn btn-outline-secondary">빈 방</button>
-                            <button th:if="${data.resStatus == '2'}" class="btn btn-outline-primary">예약중</button>
-                            <button th:if="${data.resStatus == '3'}" class="btn btn-outline-warning">체크인</button>
-                            <button th:if="${data.resStatus == '4'}" class="btn btn-outline-dark">체크아웃</button>
+                            <button th:if="${data.resStatus == '2'}" class="btn btn-outline-warning">체크인</button>
+                            <button th:if="${data.resStatus == '3'}" class="btn btn-outline-dark">체크아웃</button>
                         </td>
                     </tr>
                     </tbody>

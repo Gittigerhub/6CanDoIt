@@ -248,7 +248,7 @@ public class QnaService {
                 qnaEntities = qnaRepository.searchFavYn(pageable);
             } else if (type.equals("6")) { // type 분류 6, 미답변만 검색할 때
                 log.info("미답변만 검색 중...");
-                qnaEntities = qnaRepository.searchUnreplied(pageable);
+                qnaEntities = qnaRepository.searchNoReply(pageable);
             } else if (type.equals("7")) { // type 분류 7, 답변완료만 검색할 때
                 log.info("답변완료만 검색 중...");
                 qnaEntities = qnaRepository.searchReplied(pageable);
@@ -441,5 +441,25 @@ public class QnaService {
         });
         
         return dtoPage;
+    }
+
+    // 회원의 최근 문의 3개 조회
+    public List<QnaDTO> getRecentQnasByMember(Integer memberIdx) {
+        log.info("회원의 최근 문의 3개를 조회합니다. 회원 IDX: {}", memberIdx);
+        
+        Pageable pageable = PageRequest.of(0, 3);
+        List<QnaEntity> qnaEntities = qnaRepository.findTop3ByMemberJoinIdxOrderByInsDateDesc(memberIdx, pageable);
+        
+        List<QnaDTO> qnaDTOs = qnaEntities.stream()
+                .map(entity -> {
+                    QnaDTO dto = modelMapper.map(entity, QnaDTO.class);
+                    log.info("문의 변환 완료 - IDX: {}, 제목: {}, 답변여부: {}", 
+                        dto.getIdx(), dto.getQnaTitle(), dto.getReplyYn());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        
+        log.info("조회된 최근 문의 수: {}", qnaDTOs.size());
+        return qnaDTOs;
     }
 }

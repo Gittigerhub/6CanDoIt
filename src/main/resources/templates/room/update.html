@@ -30,7 +30,6 @@
 <body>
 <div layout:fragment="content" class="p-5">
 
-    <h3>룸 관리</h3>
     <div class="container p-5 bg-white">
         <!--row 시작-->
         <div id="row" class="row">
@@ -166,8 +165,7 @@
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">등록</button>
                             <button type="reset" class="btn btn-secondary">초기화</button>
-                            <button type="button" class="btn btn-danger"
-                                    th:onclick="|location.href='@{/room/list}'|">취소</button>
+                            <button onclick="history.back()" type="button" class="btn btn-danger">취소</button>
                         </div>
                     </div>
                 </form>

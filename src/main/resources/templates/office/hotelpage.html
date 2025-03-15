@@ -93,9 +93,8 @@
                             ${hotel.organAddress}">위치</span>
                         </p>
                         <p class="card-text">
-                            <i class="bi bi-star-fill text-warning"></i> 
-                            <span>4.5</span>
-                            <span class="text-muted">/ 5.0</span>
+                            <i class="bi bi-telephone"></i>
+                            <span th:text="${#strings.substring(hotel.organTel, 0, 3) + '-' + #strings.substring(hotel.organTel, 3, 7) + '-' + #strings.substring(hotel.organTel, 7, 11)}"></span>
                         </p>
                         <p class="card-text">
                             <strong>최저가</strong>

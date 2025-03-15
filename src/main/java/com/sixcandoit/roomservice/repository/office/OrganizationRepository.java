@@ -47,4 +47,10 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     List<OrganizationEntity> findByOrganTypeAndOrganNameLikeIgnoreCase(String searchType, String searchWord);
     // 본사 + 조직명
 
+    // ===============================
+
+    // 관리자 메뉴 등록시 조직 조회하기
+    @Query("SELECT o FROM OrganizationEntity o WHERE o.hotels.idx = :idx")
+    OrganizationEntity findHotels(@Param("idx") Integer idx);
+
 }

@@ -140,15 +140,23 @@ public class ShopDetailService {
     설명 : 매장 정보를 수정할때 사용;
   ---------------------------------------------------*/
     public void update(ShopDetailDTO shopDetailDTO, OrganizationDTO organizationDTO, String join, List<MultipartFile> imageFiles, Integer organIdx){
-
+        System.out.println("체크 3");
+        System.out.println("shopDetailDTO : " + shopDetailDTO.toString());
+        System.out.println("organizationDTO : " + organizationDTO.toString());
         try {
             // organizationDTO.getIdx()로 조직 데이터 조회
             OrganizationEntity organ = organizationRepository.findById(organIdx)
                     .orElseThrow(() -> new RuntimeException("수정할 조직 조회 실패"));
 
+            System.out.println("체크 4");
+            System.out.println("organ : " + organ.toString());
+
             // shopDetailDTO.getIdx()로 매장 데이터 조회
             ShopDetailEntity shopEntity = shopDetailRepository.findById(shopDetailDTO.getIdx())
                     .orElseThrow(() -> new RuntimeException("상점 조회 실패"));
+
+            System.out.println("체크 5");
+            System.out.println("shopEntity : " + shopEntity.toString());
 
             // 빠진 idx값 주입
             organizationDTO.setIdx(organIdx);
@@ -158,8 +166,12 @@ public class ShopDetailService {
             modelMapper.map(organizationDTO, organ);
             modelMapper.map(shopDetailDTO, shopEntity);
 
+            System.out.println("체크 6");
+
             // 이미지 추가 등록
             List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
+
+            System.out.println("체크 7");
 
             // 이미지 정보 추가
             // 양방향 연관관계 편의 메서드 사용
@@ -169,14 +181,22 @@ public class ShopDetailService {
                 }
             }
 
+            System.out.println("체크 8");
+
             // 연관 관계 설정 (필요 시)
             shopEntity.setOrganizationJoin(organ);
+
+            System.out.println("체크 9");
 
             // Entity 테이블에 저장
             shopDetailRepository.save(shopEntity);
 
+            System.out.println("체크 10");
+
             // Entity 테이블에 저장
             organizationRepository.save(organ);
+
+            System.out.println("체크 11");
 
         } catch (Exception e) {
             throw new RuntimeException("수정서비스 실패: " + e.getMessage());

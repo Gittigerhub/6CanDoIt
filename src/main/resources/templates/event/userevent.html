@@ -14,16 +14,16 @@
 
     <!--검색 기능-->
     <form th:action="@{/event/userevent}" method="get">
-        <div class="container bg-white">
+        <div class="container p-5 bg-white">
             <div class>
                 <div class="row-6">
-                    <h3>게시글 검색</h3>
+                    <h3>유저 이벤트</h3>
                 </div>
             </div>
             <div class="col-12">
                 <div class="input-group mb-3 bg-white">
                     <select class="form-select" id="selectBox" name="type">
-                        <option th:selected="${type==null}"></option>
+                        <option th:selected="${type==null}">선택안함</option>
                         <option value="1" th:selected="${type=='1'}">내용</option>
                         <option value="2" th:selected="${type=='2'}">활성화</option>
                         <option value="3" th:selected="${type=='3'}">기간</option>
@@ -49,11 +49,11 @@
     <!--검색 끝-->
 
 
-    <div class="container">
+    <div class="container p-5">
         <div class="row">
             <div class="col-12 mainTable">
                 <table class="table">
-                    <thead class="table-dark">
+                    <thead class="table">
                     <tr>
                         <th style="width: 5%">No.</th>
                         <th style="width: 20%">이벤트 제목</th>

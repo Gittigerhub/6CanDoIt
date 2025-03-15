@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/memberlayout}">
+      layout:decorate="~{layouts/superlayout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,75 +20,91 @@
                 </div>
                 <div class="col">
                     <div class="card">
-                        <div class="card-header" style="display: flex; justify-content: center ; width: 100%;">
-                            <div class="col-4" style="flex: 1; text-align: center;">수정 페이지</div>
-                        </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="input-group">
-                                    <label>이벤트 제목:</label>
-                                    <input type="text" class="title" name="eventTitle" th:value="${eventRead.eventTitle}">
-                                </div>
+
                             </div>
                             <br>
                             <div class="row" style="flex: content; justify-content: space-between ;">
-                                <div class="col-6">
+                                <div class="col-12" style="flex: content">
                                     <th:block th:if="${eventRead.eventTitleImg}!=null">
-                                        <img th:src="${eventRead.eventTitleImg}" style="width: 600px; height: 350px;" >
+                                        <img th:src="${eventRead.eventTitleImg}" style="width: 1200px; height: 800px;">
                                     </th:block>
                                     <th:block th:if="${eventRead.eventTitleImg}==null">
                                     </th:block>
                                 </div>
-                                <div class="input-group col-6">
-                                    <label>이벤트 타이틀 사진(수정):</label>
-                                    <input type="file" class="title_img" id="title_img" name="Files" th:value="${eventRead.eventTitleImg}">
-                                </div>
-                                <div class="col-6">
+                                <div class="col-12 mt-2">
                                     <th:block th:if="${eventRead.eventImg}!=null">
-                                        <img th:src="${eventRead.eventImg}" style="width: 600px; height: 350px;" >
+                                        <img th:src="${eventRead.eventImg}" style="width: 300px; height: 175px;">
                                     </th:block>
                                     <th:block th:if="${eventRead.eventImg}==null">
                                     </th:block>
                                 </div>
-                                <div class="input-group col-6">
-                                    <label>이벤트 메인 사진(수정):</label>
-                                    <input type="file" class="main_img" id="main_img" name="Files" th:value="${eventRead.eventImg}">
+                                <br>
+                                <div class="input-group col-12">
+                                    <label>이벤트 타이틀 사진(수정):</label>
                                 </div>
-                                <div class="input-group">
-                                    <label>이벤트 내용</label>
-                                    <textarea class="event_text" rows="3"
-                                              name="eventContents" cols="160" th:value="${eventRead.eventContents}"></textarea>
+                                <div class="col-12">
+                                    <input type="file" class="title_img form-control" id="title_img" name="Files"
+                                           th:value="${eventRead.eventTitleImg}">
+                                </div>
+                                <div class="input-group col-12">
+                                    <label>이벤트 메인 사진(수정):</label>
+                                </div>
+                                <div class="col-12" id="main_img">
+                                    <input type="file" class="main_img form-control"  name="Files"
+                                           th:value="${eventRead.eventImg}">
+                                </div>
+                            </div>
+                            <!-- 이벤트 이미지 사진 추가버튼 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <input type="button" id="addImage" value="이미지 추가" class="btn btn-outline-primary">
                                 </div>
                             </div>
                             <br>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <label>이벤트 시작날</label>
-                                    <input type="datetime-local" class="form-select startDay" id="startDay"
-                                           name="eventStartDate" th:value="${eventRead.eventStartDate}">
-                                </div>
-                                <div class="col-sm-6">
-                                    <label>이벤트 종료날</label>
-                                    <input type="datetime-local" class="form-select endDay" id="endDay"
-                                           name="eventEndDate" th:value="${eventRead.eventEndDate}">
-                                </div>
-                            </div>
-                            <div class=" row">
-                                <div class="col-sm-6">
-                                    <label>이벤트 활성화</label>
-                                    <select id="activeYn" name="activeYn" class="form-select"
-                                            th:value="${eventRead.activeYn}">
-                                        <option value="N">비활성</option>
-                                        <option value="Y">활성</option>
-                                    </select>
-                                </div>
-                                <div class="col-sm-6">
-                                    <label>*이벤트 상태:</label>
-                                    <select id="eventState" name="eventState" class="form-select"
-                                            th:value="${eventRead.eventState}">
+                            <div class="card-body bg-light text-dark">
+                                <div class="eventUpdate-info-card mt-4">
+                                    <h5>이벤트 정보</h5>
+                                    <div class="info-item">
+                                        <i class="bi bi-bookmark-fill"></i> <!-- 아이콘 -->
+                                        <span>글 제목: <input class="form-control" type="text" name="eventTitle"
+                                                           th:value="${eventRead.eventTitle}"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="bi bi-calendar"></i>
+                                        <span>이벤트 기간:
+                                    <input class="form-control" type="datetime-local"
+                                           name="eventStartDate"
+                                           th:value="${eventRead.eventStartDate}">
+                                    ~<input class="form-control" type="datetime-local"
+                                            name="eventEndDate"
+                                            th:value="${eventRead.eventEndDate}"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="bi bi-activity"></i>
+                                        <span>이벤트 상태:<select name="eventState" th:value="${eventRead.eventState}" class="form-select">
                                         <option value="N">종료</option>
                                         <option value="Y">진행중</option>
-                                    </select>
+                                        </select>
+                                    </span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="bi bi-skip-start-circle"></i>
+                                        <span>이밴트 활성 : <select name="activeYn" th:value="${eventRead.activeYn}" class="form-select">
+                                        <option value="N">비활성화</option>
+                                        <option value="Y">활성화</option>
+                                        </select>
+                                    </span>
+                                    </div>
+                                    <!-- 객실 설명 추가 -->
+                                    <div class="info-item mt-4">
+                                        <i class="bi bi-body-text"></i>
+                                        이벤트 내용:
+                                        <textarea class="form-control" name="eventContents" style="white-space: pre-line;" rows="3"
+                                                  cols="160" th:value="${eventRead.eventContents}"></textarea>
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -100,4 +116,39 @@
     </div>
 </div>
 </body>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            console.log("작동중")
+            // 이미지 추가 버튼 클릭했을 때
+            $("#addImage").on('click', function () {
+                // 이미지 추가 함수
+                addImageInput();
+            });
+
+            // 이미지 추가
+            function addImageInput() {
+                const container = document.getElementById('main_img');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.innerHTML = '<input name="Files" type="file" class="form-control mt-2" accept="image/*">';
+                container.appendChild(newInputDiv);
+            }
+            // 이미지 input 초기화
+            function resetImageInput() {
+                const input = document.querySelector('input[name="Files"]');
+                const container2 = document.getElementById('main_img');
+
+                // 파일 선택 초기화
+                if (input) {
+                    input.value = '';
+                }
+
+                // 이미지 추가창 제거
+                container2.innerHTML = '<label>*이미지 :</label>' +
+                    '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            }
+        });
+    </script>
+</th:block>
+
 </html>

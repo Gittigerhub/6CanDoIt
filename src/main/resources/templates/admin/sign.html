@@ -7,8 +7,7 @@
     <title>Sign In / Sign Up</title>
     <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <th:block layout:fragment="css">
-        <style>
+    <style>
             @import url(https://fonts.googleapis.com/css?family=Raleway:400,100,200,300);
             /* GENERAL RESETS */
             * {
@@ -32,7 +31,7 @@
             }
 
             a:hover {
-                color: #4FDA8C;
+                color: #0d6efd;
             }
 
             /* BODY */
@@ -77,7 +76,7 @@
             }
 
             a.button:hover {
-                border-color: #04B5B5;
+                border-color: #0b5ed7;
                 color: #fff;
                 padding: 1.0rem 3.2rem;
             }
@@ -120,13 +119,13 @@
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: 40px;
                 background: #1F222C;
+                height: 40px;
             }
 
             .logo a {
-                height: 28px;
-                width: 28px;
+                height: 50px;
+                width: 50px;
                 display: block;
                 position: absolute;
                 top: 0;
@@ -137,7 +136,8 @@
             }
 
             .logo img {
-                width: 100%;
+                width: auto;
+                height: 100%;
             }
 
             /* USER (FORM WRAPPER) */
@@ -186,15 +186,15 @@
                 box-shadow: 0px 0px 27px -9px rgba(0, 0, 0, 0.75);
             }
 
-            .user .actions a:last-child {
-                color: #fff;
-                border-radius: 0 30px 30px 0;
-                background-color: #28A55F;
-                background: -moz-linear-gradient(270deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);
-                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(105, 221, 201, 1)), color-stop(100%, rgba(78, 193, 182, 1)));
-                background: -webkit-linear-gradient(270deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);
-                background: linear-gradient(180deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);
-            }
+            /*.user .actions a:last-child {*/
+            /*    color: #fff;*/
+            /*    border-radius: 0 30px 30px 0;*/
+            /*    background-color: #28A55F;*/
+            /*    background: -moz-linear-gradient(270deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);*/
+            /*    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(105, 221, 201, 1)), color-stop(100%, rgba(78, 193, 182, 1)));*/
+            /*    background: -webkit-linear-gradient(270deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);*/
+            /*    background: linear-gradient(180deg, rgba(105, 221, 201, 1) 0%, rgba(78, 193, 182, 1) 100%);*/
+            /*}*/
 
             /* TERMS */
             @keyframes show_terms {
@@ -298,21 +298,27 @@
                 color: #666;
             }
 
+            /* 기존 그림자 제거 */
             .recovery form .button {
                 margin: 1em 0;
-                padding: .2em 3em;
-                width: auto;
+                padding: 0.4em 1.8em; /* 버튼의 상하 여백을 줄이고 좌우 여백을 조정 */
+                font-size: 1.1em; /* 글자 크기를 약간 줄임 */
+                border-radius: 5px; /* 버튼 모서리를 둥글게 */
                 display: block;
-                background-color: #04BEBD;
+                background-color: #0d6efd;
                 border: none;
                 color: #fff;
                 cursor: pointer;
-                font-size: .8em;
-                border-radius: 0;
+                /* box-shadow: 0px 0px 37px -9px rgba(0, 0, 0, 0.75); */ /* 이 줄을 삭제하거나 주석 처리 */
+                box-shadow: none; /* 그림자를 없애기 위해 추가 */
+            }
+
+            .recovery form .button:hover {
+                background-color: #0b5ed7;
             }
 
             .form-wrap form .button:hover {
-                background-color: #04B5B5;
+                background-color: #0b5ed7;
             }
 
             .recovery p.mssg {
@@ -554,7 +560,7 @@
             .form-wrap a {
                 color: #ccc;
                 padding-bottom: 4px;
-                border-bottom: 1px solid #04BEBD;
+                border-bottom: 1px solid #0d6efd;
             }
 
             .form-wrap a:hover {
@@ -592,7 +598,7 @@
 
             .form-wrap .tabs h3 a.active span {
                 padding-bottom: 4px;
-                border-bottom: 1px solid #04BEBD;
+                border-bottom: 1px solid #0d6efd;
             }
 
             .form-wrap .tabs-content {
@@ -630,24 +636,23 @@
                 color: #fff;
             }
 
+            /* 기존 그림자 제거 */
             .form-wrap form .button {
                 margin: 1em 0;
-                padding: .2em 3em;
-                width: auto;
+                padding: 0.4em 1.8em; /* 버튼의 상하 여백을 줄이고 좌우 여백을 조정 */
+                font-size: 1.1em; /* 글자 크기를 약간 줄임 */
+                border-radius: 5px; /* 버튼 모서리를 둥글게 */
                 display: block;
-                background-color: #04BEBD;
+                background-color: #0d6efd;
                 border: none;
                 color: #fff;
                 cursor: pointer;
-                font-size: .8em;
-                border-radius: 0;
-                -webkit-box-shadow: 0px 0px 37px -9px rgba(0, 0, 0, 0.75);
-                -moz-box-shadow: 0px 0px 37px -9px rgba(0, 0, 0, 0.75);
-                box-shadow: 0px 0px 37px -9px rgba(0, 0, 0, 0.75);
+                /* box-shadow: 0px 0px 37px -9px rgba(0, 0, 0, 0.75); */ /* 이 줄을 삭제하거나 주석 처리 */
+                box-shadow: none; /* 그림자를 없애기 위해 추가 */
             }
 
             .form-wrap form .button:hover {
-                background-color: #04B5B5;
+                background-color: #0b5ed7;
             }
 
             .form-wrap form .checkbox {
@@ -657,46 +662,45 @@
                 text-align: left;
             }
 
-            .form-wrap form .checkbox:checked + label:after {
-                -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-                filter: alpha(opacity=100);
-                opacity: 1;
-            }
+            /*.form-wrap form .checkbox:checked + label:after {*/
+            /*    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";*/
+            /*    filter: alpha(opacity=100);*/
+            /*    opacity: 1;*/
+            /*}*/
 
             .form-wrap form label[for] {
                 position: relative;
-                padding-left: 20px;
                 cursor: pointer;
             }
 
-            .form-wrap form label[for]:before {
-                position: absolute;
-                width: 17px;
-                height: 17px;
-                top: 0px;
-                left: -14px;
-                content: '';
-                border: 1px solid #5A6374;
-            }
+            /*.form-wrap form label[for]:before {*/
+            /*    position: absolute;*/
+            /*    width: 17px;*/
+            /*    height: 17px;*/
+            /*    top: 0px;*/
+            /*    left: -14px;*/
+            /*    content: '';*/
+            /*    border: 1px solid #5A6374;*/
+            /*}*/
 
-            .form-wrap form label[for]:after {
-                position: absolute;
-                top: 1px;
-                left: -10px;
-                width: 15px;
-                height: 8px;
-                -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-                filter: alpha(opacity=0);
-                opacity: 0;
-                content: '';
-                background-color: transparent;
-                border: solid #04BEBD;
-                border-width: 0 0 3px 3px;
-                -webkit-transform: rotate(-45deg);
-                -moz-transform: rotate(-45deg);
-                -o-transform: rotate(-45deg);
-                transform: rotate(-45deg);
-            }
+            /*.form-wrap form label[for]:after {*/
+            /*    position: absolute;*/
+            /*    top: 1px;*/
+            /*    left: -10px;*/
+            /*    width: 15px;*/
+            /*    height: 8px;*/
+            /*    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";*/
+            /*    filter: alpha(opacity=0);*/
+            /*    opacity: 0;*/
+            /*    content: '';*/
+            /*    background-color: transparent;*/
+            /*    border: solid #0d6efd;*/
+            /*    border-width: 0 0 3px 3px;*/
+            /*    -webkit-transform: rotate(-45deg);*/
+            /*    -moz-transform: rotate(-45deg);*/
+            /*    -o-transform: rotate(-45deg);*/
+            /*    transform: rotate(-45deg);*/
+            /*}*/
 
             .form-wrap .help-text {
                 margin-top: .6em;
@@ -721,9 +725,9 @@
                 /* WRAP */
                 .wrap {
                     position: fixed;
-                    top: 0;
+                top: 0;
                     left: 0;
-                    right: 0;
+                right: 0;
                     bottom: 0;
                     width: 450px;
                     height: 540px;
@@ -840,8 +844,8 @@
             .invalid-feedback, .valid-feedback {
                 margin-top: 5px;
                 font-size: 14px;
-                display: none;
-            }
+                    display: none;
+                }
 
             .invalid-feedback {
                 color: #dc3545;
@@ -884,7 +888,7 @@
             .btn {
                 padding: 12px 15px;
                 margin-left: 10px;
-                background-color: #04BEBD;
+                background-color: #0d6efd;
                 color: white;
                 border: none;
                 border-radius: 4px;
@@ -894,7 +898,7 @@
             }
 
             .btn:hover {
-                background-color: #04B5B5;
+                background-color: #0b5ed7;
             }
 
             /* 이메일 입력창 */
@@ -919,8 +923,46 @@
                 margin-bottom: 15px;
             }
 
+            /* 비밀번호 재발급 버튼 스타일 */
+            .recovery .button {
+                margin: 1em 0;
+                padding: 0.4em 1.8em; /* 버튼의 상하 여백을 줄이고 좌우 여백을 조정 */
+                font-size: 1.1em; /* 글자 크기를 약간 줄임 */
+                border-radius: 5px; /* 버튼 모서리를 둥글게 */
+                display: block;
+                background-color: #0d6efd;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+                /* box-shadow: 0px 0px 37px -9px rgba(0, 0, 0, 0.75); */ /* 이 줄을 삭제하거나 주석 처리 */
+                box-shadow: none; /* 그림자를 없애기 위해 추가 */
+            }
+
+            .recovery .button:hover {
+                background-color: #0b5ed7;
+            }
+            /* 드롭다운 */
+            .custom-dropdown {
+                width: 70%;
+                height: 32px;
+                padding: 8px 12px;
+                font-size: 12px;
+                border: 1px solid #aaa;
+                border-radius: 5px;
+                background-color: #f8f8f8;
+                color: #333;
+                cursor: pointer;
+                margin: 0 auto; /* 가운데 정렬 */
+                white-space: nowrap; /* 글자가 잘리지 않도록 설정 */
+            }
+
+            .custom-dropdown:focus {
+                border-color: #007bff;
+                outline: none;
+                background-color: #fff;
+            }
+
         </style>
-    </th:block>
 </head>
 <body>
 <div>
@@ -935,14 +977,14 @@
                     <!-- ACTIONS
                     <div class="actions">
                         <a class="help" href="#signup-tab-content">Sign Up</a><a class="faq" href="#login-tab-content">Login</a>
-                    </div>
+                            </div>
                     -->
                     <!-- 로고 -->
                     <div class="logo">
                         <a href="#"><img
                                 src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/6CanDoIt%EB%A1%9C%EA%B3%A0.png"
                                 alt=""></a>
-                    </div>
+                            </div>
                     <!-- 토글 -->
                     <div id="toggle-wrap">
                         <div id="toggle-terms">
@@ -950,18 +992,18 @@
                                 <span></span>
                                 <span></span>
                             </div>
-                        </div>
-                    </div>
+                          </div>
+                            </div>
 
                     <!-- 동의 내용 -->
                     <div class="terms">
-                        <div class="terms-agreement">
+                            <div class="terms-agreement">
                             <h2>이용약관 및 정보수집 동의</h2>
                             <br>
                             <div class="terms-section collapsed">
                                 <h4>[필수] 서비스 이용약관 동의</h4>
-                                <div class="terms-content">
-                                    <textarea readonly>
+                              <div class="terms-content">
+                        <textarea readonly>
 제1조(목적) 이 약관은 OO 회사(전자상거래 사업자)가 운영하는 6candoit(이하 "몰"이라 한다)에서 제공하는 인터넷 관련 서비스(이하 "서비스"라 한다)를 이용함에 있어 사이버 몰과 이용자의 권리․의무 및 책임사항을 규정함을 목적으로 합니다.
 
   ※「PC통신, 무선 등을 이용하는 전자상거래에 대해서도 그 성질에 반하지 않는 한 이 약관을 준용합니다.」
@@ -1201,17 +1243,17 @@
   ① "몰"과 이용자 간에 발생한 전자상거래 분쟁에 관한 소송은 제소 당시의 이용자의 주소에 의하고, 주소가 없는 경우에는 거소를 관할하는 지방법원의 전속관할로 합니다. 다만, 제소 당시 이용자의 주소 또는 거소가 분명하지 않거나 외국 거주자의 경우에는 민사소송법상의 관할법원에 제기합니다.
 
   ② "몰"과 이용자 간에 제기된 전자상거래 소송에는 한국법을 적용합니다.</textarea>
-                                    <div class="form-check">
-                                        <input type="checkbox" id="serviceTerms" required>
-                                        <label for="serviceTerms">서비스 이용약관에 동의합니다.</label>
-                                    </div>
+                                <div class="form-check">
+                                  <input type="checkbox" id="serviceTerms" required>
+                                  <label for="serviceTerms">서비스 이용약관에 동의합니다.</label>
                                 </div>
+                              </div>
                             </div>
                             <br>
                             <div class="terms-section collapsed">
                                 <h4>[필수] 개인정보 수집 및 이용 동의</h4>
-                                <div class="terms-content">
-                                    <textarea readonly>
+                              <div class="terms-content">
+                        <textarea readonly>
 개인정보 수집 및 활용 동의서
 
 대한민국 국민은 누구나 사생활의 비밀 및 통신상의 비밀을 보호받을 수 있는 권리가 있음이 헌법상에 명시되어 있습니다. 그러나 개인의 사생활에 대한 기본 정보가 공공연하게 유출되어 개인의 사생활 침해 사례가 빈번하게 이루어지고 있는 것이 현실입니다. 따라서 6candoit은 어떠한 경우에도 회원님의 개인 사생활이 침해당하는 경우가 없도록 회원님의 개인정보 보호를 위하여 정부의 기본적인 정책, 법률을 충실히 이행하고 있음을 다음과 같이 명시합니다.
@@ -1260,18 +1302,18 @@ E-mail : himyeongsun@gmail.com
 
 이상의 개인정보 보호정책은 2025년 3월 1일부로 시행됩니다.
                         </textarea>
-                                    <div class="form-check">
-                                        <input type="checkbox" id="privacyTerms" required>
-                                        <label for="privacyTerms">개인정보 수집 및 이용에 동의합니다.</label>
-                                    </div>
+                                <div class="form-check">
+                                  <input type="checkbox" id="privacyTerms" required>
+                                  <label for="privacyTerms">개인정보 수집 및 이용에 동의합니다.</label>
                                 </div>
+                              </div>
                             </div>
                             <br>
                             <div class="form-check all-terms">
-                                <input type="checkbox" id="allTerms">
+                              <input type="checkbox" id="allTerms">
                                 <label for="allTerms"><strong>모든 약관에 동의합니다.</strong></label>
                             </div>
-                        </div>
+                          </div>
                     </div>
 
                     <!-- 임시 비밀번호 발급 -->
@@ -1280,11 +1322,11 @@ E-mail : himyeongsun@gmail.com
                         <p><strong>이메일</strong>과 <strong>이름</strong>을 입력 후, <strong>비밀번호 재발급</strong> 버튼을 클릭해주세요.<br>
                             입력하신 이메일로 임시 비밀번호가 발급됩니다.<br></p>
                         <p>임시비밀번호 로그인한 후에는 <strong>반드시 비밀번호를 변경</strong>해주세요.</p>
-                        <form id="passswordResetForm" class="recovery-form" th:action="@{/admin/password}" method="post"
-                              onsubmit="return validatePasswordReset()">
-                            <input type="email" class="input" name="adminEmail" placeholder="이메일">
-                            <input type="text" class="input" name="adminName" placeholder="이름">
+                        <form class="recovery-form" th:action="@{/admin/password}" method="post" onsubmit="return validatePasswordReset()">
+                            <input type="email" class="input" id="resetEmail" name="adminEmail" placeholder="이메일">
+                            <input type="text" class="input" id="resetName" name="adminName" placeholder="이름">
                             <input type="submit" class="button" value="비밀번호 재발급">
+                            <div id="resetMessage" style="text-align: center; margin-top: 10px;"></div>
                         </form>
                         <p class="mssg">이메일로 임시 비밀번호가 전송되었습니다.</p>
                     </div>
@@ -1303,16 +1345,11 @@ E-mail : himyeongsun@gmail.com
                         <div class="tabs-content">
                             <!-- 로그인 -->
                             <div id="login-tab-content" class="active">
-                                <form id="sign-in" class="login-form" th:action="@{/admin/login}" method="post">
+                                <form id="loginForm" class="login-form" th:action="@{/admin/login}" method="post">
                                     <div>
                                         <input type="email" class="input" name="adminEmail" placeholder="이메일" required>
+                                        <input type="password" class="input" name="password" placeholder="비밀번호" required>
                                     </div>
-                                    <div>
-                                        <input type="password" class="input" name="password" placeholder="비밀번호"
-                                               required>
-                                    </div>
-                                    <!--                                    <input type="checkbox" class="checkbox" checked id="remember_me">-->
-                                    <!--                                    <label for="remember_me">이메일 기억하기</label>-->
                                     <input type="submit" class="button" value="로그인">
                                 </form>
                                 <div class="help-action">
@@ -1320,13 +1357,13 @@ E-mail : himyeongsun@gmail.com
                                         잊으셨나요?</a></p>
                                 </div>
                             </div>
+
                             <!-- 회원 가입 -->
                             <div id="signup-tab-content">
-                                <form id="sign-up" class="signup-form" th:action="@{/admin/register}" method="post"
+                                <form id="signupForm" class="signup-form" th:action="@{/admin/register}" method="post"
                                       onsubmit="return validateForm() && validatePassword()">
                                     <div class="input-group">
-                                        <input type="email" class="email-input" id="adminEmail" name="adminEmail"
-                                               placeholder="이메일" required>
+                                        <input type="email" class="email-input" id="adminEmail" name="adminEmail" placeholder="이메일" required>
                                         <button type="button" class="btn" id="emailSendBtn">인증</button><!-- 계정 인증 이메일 발송 버튼 -->
                                     </div>
                                     <div class="input-group">
@@ -1334,22 +1371,17 @@ E-mail : himyeongsun@gmail.com
                                         <button type="button" class="btn" id="emailCheckBtn">확인</button><!-- 계정 인증 이메일 체크 버튼 -->
                                     </div>
                                     <div>
-                                        <input type="password" class="input" id="password" name="password" autocomplete="off"
-                                               placeholder="비밀번호">
+                                        <input type="password" class="input" id="password" name="password" placeholder="비밀번호" required>
                                     </div>
                                     <div>
-                                        <input type="password" class="input" id="confirmPassword" name="confirmPassword"
-                                               autocomplete="off" placeholder="비밀번호 확인">
-                                        <div id="confirmPasswordFeedback" class="invalid-feedback">비밀번호가 일치하지 않습니다.
-                                        </div>
+                                        <input type="password" class="input" id="confirmPassword" name="confirmPassword" placeholder="비밀번호 확인" required>
+                                        <div id="confirmPasswordFeedback" class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
                                         <div id="confirmPasswordValid" class="valid-feedback">비밀번호가 일치합니다.</div>
                                     </div>
                                     <div class="input">
-                                        <label for="organization" class="form-label">호텔명</label>
-                                        <select class="form-select" id="organization" name="organization" required>
-                                            <option th:if="${#lists.isEmpty(organizations)}" value="" disabled>등록된 호텔이
-                                                없습니다.
-                                            </option>
+                                        <label for="organization" class="form-label" style="color: dimgray; margin-right: 15px; display: inline-block;">호텔명</label>
+                                        <select class="custom-dropdown" id="organization" name="organization" required>
+                                            <option th:if="${#lists.isEmpty(organizations)}" value="" disabled>등록된 호텔이 없습니다.</option>
                                             <option th:each="org : ${organizations}"
                                                     th:value="${org.idx}"
                                                     th:text="${org.organName}"
@@ -1358,17 +1390,15 @@ E-mail : himyeongsun@gmail.com
                                         </select>
                                     </div>
                                     <div>
-                                        <input type="text" class="input" id="adminName" name="adminName"
-                                               autocomplete="off" placeholder="이름">
+                                        <input type="text" class="input" id="adminName" name="adminName" placeholder="이름" required>
                                     </div>
                                     <div>
-                                        <input type="tel" class="input" name="adminPhone" id="adminPhone"
-                                               placeholder="전화번호" required>
+                                        <input type="tel" class="input" name="adminPhone" id="adminPhone" placeholder="전화번호" required>
                                         <div id="confirmPhoneFeedback" class="invalid-feedback">잘못된 전화번호 형식입니다.</div>
                                         <div id="confirmPhoneValid" class="valid-feedback">올바른 전화번호 형식입니다.</div>
                                     </div>
                                     <div class="help-action">
-                                        <p>회원가입을 하시려면 이용약관에 동의해주세요.</p>
+                                        <p>회원가입 전 이용약관에 동의해주세요.</p>
                                         <p><i class="fa fa-arrow-left" aria-hidden="true"></i><a class="agree" href="#">약관
                                             동의</a></p>
                                     </div>
@@ -1381,68 +1411,11 @@ E-mail : himyeongsun@gmail.com
             </div>
         </div>
     </div>
-
-    <!-- 비밀번호 불일치 시 띄울 모달 -->
-    <div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="passwordMismatchModalLabel">비밀번호 불일치</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    비밀번호가 일치하지 않습니다.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 이메일 중복 시 띄울 모달 -->
-    <div class="modal fade" id="emailMismatchModal" tabindex="-1" aria-labelledby="emailMismatchModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="emailMismatchModalLabel">이메일 확인</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    이미 가입된 이메일입니다.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 연락처 중복 시 띄울 모달 -->
-    <div class="modal fade" id="phoneMismatchModal" tabindex="-1" aria-labelledby="phoneMismatchModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="phoneMismatchModalLabel">연락처 확인</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    이미 가입된 연락처입니다.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
-<th:block layout:fragment="script">
-    <script>
-    var emailCheckYN = 0;
+<script>
+        // 이메일 인증
+        var emailCheckYN = 0;
         $("#emailSendBtn").on("click", function () {
 
             console.log("코드 발송 접근")
@@ -1484,258 +1457,318 @@ E-mail : himyeongsun@gmail.com
                     console.log(xhr, status, err)
                 }
 
-
-
             })
 
         })
 
-
-
-            // 로그인 탭
-            $(function () {
-                tab = $('.tabs h3 a');
-                tab.on('click', function (event) {
-                    event.preventDefault();
-                    tab.removeClass('active');
-                    $(this).addClass('active');
-                    tab_content = $(this).attr('href');
-                    $('div[id$="tab-content"]').removeClass('active');
-                    $(tab_content).addClass('active');
-                });
+        // 로그인 탭
+        $(function () {
+            tab = $('.tabs h3 a');
+            tab.on('click', function (event) {
+                event.preventDefault();
+                tab.removeClass('active');
+                $(this).addClass('active');
+                tab_content = $(this).attr('href');
+                $('div[id$="tab-content"]').removeClass('active');
+                $(tab_content).addClass('active');
             });
+        });
 
-            // 슬라이드쇼
-            $(function () {
-                $('#slideshow > div:gt(0)').hide();
-                setInterval(function () {
-                    $('#slideshow > div:first')
-                        .fadeOut(1000)
-                        .next()
-                        .fadeIn(1000)
-                        .end()
-                        .appendTo('#slideshow');
-                }, 3850);
+        // 슬라이드쇼
+        $(function () {
+            $('#slideshow > div:gt(0)').hide();
+            setInterval(function () {
+                $('#slideshow > div:first')
+                    .fadeOut(1000)
+                    .next()
+                    .fadeIn(1000)
+                    .end()
+                    .appendTo('#slideshow');
+            }, 3850);
+        });
+
+        // 클래스를 교체하는 jquery 함수
+        (function ($) {
+            'use strict';
+            $.fn.swapClass = function (remove, add) {
+                this.removeClass(remove).addClass(add);
+                return this;
+            };
+        }(jQuery));
+
+        // 보기 및 숨기기
+        $(function () {
+            $('.agree, .forgot, #toggle-terms, .log-in, .sign-up').on('click', function (event) {
+                event.preventDefault();
+                var user = $('.user'), terms = $('.terms'), form = $('.form-wrap'), recovery = $('.recovery'),
+                    close = $('#toggle-terms'), arrow = $('.tabs-content .fa');
+                if ($(this).hasClass('agree') || $(this).hasClass('log-in') || ($(this).is('#toggle-terms')) && terms.hasClass('open')) {
+                    if (terms.hasClass('open')) {
+                        form.swapClass('open', 'closed');
+                        terms.swapClass('open', 'closed');
+                        close.swapClass('open', 'closed');
+                    } else {
+                        if ($(this).hasClass('log-in')) {
+                            return;
+                        }
+                        form.swapClass('closed', 'open');
+                        terms.swapClass('closed', 'open').scrollTop(0);
+                        close.swapClass('closed', 'open');
+                        user.addClass('overflow-hidden');
+                    }
+                } else if ($(this).hasClass('forgot') || $(this).hasClass('sign-up') || $(this).is('#toggle-terms')) {
+                    if (recovery.hasClass('open')) {
+                        form.swapClass('open', 'closed');
+                        recovery.swapClass('open', 'closed');
+                        close.swapClass('open', 'closed');
+                    } else {
+                        if ($(this).hasClass('sign-up')) {
+                            return;
+                        }
+                        form.swapClass('closed', 'open');
+                        recovery.swapClass('closed', 'open');
+                        close.swapClass('closed', 'open');
+                        user.addClass('overflow-hidden');
+                    }
+                }
             });
+        });
 
-            // 클래스를 교체하는 jquery 함수
-            (function ($) {
-                'use strict';
-                $.fn.swapClass = function (remove, add) {
-                    this.removeClass(remove).addClass(add);
-                    return this;
-                };
-            }(jQuery));
+        // 메세지
+        $(function () {
+            $('.recovery .button').on('click', function (event) {
+                event.preventDefault();
+                $('.recovery .mssg').addClass('animate');
+                setTimeout(function () {
+                    $('.form-wrap').swapClass('open', 'closed');
+                    $('.recovery').swapClass('open', 'closed');
+                    $('#toggle-terms').swapClass('open', 'closed');
+                    $('.tabs-content .fa').swapClass('active', 'inactive');
+                    $('.recovery .mssg').removeClass('animate');
+                }, 2500);
+            });
+        });
 
-            // 보기 및 숨기기
-            $(function () {
-                $('.agree, .forgot, #toggle-terms, .log-in, .sign-up').on('click', function (event) {
-                    event.preventDefault();
-                    var user = $('.user'), terms = $('.terms'), form = $('.form-wrap'), recovery = $('.recovery'),
-                        close = $('#toggle-terms'), arrow = $('.tabs-content .fa');
-                    if ($(this).hasClass('agree') || $(this).hasClass('log-in') || ($(this).is('#toggle-terms')) && terms.hasClass('open')) {
-                        if (terms.hasClass('open')) {
-                            form.swapClass('open', 'closed');
-                            terms.swapClass('open', 'closed');
-                            close.swapClass('open', 'closed');
-                        } else {
-                            if ($(this).hasClass('log-in')) {
-                                return;
-                            }
-                            form.swapClass('closed', 'open');
-                            terms.swapClass('closed', 'open').scrollTop(0);
-                            close.swapClass('closed', 'open');
-                            user.addClass('overflow-hidden');
-                        }
-                    } else if ($(this).hasClass('forgot') || $(this).hasClass('sign-up') || $(this).is('#toggle-terms')) {
-                        if (recovery.hasClass('open')) {
-                            form.swapClass('open', 'closed');
-                            recovery.swapClass('open', 'closed');
-                            close.swapClass('open', 'closed');
-                        } else {
-                            if ($(this).hasClass('sign-up')) {
-                                return;
-                            }
-                            form.swapClass('closed', 'open');
-                            recovery.swapClass('closed', 'open');
-                            close.swapClass('closed', 'open');
-                            user.addClass('overflow-hidden');
-                        }
+        // // 제출 거부
+        // $(function() {
+        //     $('.button').on('click', function(event) {
+        //         $(this).stop();
+        //         event.preventDefault();
+        //         return false;
+        //     });
+        // });
+
+        // 에러 메시지가 있으면 표시
+        const errorMessage = /*[[${errorMessage}]]*/ null;
+        if (errorMessage) {
+            alert(errorMessage);
+        }
+
+        // 약관 동의 처리
+        document.getElementById('allTerms').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.terms-agreement input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    if (checkbox !== this) {
+                        checkbox.checked = this.checked;
                     }
                 });
-            });
+        });
 
-            // 메세지
-            $(function () {
-                $('.recovery .button').on('click', function (event) {
-                    event.preventDefault();
-                    $('.recovery .mssg').addClass('animate');
-                    setTimeout(function () {
-                        $('.form-wrap').swapClass('open', 'closed');
-                        $('.recovery').swapClass('open', 'closed');
-                        $('#toggle-terms').swapClass('open', 'closed');
-                        $('.tabs-content .fa').swapClass('active', 'inactive');
-                        $('.recovery .mssg').removeClass('animate');
-                    }, 2500);
+        // 개별 약관 체크박스 변경 시 전체 동의 체크박스 상태 업데이트
+        document.querySelectorAll('.terms-section input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const allChecked = Array.from(document.querySelectorAll('.terms-section input[type="checkbox"]'))
+                        .every(cb => cb.checked);
+                    document.getElementById('allTerms').checked = allChecked;
                 });
-            });
+        });
 
-            // // 제출 거부
-            // $(function() {
-            //     $('.button').on('click', function(event) {
-            //         $(this).stop();
-            //         event.preventDefault();
-            //         return false;
-            //     });
-            // });
+        // 회원가입 폼 제출 시 필수 약관 확인
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // 에러 메시지가 있으면 표시
-            const errorMessage = /*[[${errorMessage}]]*/ null;
-            if (errorMessage) {
-                alert(errorMessage);
+            if (password !== confirmPassword) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return false;
+            }
+            return true;
+        }
+        // 비밀번호 확인
+        document.getElementById("password").addEventListener("input", checkPasswordMatch);
+        document.getElementById("confirmPassword").addEventListener("input", checkPasswordMatch);
+
+        function checkPasswordMatch() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+            var confirmPasswordInput = document.getElementById("confirmPassword");
+            var confirmPasswordFeedback = document.getElementById("confirmPasswordFeedback");
+            var confirmPasswordValid = document.getElementById("confirmPasswordValid");
+
+            // 비밀번호 입력 필드가 비어있는지 체크
+            if (password === "" || confirmPassword === "") {
+                confirmPasswordInput.classList.remove("is-invalid", "is-valid");
+                confirmPasswordFeedback.style.display = "none";
+                confirmPasswordValid.style.display = "none";
+                return; // 비밀번호가 비어있으면 아무것도 표시하지 않음
             }
 
-            // 비밀번호 확인
-            document.getElementById("password").addEventListener("input", checkPasswordMatch);
-            document.getElementById("confirmPassword").addEventListener("input", checkPasswordMatch);
-
-            function checkPasswordMatch() {
-                var password = document.getElementById("password").value;
-                var confirmPassword = document.getElementById("confirmPassword").value;
-                var confirmPasswordInput = document.getElementById("confirmPassword");
-                var confirmPasswordFeedback = document.getElementById("confirmPasswordFeedback");
-                var confirmPasswordValid = document.getElementById("confirmPasswordValid");
-
-                // 비밀번호 입력 필드가 비어있는지 체크
-                if (password === "" || confirmPassword === "") {
-                    confirmPasswordInput.classList.remove("is-invalid", "is-valid");
-                    confirmPasswordFeedback.style.display = "none";
-                    confirmPasswordValid.style.display = "none";
-                    return; // 비밀번호가 비어있으면 아무것도 표시하지 않음
-                }
-
-                if (password !== confirmPassword) {
-                    confirmPasswordInput.classList.remove("is-valid");
-                    confirmPasswordInput.classList.add("is-invalid");
-                    confirmPasswordFeedback.style.display = "block";
-                    confirmPasswordValid.style.display = "none";
-                } else {
-                    confirmPasswordInput.classList.remove("is-invalid");
-                    confirmPasswordInput.classList.add("is-valid");
-                    confirmPasswordFeedback.style.display = "none";
-                    confirmPasswordValid.style.display = "block";
-                }
+            if (password !== confirmPassword) {
+                confirmPasswordInput.classList.remove("is-valid");
+                confirmPasswordInput.classList.add("is-invalid");
+                confirmPasswordFeedback.style.display = "block";
+                confirmPasswordValid.style.display = "none";
+            } else {
+                confirmPasswordInput.classList.remove("is-invalid");
+                confirmPasswordInput.classList.add("is-valid");
+                confirmPasswordFeedback.style.display = "none";
+                confirmPasswordValid.style.display = "block";
             }
+        }
 
-            // 비밀번호 일치 체크 함수 (회원가입 폼 제출 전에 실행)
-            function validatePassword() {
-                var password = document.getElementById("password").value;
-                var confirmPassword = document.getElementById("confirmPassword").value;
+        // 비밀번호 일치 체크 함수 (회원가입 폼 제출 전에 실행)
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
 
-                if (password !== confirmPassword) {
-                    // 모달 띄우기
-                    var myModal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
-                    myModal.show();
-                    return false; // 폼 제출 막기
-                }
-                return true; // 비밀번호 일치 시 폼 제출
+            if (password !== confirmPassword) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return false; // 폼 제출 막기
             }
+            return true; // 비밀번호 일치 시 폼 제출
+        }
 
-            // 이메일, 연락처 중복 체크 함수
-            $(function () {
-                $("#signupForm").on("submit", function (event) {
-                    event.preventDefault();  // 폼 제출을 막고 Ajax로 처리
-                    if(emailCheckYN===0){
-                        alert("이메일 인증을 진행해 주세요.")
-                        return;
-                    }
-                    var email = $("#adminEmail").val();
-                    var phone = $("#adminPhone").val();
-
-                    // 이메일 중복 체크
-                    $.ajax({
-                        url: '/admin/checkEmail',
-                        method: 'POST',
-                        dataType: 'text',
-                        data: {"email": email},
-                        success: function (checkMail) {
-                            console.log("이메일 중복 확인 응답:", checkMail); // 로그 추가
-                            if (parseInt(checkMail) === 1) {
-                                // 이메일 중복 모달 띄우기
-                                var myModal = new bootstrap.Modal($("#emailMismatchModal"));
-                                myModal.show();
-                            } else {
-                                // 이메일 중복이 없으면 연락처 중복 확인
-                                $.ajax({
-                                    url: '/admin/checkPhone',
-                                    method: 'POST',
-                                    dataType: 'text',
-                                    data: {"phone": phone},
-                                    success: function (checkPhone) {
-                                        console.log("연락처 중복 확인 응답:", checkPhone); // 로그 추가
-                                        if (parseInt(checkPhone) === 1) {
-                                            // 연락처 중복 모달 띄우기
-                                            var myModal = new bootstrap.Modal($("#phoneMismatchModal"));
-                                            myModal.show();
-                                        } else {
-                                            console.log(checkPhone)
-                                            // 이메일과 연락처 둘 다 중복되지 않으면 폼 제출
-                                            $("#signupForm").off("submit").submit();
-                                        }
-                                    },
-                                    error: function () {
-                                        console.error("연락처 중복 확인 실패");
-                                    }
-                                });
-                            }
-                        },
-                        error: function () {
-                            console.error("이메일 중복 확인 실패");
-                        }
-                    });
-                });
-            });
-
-            // 전화번호 유효성 검사
-            document.getElementById("adminPhone").addEventListener("input", function () {
-                var phone = this.value;
-                var phoneInput = this;
-                var phoneFeedback = document.getElementById("confirmPhoneFeedback");
-                var phoneValid = document.getElementById("confirmPhoneValid");
-
-                // 전화번호 형식 검사 (000-0000-0000 또는 000-000-0000)
-                var phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;
-
-                // 입력값이 비어있는 경우
-                if (phone === "") {
-                    phoneInput.classList.remove("is-invalid", "is-valid");
-                    phoneFeedback.style.display = "none";
-                    phoneValid.style.display = "none";
+        // 이메일, 연락처 중복 체크 함수
+        $(function () {
+            $("#signupForm").on("submit", function (event) {
+                event.preventDefault();  // 폼 제출을 막고 Ajax로 처리
+                if(emailCheckYN===0){
+                    alert("이메일 인증을 진행해 주세요.")
                     return;
                 }
+                var email = $("#adminEmail").val();
+                var phone = $("#adminPhone").val();
 
-                if (!phonePattern.test(콜)) {
-                    phoneInput.classList.remove("is-valid");
-                    phoneInput.classList.add("is-invalid");
-                    phoneFeedback.style.display = "block";
-                    phoneValid.style.display = "none";
-                } else {
-                    phoneInput.classList.remove("is-invalid");
-                    phoneInput.classList.add("is-valid");
-                    phoneFeedback.style.display = "none";
-                    phoneValid.style.display = "block";
-                }
-
-                // 자동으로 하이픈 추가
-                var value = phone.replace(/[^0-9]/g, ''); // 숫자만 추출
-                if (value.length > 3 && value.length <= 7) {
-                    value = value.slice(0, 3) + '-' + value.slice(3);
-                } else if (value.length > 7) {
-                    value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
-                }
-                this.value = value;
+                // 이메일 중복 체크
+                $.ajax({
+                    url: '/admin/checkEmail',
+                    method: 'POST',
+                    dataType: 'text',
+                    data: {"email": email},
+                    success: function (checkMail) {
+                        console.log("이메일 중복 확인 응답:", checkMail); // 로그 추가
+                        if (parseInt(checkMail) === 1) {
+                            alert("이미 가입된 이메일입니다.")
+                        } else {
+                            // 이메일 중복이 없으면 연락처 중복 확인
+                            $.ajax({
+                                url: '/admin/checkPhone',
+                                method: 'POST',
+                                dataType: 'text',
+                                data: {"phone": phone},
+                                success: function (checkPhone) {
+                                    console.log("연락처 중복 확인 응답:", checkPhone); // 로그 추가
+                                    if (parseInt(checkPhone) === 1) {
+                                        alert("이미 가입된 연락처입니다.")
+                                    } else {
+                                        console.log(checkPhone)
+                                        // 이메일과 연락처 둘 다 중복되지 않으면 폼 제출
+                                        $("#signupForm").off("submit").submit();
+                                    }
+                                },
+                                error: function () {
+                                    console.error("연락처 중복 확인 실패");
+                                }
+                            });
+                        }
+                    },
+                    error: function () {
+                        console.error("이메일 중복 확인 실패");
+                    }
+                });
             });
-    </script>
-</th:block>
+        });
+
+        // 전화번호 유효성 검사
+        document.getElementById("adminPhone").addEventListener("input", function () {
+            var phone = this.value;
+            var phoneInput = this;
+            var phoneFeedback = document.getElementById("confirmPhoneFeedback");
+            var phoneValid = document.getElementById("confirmPhoneValid");
+
+            // 전화번호 형식 검사 (000-0000-0000 또는 000-000-0000)
+            var phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;
+
+            // 입력값이 비어있는 경우
+            if (phone === "") {
+                phoneInput.classList.remove("is-invalid", "is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "none";
+                return;
+            }
+
+            if (!phonePattern.test(phone)) {
+                phoneInput.classList.remove("is-valid");
+                phoneInput.classList.add("is-invalid");
+                phoneFeedback.style.display = "block";
+                phoneValid.style.display = "none";
+            } else {
+                phoneInput.classList.remove("is-invalid");
+                phoneInput.classList.add("is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "block";
+            }
+
+            // 자동으로 하이픈 추가
+            var value = phone.replace(/[^0-9]/g, ''); // 숫자만 추출
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+            }
+            this.value = value;
+        });
+
+        // 비밀번호 재발급 검증
+        function validatePasswordReset() {
+            const name = document.getElementById('resetName').value;
+            const email = document.getElementById('resetEmail').value;
+            const messageDiv = document.getElementById('resetMessage');
+
+            // 서버에 비밀번호 재발급 요청
+            fetch('/admin/password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'text/plain'
+                },
+                body: JSON.stringify({
+                    adminName: name,
+                    adminEmail: email
+                })
+            })
+                .then(response => response.text())
+                .then(result => {
+                    if (result === 'success') {
+                        messageDiv.style.color = '#4CAF50';
+                        messageDiv.textContent = '이메일로 임시 비밀번호가 발송되었습니다.';
+                        setTimeout(() => {
+                            showLoginForm();
+                        }, 2000);
+                    } else {
+                        messageDiv.style.color = '#333333';
+                        messageDiv.textContent = '이름 또는 이메일이 일치하지 않습니다.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messageDiv.style.color = '#333333';
+                    messageDiv.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+                });
+
+            return false; // 폼 기본 제출 방지
+        }
+        </script>
+
 </body>
 </html>

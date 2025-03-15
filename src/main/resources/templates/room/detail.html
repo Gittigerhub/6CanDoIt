@@ -15,8 +15,8 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <!--부트스트랩 아이콘-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!--알림창 스크립트-->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -139,7 +139,7 @@
         .info-item i {
             margin-right: 10px;
             font-size: 20px;
-            color: #007bff; /* 아이콘 색상 */
+            color: #555; /* 아이콘 색상 */
         }
 
         .info-item span {
@@ -170,6 +170,20 @@
                 <!--디자인-->
                 <div class="card">
                     <div class="card-body">
+                        <div class="room-info-card text-center">
+                            <h3 style="margin: 0; display: inline-block;">
+                                <span th:if="${roomDTO.roomType == 'STD'}">스탠다드</span>
+                                <span th:if="${roomDTO.roomType == 'ROH'}">런 오브 하우스</span>
+                                <span th:if="${roomDTO.roomType == 'MOD'}">모더레이트</span>
+                                <span th:if="${roomDTO.roomType == 'SUP'}">슈페리어</span>
+                                <span th:if="${roomDTO.roomType == 'DLX'}">디럭스</span>
+                                <span th:if="${roomDTO.roomType == 'STU'}">스튜디오</span>
+                                <span th:if="${roomDTO.roomType == 'JRSTE'}">쥬니어 스위트</span>
+                                <span th:if="${roomDTO.roomType == 'STE'}">스위트</span>
+                                <span th:if="${roomDTO.roomType == 'PH'}">팬트하우스</span>
+                                <span th:text="${' ' + roomDTO.roomName}"></span>
+                            </h3>
+                        </div>
                         <!-- 대표 이미지가 없을때 나오는 이미지 -->
                         <div style="flex-basis: 100%; text-align: left">
                             <th:block th:if="${!hasRepImage}">
@@ -303,65 +317,65 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
 
-    $(document).ready(function () {
-        // 이미지 삭제버튼을 클릭했을 때
-        $(".deleteBtn").on('click', function () {
+        $(document).ready(function () {
+            // 이미지 삭제버튼을 클릭했을 때
+            $(".deleteBtn").on('click', function () {
 
-            var idx = this.value;
+                var idx = this.value;
 
-            $.ajax({
-                url: "/images/delete",
-                type: 'GET',
-                data: {
-                    idx: idx                        // 전달값 : 값
-                },
-                success: function (response) {      // 작업 성공시
-                    Swal.fire({
-                        icon: null,
-                        text: "이미지를 삭제하였습니다",
-                        customClass: {
-                            container: 'bootstrap-swal-container',
-                            popup: 'card shadow-sm',
-                            title: 'h4 text-success',
-                            content: 'text-dark',
-                        },
-                        showConfirmButton: false,
-                        timer: 2000,
-                        willOpen: () => {
-                            Swal.showLoading();
-                        },
-                        buttonsStyling: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false
-                    }).then(() => {
-                        location.reload();          // 현재 목록페이지를 다시 읽어온다.
-                    });
-                },
-                error: function () {                // 작업 실패시
-                    Swal.fire({
-                        icon: null,
-                        text: "이미지 삭제를 실패하였습니다",
-                        customClass: {
-                            container: 'bootstrap-swal-container',
-                            popup: 'card shadow-sm',
-                            title: 'h4 text-success',
-                            content: 'text-dark',
-                        },
-                        showConfirmButton: false,
-                        timer: 2000,
-                        willOpen: () => {
-                            Swal.showLoading();
-                        },
-                        buttonsStyling: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false
-                    });
-                }
+                $.ajax({
+                    url: "/images/delete",
+                    type: 'GET',
+                    data: {
+                        idx: idx                        // 전달값 : 값
+                    },
+                    success: function (response) {      // 작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "이미지를 삭제하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        }).then(() => {
+                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function () {                // 작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "이미지 삭제를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
             });
         });
-    });
     </script>
 </th:block>
 </body>

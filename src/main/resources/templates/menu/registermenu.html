@@ -18,18 +18,22 @@
         <div class="col-2"></div>
         <div class="col-8">
             <form th:action="@{/admin/menu/registermenu}" method="post" enctype="multipart/form-data" onsubmit="validateForm(event)">
-            <!--디자인-->
+                <!--디자인-->
                 <div class="card">
                     <div class="card-body">
                         <h2>메뉴 등록</h2>
                     </div>
+
+                    <!-- url에서 가져온 organIdx값을 담아둘 input태그 -->
+                    <input type="hidden" id="organIdxInput" name="organ.idx">
+
                     <!--id와 name은 DTO에 변수명으로 작업-->
                     <div class="card-body">
                         <!--현재 로그인한 관리자의 조직 정보-->
-                        <label for="organ3" class="form-label">123</label>
-                        <input type="text" id="organ3" name="organ_idx" th:value="${organizationDTO.idx}" th:text="${organizationDTO.idx}">
-                        <label for="organ2" class="form-label">456</label>
-                        <input type="text" id="organ2" name="shop_detail_idx" th:value="${shopDetailDTO.idx}" th:text="${shopDetailDTO.idx}">
+                        <label for="organ3" class="form-label">조직 정보</label>
+                        <input type="text" id="organ3" name="organ_idx" th:value="${organizationDTO.idx}" >
+                        <label for="organ2" class="form-label">매장정보</label>
+                        <input type="text" id="organ2" name="shop_detail_idx" th:value="${shopDetailDTO.idx}">
 
                         <!-- 조직 정보 표시 (읽기 전용) -->
                         <div class="form-group">
@@ -166,10 +170,7 @@
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary">등록</button>
                                 <button type="reset" class="btn btn-secondary">초기화</button>
-                                <button type="button" class="btn btn-danger"
-                                        th:data-organ-idx="${shopDetailDTO.organizationJoin.idx}"
-                                        th:onclick="|location.href='/admin/menu/adlistmenu?organIdx=' + ${shopDetailDTO.organizationJoin.idx}|">
-                                    목록으로</button>
+                                <a type="button" class="btn btn-danger" href="#" id="moveButton">목록으로</a>
                             </div>
                         </th:block>
                     </div>
@@ -177,6 +178,35 @@
             </form>
             <!--이미지 미리보기를 위한 함수-->
             <script th:inline="javascript">
+
+                // 등록 버튼 클릭 시 동작하는 함수
+                document.getElementById('moveButton').addEventListener('click', function(event) {
+                    event.preventDefault();  // 기본 링크 이동을 막음 (동적으로 href를 설정하기 위해)
+
+                    // input 값 읽어오기
+                    const organIdx = document.getElementById('organIdxInput').value;
+
+                    // 만약 input 값이 비어 있지 않다면, 해당 값을 링크의 href에 추가
+                    if (organIdx) {
+                        const newUrl = `/admin/menu/adlistmenu?organIdx=${encodeURIComponent(organIdx)}`;
+                        window.location.href = newUrl;  // 페이지 이동
+                    } else {
+                        alert('값을 입력해주세요!');
+                    }
+                });
+
+                // ========================
+
+                // 현재 페이지 URL에서 쿼리 파라미터를 가져오는 코드
+                const urlParams = new URLSearchParams(window.location.search);
+                const organIdx = urlParams.get('organIdx');  // 쿼리 파라미터 'idx' 값을 가져옴
+
+                // 'organIdx' 값을 input 태그에 자동으로 채움
+                if (organIdx) {
+                    document.getElementById('organIdxInput').value = organIdx;
+                }
+
+
                 // 이미지 미리보기 함수
                 function previewImage(event, inputId) {
                     console.log("수정 진입");

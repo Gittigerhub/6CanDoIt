@@ -218,6 +218,7 @@ public class OfficeController {
 
     }
 
+    // 모달로 조직 등록
     @PostMapping("/organ/register")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
     public ResponseEntity<String> register(@ModelAttribute OrganizationDTO organizationDTO, List<MultipartFile> imageFiles) {
@@ -268,6 +269,7 @@ public class OfficeController {
 
     }
 
+    // 조직 상세보기
     @GetMapping("/organ")
     public String organDetail(Integer idx, Model model) {
 
@@ -349,10 +351,10 @@ public class OfficeController {
                                                    List<MultipartFile> imageFiles, Integer organIdx){
         // 이미지 조회할 join
         String join = "organ";
-
+        System.out.println("체크 1");
         try {
             shopDetailService.update(shopDetailDTO, organizationDTO, join, imageFiles, organIdx);
-
+            System.out.println("체크 2");
             return  ResponseEntity.ok("수정하였습니다.");
         }catch (Exception e){
 

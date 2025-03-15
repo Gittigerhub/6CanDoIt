@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -104,7 +105,7 @@ public class EventController {
     //이벤트 자세히 보기
     @PostMapping("/event/read")
     @ResponseBody
-    public Map<String, Object> EventRead(@RequestParam Integer idx) {
+    public Map<String, Object> eventRead(@RequestParam Integer idx) {
         EventDTO eventDTO = eventService.read(idx);
         Map<String, Object> response = new HashMap<>();
         response.put("eventDTO", eventDTO);
@@ -114,7 +115,7 @@ public class EventController {
     }
 
     @GetMapping("/eventread")
-    public String eventRead(Integer idx, Model model) {
+    public String read(Integer idx, Model model) {
 
         EventDTO eventDTORead = eventService.read(idx);
 
@@ -127,10 +128,10 @@ public class EventController {
     //이벤트 수정
     @PostMapping("/event/update")
     @ResponseBody
-    public ResponseEntity<String> EventUpdate(@ModelAttribute EventDTO eventDTO) {
+    public ResponseEntity<String> EventUpdate(@ModelAttribute EventDTO eventDTO, List<MultipartFile> Files) {
         //System.out.println(eventDTO.toString());
         try {
-            eventService.update(eventDTO);
+            eventService.update(eventDTO, Files);
             //System.out.println("수정성5공!!!");
 
             return ResponseEntity.ok("수정을 성공하였습니다.");
@@ -154,9 +155,9 @@ public class EventController {
     }
 
     @PostMapping("/eventupdate")
-    public String eventUpdatePost(@ModelAttribute EventDTO eventDTO) {
+    public String eventUpdatePost(@ModelAttribute EventDTO eventDTO ,List<MultipartFile> Files) {
         try {
-            eventService.update(eventDTO);
+            eventService.update(eventDTO,Files);
         } catch (Exception e) {
             System.out.println("수정 오류:" + e.getMessage());
         }

@@ -9,6 +9,7 @@ import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.menu.MenuService;
+import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.service.office.ShopDetailService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.persistence.EntityNotFoundException;
@@ -52,14 +53,20 @@ public class AdminMenuController {
     private final MenuService menuService;
     private final ImageFileService imageFileService;
     private final ShopDetailService shopDetailService;
+    private final OrganizationService organizationService;
 
     //아이템 등록
     @GetMapping("/menu/registermenu")
-    public String registerMenu(Model model, Principal principal) {
+    public String registerMenu(Model model, Principal principal, String organIdx) {
         if (principal == null) {
             //로그인이 안되어 있으면, 접근 불가능하도록
             return "redirect:/login";
         }
+
+        System.out.println(organIdx);
+        // String -> Integer로 변환
+        Integer idx = Integer.parseInt(organIdx);  // 또는 Integer.valueOf(organIdxStr);
+
         System.out.println("이메일 : " + principal.getName());
         try {
             // SecurityContextHolder에서 현재 인증된 사용자 정보 가져오기
@@ -73,35 +80,55 @@ public class AdminMenuController {
 
                 System.out.println("지나감 2");
 
-                // 관리자의 조직 정보 가져오기
-                OrganizationEntity organizationEntity = adminEntity.getOrganizationJoin();
+//                // 관리자의 조직 정보 가져오기
+//                OrganizationEntity organizationEntity = adminEntity.getOrganizationJoin();
+//
+//                System.out.println("지나감 3");
 
-                System.out.println("지나감 3");
+//                // DTO로 변환
+//                OrganizationDTO organizationDTO = modelMapper.map(organizationEntity, OrganizationDTO.class);
+//
+//                System.out.println("지나감 4");
 
-                // DTO로 변환
-                OrganizationDTO organizationDTO = modelMapper.map(organizationEntity, OrganizationDTO.class);
+                // 조직 정보로 매장 정보 조회
+                ShopDetailDTO shopDetailDTO = shopDetailService.findOrgan(idx);
 
-                System.out.println("지나감 4");
+                System.out.println("지나감 5");
 
-                if (organizationDTO != null) {
-                    // 조직 정보로 매장 정보 조회
-                    ShopDetailDTO shopDetailDTO = shopDetailService.findOrgan(9);
-
-                    System.out.println("지나감 5");
-
-                    if (shopDetailDTO != null) {
-                        // 모델에 필요한 정보 추가
-                        model.addAttribute("shopDetailDTO", shopDetailDTO);
-                    }
-
-                    System.out.println("지나감 6");
-
+                if (shopDetailDTO != null) {
                     // 모델에 필요한 정보 추가
-                    model.addAttribute("organizationDTO", organizationDTO);
-
-                } else {
-                    System.out.println("organizationDTO가 NULL이야 ");
+                    model.addAttribute("shopDetailDTO", shopDetailDTO);
                 }
+
+                System.out.println("지나감 6");
+
+                // idx로 조회한 조직컬럼의 hotels_idx(FK)가 있는걸 찾아오기
+
+                // 매장이 등록된 조직정보 조회
+                OrganizationEntity organization = organizationService.findById(idx)
+                        .orElseThrow(() -> new RuntimeException("매장을 조회할 수 없습니다."));
+
+                System.out.println("지나감 7");
+                System.out.println("organization : " + organization.toString());
+                System.out.println("organization : " + organization.getHotels());
+                System.out.println("organization : " + organization.getHotels().getIdx());
+
+                // 조직정보 조회
+                OrganizationEntity organ = organizationService.findById(organization.getHotels().getIdx())
+                        .orElseThrow(() -> new RuntimeException("조직을 조회할 수 없습니다."));
+
+                System.out.println("지나감 8");
+                System.out.println("organ : " + organ.toString());
+                System.out.println("organ : " + organ.getIdx());
+
+                // Entity -> DTO
+                OrganizationDTO organizationDTO = modelMapper.map(organ, OrganizationDTO.class);
+
+                System.out.println("지나감 9");
+                System.out.println("organizationDTO : " + organizationDTO.toString());
+
+                // 모델에 필요한 정보 추가
+                model.addAttribute("organizationDTO", organizationDTO);
 
             }
         } catch (Exception e) {
@@ -143,7 +170,7 @@ public class AdminMenuController {
 
                 if (contentType == null || !contentType.startsWith("image")) {
                     model.addAttribute("msg", "이미지 파일만 업로드 가능합니다.");
-                            return "/menu/registermenu";  //이미지 파일이 아니라면 다시 처음으로 돌아감
+                    return "/menu/registermenu";  //이미지 파일이 아니라면 다시 처음으로 돌아감
                 }
             }
         }
@@ -172,7 +199,9 @@ public class AdminMenuController {
 
     //메뉴 목록 확인
     @GetMapping("/menu/adreadmenu")
-    public String readMenu(Integer menuidx, Model model, RedirectAttributes redirectAttributes) {
+    public String readMenu(@RequestParam(required = false) Integer menuidx,
+                           @RequestParam(required = false) Integer organIdx,
+                           Model model, RedirectAttributes redirectAttributes) {
 
         // menuidx가 null인 경우 처리
         if (menuidx == null) {
@@ -199,6 +228,7 @@ public class AdminMenuController {
             //메뉴 불러오기
             log.info("menuDTO: " + menuDTO);
             model.addAttribute("menuDTO", menuDTO);
+            model.addAttribute("organIdx", organIdx);
             model.addAttribute("bucket", bucket);
             model.addAttribute("region", region);
             model.addAttribute("folder", folder);

@@ -3,9 +3,7 @@ package com.sixcandoit.roomservice.service.admin;
 import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.admin.AdminDTO;
-import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
-import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.service.EmailService;
 import lombok.RequiredArgsConstructor;
@@ -174,48 +172,37 @@ public class AdminService {
         return adminDTO;
     }
 
-    //임시비밀번호 발급(아이디, 회원명, 전화번호를 입력받아서 일치하면 해당 메일(아이디)로 임시비밀번호를 전송)
-    public void passwordSend(AdminDTO adminDTO) {
+    //임시비밀번호 발급(아이디, 회원명을 입력받아서 일치하면 해당 메일(아이디)로 임시비밀번호를 전송)
+    public boolean passwordSend(AdminDTO adminDTO) {
         try { //서버가 멈추는 것을 예방
             Optional<AdminEntity> read = adminRepository.findByAdminEmail(adminDTO.getAdminEmail()); //조회
             if (!read.isPresent()) { //일치하는 회원이 없으면
+                log.info("에러1");
                 throw new IllegalStateException("일치하는 회원이 존재하지 않습니다.");
             }
             if (!read.get().getAdminName().equals(adminDTO.getAdminName())) { //이름이 일치하지 않으면
+                log.info("에러2");
                 throw new IllegalStateException("회원이름이 일치하지 않습니다.");
             }
-//            if (!read.get().getMemberPhone().equals(memberDTO.getMemberPhone())){ //전화번호가 일치하지 않으면
-//                throw new IllegalStateException("전화번호가 일치하지 않습니다.");
-//            }
-            else {
-
                 String tempPassword = generateTempPassword(8); //임시비밀번호 생성
                 read.get().setPassword(passwordEncoder.encode(tempPassword)); //임시비밀번호를 저장
                 adminRepository.save(read.get()); //데이터베이스에 저장
 
-//            //임시비밀번호를 회원 이메일(아이디)로 전달
-//            String emailSubject = "임시비밀번호 발급"; //메일제목
-//            String emailText = "안녕하세요"+read.get().getAdminName()+"님.\n"+
-//                    "요청하신 임시 비밀번호는 다음과 같습니다.\n"+
-//                    tempPassword+"\n"+
-//                    "로그인 후 반드시 비밀번호를 변경해 주십시오."; //본문내용
-
                 String message = emailService.getTempEmailHTML(tempPassword, 1);
                 String to = read.get().getAdminEmail();
                 String subject = "임시 비밀번호 발급";
+
                 log.info(message);
-
-
                 emailService.sendEmail(to, subject, message);
-            }
+                return true;
 
         } catch (IllegalStateException e) { //상태오류(데이터베이스 처리 실패시)
             //e.getMessage() 오류메세지
             System.out.println("회원 가입을 실패하였습니다." + e.getMessage());
-            throw e; //호출한 곳으로 돌아간다.(return)
+            return false;
         } catch (Exception e) { //비정상적인 처리(오류발생)
             System.out.println("예기치 않은 문제가 발생하였습니다." + e.getMessage());
-            throw new RuntimeException("가입 중 오류가 발생하였습니다."); //사용자가 오류처리
+            return false;
         }
     }
 

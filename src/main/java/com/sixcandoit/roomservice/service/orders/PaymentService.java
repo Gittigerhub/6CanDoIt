@@ -12,11 +12,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +62,7 @@ public class PaymentService {
     }
 
     // 결제 취소
-    public PaymentDTO cancelPayment(Integer idx) {
+    public PaymentDTO cancelPayment(Integer idx, String payment) {
         log.info("결제 취소를 처리합니다. idx: " + idx);
         PaymentEntity paymentEntity = paymentRepository.findById(idx)
                 .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다. idx: " + idx));
@@ -197,7 +193,7 @@ public class PaymentService {
     }
 
     // 환불 처리 (구현 필요)
-    private void processRefund(PaymentEntity paymentEntity) {
+    public void processRefund(PaymentEntity paymentEntity) {
         // TODO: 실제 환불 처리 로직 구현
         log.info("환불 처리를 시작합니다. paymentIdx: " + paymentEntity.getIdx());
     }
@@ -251,5 +247,6 @@ public class PaymentService {
 
     public String getPaymentStatus(Integer idx) {
         return "";
+
     }
 }

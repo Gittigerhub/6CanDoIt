@@ -40,6 +40,12 @@ public class ReservationController {
     private final ImageFileService imageFileService;
     private final MemberService memberService;
 
+    /* -----------------------------------------------------------------------------
+       경로 : /res/create
+       인수 : Model model
+       출력 : 예약 등록 폼으로 이동
+       설명 : 예약 등록 폼을 로드하기 위해 모든 객실 정보를 조회하고 모델에 담아 뷰로 전달
+    ----------------------------------------------------------------------------- */
     //등록폼으로 이동
     @GetMapping("/create")
     public String createForm(Model model) {
@@ -58,6 +64,13 @@ public class ReservationController {
         return "reserve/insert"; // Insert.html 뷰 템플릿을 찾아서 렌더링
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /res/updateStatus/{idx}
+       인수 : Integer idx, Map<String, String> requestBody
+       출력 : 상태 업데이트 후 성공 여부를 JSON 형식으로 반환
+       설명 : 예약의 상태를 업데이트하고 성공 여부를 JSON 형태로 반환
+   ----------------------------------------------------------------------------- */
     @PostMapping("/updateStatus/{idx}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateResStatus(@PathVariable Integer idx, @RequestBody Map<String, String> requestBody) {
@@ -79,6 +92,13 @@ public class ReservationController {
         return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : 예외 처리기
+       인수 : RuntimeException e, RedirectAttributes redirectAttributes
+       출력 : 예외 발생 시 알림 메시지를 리다이렉트로 전달
+       설명 : RuntimeException 예외가 발생했을 때 알림 메시지를 설정하고, 예약 등록 페이지로 리다이렉트
+   ----------------------------------------------------------------------------- */
     // 예외 발생 시 에러 메시지 전달
     @ExceptionHandler(RuntimeException.class)
     public String handleException(RuntimeException e, RedirectAttributes redirectAttributes) {
@@ -87,6 +107,12 @@ public class ReservationController {
         return "redirect:/res/create"; // 예약 등록 페이지로 리다이렉트
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /res/create
+       인수 : ReservationDTO reservationDTO, RedirectAttributes redirectAttributes, Principal principal
+       출력 : 예약 생성 후 결제 페이지로 리다이렉트
+       설명 : 예약 정보를 저장하고, 결제 페이지로 리다이렉트
+    ----------------------------------------------------------------------------- */
     //등폭폼에서 입력한 내용을 저장
     @PostMapping("/create")
     public String createPage(@ModelAttribute ReservationDTO reservationDTO,
@@ -103,18 +129,18 @@ public class ReservationController {
 
             // 예약 정보 저장
             ReservationDTO savedReservation = reservationService.reserveInsert(reservationDTO);
-            
+
             // 룸 정보 조회하여 가격 정보 가져오기
             RoomEntity room = roomRepository.findById(reservationDTO.getRoomIdx())
-                .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
-            
+                    .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
+
             // 결제 페이지로 리다이렉트
             redirectAttributes.addAttribute("amount", room.getRoomPrice());
             redirectAttributes.addAttribute("orderId", "ROOM_" + savedReservation.getIdx());
             redirectAttributes.addAttribute("reservationId", savedReservation.getIdx());
-            
+
             return "redirect:/orders/payment/checkout";
-            
+
         } catch (RuntimeException e) {
             log.error("예약 처리 중 오류 발생: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -122,17 +148,24 @@ public class ReservationController {
         }
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /res/create/ajax
+       인수 : ReservationDTO reservationDTO, Principal principal
+       출력 : AJAX 요청에 대한 예약 결과 반환
+       설명 : AJAX 방식으로 예약을 처리하고, 성공/실패 메시지를 반환
+   ----------------------------------------------------------------------------- */
     // AJAX 예약 요청을 처리하는 새로운 엔드포인트
     @PostMapping("/create/ajax")
     @ResponseBody
     public ResponseEntity<?> createReservationAjax(@RequestBody ReservationDTO reservationDTO,
-                                                 Principal principal) {
+                                                   Principal principal) {
         log.info("AJAX 예약 요청 처리 시작.... reservationDTO: {}", reservationDTO);
 
         try {
             if (principal == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("message", "로그인이 필요합니다."));
+                        .body(Collections.singletonMap("message", "로그인이 필요합니다."));
             }
 
             // 현재 로그인한 사용자 정보 설정
@@ -142,29 +175,35 @@ public class ReservationController {
             reservationDTO.setUsername(memberDTO.getMemberName());
 
             ReservationDTO savedReservation = reservationService.reserveInsert(reservationDTO);
-            
+
             if (savedReservation != null) {
                 // 룸 정보 조회하여 가격 정보 가져오기
                 RoomEntity room = roomRepository.findById(reservationDTO.getRoomIdx())
-                    .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
-                
+                        .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("message", "예약이 완료되었습니다.");
                 response.put("reservationId", savedReservation.getIdx());
                 response.put("totalAmount", room.getRoomPrice());
-                
+
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.badRequest()
-                    .body(Collections.singletonMap("message", "예약 처리 중 오류가 발생했습니다."));
+                        .body(Collections.singletonMap("message", "예약 처리 중 오류가 발생했습니다."));
             }
         } catch (RuntimeException e) {
             log.error("예약 처리 중 오류 발생: {}", e.getMessage());
             return ResponseEntity.badRequest()
-                .body(Collections.singletonMap("message", e.getMessage()));
+                    .body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /res/available
+       인수 : LocalDate startDate, LocalDate endDate, Integer organ_idx
+       출력 : 빈 객실 목록을 JSON 형식으로 반환
+       설명 : 주어진 날짜 범위와 조직 ID에 맞는 빈 객실 목록을 조회하여 반환
+    ----------------------------------------------------------------------------- */
     // 빈 객실 목록 조회
     @GetMapping("/available")
     @ResponseBody
@@ -172,13 +211,13 @@ public class ReservationController {
             @RequestParam("startDate") LocalDate startDate,
             @RequestParam("endDate") LocalDate endDate,
             @RequestParam("organ_idx") Integer organ_idx) {
-        
+
         log.info("빈 객실 목록 조회... organization: {}, startDate: {}, endDate: {}", organ_idx, startDate, endDate);
 
         try {
             // 빈 객실 목록을 조회 (organization_idx 기준)
             List<RoomEntity> availableRooms = reservationService.getAvailableRooms(organ_idx, startDate, endDate);
-            
+
             // Entity를 DTO로 변환
             List<RoomDTO> roomDTOs = availableRooms.stream()
                     .map(room -> modelMapper.map(room, RoomDTO.class))
@@ -203,13 +242,19 @@ public class ReservationController {
         }
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /res/list
+       인수 : Integer organ_idx, LocalDate sdate, LocalDate edate, Model model, Principal principal
+       출력 : 예약 목록 페이지로 이동
+       설명 : 사용자의 예약 목록을 조회하여 페이지로 전달
+    ----------------------------------------------------------------------------- */
     //목록페이지로 이동
     @GetMapping("/list")
     public String getAllPages(@RequestParam(name = "organ_idx", required = false) Integer organ_idx,
-                            @RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
-                            @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
-                            Model model,
-                            Principal principal) {
+                              @RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
+                              @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
+                              Model model,
+                              Principal principal) {
         log.info("데이터 조회 후 목록페이지로 이동....");
 
         // 리다이렉트 후 전달된 성공 또는 실패 메시지를 받아옵니다.
@@ -321,7 +366,7 @@ public class ReservationController {
             ReservationDTO reservationDTO = reservationService.reserveRead(idx);
             if (reservationDTO == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("message", "예약을 찾을 수 없습니다."));
+                        .body(Collections.singletonMap("message", "예약을 찾을 수 없습니다."));
             }
 
             // 예약 취소 처리
@@ -329,7 +374,7 @@ public class ReservationController {
 
             // 룸 상태 업데이트
             RoomEntity room = roomRepository.findById(reservationDTO.getRoomIdx())
-                .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new RuntimeException("객실을 찾을 수 없습니다."));
             room.setResStatus("1"); // 빈 방으로 상태 변경
             roomRepository.save(room);
 
@@ -337,7 +382,7 @@ public class ReservationController {
         } catch (Exception e) {
             log.error("예약 취소 중 오류 발생: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Collections.singletonMap("message", "예약 취소 중 오류가 발생했습니다."));
+                    .body(Collections.singletonMap("message", "예약 취소 중 오류가 발생했습니다."));
         }
     }
 }

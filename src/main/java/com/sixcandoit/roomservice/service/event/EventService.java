@@ -144,12 +144,11 @@ public class EventService {
     출력 : 없음
     설명 : 이벤트 정보를 수정할때 사용;
   ---------------------------------------------------*/
-    public void update(EventDTO eventDTO) {
+    public void update(EventDTO eventDTO, List<MultipartFile> imageFiles) {
 
 
         try {
             Optional<EventEntity> read = eventRepository.findById(eventDTO.getIdx());
-            List<ImageFileDTO> imageFileDTOList = imageFileService.readImage(eventDTO.getIdx(), "event");
             List<MultipartFile> imgFile = eventDTO.getFiles();
 
             // 빈 파일 제거 후 유효한 파일 리스트만 남김
@@ -157,6 +156,7 @@ public class EventService {
             List<MultipartFile> validImageFiles = imgFile.stream()
                     .filter(file -> file != null && !file.isEmpty()) // 비어 있지 않은 파일만 필터링
                     .collect(Collectors.toList());
+
             System.out.println("유효한 이미지 파일 개수: " + validImageFiles.size());
 
 
@@ -167,9 +167,9 @@ public class EventService {
                 EventEntity eventEntity = modelMapper.map(eventDTO, EventEntity.class);
                 System.out.println("변환까지");
 
-                System.out.println("이벤트 사진:" + imageFileDTOList);
 
 
+                /*
                 if (!eventDTO.getFiles().getFirst().isEmpty() && !eventDTO.getFiles().getLast().isEmpty()) {
                     if (imageFileDTOList.isEmpty()) {
                         System.out.println("둘다 없을때");
@@ -216,12 +216,31 @@ public class EventService {
                     eventEntity.updateImages(images);
 
 
+                }*/
+
+
+                // 이미지 추가 등록
+                log.info("수정 이미지 추가를 진행");
+                List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, "event", eventEntity.getIdx());
+                // 이미지 정보 추가
+                // 양방향 연관관계 편의 메서드 사용
+                if (images != null && !images.isEmpty()) {
+                    log.info("새로운 이미지가 등록되었습니다.");
+                    for (ImageFileEntity image : images) {
+                        eventEntity.addImage(image);  // FK 자동 설정
+                    }
+                } else {
+                    log.warning("이미지가 없거나 저장 실패.");
                 }
+                //--------------------------------------------------------------//
+
+                // 저장
+                eventRepository.save(eventEntity);
+
                 System.out.println("게시글 저장중1");
 
 
-                // FK 자동 설정
-                eventRepository.save(eventEntity);
+
 
                 System.out.println("게시글 저장 완료");
             }

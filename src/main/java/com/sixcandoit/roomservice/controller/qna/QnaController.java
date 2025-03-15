@@ -4,7 +4,6 @@ import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
-import com.sixcandoit.roomservice.repository.qna.QnaRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.service.qna.ReplyService;
@@ -37,8 +36,13 @@ public class QnaController {
     private final ImageFileService imageFileService;
     private final ReplyService replyService;
     private final ModelMapper modelMapper;
-    private final QnaRepository qnaRepository;
 
+    /* -----------------------------------------------------------------------------
+       경로 : /qna/list
+       인수 : Pageable page, String type, String keyword, Model model
+       출력 : QnA 사용자 Q 전체 출력
+       설명 : QnA 사용자 페이지, QnA를 가져온다
+   ----------------------------------------------------------------------------- */
     // Qna의 Q 전체 목록, 페이지, 키워드로 분류 검색
     // 페이지 번호를 받아서 해당 페이지의 데이터 조회하여 목록 페이지로 전달
     @GetMapping("/qna/list")
@@ -60,6 +64,13 @@ public class QnaController {
         return "qna/list";
     }
 
+    /* -----------------------------------------------------------------------------
+   경로 : /qna/qnalist
+   인수 : Pageable page, String type, String keyword, CustomUserDetails userDetails,
+          Model model, RedirectAttributes redirectAttributes
+   출력 : 관리자용 QnA 목록 출력
+   설명 : 관리자 권한 확인 후 QnA 목록을 출력하며, 필터링된 목록을 제공한다.
+----------------------------------------------------------------------------- */
     // 관리자용 QnA 전체 목록 페이지
     @GetMapping("/qna/qnalist")
     public String qnalist(@PageableDefault(page = 1) Pageable page,
@@ -111,6 +122,12 @@ public class QnaController {
         return "qna/qnalist";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /qna/register
+       인수 : CustomUserDetails userDetails, Model model
+       출력 : QnA 등록 페이지
+       설명 : 로그인한 사용자가 QnA를 등록할 수 있는 페이지로 이동
+   ----------------------------------------------------------------------------- */
     // Qna의 Q 등록
     @GetMapping("/qna/register")
     public String register(@AuthenticationPrincipal CustomUserDetails userDetails, Model model){
@@ -130,6 +147,14 @@ public class QnaController {
         return "qna/register";
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /qna/register
+       인수 : QnaDTO qnaDTO, BindingResult bindingResult, List<MultipartFile> imageFiles,
+              CustomUserDetails userDetails
+       출력 : QnA 등록 처리 후 목록 페이지로 리다이렉트
+       설명 : QnA 게시글을 등록하고, 이미지 파일을 함께 업로드하여 QnA 목록 페이지로 리다이렉트
+   ----------------------------------------------------------------------------- */
     // Qna의 Q 등록 저장 처리
     @PostMapping("/qna/register")
     public String registerProc(@Valid @ModelAttribute QnaDTO qnaDTO,
@@ -166,6 +191,12 @@ public class QnaController {
         }
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /qna/read
+       인수 : Integer idx, Model model, CustomUserDetails userDetails, RedirectAttributes redirectAttributes
+       출력 : QnA 게시글 상세 페이지
+       설명 : 특정 QnA 게시글을 조회하고, 조회수 및 관련 이미지를 함께 표시
+    ----------------------------------------------------------------------------- */
     // Qna의 Q 읽기
     @GetMapping("/qna/read")
     public String read(@RequestParam Integer idx, Model model,
@@ -220,6 +251,13 @@ public class QnaController {
         return "qna/read";
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /qna/adminread
+       인수 : Integer idx, Model model, CustomUserDetails userDetails, RedirectAttributes redirectAttributes
+       출력 : 관리자용 QnA 게시글 상세 페이지
+       설명 : 관리자가 특정 QnA 게시글을 조회할 수 있는 페이지. 관리자만 접근 가능
+   ----------------------------------------------------------------------------- */
     // 관리자용 Qna 읽기
     @GetMapping("/qna/adminread")
     public String adminread(@RequestParam Integer idx, Model model,
@@ -278,6 +316,13 @@ public class QnaController {
         return "qna/adminread";
     }
 
+    /* -----------------------------------------------------------------------------
+        경로 : /qna/update
+        인수 : Integer idx, Model model, CustomUserDetails userDetails, RedirectAttributes redirectAttributes
+        출력 : QnA 게시글 수정 페이지
+        설명 : 로그인된 사용자가 자신의 QnA 게시글을 수정할 수 있는 페이지로 이동.
+                관리자 권한을 가진 사용자는 모든 게시글 수정 가능.
+    ----------------------------------------------------------------------------- */
     // Qna의 Q 수정할 게시글 수정하기
     @GetMapping("/qna/update")
     public String update(@RequestParam Integer idx, Model model,
@@ -323,6 +368,13 @@ public class QnaController {
         return "qna/update";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /qna/update
+       인수 : QnaDTO qnaDTO, String join, List<MultipartFile> imageFiles,
+              CustomUserDetails userDetails, RedirectAttributes redirectAttributes
+       출력 : 수정된 QnA 게시글 저장 후 상세 페이지로 리다이렉트
+       설명 : 사용자가 수정한 QnA 게시글을 저장하고, 저장 후 해당 게시글 상세 페이지로 이동
+    ----------------------------------------------------------------------------- */
     // Qna의 Q 수정 저장 처리
     @PostMapping("/qna/update")
     public String updateProc(@ModelAttribute QnaDTO qnaDTO,
@@ -377,6 +429,13 @@ public class QnaController {
         }
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /qna/delete
+       인수 : Integer idx, CustomUserDetails userDetails, RedirectAttributes redirectAttributes
+       출력 : QnA 게시글 삭제 처리 후 목록 페이지로 리다이렉트
+       설명 : QnA 게시글을 삭제하며, 관리자 또는 작성자 본인만 삭제 가능
+   ----------------------------------------------------------------------------- */
     // Qna의 Q 삭제
     @GetMapping("/qna/delete")
     public String delete(@RequestParam Integer idx,
@@ -464,6 +523,12 @@ public class QnaController {
         }
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /qna/favYn/update
+       인수 : Integer idx, String favYn
+       출력 : QnA 게시글 즐겨찾기 상태 변경 후 상세 페이지로 리다이렉트
+       설명 : QnA 게시글의 즐겨찾기 상태를 변경 (등록/해제)하고, 상세 페이지로 리다이렉트
+   ----------------------------------------------------------------------------- */
     // 자주 묻는 질문을 등록 및 해제
     @GetMapping("/qna/favYn/update")
     public String updateFavYn(@RequestParam Integer idx, @RequestParam String favYn) {
@@ -471,6 +536,12 @@ public class QnaController {
         return "redirect:/qna/adminread?idx=" + idx; // 상세 페이지로 리다이렉트
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : 예외 처리기
+       인수 : RuntimeException e, RedirectAttributes redirectAttributes
+       출력 : 예외 발생 시 알림 메시지를 리다이렉트로 전달
+       설명 : RuntimeException 예외가 발생했을 때 알림 메시지를 설정하고, 목록 페이지로 리다이렉트
+   ----------------------------------------------------------------------------- */
     // 예외 처리기 추가
     @ExceptionHandler(RuntimeException.class)
     public String handleRuntimeException(RuntimeException e, RedirectAttributes redirectAttributes) {

@@ -30,6 +30,12 @@ public class NoticeController {
     private final ImageFileService imageFileService;
     private final ModelMapper modelMapper;
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/list
+        인수 : Pageable page, String type, String keyword, Model model
+        출력 : 관리자용, 사용자용 공지사항 목록
+        설명 : 관리자용 및 사용자용 공지사항을 페이지네이션을 통해 출력
+    -------------------------------------------------------------------------- */
     @GetMapping("/notice/list")
     public String list(@PageableDefault(page = 1) Pageable page,
                        @RequestParam(value = "type", defaultValue = "") String type,
@@ -40,11 +46,11 @@ public class NoticeController {
         Page<NoticeDTO> adminNoticeDTOS = noticeService.getNoticeListByType(page, type, keyword, "ADMIN");
         // 사용자용 공지사항 목록도 함께 보여줌
         Page<NoticeDTO> userNoticeDTOS = noticeService.getNoticeListByType(page, type, keyword, "USER");
-        
-        log.info("관리자 공지 개수: {}, 사용자 공지 개수: {}", 
-            adminNoticeDTOS.getTotalElements(), 
-            userNoticeDTOS.getTotalElements());
-        
+
+        log.info("관리자 공지 개수: {}, 사용자 공지 개수: {}",
+                adminNoticeDTOS.getTotalElements(),
+                userNoticeDTOS.getTotalElements());
+
         Map<String, Integer> adminPageInfo = PageNationUtil.Pagination(adminNoticeDTOS);
         Map<String, Integer> userPageInfo = PageNationUtil.Pagination(userNoticeDTOS);
 
@@ -58,17 +64,23 @@ public class NoticeController {
         return "notice/list";
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/userlist
+        인수 : Pageable page, String type, String keyword, Model model
+        출력 : 사용자용 공지사항 목록
+        설명 : 사용자용 공지사항만 조회하고 페이지네이션을 적용하여 출력
+    -------------------------------------------------------------------------- */
     @GetMapping("/notice/userlist")
     public String userList(@PageableDefault(page = 1) Pageable page,
-                           @RequestParam(value = "type",defaultValue = "")String type,
-                           @RequestParam(value = "keyword",defaultValue = "")String keyword,
+                           @RequestParam(value = "type", defaultValue = "") String type,
+                           @RequestParam(value = "keyword", defaultValue = "") String keyword,
                            Model model) {
         log.info("사용자 목록 조회 - type: {}, keyword: {}", type, keyword);
         // 사용자용 공지사항만 조회
         Page<NoticeDTO> noticeDTOS = noticeService.getNoticeListByType(page, type, keyword, "USER");
         log.info("조회된 사용자 공지 개수: {}", noticeDTOS.getTotalElements());
-        
-        Map<String,Integer> pageInfo = PageNationUtil.Pagination(noticeDTOS);
+
+        Map<String, Integer> pageInfo = PageNationUtil.Pagination(noticeDTOS);
 
         model.addAttribute("noticeDTO", noticeDTOS);
         model.addAttribute("type", type);
@@ -78,6 +90,12 @@ public class NoticeController {
         return "notice/userlist";
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/read
+        인수 : Integer idx, Model model
+        출력 : 공지사항 상세 페이지
+        설명 : 공지사항 상세 정보를 조회하고, 대표 이미지 여부와 함께 출력
+    -------------------------------------------------------------------------- */
     @GetMapping("/notice/read")
     public String read(@RequestParam("idx") Integer idx, Model model) {
         noticeService.count(idx);
@@ -93,6 +111,12 @@ public class NoticeController {
         return "notice/read";
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/userread
+        인수 : Integer idx, Model model
+        출력 : 사용자용 공지사항 상세 페이지
+        설명 : 사용자용 공지사항 상세 정보를 조회하고, 대표 이미지 여부와 함께 출력
+    -------------------------------------------------------------------------- */
     @GetMapping("/notice/userread")
     public String userRead(@RequestParam("idx") Integer idx, Model model) {
         noticeService.count(idx);
@@ -107,12 +131,24 @@ public class NoticeController {
         return "notice/userread";
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/register
+        인수 : Model model
+        출력 : 공지사항 등록 페이지
+        설명 : 공지사항 등록 페이지로 이동
+    -------------------------------------------------------------------------- */
     @GetMapping("/notice/register")
     public String register(Model model) {
         model.addAttribute("noticeDTO", new NoticeDTO());
         return "notice/register";
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/register (POST)
+        인수 : NoticeDTO noticeDTO, BindingResult bindingResult, List<MultipartFile> imageFiles
+        출력 : 공지사항 등록 후 목록 페이지로 리디렉션
+        설명 : 공지사항 등록 처리 후 공지사항 목록 페이지로 이동
+    -------------------------------------------------------------------------- */
     @PostMapping("/notice/register")
     public String registerProc(@Valid @ModelAttribute NoticeDTO noticeDTO,
                                BindingResult bindingResult,
@@ -129,6 +165,12 @@ public class NoticeController {
         return "redirect:/notice/list";
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/update
+        인수 : Integer idx, Model model
+        출력 : 공지사항 수정 페이지
+        설명 : 공지사항 수정 페이지로 이동
+    -------------------------------------------------------------------------- */
     @GetMapping("/notice/update")
     public String update(@RequestParam("idx") Integer idx, Model model) {
         NoticeDTO noticeDTO = noticeService.noticeRead(idx);
@@ -137,16 +179,22 @@ public class NoticeController {
         return "notice/update";
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/update (POST)
+        인수 : NoticeDTO noticeDTO, String join, List<MultipartFile> imageFiles
+        출력 : 공지사항 수정 후 상세 페이지로 리디렉션
+        설명 : 공지사항 수정 후 수정된 공지사항 상세 페이지로 이동
+    -------------------------------------------------------------------------- */
     @PostMapping("/notice/update")
     public String updateProc(@Valid @ModelAttribute NoticeDTO noticeDTO,
                              String join,
                              List<MultipartFile> imageFiles) {
         try {
-            log.info("공지사항 수정 시작 - 번호: {}, 제목: {}, 타입: {}", 
-                noticeDTO.getIdx(), 
-                noticeDTO.getNoticeTitle(), 
-                noticeDTO.getNoticeType());
-            
+            log.info("공지사항 수정 시작 - 번호: {}, 제목: {}, 타입: {}",
+                    noticeDTO.getIdx(),
+                    noticeDTO.getNoticeTitle(),
+                    noticeDTO.getNoticeType());
+
             if (imageFiles != null && !imageFiles.isEmpty()) {
                 MultipartFile firstFile = imageFiles.get(0);
                 log.info("0번 인덱스 파일 이름: {}", firstFile.getOriginalFilename());
@@ -160,6 +208,12 @@ public class NoticeController {
         }
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/delete/{idx}
+        인수 : Integer idx
+        출력 : 공지사항 삭제 후 목록 페이지로 리디렉션
+        설명 : 공지사항 삭제 후 목록 페이지로 리디렉션
+    -------------------------------------------------------------------------- */
     @PostMapping("/notice/delete/{idx}")
     public String delete(@PathVariable("idx") Integer idx) {
         try {
@@ -171,6 +225,12 @@ public class NoticeController {
         }
     }
 
+    /* --------------------------------------------------------------------------
+        경로 : /notice/getModelMapper
+        인수 : 없음
+        출력 : ModelMapper 객체 반환
+        설명 : ModelMapper 객체를 반환
+    -------------------------------------------------------------------------- */
     public ModelMapper getModelMapper() {
         return modelMapper;
     }

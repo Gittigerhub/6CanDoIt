@@ -15,16 +15,16 @@
 
     <!--검색 기능-->
     <form th:action="@{/event/usermemberpoint}" method="get">
-        <div class="container bg-white">
+        <div class="container p-5 bg-white">
             <div class>
                 <div class="row-6">
-                    <h3>게시글 검색</h3>
+                    <h3>유저포인트</h3>
                 </div>
             </div>
             <div class="col-12">
                 <div class="input-group mb-3">
                     <select class="form-select" id="selectBox" name="type">
-                        <option th:selected="${type==null}"></option>
+                        <option th:selected="${type==null}">선택안함</option>
                         <option value="1" th:selected="${type=='1'}">내용</option>
                         <option value="2" th:selected="${type=='2'}">기간</option>
                         <option value="3" th:selected="${type=='3'}">사용</option>
@@ -37,7 +37,7 @@
                         <input class="startDay" name="startDate" type="datetime-local">~<input class="endDay" name="endDate" type="datetime-local">
                     </th:block>
                     <th:block th:if="${type=='3'}">
-                        <select class="form-select" name="type">
+                        <select class="form-select" name="keyword">
                             <option value="N">사용가능</option>
                             <option value="Y">사용함</option>
                         </select>
@@ -51,10 +51,10 @@
 
 
     <div class="container">
-        <div class="row">
+        <div class="row p-5">
             <div class="col-12 mainTable">
                 <table class="table">
-                    <thead class="table-dark">
+                    <thead class="table">
                     <tr>
                         <th style="width: 5%">No.</th>
                         <th style="width: 20%">포인트</th>
@@ -67,7 +67,7 @@
                     <tr class="column" th:each="memberPoint:${memberPointDTO}" th:data-id="${memberPoint.idx}">
                         <td th:text="${memberPoint.idx}"></td>
                         <td th:text="${memberPoint.memberPoint}"></td>
-                        <td class="contents" th:text="${#strings.length(memberPoint.memberPointContents)>30 ? #strings.substring(memberPoint.memberPointContents,0,30)+'...':
+                        <td class="contents" th:text="${#strings.length(memberPoint.memberPointContents)>20 ? #strings.substring(memberPoint.memberPointContents,0,20)+'...':
                         memberPoint.memberPointContents}"></td>
                         <td th:text="${#temporals.format(memberPoint.memberPointStartDate, 'yy-MM-dd')}+'~'+${#temporals.format(memberPoint.memberPointEndDate, 'yy-MM-dd')}"></td>
                         <th:block th:if="${memberPoint.memberPointOperationYn.equals('N')}">

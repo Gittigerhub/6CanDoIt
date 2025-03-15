@@ -78,7 +78,7 @@ public class OrganizationEntity extends BaseEntity {
     private List<MenuEntity> menuJoin;
 
     // 룸 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "organizationJoin")
     private List<RoomEntity> roomJoin;
 
     // 광고 테이블과 1:N 매핑

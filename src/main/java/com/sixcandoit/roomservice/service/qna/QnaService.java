@@ -221,9 +221,10 @@ public class QnaService {
         int currentPage = page.getPageNumber()-1; // 화면의 페이지 번호를 db 페이지 번호로
         int pageLimit = 10; // 한 페이지를 구성하는 레코드 수
 
-        // 지정된 내용으로 페이지 정보를 재생산, 정렬 내림차순 DESC
+        // 지정된 내용으로 페이지 정보를 재생산, favYn 내림차순 우선, 그 다음 idx 내림차순
         Pageable pageable = PageRequest.of(currentPage, pageLimit,
-                Sort.by(Sort.Direction.DESC, "idx"));
+                Sort.by(Sort.Direction.DESC, "favYn")
+                    .and(Sort.by(Sort.Direction.DESC, "idx")));
 
         // 조회한 변수를 선언
         // type : 제목(1), 내용(2), 제목+내용(2), 답변만(4), 자주 묻는 질문(5), 전체(0)

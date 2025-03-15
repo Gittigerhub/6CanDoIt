@@ -43,28 +43,29 @@ public class UserMemberPointService {
                 System.out.println("서비스에 들어오는 타입:" + type);
                 if (!type.isEmpty()) {
                     switch (type) {
-                        case "1":
+                        case "1" :
                             log.info("포인트 내용으로 검색하는 중");
-                            if(keyword != null) {
-                                memberPointEntities = memberPointRepository.findByContents(keyword, pageable);
-                                break;
+                            memberPointEntities = memberPointRepository.findByContents(keyword, pageable);
+                            if(keyword==null){
+                                memberPointEntities = memberPointRepository.findAll(pageable);
                             }
+                            break;
 
-
-
-                        case "2":
+                        case "2" :
                             log.info("포인트 사용기간으로 검색하는 중");
-                            if(startDate != null && endDate != null) {
-                                memberPointEntities = memberPointRepository.findByDateRange(startDate, endDate, pageable);
-                                break;
+                            memberPointEntities = memberPointRepository.findByDateRange(startDate, endDate, pageable);
+                            if(startDate==null && endDate==null){
+                                memberPointEntities = memberPointRepository.findAll(pageable);
                             }
+                            break;
 
-                        case "3":
+                        case "3" :
                             log.info("포인트 사용가능으로 검색");
-                            if(keyword != null) {
-                                memberPointEntities = memberPointRepository.findByPointOperationYn(keyword, pageable);
-                                break;
+                            memberPointEntities = memberPointRepository.findByPointOperationYn(keyword, pageable);
+                            if(keyword==null){
+                                memberPointEntities = memberPointRepository.findAll(pageable);
                             }
+                            break;
 
                         default:
                             memberPointEntities = memberPointRepository.findAll(pageable);

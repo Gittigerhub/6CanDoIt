@@ -50,34 +50,34 @@
 
 
                 <div class="payment-details mt-4">
-                        <h5 class="mb-3">결제 정보</h5>
-                        <table class="table table-bordered">
-                            <tr>
-                                <th class="table-light" style="width: 150px;">주문 번호</th>
-                                <td th:text="${paymentDTO.orderId}">ORDER_123</td>
-                            </tr>
-                            <tr>
-                                <th class="table-light">결제 금액</th>
-                                <td>
-                                    <span class="text-primary fw-bold" th:text="${#numbers.formatInteger(paymentDTO.paymentPrice, 0, 'COMMA') + '원'}">100,000원</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="table-light">결제 상태</th>
-                                <td th:text="${paymentDTO.paymentState == 'Y' ? '결제 완료' : '결제 취소'}">결제 상태</td>
-                            </tr>
-                        </table>
-                    </div>
+                    <h5 class="mb-3">결제 정보</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th class="table-light" style="width: 150px;">주문 번호</th>
+                            <td th:text="${paymentDTO.orderId}">ORDER_123</td>
+                        </tr>
+                        <tr>
+                            <th class="table-light">결제 금액</th>
+                            <td>
+                                <span class="text-primary fw-bold" th:text="${#numbers.formatInteger(paymentDTO.paymentPrice, 0, 'COMMA') + '원'}">100,000원</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="table-light">결제 상태</th>
+                            <td th:text="${paymentDTO.paymentState == 'Y' ? '결제 완료' : '결제 취소'}">결제 상태</td>
+                        </tr>
+                    </table>
+                </div>
 
-                    <!-- 결제 취소 폼 (결제 상태가 'Y'일 때만 표시) -->
-                    <form th:if="${paymentDTO.paymentState == 'Y'}" th:action="@{/orders/payment/cancel}" method="post" class="mt-4">
-                        <input type="hidden" name="idx" th:value="${paymentDTO.idx}">
-                        <div class="d-flex justify-content-center">
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-ban me-2"></i>결제 취소하기
-                            </button>
-                        </div>
-                    </form>
+                <!-- 결제 취소 폼 (결제 상태가 'Y'일 때만 표시) -->
+                <form th:if="${paymentDTO.paymentState == 'Y'}" th:action="@{/orders/payment/cancel}" method="post" class="mt-4">
+                    <input type="hidden" name="idx" th:value="${paymentDTO.idx}">
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-ban me-2"></i>결제 취소하기
+                        </button>
+                    </div>
+                </form>
 
                 <!-- 이미 취소된 경우 -->
                 <div class="d-flex justify-content-center mt-4" style="gap: 20px;">

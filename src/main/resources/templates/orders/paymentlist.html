@@ -106,14 +106,14 @@
     <div class="col"></div>
     <div class="col-11">
       <div class="mb-3 mt-3">
-    <div class="payment-list">
-      <h2 class="payment-title">결제 목록</h2>
-    </div>
-      <!-- 에러 메시지가 있는 경우 표시 -->
-      <div th:if="${param.error}" class="alert alert-danger" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i>
-        <span th:text="${param.error}"></span>
-      </div>
+        <div class="payment-list">
+          <h2 class="payment-title">결제 목록</h2>
+        </div>
+        <!-- 에러 메시지가 있는 경우 표시 -->
+        <div th:if="${param.error}" class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <span th:text="${param.error}"></span>
+        </div>
 
         <table class="table table-hover" border="1px">
           <thead class="table-light">

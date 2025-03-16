@@ -101,7 +101,7 @@ public class OfficeController {
     @GetMapping("/member/list")
     public String hotelList(@PageableDefault(page=1) Pageable page,
                        @RequestParam(value="keyword", defaultValue = "") String keyword,
-                       @RequestParam(value="type", defaultValue = "") String type,
+                       @RequestParam(value="type", defaultValue = "ALL") String type,
                        HttpServletRequest request, Model model) {
 
         // 서비스에 조회 요청

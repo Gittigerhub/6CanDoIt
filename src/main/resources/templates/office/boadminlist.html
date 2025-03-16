@@ -695,7 +695,7 @@
                                 <div class="col-sm-12 mt-2">
                                     <div class="form-group form-group-default">
                                         <label>*주소 :</label>
-                                        <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기"><br>
+                                        <input type="button" onclick="sample4_execDaumPostcode2()" value="우편번호 찾기"><br>
                                         <input id="organAddress3" name="organAddress" type="text" class="form-control mt-2" placeholder="주소를 입력하세요." readonly required maxlength="100"/>
 
                                         <!-- 주소입력 기능 -->
@@ -724,7 +724,7 @@
 
 
                                             //본 예제에서는 도로명 주소 표기 방식에 대한 법령에 따라, 내려오는 데이터를 조합하여 올바른 주소를 구성하는 방법을 설명합니다.
-                                            function sample4_execDaumPostcode() {
+                                            function sample4_execDaumPostcode2() {
                                                 new daum.Postcode({
                                                     oncomplete: function(data) {
                                                         // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.

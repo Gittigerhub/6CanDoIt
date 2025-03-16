@@ -157,7 +157,7 @@
             <div class="d-flex justify-content-end mt-5">
                 <button type="button" class="btn btn-outline-secondary btn-adlistmenu" th:data-organ-idx="${organDTO.idx}">메뉴 관리</button>
                 <button type="button" class="btn btn-outline-secondary btn-update ms-2" th:data-id="${organDTO.idx}">수정</button>
-                <button type="button" class="btn btn-outline-secondary ms-2" onclick="location.href='/office/list'">목록</button>
+                <button type="button" class="btn btn-outline-secondary ms-2" onclick="location.href='/office/bo/list'">목록</button>
                 <button type="button" class="btn btn-outline-danger ms-2 btn-delete">삭제</button>
             </div>
             <!-- 수정/취소 버튼 끝 -->
@@ -180,7 +180,7 @@
                 <form id="shopDetailForm" method="post" enctype="multipart/form-data">
                     <!-- Modal body -->
                     <div class="modal-body">
-                        <p>새로운 매장을 등록합니다.</p>
+                        <p>매장 정보를 수정합니다.</p>
                         <!-- 조직 idx -->
                         <input type="hidden" id="idx" name="idx">
                         <input type="hidden" id="organIdx" name="organIdx">
@@ -630,8 +630,8 @@
                                 allowEscapeKey: false,
                                 allowEnterKey: false
                             }).then(() => {
-                                // 삭제 완료 후 '/office/list'로 리디렉션
-                                location.href = "/office/list";  // 페이지 이동
+                                // 삭제 완료 후 '/office/bo/list'로 리디렉션
+                                location.href = "/office/bo/list";  // 페이지 이동
                             });
                         },
                         error: function () {                // 작업 실패시
@@ -676,7 +676,7 @@
                             idx: idx                                // 전달값:값
                         },
                         success: function (response) {              // 작업 성공시
-                            $('#title').text("매장 상세 수정");
+                            $('#title2').text("매장 상세 수정");
 
                             $('#idx').val(response.shopDTO.idx);
                             $('#organIdx').val(response.organDTO.idx);

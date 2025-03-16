@@ -338,8 +338,11 @@ public class AdminController {
    ----------------------------------------------------------------------------- */
     @PostMapping("/password")
     @ResponseBody
-    public String modifyPassword(@RequestBody AdminDTO adminDTO){
+    public String modifyPassword(@RequestParam("adminName") String adminName, @RequestParam("adminEmail") String adminEmail){
         log.info("임시비밀번호를 발급해줘~!~");
+        AdminDTO adminDTO = new AdminDTO();
+        adminDTO.setAdminName(adminName);
+        adminDTO.setAdminEmail(adminEmail);
         boolean result = adminService.passwordSend(adminDTO);
         return result ? "success" : "fail";
     }

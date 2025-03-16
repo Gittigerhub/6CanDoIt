@@ -70,8 +70,8 @@ public class SecurityConfig{
                     auth.requestMatchers("/admin/login").permitAll();
                     auth.requestMatchers("/admin/updateRole").permitAll();
                     //ajax 허용
-
-                    auth.requestMatchers("/member/checkEmail", "/member/checkEmailCode","/admin/checkEmail", "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode", "/admin/checkEmailCode").permitAll();
+                    auth.requestMatchers("/member/checkEmail", "/admin/checkEmail",
+                            "/member/checkEmailCode", "/admin/checkEmailCode", "/admin/sendEmailCode", "/member/sendEmailCode").permitAll();
                     auth.requestMatchers("/member/checkPhone", "/admin/checkPhone").permitAll();
                     auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
                     auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "HO","BO", "MEMBER");
@@ -143,10 +143,9 @@ public class SecurityConfig{
             auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico","/error").permitAll();
             auth.requestMatchers("/h2-console/**").permitAll();
             auth.requestMatchers("/admin/updateRole").permitAll();
-
             auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
-            //ajax 허용
-            auth.requestMatchers("/member/checkPhone", "/admin/checkPhone", "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode","/member/checkEmailCode", "/admin/checkEmailCode").permitAll();
+            auth.requestMatchers("/member/checkPhone", "/admin/checkPhone",
+                    "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode","/member/checkEmailCode").permitAll();
 
             auth.requestMatchers("/member/checkEmail", "/admin/checkEmail").permitAll();
             auth.requestMatchers("/member/**").hasAnyRole("ADMIN","HO","BO", "MEMBER");

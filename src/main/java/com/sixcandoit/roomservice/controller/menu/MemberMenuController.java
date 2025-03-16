@@ -2,7 +2,9 @@ package com.sixcandoit.roomservice.controller.menu;
 
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.service.ImageFileService;
+import com.sixcandoit.roomservice.service.member.MemberService;
 import com.sixcandoit.roomservice.service.menu.MenuService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +31,7 @@ import java.util.Map;
 @Log4j2
 @RequestMapping("/member")
 public class MemberMenuController {
+    private final MemberService memberService;
     //HTML 전달할 S3정보
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
@@ -90,12 +94,19 @@ public class MemberMenuController {
     public String listMenu(@PageableDefault(page = 1) Pageable page, //페이지 정보
                            @RequestParam(value = "type", defaultValue = "") String type, //검색 대상
                            @RequestParam(value = "keyword", defaultValue = "") String keyword, //키워드
-                           Model model){
+                           Model model, Principal principal){
 
+        // 로그인한 회원정보로 예약건 찾아서 해당 호텔정보 가져오기
+        OrganizationDTO organizationDTO = menuService.findMemberRes(principal.getName());
+
+        // 호텔의 idx
+        Integer organIdx = organizationDTO.getIdx();
+
+        // 이미지 구별용
         String join = "menu";
 
         //해당페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<MenuDTO> menuDTOS = menuService.menuList(page, type, keyword);
+        Page<MenuDTO> menuDTOS = menuService.menuMemberList(page, type, keyword, organIdx);
 
         //html에 필요한 페이지 정보를 받기
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(menuDTOS);

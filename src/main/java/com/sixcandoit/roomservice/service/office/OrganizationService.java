@@ -2,6 +2,7 @@ package com.sixcandoit.roomservice.service.office;
 
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
+import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
@@ -193,7 +194,7 @@ public class OrganizationService {
 
                 // 3. 조회
                 // 조회결과를 저장할 변수
-                Page<OrganizationEntity> organizationEntities = Page.empty();
+                Page<OrganizationEntity> organizationEntities = Page.empty(pageable);
 
                 // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
                 if (roles.equals("HO")) {
@@ -242,7 +243,7 @@ public class OrganizationService {
 
                 // 3. 조회
                 // 조회결과를 저장할 변수
-                Page<OrganizationEntity> organizationEntities = Page.empty();
+                Page<OrganizationEntity> organizationEntities = Page.empty(pageable);
 
                 // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
                 if (keyword == null) {                           // 타입만 존재한다면
@@ -388,55 +389,39 @@ public class OrganizationService {
         출력 : 받은 인수들로 조직 조회
         설명 : 사용자의 호텔검색
     ----------------------------------------------------------------------------- */
-    public Page<OrganizationDTO> hotelList(Pageable page, String type, String keyword) {
+    public List<OrganizationDTO> hotelList(String location, String location2, String keyword) {
 
-        System.out.println(page);
-        System.out.println(type);
+        System.out.println(location);
+        System.out.println(location2);
         System.out.println(keyword);
 
         try {
-            // 1. 페이지정보를 재가공
-            int currentPage = page.getPageNumber() - 1;
-            int pageSize = 5;
-
-            // 기본 키로 올림차순해서 페이지 조회
-            Pageable pageable = PageRequest.of(currentPage, pageSize,
-                    Sort.by(Sort.Direction.ASC, "idx"));
-
-            // 2. 조회
+            // 1. 조회
             // 조회결과를 저장할 변수
-            Page<OrganizationEntity> organizationEntities = Page.empty();
+            List<OrganizationEntity> organizationEntities = new ArrayList<>();
 
             // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
             if (keyword == null) {                           // 타입만 존재한다면
-                if (type.equals("HO")) {
-                    organizationEntities = organizationRepository.searchHO(pageable);     // 타입에 해당하는 데이터 조회
-                } else if (type.equals("BO")) {
-                    organizationEntities = organizationRepository.searchBO(pageable);     // 타입에 해당하는 데이터 조회
-                } else if (type.equals("SHOP")) {
-                    organizationEntities = organizationRepository.searchSHOP(pageable);   // 타입에 해당하는 데이터 조회
-                } else if (type.equals("ALL")) {
-                    organizationEntities = organizationRepository.searchALL(pageable);    // 타입에 해당하는 데이터 조회
+                if (location.equals("전체")) {
+                    organizationEntities = organizationRepository.searchALLList();    // 타입에 해당하는 데이터 조회
+                } else {
+                    organizationEntities = organizationRepository.searchHotels(location, location2);    // 타입에 해당하는 데이터 조회
                 }
             } else {                                         // 검색어와 타입이 존재한다면
-                if (type.equals("HO")) {
-                    organizationEntities = organizationRepository.searchHOName(keyword, pageable);       // 검색어에 해당하는 데이터 조회
-                } else if (type.equals("BO")) {
-                    organizationEntities = organizationRepository.searchBOName(keyword, pageable);       // 검색어에 해당하는 데이터 조회
-                } else if (type.equals("SHOP")) {
-                    organizationEntities = organizationRepository.searchSHOPName(keyword, pageable);     // 검색어에 해당하는 데이터 조회
-                } else if (type.equals("ALL")) {
-                    organizationEntities = organizationRepository.searchALLName(keyword, pageable);      // 검색어에 해당하는 데이터 조회
+                if (location.equals("전체")) {
+                    organizationEntities = organizationRepository.searchALLNameList(keyword);      // 검색어에 해당하는 데이터 조회
+                } else {
+                    organizationEntities = organizationRepository.searchHotelsName(location, location2, keyword);      // 검색어에 해당하는 데이터 조회
                 }
 
             }
 
-            // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
-            Page<OrganizationDTO> organizationDTOS =
-                    organizationEntities.map(entity ->
-                            modelMapper.map(entity, OrganizationDTO.class));
+            // 2. 조회한 결과를 HTML에서 사용할 DTO로 변환
+            List<OrganizationDTO> organizationDTOS = organizationEntities.stream()
+                    .map(entity -> modelMapper.map(entity, OrganizationDTO.class))
+                    .collect(Collectors.toList());
 
-            // 4. 결과값을 전달
+            // 3. 결과값을 전달
             return organizationDTOS;
 
         } catch (Exception e) {     //오류발생시 오류 처리
@@ -500,6 +485,18 @@ public class OrganizationService {
 
     public Optional<OrganizationEntity> findById(Integer idx) {
         return organizationRepository.findById(idx);
+    }
+
+    // 호텔에서 가장 싼 방
+    public RoomDTO CheapRoom(Integer idx) {
+        // 가장 싼 방
+        RoomEntity room = roomRepository.findCheap(idx)
+                .orElseThrow(() -> new RuntimeException("방을 찾지 못했습니다."));
+
+        // Entity -> DTO
+        RoomDTO roomDTO = modelMapper.map(room, RoomDTO.class);
+
+        return roomDTO;
     }
 
 }

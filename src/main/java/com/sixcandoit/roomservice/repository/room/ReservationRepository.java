@@ -17,6 +17,10 @@ import java.util.Optional;
 @Repository
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Integer> {
 
+    // 회원이 체크인한 예약건 찾기
+    @Query("select r from ReservationEntity r where r.resStatus = '2' and r.memberJoin.idx = :idx")
+    ReservationEntity findCheckInRes(Integer idx);
+
     //입력한 2개의 날짜가 시작날짜에 속하는 값을 조회
     Page<ReservationEntity> findByStartDateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
 

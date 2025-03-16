@@ -14,14 +14,12 @@
 
     <!-- 페이지 시작 -->
     <div class="container">
-        <h2>광고 관리 > 광고 상세정보</h2>
-
         <div class="row p-5 bg-white">
             <div class="mb-3 d-flex">
                 <h3 class="me-4">광고 상세정보</h3>
                 <span>
-                    <button style="font-size: 12px" th:if="${advertisementDTO.adState == 'Y'}" th:value="${advertisementDTO.adState}" class="btn btn-primary justify-content-start">진행중</button>
-                    <button style="font-size: 12px" th:unless="${advertisementDTO.adState == 'Y'}" th:value="${advertisementDTO.adState}" class="btn btn-danger justify-content-start">미진행</button>
+                    <span style="font-size: 12px" th:if="${advertisementDTO.adState == 'Y'}" th:value="${advertisementDTO.adState}" class="badge rounded-pill text-bg-primary justify-content-start">진행중</span>
+                    <span style="font-size: 12px" th:unless="${advertisementDTO.adState == 'Y'}" th:value="${advertisementDTO.adState}" class="badge rounded-pill text-bg-danger justify-content-start">미진행</span>
                 </span>
             </div>
 
@@ -40,7 +38,7 @@
                 <tr style="height: 50px; vertical-align: middle">
                     <th style="width: 10%">링크</th>
                     <td colspan="3" style="text-align: left" >
-                        <a th:href="@{advertisementDTO.adTitle}" th:text="${advertisementDTO.adLinkUrl}"></a>
+                        <a style="text-decoration: none; font-weight: bold" th:href="@{advertisementDTO.adTitle}" th:text="${advertisementDTO.adLinkUrl}"></a>
                     </td>
                 </tr>
                 <tr style="height: 50px; vertical-align: middle">
@@ -60,7 +58,7 @@
                                         <th:block th:unless="${data.getRepimageYn()} == 'Y'">
                                             <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
                                             <div>
-                                                <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                                <button type="button" class="btn btn-outline-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
                                             </div>
                                         </th:block>
                                     </div>
@@ -73,7 +71,7 @@
                                     <div style="flex-basis: 100%; text-align: left">
                                         <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
                                         <div>
-                                            <button type="button" class="btn btn-danger deleteBtn mb-4" style="margin-left: 130px" th:value="${data.idx}">삭제</button>
+                                            <button type="button" class="btn btn-outline-danger deleteBtn mb-4" style="margin-left: 130px" th:value="${data.idx}">삭제</button>
                                         </div>
                                     </div>
                                 </th:block>
@@ -84,7 +82,7 @@
                                     <div>
                                         <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
                                         <div>
-                                            <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                            <button type="button" class="btn btn-outline-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
                                         </div>
                                     </div>
                                 </th:block>
@@ -107,9 +105,9 @@
 
             <!-- 수정/취소 버튼 -->
             <div class="d-flex justify-content-end mt-5">
-                <button type="button" class="btn btn-success ms-2" id="btn-update" th:data-id="${advertisementDTO.idx}">수정</button>
-                <button type="button" class="btn btn-danger btn-delete ms-2" th:data-id="${advertisementDTO.idx}">삭제</button>
-                <button type="button" class="btn btn-secondary ms-2"><a th:href="@{/advertisement/list}" style="text-decoration: none; color: white">목록</a></button>
+                <button type="button" class="btn btn-outline-secondary ms-2" id="btn-update" th:data-id="${advertisementDTO.idx}">수정</button>
+                <button type="button" class="btn btn-outline-secondary ms-2" onclick="location.href='/advertisement/list'">목록</button>
+                <button type="button" class="btn btn-outline-danger btn-delete ms-2" th:data-id="${advertisementDTO.idx}">삭제</button>
             </div>
         </div>
 
@@ -161,12 +159,35 @@
                                     <input id="adLinkUrl" name="adLinkUrl" type="text" class="form-control mt-2" required/>
                                 </div>
                             </div>
-                            <div class="col-12 mt-2">
-                                <div class="form-group form-group-default">
-                                    <label>*이미지 첨부 :</label>
-                                    <input id="adImgUrl" name="adImgUrl" type="text" class="form-control mt-2" required/>
+
+                            <!-- 광고 대표 사진 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default" id="inputImage">
+                                    <label>*대표 이미지 :</label>
+                                    <th:block th:if="${hasRepImage}">
+                                        <input disabled name="imageFiles" type="file" class="form-control mt-2" accept="image/*"/>
+                                    </th:block>
+                                    <th:block th:unless="${hasRepImage}">
+                                        <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*"/>
+                                    </th:block>
                                 </div>
                             </div>
+
+                            <!-- 광고 사진 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default" id="inputImage2">
+                                    <label>*이미지 :</label>
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
+                                </div>
+                            </div>
+
+                            <!-- 광고 사진 추가버튼 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <input type="button" id="addImage" value="이미지 추가">
+                                </div>
+                            </div>
+
                             <div class="col-12 mt-2">
                                 <div class="form-group form-group-default">
                                     <label>*기간 :</label>
@@ -179,7 +200,7 @@
                             <input id="adHits" name="adHits" type="hidden" class="form-control mt-2" required/>
                             <input id="organType" name="organType" type="hidden" class="form-control mt-2" required/>
                             <input id="organAddress" name="organAddress" type="hidden" class="form-control mt-2" required/>
-                            <input id="organIdx" name="idx" type="hidden" class="form-control mt-2" required/>
+                            <input id="organIdx" name="organIdx" type="hidden" class="form-control mt-2" required/>
                             <input id="activeYn" name="activeYn" type="hidden" class="form-control mt-2" required/>
                             <input id="organTel" name="organTel" type="hidden" class="form-control mt-2" required/>
                         </div>
@@ -299,6 +320,99 @@
         // 문서가 준비가 되었다면
         $(document).ready(function () {
 
+            // 이미지 삭제버튼을 클릭했을 때
+            $(".deleteBtn").on('click', function () {
+
+                var idx = this.value;
+
+                $.ajax({
+                    url: "/images/delete",
+                    type: 'GET',
+                    data: {
+                        idx: idx                        // 전달값 : 값
+                    },
+                    success: function (response) {      // 작업 성공시
+                        Swal.fire({
+                            title: "삭제 완료",
+                            text: "이미지를 삭제하였습니다",
+                            icon: "success",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        }).then(() => {
+                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function () {                // 작업 실패시
+                        Swal.fire({
+                            title: "오류 발생",
+                            icon: "error",
+                            text: "이미지 삭제를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+
+
+            });
+
+            // 이미지 추가 버튼 클릭했을 때
+            $("#addImage").on('click', function() {
+
+                // 이미지 추가 함수
+                addImageInput();
+
+            });
+
+            // 이미지 추가
+            function addImageInput() {
+                const container = document.getElementById('inputImage2');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+                container.appendChild(newInputDiv);
+            }
+
+            // 이미지 input 초기화
+            function resetImageInput() {
+                const input = document.querySelector('input[name="imageFiles"]');
+                const container2 = document.getElementById('inputImage2');
+
+                // 파일 선택 초기화
+                if (input) {
+                    input.value = '';
+                }
+
+                // 이미지 추가창 제거
+                container2.innerHTML = '<label>*이미지 :</label>' +
+                    '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
+            }
+
             // 광고 수정 모달에서 검색 버튼을 클릭했을 때
             $("#searchButton").on('click', function() {
 
@@ -310,7 +424,7 @@
                 $("#searchModal tbody").empty();  // tbody 내부의 모든 내용 삭제
 
                 // 이전 모달창을 화면에서 숨긴다.
-                $("#addModal").modal('hide');
+                $("#updatemodal").modal('hide');
 
                 // 검색 모달창을 화면에 띄운다.
                 $("#searchModal").modal('show');
@@ -362,17 +476,18 @@
 
                 // 클릭한 td의 텍스트 값 가져오기
                 var organ = $(this).text();
-                var organIdx = $(".idx").val();
+                var organIdx = $(this).find('.idx').val();  // input 요소의 value 값을 가져옴
+                console.log(organIdx)
 
                 // 이전 모달 input에 organName 값 넣기
-                $("#organ").val(organ);
-                $("#organidx").val(organIdx);
+                $("#organName").val(organ);
+                $("#organIdx").val(organIdx);
 
                 // 검색 모달창을 숨긴다
                 $("#searchModal").modal('hide');
 
                 // 이전 모달창을 화면에 띄운다.
-                $("#addModal").modal('show');
+                $("#updatemodal").modal('show');
 
             });
 
@@ -465,6 +580,9 @@
             // 수정버튼 클릭시 대화상자 채우기
             $("#btn-update").on("click", function () {
 
+                // 이미지 추가창 리셋 함수
+                resetImageInput();
+
                 var idx = $(this).data("id");
 
                 $.ajax({
@@ -527,32 +645,29 @@
             $('#update').on('click', function () {
                 var form = $('#updatemodalForm')[0];
                 var formData = new FormData(form);      // form내의 데이터 읽기
+                console.log(formData)
 
-                // organization 객체를 JSON 문자열로 변환하여 전송
-                var organization = {
-                    idx: $('#organIdx').val(),
-                    organName: $('#organName').val(),
-                    organType: $('#organType').val(),
-                    activeYn: $('#activeYn').val(),
-                    organAddress: $('#organAddress').val(),
-                    organTel: $('#organTel').val()
-                };
-                formData.append("organizationJoin", JSON.stringify(organization));
+                // // organization 객체를 JSON 문자열로 변환하여 전송
+                // var organization = {
+                //     idx: $('#organIdx').val(),
+                //     organName: $('#organName').val(),
+                //     organType: $('#organType').val(),
+                //     activeYn: $('#activeYn').val(),
+                //     organAddress: $('#organAddress').val(),
+                //     organTel: $('#organTel').val()
+                // };
+                // formData.append("organizationJoin", JSON.stringify(organization));
 
-                // FormData 내부 데이터 확인 (디버깅)
-                for (var pair of formData.entries()) {
-                    console.log(pair[0] + ': ' + pair[1]);
-                }
-
-                //폼 검증 수행
+                // 폼 검증 수행
                 if (form.checkValidity() === false) {
                     form.reportValidity();              // 폼 검증
                     return;
                 }
+
                 $('#updatemodal').modal('hide');
 
                 $.ajax({
-                    url: "/advertisement/update/update",       // 맵핑
+                    url: "/advertisement/update",       // 맵핑
                     type: 'POST',                       // 전달 방식
                     data: formData,                     // 데이터 값
                     processData: false,                 // 현재상태 그대로 유지하면서 전달

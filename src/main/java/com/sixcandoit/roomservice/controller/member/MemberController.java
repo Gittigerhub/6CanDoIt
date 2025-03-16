@@ -1,11 +1,15 @@
 package com.sixcandoit.roomservice.controller.member;
 
 import com.sixcandoit.roomservice.config.CustomUserDetails;
+import com.sixcandoit.roomservice.dto.AdvertisementDTO;
+import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.dto.qna.QnaDTO;
 import com.sixcandoit.roomservice.dto.room.ReservationDTO;
+import com.sixcandoit.roomservice.service.AdvertisementService;
 import com.sixcandoit.roomservice.service.EmailService;
+import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.member.MemberService;
 import com.sixcandoit.roomservice.service.qna.QnaService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
@@ -22,7 +26,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,10 +41,41 @@ public class MemberController {
     private final QnaService qnaService;
     private final EmailService email;
     private final EmailService emailService;
+    private final AdvertisementService advertisementService;
+    private final ImageFileService imageFileService;
 
     @GetMapping("/")
-    public String IndexForm(HttpSession session, MemberDTO memberDTO) {
+    public String IndexForm(HttpSession session, MemberDTO memberDTO, Model model) {
+
+        // 조회할 광고 가져오기
+        List<AdvertisementDTO> advertisementDTOS = advertisementService.adMemberList();
+
+        // 이미지 조회전 join값 생성
+        String join = "adver";
+
+        // 이미지 데이터를 담을 Map 생성
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+
+        for (AdvertisementDTO advertisementDTO : advertisementDTOS) {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(advertisementDTO.getIdx(), join);
+
+            // Map에 저장 (advertisementDTO의 idx를 key로 저장)
+            imageFileMap.put(advertisementDTO.getIdx(), imageFileDTOS);
+
+            // 대표 사진 여부 확인 후 저장
+            boolean hasRepImage = imageFileDTOS.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+            repImageMap.put(advertisementDTO.getIdx(), hasRepImage);
+        }
+
         session.setAttribute("memberName", memberDTO.getMemberName());
+        model.addAttribute("advertisementDTOS", advertisementDTOS);  // 데이터 전달
+        model.addAttribute("imageFileMap", imageFileMap);            // 메뉴별 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap);              // 메뉴별 대표 사진 여부
+
         return "memberindex";
     }
 

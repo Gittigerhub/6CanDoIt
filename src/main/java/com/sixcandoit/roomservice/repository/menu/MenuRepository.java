@@ -48,5 +48,39 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Integer> {
             "(u.menuName like %:keyword% or u.menuContent like %:keyword%) or u.menuCategory = :keyword")
     Page<MenuEntity> searchMenuAll(@Param("keyword") String keyword, Pageable page);
 
-}
+    // ================================================
 
+    //메뉴명만
+    @Query("SELECT u FROM MenuEntity u WHERE " +
+            "u.menuName like %:keyword%")
+    Page<MenuEntity> MenuName(@Param("keyword") String keyword, Pageable page);
+
+    //메뉴설명만
+    @Query("SELECT u FROM MenuEntity u WHERE " +
+            "u.menuContent like %:keyword%")
+    Page<MenuEntity> MenuContent(@Param("keyword") String keyword, Pageable page);
+
+    //메뉴명+메뉴설명
+    @Query("SELECT u FROM MenuEntity u WHERE " +
+            "u.menuName like %:keyword% or u.menuContent like %:keyword%")
+    Page<MenuEntity> MenuNameContent(@Param("keyword") String keyword, Pageable page);
+
+    //카테고리
+    @Query("SELECT u FROM MenuEntity u WHERE " +
+            "u.menuCategory = :keyword")
+    Page<MenuEntity> Category(@Param("keyword") String keyword, Pageable page);
+
+    //목록 카테고리 선택
+    @Query("SELECT u FROM MenuEntity u WHERE u.menuCategory = :categoryEnum")
+    Page<MenuEntity> CategoryList(@Param("categoryEnum") MenuCategory categoryEnum, Pageable page);
+
+    // 전체
+    @Query("SELECT u From MenuEntity u where u.organizationJoin.idx = :organIdx")
+    Page<MenuEntity> AllMenu(Pageable page, Integer organIdx);
+
+    // 전체 + 검색어
+    @Query("SELECT u From MenuEntity u WHERE " +
+            "(u.menuName like %:keyword% or u.menuContent like %:keyword%) or u.menuCategory = :keyword")
+    Page<MenuEntity> AllMenuKeyword(@Param("keyword") String keyword, Pageable page);
+
+}

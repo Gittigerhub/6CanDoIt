@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -79,9 +80,14 @@ public class AdvertisementService {
         출력 : 없음
         설명 : 전달받은 데이터를 데이터베이스에서 조회하여 수정
     ----------------------------------------------------------------------------- */
-    public void adUpdate(AdvertisementDTO advertisementDTO, String join, List<MultipartFile> imageFiles) {
+    public void adUpdate(AdvertisementDTO advertisementDTO , OrganizationDTO organizationDTO, Integer organIdx, String join, List<MultipartFile> imageFiles) {
 
         try {
+            // organizationDTO에 맞는 idx 주입
+            organizationDTO.setIdx(organIdx);
+
+            System.out.println("organizationDTO : " + organizationDTO.toString());
+
             // idx로 수정할 데이터 조회
             Optional<AdvertisementEntity> advertisementEntity =
                     advertisementRepository.findById(advertisementDTO.getIdx());
@@ -95,7 +101,7 @@ public class AdvertisementService {
                         modelMapper.map(advertisementDTO, AdvertisementEntity.class);
 
                 // 조직 ID로 조회하여 데이터 가져오기
-                OrganizationEntity organization = organizationRepository.findById(advertisementDTO.getOrganizationJoin().getIdx())
+                OrganizationEntity organization = organizationRepository.findById(organizationDTO.getIdx())
                         .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
 
                 // 광고테이블에 연관관계 조직테이블 데이터 추가
@@ -170,26 +176,48 @@ public class AdvertisementService {
 
         // 2. 조회
         // type : 전체(0), 제목(1), 조직명(2)
-        Page<AdvertisementEntity> advertisementEntities;
-        if (keyword != null && !keyword.isEmpty()){         // 검색어가 존재하면
-            log.info("검색어가 존재하면...");
-            if (type.equals("1")){                          // type 분류 1, 제목으로 검색할 때
-                log.info("제목으로 검색을 하는 중...");
-                advertisementEntities = advertisementRepository.searchTitle(keyword, page);
-            } else if (type.equals("2")){                   // type 분류 2, 조직명으로 검색할 때
-                log.info("내용으로 검색을 하는 중...");
-                advertisementEntities = advertisementRepository.searchOrgan(keyword, page);
-            } else {                                        // type 분류 0, 전체(제목 + 조직명)으로 검색할 때
-                log.info("모든 대상으로 검색을 하는 중...");
-                advertisementEntities = advertisementRepository.searchAll(keyword, page);
+        Page<AdvertisementEntity> advertisementEntities = Page.empty(pageable);
+
+        if (keyword == null || keyword.equals("")){                                         // 검색어가 존재하지 않으면
+            if (type.equals("1")){
+                advertisementEntities = advertisementRepository.searchAll(pageable);                // type 분류 1, 제목으로 검색할 때
+            } else if (type.equals("2")){
+                advertisementEntities = advertisementRepository.searchAll(pageable);                // type 분류 2, 조직명으로 검색할 때
+            } else if (type.equals("0")){
+                advertisementEntities = advertisementRepository.searchAll(pageable);                // type 분류 0, 전체(제목 + 조직명)으로 검색할 때
             }
-        } else {                                            // 검색어가 존재하지 않으면 모두 검색
-            advertisementEntities = advertisementRepository.findAll(pageable);
+        } else {                                                                            // 검색어가 존재하면
+            if (type.equals("1")){
+                advertisementEntities = advertisementRepository.searchTitle(keyword, pageable);     // type 분류 1, 제목으로 검색할 때
+            } else if (type.equals("2")){
+                advertisementEntities = advertisementRepository.searchOrgan(keyword, pageable);     // type 분류 2, 조직명으로 검색할 때
+            } else if (type.equals("0")){
+                advertisementEntities = advertisementRepository.searchAllName(keyword, pageable);   // type 분류 0, 전체(제목 + 조직명)으로 검색할 때
+            }
         }
 
         // Entity를 DTO로 변환 후 저장
         Page<AdvertisementDTO> advertisementDTOS = advertisementEntities.map(
                 data -> modelMapper.map(data, AdvertisementDTO.class));
+
+        return advertisementDTOS;
+    }
+
+    /* -----------------------------------------------------------------------------
+        함수명 : List<AdvertisementDTO> adMemberList
+        인수 : String type, String keyword
+        출력 : 활성화된 광고 리스트 출력
+        설명 : 광고 리스트중 활성화 되어있는 광고만 메인에 출력
+    ----------------------------------------------------------------------------- */
+    public List<AdvertisementDTO> adMemberList() {
+
+        // 1. 조회
+        // 활성화 되어있는 광고 전부 조회
+        List<AdvertisementEntity> advertisementEntities = advertisementRepository.adPick();
+
+        // 2. Entity를 DTO로 변환 후 저장
+        List<AdvertisementDTO> advertisementDTOS = advertisementEntities.stream().map(
+                data -> modelMapper.map(data, AdvertisementDTO.class)).collect(Collectors.toList());
 
         return advertisementDTOS;
     }
@@ -203,13 +231,25 @@ public class AdvertisementService {
     public List<OrganizationDTO> searchOrgan(String searchType, String searchWord) {
 
         // 1. 조회
-        List<OrganizationEntity> organizationEntities;
+        List<OrganizationEntity> organizationEntities = new ArrayList<>();
 
         // 여러개를 조회해야 할땐 if문으로 분류따라 조회해야함
-        if (searchWord == null && searchWord.trim().isEmpty()) {                         // 타입만 존재한다면
-            organizationEntities = organizationRepository.findByOrganType(searchType);
+        if (searchWord == null) {                         // 타입만 존재한다면
+            if (searchType.equals("HO")) {
+                organizationEntities = organizationRepository.findHO();
+            } else if (searchType.equals("BO")) {
+                organizationEntities = organizationRepository.findBO();
+            } else if (searchType.equals("ALL")) {
+                organizationEntities = organizationRepository.searchALLList();
+            }
         } else {                                          // 검색어와 타입이 존재한다면
-            organizationEntities = organizationRepository.findByOrganTypeAndOrganNameLikeIgnoreCase(searchType, "%" + searchWord + "%");
+            if (searchType.equals("HO")) {
+                organizationEntities = organizationRepository.findHOName(searchWord);
+            } else if (searchType.equals("BO")) {
+                organizationEntities = organizationRepository.findBOName(searchWord);
+            } else if (searchType.equals("ALL")) {
+                organizationEntities = organizationRepository.searchALLNameList(searchWord);
+            }
         }
 
         // 2. Entity를 DTO로 변환 후 저장
@@ -239,6 +279,19 @@ public class AdvertisementService {
 
         // 반환
         return advertisementDTO;
+    }
+
+    /* -----------------------------------------------------------------------------
+        함수명 : adHitsUp
+        인수 : Integer idx
+        출력 : 조회수 + 1
+        설명 : 해당 idx의 페이지를 열때마다 조회수 증가
+    ----------------------------------------------------------------------------- */
+    public void adHitsUp(Integer idx) {
+
+        // 조회수 증가
+        advertisementRepository.incrementAdHits(idx);
+
     }
 
 }

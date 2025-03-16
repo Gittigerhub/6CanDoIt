@@ -30,6 +30,14 @@ public class ReservationService {
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
 
+    // 예약완료된 사용자 예약건 가져오기
+    public ReservationEntity findCheckInRes(Integer idx) {
+        // 조회
+        ReservationEntity reservationEntity = reservationRepository.findCheckInRes(idx);
+        // 반환
+        return reservationEntity;
+    }
+
     // 예약이 가능한지 확인
     private boolean checkAvailability(Integer roomIdx, LocalDate startDate, LocalDate endDate) {
         List<ReservationEntity> overlappingReservations = reservationRepository.findOverlappingReservations(roomIdx, startDate, endDate);

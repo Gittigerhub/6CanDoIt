@@ -1,6 +1,7 @@
 package com.sixcandoit.roomservice.dto.office;
 
 import com.sixcandoit.roomservice.dto.admin.AdminDTO;
+import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import lombok.*;
 
 import java.util.List;
@@ -27,6 +28,8 @@ public class OrganizationDTO {
     private ShopDetailDTO shopDetailDTO;    // 매장 상세 DTO
 
     private List<AdminDTO> adminDTO;        // 관리자 회원 DTOlist
+
+    private List<RoomDTO> roomJoin;         // 객실 목록
 
     public OrganizationDTO(Integer idx, String organName) {
         this.idx = idx;

@@ -16,6 +16,8 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
         }
 
         /* 내용의 불투명 배경 스타일 */
@@ -29,36 +31,328 @@
 <body>
 <div layout:fragment="content" class="p-5 content-container">
 
-    <div class="container p-3" style="margin-top: 20%">
+    <div class="container p-3">
+        <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <th:block th:each="adver : ${advertisementDTOS}" th:if="${adver.adState == 'Y'}">
+                    <div class="carousel-item active">
+
+                        <th:block th:each="data:${imageFileMap[adver.idx]}" th:if="${repImageMap[adver.idx]}">
+                            <!-- 대표 이미지 -->
+                            <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                                <a th:href="${adver.adLinkUrl}"><img class="d-block " style="width: 100%; height: 400px; object-fit: cover" th:src="${data.url}" th:alt="${data.originName}"></a>
+                            </th:block>
+                        </th:block>
+
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5 th:text="${adver.adTitle}">시모나</h5>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="container p-3 mt-4">
         <h1 class="p-3">Booking</h1>
         <div class="p-3">
             <!-- 검색 필터 -->
             <div class="card mb-4 container">
                 <div class="card-body">
-                    <form action="#" method="get" class="row g-3">
+                    <form action="/office/member/list" method="get" class="row g-3">
                         <div class="col-md-3">
                             <label for="location" class="form-label">지역</label>
-                            <select class="form-select" id="location" name="location">
-                                <option value="">전체</option>
+                            <select class="form-select" id="location" name="location" th:value="${location}">
+                                <option value="전체">전체</option>
                                 <option value="서울">서울</option>
                                 <option value="부산">부산</option>
                                 <option value="제주">제주</option>
-                                <!-- 추가 지역 옵션 -->
+                                <option value="경기">경기</option>
+                                <option value="인천">인천</option>
+                                <option value="강원">강원</option>
+                                <option value="경상">경상</option>
+                                <option value="전라">전라</option>
+                                <option value="충청">충청</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="priceRange" class="form-label">가격대</label>
-                            <select class="form-select" id="priceRange" name="priceRange">
-                                <option value="">전체</option>
-                                <option value="0-100000">10만원 이하</option>
-                                <option value="100000-200000">10-20만원</option>
-                                <option value="200000-300000">20-30만원</option>
-                                <option value="300000">30만원 이상</option>
+                            <label for="location2" class="form-label">군/구</label>
+                            <select class="form-select" id="location2" name="location2" th:value="${location2}">
+                                <option value="전체">전체</option>
                             </select>
                         </div>
+
+                        <!-- JavaScript 부분 -->
+                        <script>
+                            // 예시로 각 지역에 따른 가격 범위 옵션을 설정합니다.
+                            const priceRangeOptions = {
+                                '서울': [
+                                    {value: '강남', text: '강남'},
+                                    {value: '역삼', text: '역삼'},
+                                    {value: '삼성', text: '삼성'},
+                                    {value: '신사', text: '신사'},
+                                    {value: '청담', text: '청담'},
+                                    {value: '압구정', text: '압구정'},
+                                    {value: '서초', text: '서초'},
+                                    {value: '교대', text: '교대'},
+                                    {value: '사당', text: '사당'},
+                                    {value: '잠실', text: '잠실'},
+                                    {value: '송파', text: '송파'},
+                                    {value: '강동', text: '강동'},
+                                    {value: '을지로', text: '을지로'},
+                                    {value: '명동', text: '명동'},
+                                    {value: '중구', text: '중구'},
+                                    {value: '동대문', text: '동대문'},
+                                    {value: '서울역', text: '서울역'},
+                                    {value: '이태원', text: '이태원'},
+                                    {value: '용산', text: '용산'},
+                                    {value: '종로', text: '종로'},
+                                    {value: '인사동', text: '인사동'},
+                                    {value: '홍대', text: '홍대'},
+                                    {value: '합정', text: '합정'},
+                                    {value: '마포', text: '마포'},
+                                    {value: '서대문', text: '서대문'},
+                                    {value: '여의도', text: '여의도'},
+                                    {value: '영등포역', text: '영등포역'},
+                                    {value: '구로', text: '구로'},
+                                    {value: '신도림', text: '신도림'},
+                                    {value: '금천', text: '금천'},
+                                    {value: '김포공항', text: '김포공항'},
+                                    {value: '염창', text: '염창'},
+                                    {value: '강서', text: '강서'},
+                                    {value: '건대입구', text: '건대입구'},
+                                    {value: '성수', text: '성수'},
+                                    {value: '왕십리', text: '왕십리'},
+                                    {value: '성북', text: '성북'},
+                                    {value: '강북', text: '강북'},
+                                    {value: '노원', text: '노원'},
+                                    {value: '도봉', text: '도봉'}
+
+                                ],
+                                '부산': [
+                                    {value: '해운대', text: '해운대'},
+                                    {value: '마린시티', text: '마린시티'},
+                                    {value: '벡스코', text: '벡스코'},
+                                    {value: '센텀시티', text: '센텀시티'},
+                                    {value: '송정', text: '송정'},
+                                    {value: '기장', text: '기장'},
+                                    {value: '정관', text: '정관'},
+                                    {value: '광안리', text: '광안리'},
+                                    {value: '경성대', text: '경성대'},
+                                    {value: '부산역', text: '부산역'},
+                                    {value: '자갈치', text: '자갈치'},
+                                    {value: '남포동', text: '남포동'},
+                                    {value: '영도', text: '영도'},
+                                    {value: '송도', text: '송도'},
+                                    {value: '다대포', text: '다대포'},
+                                    {value: '서면', text: '서면'}
+                                ],
+                                '제주': [
+                                    {value: '제주시', text: '제주시'},
+                                    {value: '제주국제공항', text: '제주국제공항'},
+                                    {value: '서귀포시', text: '서귀포시'},
+                                    {value: '모슬포', text: '모슬포'},
+                                    {value: '애월', text: '애월'},
+                                    {value: '한림', text: '한림'},
+                                    {value: '협재', text: '협재'},
+                                    {value: '중문', text: '중문'},
+                                    {value: '표선', text: '표선'},
+                                    {value: '성산', text: '성산'},
+                                    {value: '함덕', text: '함덕'},
+                                    {value: '김녕', text: '김녕'},
+                                    {value: '세화', text: '세화'}
+                                ],
+                                '경기': [
+                                    {value: '가평', text: '가평'},
+                                    {value: '청평', text: '청평'},
+                                    {value: '양평', text: '양평'},
+                                    {value: '수원', text: '수원'},
+                                    {value: '화성', text: '화성'},
+                                    {value: '고양', text: '고양'},
+                                    {value: '파주', text: '파주'},
+                                    {value: '김포', text: '김포'},
+                                    {value: '의정부', text: '의정부'},
+                                    {value: '포천', text: '포천'},
+                                    {value: '동두천', text: '동두천'},
+                                    {value: '용인', text: '용인'},
+                                    {value: '동탄', text: '동탄'},
+                                    {value: '오산', text: '오산'},
+                                    {value: '평택', text: '평택'},
+                                    {value: '남양주', text: '남양주'},
+                                    {value: '구리', text: '구리'},
+                                    {value: '성남', text: '성남'},
+                                    {value: '분당', text: '분당'},
+                                    {value: '이천', text: '이천'},
+                                    {value: '광주', text: '광주'},
+                                    {value: '여주', text: '여주'},
+                                    {value: '하남', text: '하남'},
+                                    {value: '부천', text: '부천'},
+                                    {value: '광명', text: '광명'},
+                                    {value: '시흥', text: '시흥'},
+                                    {value: '안산', text: '안산'}
+
+                                ],
+                                '인천': [
+                                    {value: '송도', text: '송도'},
+                                    {value: '소래포구', text: '소래포구'},
+                                    {value: '인천국제공항', text: '인천국제공항'},
+                                    {value: '강화', text: '강화'},
+                                    {value: '을왕리', text: '을왕리'},
+                                    {value: '영종도', text: '영종도'},
+                                    {value: '월미도', text: '월미도'},
+                                    {value: '주안', text: '주안'},
+                                    {value: '간석', text: '간석'},
+                                    {value: '인천시청', text: '인천시청'},
+                                    {value: '청라', text: '청라'},
+                                    {value: '계양', text: '계양'},
+                                    {value: '부평', text: '부평'}
+                                ],
+                                '강원': [
+                                    {value: '강릉', text: '강릉'},
+                                    {value: '속초', text: '속초'},
+                                    {value: '고성', text: '고성'},
+                                    {value: '양양', text: '양양'},
+                                    {value: '춘천', text: '춘천'},
+                                    {value: '인제', text: '인제'},
+                                    {value: '철원', text: '철원'},
+                                    {value: '평창', text: '평창'},
+                                    {value: '정선', text: '정선'},
+                                    {value: '영월', text: '영월'},
+                                    {value: '동해', text: '동해'},
+                                    {value: '삼척', text: '삼척'},
+                                    {value: '태백', text: '태백'},
+                                    {value: '홍천', text: '홍천'},
+                                    {value: '횡성', text: '횡성'},
+                                    {value: '원주', text: '원주'}
+                                ],
+                                '경상': [
+                                    {value: '대구', text: '대구'},
+                                    {value: '구미', text: '구미'},
+                                    {value: '안동', text: '안동'},
+                                    {value: '문경', text: '문경'},
+                                    {value: '경주', text: '경주'},
+                                    {value: '울산', text: '울산'},
+                                    {value: '양산', text: '양산'},
+                                    {value: '밀양', text: '밀양'},
+                                    {value: '거제', text: '거제'},
+                                    {value: '통영', text: '통영'},
+                                    {value: '포항', text: '포항'},
+                                    {value: '영덕', text: '영덕'},
+                                    {value: '울진', text: '울진'},
+                                    {value: '청송', text: '청송'},
+                                    {value: '창원', text: '창원'},
+                                    {value: '마산', text: '마산'},
+                                    {value: '진해', text: '진해'},
+                                    {value: '김해', text: '김해'},
+                                    {value: '부곡', text: '부곡'},
+                                    {value: '남해', text: '남해'},
+                                    {value: '사천', text: '사천'},
+                                    {value: '하동', text: '하동'},
+                                    {value: '진주', text: '진주'}
+                                ],
+                                '전라': [
+                                    {value: '전주', text: '전주'},
+                                    {value: '완주', text: '완주'},
+                                    {value: '광주', text: '광주'},
+                                    {value: '나주', text: '나주'},
+                                    {value: '함평', text: '함평'},
+                                    {value: '여수', text: '여수'},
+                                    {value: '순천', text: '순천'},
+                                    {value: '광양', text: '광양'},
+                                    {value: '담양', text: '담양'},
+                                    {value: '보성', text: '보성'},
+                                    {value: '화순', text: '화순'},
+                                    {value: '남원', text: '남원'},
+                                    {value: '부안', text: '부안'},
+                                    {value: '정읍', text: '정읍'},
+                                    {value: '고창', text: '고창'},
+                                    {value: '무주', text: '무주'},
+                                    {value: '구례', text: '구례'},
+                                    {value: '군산', text: '군산'},
+                                    {value: '익산', text: '익산'},
+                                    {value: '목포', text: '목포'},
+                                    {value: '신안', text: '신안'},
+                                    {value: '영광', text: '영광'},
+                                    {value: '진도', text: '진도'},
+                                    {value: '고흥', text: '고흥'},
+                                    {value: '영암', text: '영암'},
+                                    {value: '완도', text: '완도'},
+                                    {value: '강진', text: '강진'}
+                                ],
+                                '충청': [
+                                    {value: '대전', text: '대전'},
+                                    {value: '세종', text: '세종'},
+                                    {value: '천안', text: '천안'},
+                                    {value: '아산', text: '아산'},
+                                    {value: '도고', text: '도고'},
+                                    {value: '당진', text: '당진'},
+                                    {value: '덕산', text: '덕산'},
+                                    {value: '태안', text: '태안'},
+                                    {value: '서산', text: '서산'},
+                                    {value: '안면도', text: '안면도'},
+                                    {value: '보령', text: '보령'},
+                                    {value: '대천', text: '대천'},
+                                    {value: '부여', text: '부여'},
+                                    {value: '공주', text: '공주'},
+                                    {value: '금산', text: '금산'},
+                                    {value: '청주', text: '청주'},
+                                    {value: '음성', text: '음성'},
+                                    {value: '진천', text: '진천'},
+                                    {value: '충주', text: '충주'},
+                                    {value: '음성', text: '음성'},
+                                    {value: '진천', text: '진천'},
+                                    {value: '충주', text: '충주'},
+                                    {value: '제천', text: '제천'},
+                                    {value: '단양', text: '단양'},
+                                    {value: '괴산', text: '괴산'},
+                                    {value: '증평', text: '증평'}
+                                ]
+                            };
+
+                            // 지역이 매핑되어 있지 않은 경우 기본 옵션
+                            const defaultPriceRanges = [
+                                {value: '전체', text: '전체'},
+                            ];
+
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const locationSelect = document.getElementById('location');
+                                const location2Select = document.getElementById('location2');
+
+                                locationSelect.addEventListener('change', function() {
+                                    const selectedLocation = this.value;
+                                    // priceRange select의 옵션 초기화
+                                    location2Select.innerHTML = '';
+
+                                    // 선택된 지역에 해당하는 옵션을 가져오거나, 없으면 기본 옵션 사용
+                                    const options = priceRangeOptions[selectedLocation] || defaultPriceRanges;
+
+                                    options.forEach(function(option) {
+                                        const optElement = document.createElement('option');
+                                        optElement.value = option.value;
+                                        optElement.textContent = option.text;
+                                        location2Select.appendChild(optElement);
+                                    });
+                                });
+                            });
+                        </script>
+
                         <div class="col-md-4">
                             <label for="searchKeyword" class="form-label">검색어</label>
-                            <input type="text" class="form-control" id="searchKeyword" name="keyword" placeholder="호텔 이름 검색">
+                            <input type="text" class="form-control" id="searchKeyword" name="keyword" th:value="${keyword}" placeholder="호텔 이름 검색">
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">검색</button>

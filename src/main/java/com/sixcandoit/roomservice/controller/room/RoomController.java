@@ -51,12 +51,12 @@ public class RoomController {
        설명 : 룸 관리 메인 페이지를 반환
     ----------------------------------------------------------------------------- */
     // 룸 관리 메인 페이지
-    @GetMapping("/room/main")
+    @GetMapping("/room/ho/main")
     public String main(@RequestParam(required = false) Integer organ_idx, Model model) {
         if (organ_idx != null) {
             model.addAttribute("organ_idx", organ_idx);
         }
-        return "room/main";
+        return "room/ho/main";
     }
 
     /* -----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ public class RoomController {
        설명 : 룸 목록을 조회하고 페이지에 데이터를 전달하여 반환
     ----------------------------------------------------------------------------- */
     // 룸 전체 목록
-    @GetMapping("/room/list")
+    @GetMapping("/room/ho/list")
     private String list(@PageableDefault(page = 1) Pageable page,
                         @RequestParam(value = "type", defaultValue = "") String type,
                         @RequestParam(value = "keyword", defaultValue = "") String keyword,
@@ -113,7 +113,7 @@ public class RoomController {
         model.addAttribute("imageFileMap", imageFileMap);
         model.addAttribute("repImageMap", repImageMap);
 
-        return "room/list";
+        return "room/ho/list";
     }
 
     /* -----------------------------------------------------------------------------
@@ -123,7 +123,7 @@ public class RoomController {
        설명 : 예약 목록을 조회하여 페이지로 전달
     ----------------------------------------------------------------------------- */
     //관리자용 예약 목록 리스트
-    @GetMapping("/room/reserve")
+    @GetMapping("/room/ho/reserve")
     public String reslist(@RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
                           @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
                           @RequestParam(required = false) Integer organ_idx,
@@ -163,7 +163,7 @@ public class RoomController {
         model.addAttribute("edate", edate);
         model.addAttribute("organ_idx", organ_idx);
 
-        return "room/reserve";
+        return "room/ho/reserve";
     }
 
     /* -----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ public class RoomController {
        출력 : JSON 응답
        설명 : 특정 방의 상태를 업데이트
     ----------------------------------------------------------------------------- */
-    @PostMapping("/room/updateStatus/{idx}")
+    @PostMapping("/room/ho/updateStatus/{idx}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateRoomStatus(@PathVariable Integer idx, @RequestBody Map<String, String> requestBody) {
         String newStatus = requestBody.get("status");
@@ -200,7 +200,7 @@ public class RoomController {
        설명 : 룸 등록 페이지로 이동하며 초기 룸 DTO를 모델에 추가
     ----------------------------------------------------------------------------- */
     // 룸 등록
-    @GetMapping("/room/register")
+    @GetMapping("/room/ho/register")
     public String register(@RequestParam(required = false) Integer organ_idx, Model model){
         log.info("룸 등록 페이지로 이동합니다.");
 
@@ -226,7 +226,7 @@ public class RoomController {
         model.addAttribute("roomDTO", roomDTO);
         model.addAttribute("organ_idx", organ_idx);
 
-        return "room/register";
+        return "room/ho/register";
     }
 
     /* -----------------------------------------------------------------------------
@@ -236,52 +236,49 @@ public class RoomController {
        설명 : 새로운 룸을 등록 처리하고, 등록이 완료된 후 룸 목록으로 리다이렉트
     ----------------------------------------------------------------------------- */
     // 룸 등록 저장 처리
-    @PostMapping("/room/register")
-    public String registerProc(@Valid @ModelAttribute RoomDTO roomDTO,
-                               BindingResult bindingResult, List<MultipartFile> imageFiles){
+    @PostMapping("/room/ho/register")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> registerProc(@Valid @ModelAttribute RoomDTO roomDTO,
+                               BindingResult bindingResult, List<MultipartFile> imageFiles) {
         log.info("새로운 룸을 등록합니다.");
 
-        // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
-        if (roomDTO.getRoomWifi() == null) {
-            roomDTO.setRoomWifi("N");
-        }
-        if (roomDTO.getRoomTv() == null) {
-            roomDTO.setRoomTv("N");
-        }
-        if (roomDTO.getRoomAir() == null) {
-            roomDTO.setRoomAir("N");
-        }
-        if (roomDTO.getRoomBath() == null) {
-            roomDTO.setRoomBath("N");
-        }
-        if (roomDTO.getRoomBreakfast() == null) {
-            roomDTO.setRoomBreakfast("N");
-        }
-        if (roomDTO.getRoomSmokingYn() == null) {
-            roomDTO.setRoomSmokingYn("N");
-        }
-        // 체크인, 체크아웃 값이 없으면 기본값을 설정
-        if (roomDTO.getRoomCheckIn() == null) {
-            roomDTO.setRoomCheckIn(LocalTime.of(14, 0)); // 기본 체크인 시간 (14:00)
-        }
-        if (roomDTO.getRoomCheckOut() == null) {
-            roomDTO.setRoomCheckOut(LocalTime.of(11, 0)); // 기본 체크아웃 시간 (11:00)
-        }
+        Map<String, Object> response = new HashMap<>();
 
-        if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
+        if (bindingResult.hasErrors()) {
             log.info("유효성 검사 오류 발생");
             bindingResult.getAllErrors().forEach(error -> log.error("Validation error: " + error.getDefaultMessage()));
-            return "room/register"; // register로 돌아간다
+            response.put("success", false);
+            response.put("message", "입력값을 확인해주세요.");
+            return ResponseEntity.badRequest().body(response);
         }
 
-        // 등록 처리
-        roomService.roomRegister(roomDTO, imageFiles);
+        try {
+            // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
+            if (roomDTO.getRoomWifi() == null) roomDTO.setRoomWifi("N");
+            if (roomDTO.getRoomTv() == null) roomDTO.setRoomTv("N");
+            if (roomDTO.getRoomAir() == null) roomDTO.setRoomAir("N");
+            if (roomDTO.getRoomBath() == null) roomDTO.setRoomBath("N");
+            if (roomDTO.getRoomBreakfast() == null) roomDTO.setRoomBreakfast("N");
+            if (roomDTO.getRoomSmokingYn() == null) roomDTO.setRoomSmokingYn("N");
 
-        // organ_idx가 있으면 해당 조직의 목록으로 리다이렉트
-        if (roomDTO.getOrgan_idx() != null) {
-            return "redirect:/room/list?organ_idx=" + roomDTO.getOrgan_idx();
+            // 체크인, 체크아웃 값이 없으면 기본값을 설정
+            if (roomDTO.getRoomCheckIn() == null) roomDTO.setRoomCheckIn(LocalTime.of(14, 0));
+            if (roomDTO.getRoomCheckOut() == null) roomDTO.setRoomCheckOut(LocalTime.of(11, 0));
+
+            // 등록 처리
+            roomService.roomRegister(roomDTO, imageFiles);
+
+            response.put("success", true);
+            response.put("message", "객실이 성공적으로 등록되었습니다.");
+            response.put("redirectUrl", "/room/ho/list" + (roomDTO.getOrgan_idx() != null ? "?organ_idx=" + roomDTO.getOrgan_idx() : ""));
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("객실 등록 중 오류 발생: " + e.getMessage());
+            response.put("success", false);
+            response.put("message", "객실 등록 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        return "redirect:/room/list";
     }
 
     /* -----------------------------------------------------------------------------
@@ -291,7 +288,7 @@ public class RoomController {
        설명 : 특정 룸의 상세 정보를 조회하여 페이지에 전달
     ----------------------------------------------------------------------------- */
     // 룸 상세보기
-    @GetMapping("/room/detail")
+    @GetMapping("/room/ho/detail")
     public String detail(@RequestParam Integer idx, Model model){
 
         // join값 생성
@@ -313,7 +310,7 @@ public class RoomController {
         model.addAttribute("imageFileDTOS", imageFileDTOS);
         model.addAttribute("hasRepImage", hasRepImage);
 
-        return "room/detail";
+        return "room/ho/detail";
     }
 
     /* -----------------------------------------------------------------------------
@@ -323,7 +320,7 @@ public class RoomController {
        설명 : 특정 룸의 데이터를 수정하기 위해 해당 데이터를 페이지로 전달
     ----------------------------------------------------------------------------- */
     // 룸 수정 불러오기
-    @GetMapping("/room/update")
+    @GetMapping("/room/ho/update")
     public String update(@RequestParam Integer idx, Model model){
         log.info("수정할 데이터를 읽는 중입니다.");
         RoomDTO roomDTO = roomService.roomDetail(idx);
@@ -331,7 +328,7 @@ public class RoomController {
         log.info("개별 데이터를 페이지로 전달합니다.");
         model.addAttribute("roomDTO", roomDTO);
 
-        return "room/update";
+        return "room/ho/update";
     }
 
     /* -----------------------------------------------------------------------------
@@ -341,7 +338,7 @@ public class RoomController {
        설명 : 수정된 룸 데이터를 저장하고, 저장 후 상세 페이지로 리다이렉트
     ----------------------------------------------------------------------------- */
     // 룸 수정 수정하기
-    @PostMapping("/room/update")
+    @PostMapping("/room/ho/update")
     public String updateProc(@Valid @ModelAttribute RoomDTO roomDTO,
                              BindingResult bindingResult,
                              List<MultipartFile> imageFiles){
@@ -380,17 +377,17 @@ public class RoomController {
             if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
                 log.info("유효성 검사 오류 발생");
                 bindingResult.getAllErrors().forEach(error -> log.error("Validation error: " + error.getDefaultMessage()));
-                return "room/update"; // update로 돌아간다
+                return "room/ho/update"; // update로 돌아간다
             }
             // 유효성 검사 성공 시 수정 처리
             roomService.roomUpdate(roomDTO, join, imageFiles);
 
-            return "redirect:/room/detail?idx=" + roomDTO.getIdx();
+            return "redirect:/room/ho/detail?idx=" + roomDTO.getIdx();
 
         } catch (Exception e) {
             // 예외가 발생했을 경우 사용자에게 오류 메시지 전달
             log.error(e.getMessage());
-            return "room/update"; // 수정 페이지로 돌아가면서 오류 메시지 전달
+            return "room/ho/update"; // 수정 페이지로 돌아가면서 오류 메시지 전달
         }
     }
 
@@ -401,7 +398,7 @@ public class RoomController {
        설명 : 특정 룸 데이터를 삭제하고, 룸 목록 페이지로 리다이렉트
     ----------------------------------------------------------------------------- */
     // 룸 삭제
-    @GetMapping("/room/delete")
+    @GetMapping("/room/ho/delete")
     public String delete(@RequestParam Integer idx){
 
         // join값 생성
@@ -410,7 +407,7 @@ public class RoomController {
         log.info("데이터를 삭제합니다.");
         roomService.roomDelete(idx, join);
 
-        return "redirect:/room/list";
+        return "redirect:/room/ho/list";
     }
 
     /* -----------------------------------------------------------------------------
@@ -420,10 +417,10 @@ public class RoomController {
        설명 : 룸의 성수기를 등록하거나 해제하며, 완료 후 룸 상세 페이지로 리다이렉트
     ----------------------------------------------------------------------------- */
     // 성수기 등록 및 해제
-    @GetMapping("/room/roomSeason/update")
+    @GetMapping("/room/ho/roomSeason/update")
     public String updateSeason(@RequestParam Integer idx, @RequestParam String roomSeason){
         roomService.updateSeason(idx, roomSeason);
-        return "redirect:/room/detail?idx=" + idx; // 상세 페이지로 리다이렉트
+        return "redirect:/room/ho/detail?idx=" + idx; // 상세 페이지로 리다이렉트
     }
 
     /* -----------------------------------------------------------------------------

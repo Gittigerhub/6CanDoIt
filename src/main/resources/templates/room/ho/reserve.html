@@ -128,7 +128,7 @@
 
         // updateRoomStatus 함수 정의
         function updateRoomStatus(idx, newStatus) {
-            fetch(`/room/updateStatus/${idx}`, {
+            fetch(`/room/ho/updateStatus/${idx}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -267,7 +267,7 @@
             <div class="col-lg-8">
                 <h2 class="text-center">예약 목록 현황</h2>
                 <!-- 검색 영역 -->
-                <form th:action="@{/room/reserve}" method="get">
+                <form th:action="@{/room/ho/reserve}" method="get">
                     <div class="input-group mb-3 mt-3">
                         <input type="date" class="form-control" name="sdate" th:value="${sdate}">
                         <input type="date" class="form-control" name="edate" th:value="${edate}">
@@ -327,7 +327,7 @@
         const csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
         function resetSearch() {
-            window.location.href = '/room/reserve' + (organ_idx ? '?organ_idx=' + organ_idx : '');
+            window.location.href = '/room/ho/reserve' + (organ_idx ? '?organ_idx=' + organ_idx : '');
         }
 
         function deleteReservation(idx) {

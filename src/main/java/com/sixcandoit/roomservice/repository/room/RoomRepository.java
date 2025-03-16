@@ -30,16 +30,16 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     Page<RoomEntity> searchRoomBreakfast(Pageable page);
 
     // 빈 방 검색
-    @Query("SELECT r FROM RoomEntity r WHERE r.resStatus = '1'")
-    Page<RoomEntity> searchRes1(Pageable pageable);
+    @Query("SELECT u FROM RoomEntity u WHERE u.resStatus = '1'")
+    Page<RoomEntity> searchRes1(Pageable page);
 
     // 예약중인 방 검색
     @Query("SELECT u FROM RoomEntity u WHERE u.resStatus = '2'")
     Page<RoomEntity> searchRes2(Pageable page);
 
     // 체크인 방 검색
-    @Query("SELECT r FROM RoomEntity r WHERE r.resStatus = '3'")
-    Page<RoomEntity> searchRes3(Pageable pageable);
+    @Query("SELECT u FROM RoomEntity u WHERE u.resStatus = '3'")
+    Page<RoomEntity> searchRes3(Pageable page);
 
     // 체크아웃 방 검색
     @Query("SELECT u FROM RoomEntity u WHERE u.resStatus = '4'")

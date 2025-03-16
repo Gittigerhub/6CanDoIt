@@ -138,7 +138,7 @@
 
     <div class="container">
         <!--검색 기능(keyword) 시작-->
-        <form th:action="@{/room/list}" method="get">
+        <form th:action="@{/room/ho/list}" method="get">
             <div class="row p-5 bg-white"><!--틀-->
                 <div class="mb-3">
                     <h3>객실 검색</h3>
@@ -183,7 +183,7 @@
                     <button type="submit" class="btn btn-success">검색</button>
                 </div><!--검색버튼-->
                 <div class="col-2">
-                    <a th:href="@{/room/register(organ_idx=${organ_idx})}" class="btn btn-primary btn-lg">객실 등록</a>
+                    <a th:href="@{/room/ho/register(organ_idx=${organ_idx})}" class="btn btn-primary btn-lg">객실 등록</a>
                 </div><!--추가버튼-->
             </div>
         </form>  <!--검색 기능(keyword) 끝-->
@@ -296,22 +296,22 @@
                 <div class="mt-3 d-flex justify-content-center">
                     <ul class="pagination">
                         <li class="page-item" th:unless="${startPage>1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
-                            <a class="page-link" th:href="@{/room/list(page=1, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≪</a>
+                            <a class="page-link" th:href="@{/room/ho/list(page=1, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≪</a>
                         </li>
                         <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
-                            <a class="page-link" th:href="@{/room/list(page=${prevPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＜</a>
+                            <a class="page-link" th:href="@{/room/ho/list(page=${prevPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＜</a>
                         </li>
                         <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}"><!--숫자 카운터-->
                         <li class="page-item">
-                            <a class="page-link" th:href="@{/room/list(page=${page}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}" th:text="${page}"></a>
+                            <a class="page-link" th:href="@{/room/ho/list(page=${page}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}" th:text="${page}"></a>
                         </li>
                     </span>
                         <!--11,12,13,14,15 다음 마지막(15)-->
                         <li class="page-item" th:unless="${currentPage>=endPage}">
-                            <a class="page-link" th:href="@{/room/list(page=${nextPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＞</a>
+                            <a class="page-link" th:href="@{/room/ho/list(page=${nextPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＞</a>
                         </li>
                         <li class="page-item" th:unless="${currentPage>endPage}">
-                            <a class="page-link" th:href="@{/room/list(page=${endPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≫</a>
+                            <a class="page-link" th:href="@{/room/ho/list(page=${endPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≫</a>
                         </li>
                     </ul>
                 </div><!--페이징 끝-->

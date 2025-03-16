@@ -152,12 +152,42 @@
             display: flex;
             padding: 1rem;
             background-color: #f8f9fa;
+            gap: 10px;  /* 버튼 사이의 간격 */
+            align-items: center;
+            justify-content: flex-start;
         }
 
         .card-footer .btn {
-            margin-right: 5px;
-            scale: min(0.9);
-            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .card-footer .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .card-footer .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .card-footer .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .card-footer .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .card-footer .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
         }
     </style>
 </head>
@@ -294,16 +324,16 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <a th:href="@{/room/update(idx=${roomDTO.idx})}" class="btn btn-primary">수정</a>
-                        <a th:href="@{/room/delete(idx=${roomDTO.idx})}" class="btn btn-danger">삭제</a>
-                        <button onclick="history.back()" class="btn btn-secondary">목록</button>
+                        <a th:href="@{/room/ho/main(organ_idx=${roomDTO.organIdx})}" class="btn btn-secondary">목록</a>
+                        <a th:href="@{/room/ho/update/{idx}(idx=${roomDTO.idx})}" class="btn btn-primary">수정</a>
+                        <button type="button" class="btn btn-danger" th:onclick="'deleteRoom(' + ${roomDTO.idx} + ')'">삭제</button>
                         <!-- 성수기 등록 (a 태그) -->
                         <a th:if="${roomDTO.roomSeason == 'off'}"
-                           th:href="@{/room/roomSeason/update(idx=${roomDTO.idx}, roomSeason='peak')}"
+                           th:href="@{/room/ho/roomSeason/update(idx=${roomDTO.idx}, roomSeason='peak')}"
                            class="btn btn-warning">성수기로 변경</a>
                         <!-- 성수기 해제 (a 태그) -->
                         <a th:if="${roomDTO.roomSeason == 'peak'}"
-                           th:href="@{/room/roomSeason/update(idx=${roomDTO.idx}, roomSeason='off')}"
+                           th:href="@{/room/ho/roomSeason/update(idx=${roomDTO.idx}, roomSeason='off')}"
                            class="btn btn-secondary">비성수기로 변경</a>
                     </div>
                 </div>
@@ -316,11 +346,9 @@
 
 <th:block layout:fragment="script">
     <script th:inline="javascript">
-
         $(document).ready(function () {
             // 이미지 삭제버튼을 클릭했을 때
             $(".deleteBtn").on('click', function () {
-
                 var idx = this.value;
 
                 $.ajax({
@@ -376,6 +404,46 @@
                 });
             });
         });
+
+        function deleteRoom(idx) {
+            Swal.fire({
+                title: '정말 삭제하시겠습니까?',
+                text: "삭제된 룸은 복구할 수 없습니다.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '예',
+                cancelButtonText: '아니오'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/room/ho/delete/${idx}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: '삭제 완료',
+                                text: '룸이 성공적으로 삭제되었습니다.',
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.href = '/room/ho/main?organ_idx=' + [[${roomDTO.organIdx}]];
+                            });
+                        } else {
+                            Swal.fire('오류', '룸 삭제에 실패했습니다.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('오류', '룸 삭제 중 오류가 발생했습니다.', 'error');
+                    });
+                }
+            });
+        }
     </script>
 </th:block>
 </body>

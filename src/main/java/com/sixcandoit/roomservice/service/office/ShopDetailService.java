@@ -196,6 +196,7 @@ public class ShopDetailService {
             organization.setRoomJoin(organ.getRoomJoin());
             organization.setEventJoin(organ.getEventJoin());
             organization.setImageFileJoin(organ.getImageFileJoin());
+            organization.setHotels(organ.getHotels());
 
             ShopDetailEntity shopDetail = modelMapper.map(shopDetailDTO, ShopDetailEntity.class);
             shopDetail.setMenuJoin(shopEntity.getMenuJoin());
@@ -223,12 +224,12 @@ public class ShopDetailService {
             System.out.println("체크 9");
 
             // Entity 테이블에 저장
-            shopDetailRepository.save(shopEntity);
+            shopDetailRepository.save(shopDetail);
 
             System.out.println("체크 10");
 
             // Entity 테이블에 저장
-            organizationRepository.save(organ);
+            organizationRepository.save(organization);
 
             System.out.println("체크 11");
 

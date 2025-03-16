@@ -208,6 +208,38 @@
                 container2.innerHTML = '<label>*이미지 :</label>' +
                     '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
             }
+
+            $(document).ready(function() {
+                $('form').on('submit', function(e) {
+                    e.preventDefault();
+                    
+                    var formData = new FormData(this);
+                    
+                    $.ajax({
+                        url: '/room/ho/update',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            Swal.fire({
+                                title: '수정 완료',
+                                text: '객실이 성공적으로 수정되었습니다.',
+                                icon: 'success'
+                            }).then((result) => {
+                                window.location.href = '/room/ho/detail?idx=' + [[${roomDTO.idx}]];
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: '오류',
+                                text: '객실 수정 중 오류가 발생했습니다.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                });
+            });
         });
     </script>
 </th:block>

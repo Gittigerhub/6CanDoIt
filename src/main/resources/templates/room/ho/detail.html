@@ -324,9 +324,9 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <a th:href="@{/room/ho/main(organ_idx=${roomDTO.organIdx})}" class="btn btn-secondary">목록</a>
-                        <a th:href="@{/room/ho/update/{idx}(idx=${roomDTO.idx})}" class="btn btn-primary">수정</a>
-                        <button type="button" class="btn btn-danger" th:onclick="'deleteRoom(' + ${roomDTO.idx} + ')'">삭제</button>
+                        <a th:href="@{/room/ho/list(organ_idx=${roomDTO.organ_idx})}" class="btn btn-secondary">목록</a>
+                        <a th:href="@{/room/ho/update(idx=${roomDTO.idx})}" class="btn btn-primary">수정</a>
+                        <button th:onclick="'deleteRoom(' + ${roomDTO.idx} + ')'" class="btn btn-danger">삭제</button>
                         <!-- 성수기 등록 (a 태그) -->
                         <a th:if="${roomDTO.roomSeason == 'off'}"
                            th:href="@{/room/ho/roomSeason/update(idx=${roomDTO.idx}, roomSeason='peak')}"
@@ -355,50 +355,24 @@
                     url: "/images/delete",
                     type: 'GET',
                     data: {
-                        idx: idx                        // 전달값 : 값
+                        idx: idx
                     },
-                    success: function (response) {      // 작업 성공시
+                    success: function (response) {
                         Swal.fire({
-                            icon: null,
+                            icon: 'success',
                             text: "이미지를 삭제하였습니다",
-                            customClass: {
-                                container: 'bootstrap-swal-container',
-                                popup: 'card shadow-sm',
-                                title: 'h4 text-success',
-                                content: 'text-dark',
-                            },
                             showConfirmButton: false,
-                            timer: 2000,
-                            willOpen: () => {
-                                Swal.showLoading();
-                            },
-                            buttonsStyling: false,
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false
+                            timer: 2000
                         }).then(() => {
-                            location.reload();          // 현재 목록페이지를 다시 읽어온다.
+                            location.reload();
                         });
                     },
-                    error: function () {                // 작업 실패시
+                    error: function () {
                         Swal.fire({
-                            icon: null,
+                            icon: 'error',
                             text: "이미지 삭제를 실패하였습니다",
-                            customClass: {
-                                container: 'bootstrap-swal-container',
-                                popup: 'card shadow-sm',
-                                title: 'h4 text-success',
-                                content: 'text-dark',
-                            },
                             showConfirmButton: false,
-                            timer: 2000,
-                            willOpen: () => {
-                                Swal.showLoading();
-                            },
-                            buttonsStyling: false,
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false
+                            timer: 2000
                         });
                     }
                 });
@@ -407,8 +381,8 @@
 
         function deleteRoom(idx) {
             Swal.fire({
-                title: '정말 삭제하시겠습니까?',
-                text: "삭제된 룸은 복구할 수 없습니다.",
+                title: '룸 삭제',
+                text: "정말 삭제하시겠습니까?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -417,25 +391,19 @@
                 cancelButtonText: '아니오'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`/room/ho/delete/${idx}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
+                    fetch('/room/ho/delete?idx=' + idx, {
+                        method: 'GET'
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: '삭제 완료',
-                                text: '룸이 성공적으로 삭제되었습니다.',
-                                icon: 'success'
-                            }).then(() => {
-                                window.location.href = '/room/ho/main?organ_idx=' + [[${roomDTO.organIdx}]];
-                            });
-                        } else {
-                            Swal.fire('오류', '룸 삭제에 실패했습니다.', 'error');
-                        }
+                    .then(response => {
+                        Swal.fire({
+                            title: '삭제 완료',
+                            text: '룸이 성공적으로 삭제되었습니다.',
+                            icon: 'success'
+                        }).then(() => {
+                            const organIdx = [[${roomDTO.organ_idx}]];
+                            const redirectUrl = organIdx ? '/room/ho/list?organ_idx=' + organIdx : '/room/ho/list';
+                            window.location.href = redirectUrl;
+                        });
                     })
                     .catch(error => {
                         console.error('Error:', error);

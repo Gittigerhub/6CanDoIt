@@ -543,6 +543,7 @@
                 <input type="password" name="password" placeholder="비밀번호" required>
             </div>
             <button type="submit" class="signin__btn">로그인</button>
+            <div th:if="${param.error}" style="display:none;" id="loginError"></div>
         </form>
 
         <!-- 회원가입 폼 -->
@@ -1022,11 +1023,10 @@ E-mail : himyeongsun@gmail.com
 </div>
 
 <th:block layout:fragment="script">
-    <script>
+    <script th:inline="javascript">
         // 이메일 인증
         var emailCheckYN = 0;
         $("#emailSendBtn").on("click", function () {
-
             console.log("코드 발송 접근")
             $.ajax({
                 url: '/member/sendEmailCode',
@@ -1035,9 +1035,9 @@ E-mail : himyeongsun@gmail.com
                 dataType: 'text',
                 success: function (data) {
                     console.log("메일 발송 완료" + data)
+                    alert("이메일이 전송되었습니다.");
                 },
                 error(xhr, status, err) {
-
                     console.log(xhr, status, err)
                 }
             });
@@ -1361,6 +1361,14 @@ E-mail : himyeongsun@gmail.com
 
             return false; // 폼 기본 제출 방지
         }
+
+        // 로그인 실패 처리
+        document.addEventListener('DOMContentLoaded', function() {
+            const error = /*[[${param.error}]]*/ null;
+            if (error) {
+                alert("회원정보를 다시 확인해주세요.");
+            }
+        });
     </script>
 </th:block>
 </body>

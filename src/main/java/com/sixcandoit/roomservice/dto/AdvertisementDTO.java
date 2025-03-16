@@ -1,15 +1,13 @@
 package com.sixcandoit.roomservice.dto;
 
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdvertisementDTO {

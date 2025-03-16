@@ -15,7 +15,6 @@
 
     <!-- 페이지 시작 -->
     <div class="container">
-        <h2>광고 관리</h2>
         <form th:action="@{/advertisement/list}" method="get">
 
             <div class="row p-5 bg-white">
@@ -39,7 +38,7 @@
 
                 <div class="col-1 d-flex justify-content-end">
                     <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
-                    <button type="submit" class="btn btn-success">조회</button>
+                    <button type="submit" class="btn btn-outline-secondary">조회</button>
                 </div>
             </div>
 
@@ -65,15 +64,15 @@
                     <td th:text="${data.idx}"></td>
                     <td th:text="${data.organizationJoin.organName}"></td>
                     <td>
-                        <a th:href="@{/advertisement/read(idx=${data.idx})}" th:text="${data.adTitle}"></a>
+                        <a style="text-decoration: none; font-weight: bold" th:href="@{/advertisement/read(idx=${data.idx})}" th:text="${data.adTitle}"></a>
                     </td>
                     <td>
                         <span th:text="${#temporals.format(data.adStartDate, 'yyyy/MM/dd HH:mm')}"></span> ~
                         <span th:text="${#temporals.format(data.adEndDate, 'yyyy/MM/dd HH:mm')}"></span>
                     </td>
                     <td>
-                        <button style="font-size: 12px" th:if="${data.adState == 'Y'}" class="btn btn-primary">활성화</button>
-                        <button style="font-size: 12px" th:unless="${data.adState == 'Y'}" class="btn btn-danger">비활성화</button>
+                        <span style="font-size: 12px" th:if="${data.adState == 'Y'}" class="badge rounded-pill text-bg-primary">활성화</span>
+                        <span style="font-size: 12px" th:unless="${data.adState == 'Y'}" class="badge rounded-pill text-bg-danger">비활성화</span>
                     </td>
                 </tr>
                 </tbody>
@@ -112,7 +111,7 @@
 
             <!-- 등록 모달 열기 버튼 시작 -->
             <div class="d-flex justify-content-end">
-                <button id="btn-add" type="button" class="btn btn-success">추가</button>
+                <button id="btn-add" type="button" class="btn btn-outline-secondary">추가</button>
             </div>
             <!-- 등록 모달 열기 버튼 끝 -->
 
@@ -144,7 +143,7 @@
                                     <label>*업체 :</label>
                                     <span class="d-flex">
                                         <input style="width: 83%; background: ghostwhite" id="organ" name="organ" type="text" class="form-control me-3" readonly>
-                                        <button type="button" id="searchButton" class="btn btn-success">검색</button> <!-- 조직 검색 버튼 -->
+                                        <button type="button" id="searchButton" class="btn btn-outline-secondary">검색</button> <!-- 조직 검색 버튼 -->
                                     </span>
                                 </div>
                             </div>
@@ -213,8 +212,8 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0">
-                        <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                        <button type="button" id="addButton" class="btn btn-outline-secondary"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
                     </div>
                 </form>
             </div>
@@ -259,7 +258,7 @@
                                         <!--검색할 단어 입력-->
                                         <input type="text" id="searchWord" name="searchWord" style="width: 83%" class="form-control me-3" placeholder="조직명을 입력하세요"/>
                                         <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
-                                        <button type="button" id="searchOrgan" class="btn btn-success">조회</button>
+                                        <button type="button" id="searchOrgan" class="btn btn-outline-secondary">조회</button>
                                     </span>
                                 </div>
                             </div>
@@ -280,7 +279,7 @@
                     </table>
 
                     <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">취소</button>
                     </div>
                 </form>
             </div>

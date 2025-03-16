@@ -3,16 +3,21 @@ package com.sixcandoit.roomservice.service.menu;
 import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
+import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
+import com.sixcandoit.roomservice.entity.room.ReservationEntity;
+import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.repository.menu.MenuRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import com.sixcandoit.roomservice.repository.office.ShopDetailRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.office.ShopDetailService;
+import com.sixcandoit.roomservice.service.room.ReservationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +39,8 @@ import java.util.stream.Collectors;
 @Log4j2
 public class MenuService {
 
+    private final ReservationService reservationService;
+    private final MemberRepository memberRepository;
     private final MenuRepository menuRepository;
     private final ModelMapper modelMapper;
     private final OrganizationRepository organizationRepository;
@@ -43,6 +50,31 @@ public class MenuService {
     private final ImageFileService imageFileService;
     private final ShopDetailService shopDetailService;
 
+
+    // 회원 찾아서 예약건 찾아오기
+    public OrganizationDTO findMemberRes(String email) {
+
+        // 회원 이메일로 회원 조회
+        MemberEntity memberEntity = memberRepository.findByMemberEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("회원정보를 찾을 수 없습니다."));
+
+        // 찾아온 회원정보로 예약건 찾기
+        ReservationEntity reservationEntities = reservationService.findCheckInRes(memberEntity.getIdx());
+
+        if (reservationEntities == null) {
+            System.out.println("예약완료된 예약건이 없습니다.");
+        }
+
+        // 예약완료된 예약건의 호텔 찾기
+        OrganizationEntity organization = organizationRepository.findById(reservationEntities.getRoomJoin().getOrganizationJoin().getIdx())
+                .orElseThrow(() -> new RuntimeException("조직을 조회할 수 없습니다."));
+
+        // Entity -> DTO
+        OrganizationDTO organizationDTO = modelMapper.map(organization, OrganizationDTO.class);
+        // 반환하기
+        return organizationDTO;
+
+    }
 
     //메뉴 등록
     public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> multipartFiles,
@@ -148,6 +180,36 @@ public class MenuService {
                     menuEntities = menuRepository.findAll(pageable);
 
             }
+
+            // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
+            //Entity를 dTO로 변환 후 저장
+
+            Page<MenuDTO> menuDTOS = menuEntities.map(
+                    data -> modelMapper.map(data, MenuDTO.class));
+
+            // 4. 결과값을 전달
+            return menuDTOS;
+
+        } catch (Exception e) { //오류 발생시 처리
+            throw new RuntimeException("조회 오류");
+        }
+
+    }
+
+    // 사용자 룸서비스 목록
+    public Page<MenuDTO> menuMemberList(Pageable page, String type, String keyword, Integer organIdx) {
+        try {
+            // 1. 페이지 정보를 재가공
+            int currentPage = page.getPageNumber() - 1;  // 화면의 페이지 번호를 db 페이지 번호로
+            int pageSize = 10; // 한 페이지를 구성하는 레코드 수
+
+            // 지정된 내용으로 페이지 정보를 재생산, 정렬 내림차순 DESC
+            Pageable pageable = PageRequest.of(currentPage, pageSize,
+                    Sort.by(Sort.Direction.DESC, "idx"));
+
+            // 2. 조회
+            // 조회 결과를 저장할 변수 선언
+            Page<MenuEntity> menuEntities = menuRepository.AllMenu(pageable, organIdx);
 
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             //Entity를 dTO로 변환 후 저장

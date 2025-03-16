@@ -35,7 +35,7 @@ public class AdvertisementController {
     // 목록
     @GetMapping("/list")
     public String list(@PageableDefault(page = 1) Pageable page,                            // 페이지 정보
-                       @RequestParam(value = "type", defaultValue = "") String type,        // 검색대상
+                       @RequestParam(value = "type", defaultValue = "0") String type,        // 검색대상
                        @RequestParam(value = "keyword", defaultValue = "") String keyword,  // 키워드
                        Model model){
 
@@ -48,7 +48,7 @@ public class AdvertisementController {
 
         model.addAllAttributes(pageInfo);                                        // 페이지 정보
         model.addAttribute("advertisementDTOS", advertisementDTOS);  // 데이터 전달
-        model.addAttribute("type", type);                            //검색분류
+        model.addAttribute("type", type);                            // 검색분류
         model.addAttribute("keyword", keyword);                      // 키워드
 
         return "advertisement/list";
@@ -103,14 +103,20 @@ public class AdvertisementController {
     @PostMapping("/update")
     @ResponseBody
     public ResponseEntity<String> Update(@ModelAttribute AdvertisementDTO advertisementDTO,
-                                         List<MultipartFile> imageFiles) {
+                                         List<MultipartFile> imageFiles, Integer organIdx,
+                                         OrganizationDTO organizationDTO) {
 
         // 이미지 조회전 join값 생성
         String join = "adver";
 
+        System.out.println(advertisementDTO.toString());
+        System.out.println(imageFiles.size());
+        System.out.println(organIdx);
+        System.out.println(organizationDTO.toString());
+
         try {
             // 서비스에 등록 요청
-            advertisementService.adUpdate(advertisementDTO, join, imageFiles);
+            advertisementService.adUpdate(advertisementDTO, organizationDTO, organIdx, join, imageFiles);
 
             // 수정 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
             return ResponseEntity.ok("수정 하였습니다.");
@@ -136,6 +142,9 @@ public class AdvertisementController {
     // 광고 상세보기
     @GetMapping("/read")
     public String read(@RequestParam Integer idx, Model model){
+
+        // 조회수 증가
+        advertisementService.adHitsUp(idx);
 
         // 이미지 조회전 join값 생성
         String join = "adver";

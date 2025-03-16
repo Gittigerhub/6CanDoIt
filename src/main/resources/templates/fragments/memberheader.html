@@ -31,7 +31,7 @@
             <a class="nav-link" style="font-size: 20px" th:href="@{/office/member/list}">호텔</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px" th:href="@{/member/menu/listmenu}">룸서비스</a>
+            <a class="nav-link" style="font-size: 20px" th:href="@{/member/menu/listmenu}" onclick="checkURLAccessibility(event, this.href)">룸서비스</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" style="font-size: 20px" th:href="@{/event/userevent}">이벤트</a>
@@ -71,6 +71,24 @@
           </ul>
         </th:block>
       </div>
+
+      <script>
+        function checkURLAccessibility(event, url) {
+          event.preventDefault(); // 기본 이동 방지
+
+          fetch(url, { method: 'HEAD' }) // URL에 HEAD 요청
+                  .then(response => {
+                    if (response.ok) {
+                      window.location.href = url; // 정상 접근 가능하면 이동
+                    } else {
+                      alert("해당 페이지에 접근할 수 없습니다."); // 접근 불가 시 알림
+                    }
+                  })
+                  .catch(() => {
+                    alert("해당 페이지에 접근할 수 없습니다."); // 네트워크 오류 등 처리
+                  });
+        }
+      </script>
 
     </div>
   </nav>

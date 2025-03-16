@@ -13,10 +13,32 @@ import java.util.List;
 @Repository
 public interface OrganizationRepository extends JpaRepository<OrganizationEntity, Integer> {
 
+    // 사용자 호텔 조회
+
+    // 전체
+    @Query("SELECT o FROM OrganizationEntity o where o.organType = 'HO' or o.organType = 'BO'")
+    List<OrganizationEntity> searchALLList();
+
+    // 전체
+    @Query("SELECT o FROM OrganizationEntity o WHERE (o.organType = 'HO' or o.organType = 'BO') and o.organName like %:keyword%")
+    List<OrganizationEntity> searchALLNameList(String keyword);
+
+    // 특정 지역 선택시
+    @Query("SELECT o FROM OrganizationEntity o where (o.organType = 'HO' or o.organType = 'BO') and o.organAddress like :location% and o.organAddress like %:location2%")
+    List<OrganizationEntity> searchHotels(String location, String location2);
+
+    // 특정 지역 선택시 + 호텔명
+    @Query("SELECT o FROM OrganizationEntity o WHERE (o.organType = 'HO' or o.organType = 'BO') and o.organName like %:keyword% and " +
+            "o.organAddress like :location% and o.organAddress like %:location2%")
+    List<OrganizationEntity> searchHotelsName(String location, String location2, String keyword);
+
+
+    // ================================================
+
     // 조직 검색
 
     // 전체(슈퍼 바이저)
-    @Query("SELECT o FROM OrganizationEntity o")
+    @Query("SELECT o FROM OrganizationEntity o where o.organType = 'HO' or o.organType = 'BO'")
     Page<OrganizationEntity> searchALL(Pageable pageable);
 
     // 본사(슈퍼 바이저)
@@ -32,7 +54,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     Page<OrganizationEntity> searchSHOP(Pageable pageable);
 
     // 전체 + 조직명(슈퍼 바이저)
-    @Query("SELECT o FROM OrganizationEntity o WHERE o.organName like %:keyword%")
+    @Query("SELECT o FROM OrganizationEntity o WHERE (o.organType = 'HO' or o.organType = 'BO') and o.organName like %:keyword%")
     Page<OrganizationEntity> searchALLName(@Param("keyword") String keyword, Pageable pageable);
 
     // 본사 + 조직명(슈퍼 바이저)
@@ -64,7 +86,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     Page<OrganizationEntity> searchHOS(Pageable pageable, Integer adminIdx);
 
     // 전체(본사 관리자) + 조직명
-    @Query("SELECT o FROM OrganizationEntity o WHERE o.head.idx = :adminIdx or o.hotels.idx = :adminIdx and o.organName like %:keyword%")
+    @Query("SELECT o FROM OrganizationEntity o WHERE (o.head.idx = :adminIdx or o.hotels.idx = :adminIdx) and o.organName like %:keyword%")
     Page<OrganizationEntity> searchHOAName(@Param("keyword") String keyword, Pageable pageable, Integer adminIdx);
 
     // 지사(본사 관리자) + 조직명
@@ -92,14 +114,6 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     // 매장(지사 관리자) + 조직명
     @Query("SELECT o FROM OrganizationEntity o WHERE o.organType = 'SHOP' and o.hotels.idx = :adminIdx and o.organName like %:keyword%")
     Page<OrganizationEntity> searchBOSName(@Param("keyword") String keyword, Pageable pageable, Integer adminIdx);
-
-    // ==============================
-
-    // 분류에 따른 조회
-    List<OrganizationEntity> findByOrganType(String searchType);
-
-    List<OrganizationEntity> findByOrganTypeAndOrganNameLikeIgnoreCase(String searchType, String searchWord);
-    // 본사 + 조직명
 
     // ===============================
 

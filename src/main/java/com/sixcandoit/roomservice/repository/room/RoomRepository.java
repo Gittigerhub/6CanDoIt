@@ -68,4 +68,10 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     @Query("SELECT r FROM RoomEntity r WHERE r.organizationJoin.idx = :organIdx AND r.roomType = :roomType")
     Page<RoomEntity> findByOrganIdxAndRoomType(@Param("organIdx") Integer organIdx, @Param("roomType") String roomType, Pageable pageable);
 
+    // =================================
+
+    // 호텔에서 가장 싼 방
+    @Query("select r from RoomEntity r where r.organizationJoin.idx = :idx order by r.roomPrice ASC")
+    Optional<RoomEntity> findCheap(Integer idx);
+
 }

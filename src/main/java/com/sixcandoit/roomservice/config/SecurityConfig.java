@@ -93,9 +93,10 @@ public class SecurityConfig{
                     auth.requestMatchers("/res/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
                     auth.requestMatchers("/room/**").permitAll();
                     // 공지사항 페이지 접근 권한
-                    auth.requestMatchers("/notice/**").permitAll();
+                    auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update", "/notice/delete").hasAnyRole("ADMIN","HO", "BO");
+                    auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
                     // 오더 페이지 접근 권한
-                    auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").permitAll();
+                    auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
                     // 메뉴 페이지 접근 권한
                     auth.requestMatchers("/menu/**").permitAll();
                     // 장바구니 페이지 접근 권한
@@ -168,9 +169,10 @@ public class SecurityConfig{
             auth.requestMatchers("/res/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             auth.requestMatchers("/room/**").permitAll();
             // 공지사항 페이지 접근 권한
-            auth.requestMatchers("/notice/**").permitAll();
+            auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update", "/notice/delete").hasAnyRole("ADMIN","HO", "BO");
+            auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             // 오더 페이지 접근 권한
-            auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").permitAll();
+            auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             // 메뉴 페이지 접근 권한
             auth.requestMatchers("/menu/**").permitAll();
             // 장바구니 페이지 접근 권한

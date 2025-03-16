@@ -17,7 +17,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
     List<PaymentEntity> findByPaymentState(String paymentState);
     Optional<PaymentEntity> findByOrderId(String orderId);
     List<PaymentEntity> findByMemberJoin_MemberEmail(String memberEmail);
-    
+
     // 회원의 예약 결제 내역 조회 (JPQL 사용)
     @Query("SELECT p FROM PaymentEntity p JOIN ReservationEntity r ON p.orderId = CONCAT('ROOM_', r.idx) WHERE r.memberJoin.memberEmail = :memberEmail")
     List<PaymentEntity> findByReservationMemberEmail(@Param("memberEmail") String memberEmail);

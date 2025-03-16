@@ -139,10 +139,10 @@ public class PaymentService {
     // 주문별 결제 내역 조회
     public PaymentDTO findByOrderIdx(Integer orderIdx) {
         log.info("주문별 결제 내역을 조회합니다. orderIdx: " + orderIdx);
-        
+
         // orderId 생성 (ROOM_ + orderIdx)
         String orderId = "ROOM_" + orderIdx;
-        
+
         // orderId로 결제 정보 조회
         PaymentEntity payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 주문의 결제 정보를 찾을 수 없습니다. orderIdx: " + orderIdx));
@@ -242,12 +242,12 @@ public class PaymentService {
         dto.setErrorCode(entity.getErrorCode());
         dto.setErrorMessage(entity.getErrorMessage());
         dto.setRegDate(entity.getRegDate());
-        
+
         // 회원 이메일 설정
         if (entity.getMemberJoin() != null) {
             dto.setMemberEmail(entity.getMemberJoin().getMemberEmail());
         }
-        
+
         return dto;
     }
 

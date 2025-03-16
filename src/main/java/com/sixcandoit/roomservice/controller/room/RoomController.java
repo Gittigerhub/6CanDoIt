@@ -167,6 +167,56 @@ public class RoomController {
     }
 
     /* -----------------------------------------------------------------------------
+   경로 : /room/reserve
+   인수 : LocalDate sdate, LocalDate edate, Integer organ_idx, Model model
+   출력 : room/reserve 페이지로 이동
+   설명 : 예약 목록을 조회하여 페이지로 전달
+----------------------------------------------------------------------------- */
+    //관리자용 예약 목록 리스트
+    @GetMapping("/room/bo/reserve")
+    public String resbolist(@RequestParam(name = "sdate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sdate,
+                          @RequestParam(name = "edate", required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate edate,
+                          @RequestParam(required = false) Integer organ_idx,
+                          Model model) {
+        log.info("데이터 조회 후 목록페이지로 이동....");
+
+        // Room 리스트 데이터 가져오기 (organ_idx에 따라 필터링)
+        List<RoomDTO> roomDTOList;
+        if (organ_idx != null) {
+            // organ_idx가 있는 경우 해당 organization의 room만 조회
+            roomDTOList = roomService.resList();  // 전체 목록 조회
+            // organ_idx로 필터링
+            roomDTOList = roomDTOList.stream()
+                    .filter(room -> room.getOrgan_idx() != null && room.getOrgan_idx().equals(organ_idx))
+                    .collect(Collectors.toList());
+        } else {
+            roomDTOList = roomService.resList();
+        }
+        model.addAttribute("roomDTOList", roomDTOList);
+
+        // 리다이렉트 후 전달된 성공 또는 실패 메시지를 받아옵니다.
+        if (model.containsAttribute("errorMessage")) {
+            model.addAttribute("errorMessage", model.getAttribute("errorMessage"));
+        }
+
+        // 예약 리스트 데이터 가져오기 (organ_idx에 따라 필터링)
+        List<ReservationDTO> reserveDTOList;
+        if (organ_idx != null) {
+            // organ_idx에 해당하는 room들의 예약만 조회
+            reserveDTOList = reservationService.reserveListByOrganization(organ_idx, sdate, edate);
+        } else {
+            reserveDTOList = reservationService.reserveList(sdate, edate);
+        }
+
+        model.addAttribute("reserveDTOList", reserveDTOList);
+        model.addAttribute("sdate", sdate);
+        model.addAttribute("edate", edate);
+        model.addAttribute("organ_idx", organ_idx);
+
+        return "room/bo/reserve";
+    }
+
+    /* -----------------------------------------------------------------------------
        경로 : /room/updateStatus/{idx}
        인수 : Integer idx, Map<String, String> requestBody
        출력 : JSON 응답

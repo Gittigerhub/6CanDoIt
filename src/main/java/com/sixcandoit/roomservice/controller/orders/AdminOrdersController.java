@@ -24,6 +24,21 @@ public class AdminOrdersController {
 
     private final OrdersService ordersService;
 
+    /* -----------------------------------------------------------------------------
+       경로 : /orders/main
+       인수 : Integer organ_idx, Model model
+       출력 : room/main 페이지로 이동
+       설명 : 룸 관리 메인 페이지를 반환
+    ----------------------------------------------------------------------------- */
+    // 룸 관리 메인 페이지
+    @GetMapping("/orders/main")
+    public String main(@RequestParam(required = false) Integer organ_idx, Model model) {
+        if (organ_idx != null) {
+            model.addAttribute("organ_idx", organ_idx);
+        }
+        return "orders/bo/main";
+    }
+
     //1. 주문 목록 페이지 (+검색 기능)
     @GetMapping("/orders/adordersList")
     public String ordersList(@PageableDefault(page = 1) Pageable page,

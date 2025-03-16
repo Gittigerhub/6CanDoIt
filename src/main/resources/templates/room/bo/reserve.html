@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/bolayout}">
+<head>
+    <title>예약 관리</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!--JQuery 반드시 추가-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--Jquery를 이용한 드래그 앤 드롭, 리사이즈, 애니메이션 등 인터랙티브 기능을 구현-->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!--부트스트랩 아이콘-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--알림창 스크립트-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: "Montserrat", sans-serif;
+        }
+        .card {
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .card-footer {
+            background-color: #ffffff;
+        }
+
+        .btn-outline-primary:hover, .btn-outline-danger:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        a {
+            text-decoration: none; /* 밑줄 없애기 */
+            color: black; /* 글자 색을 검은색으로 변경 */
+        }
+
+        /* 커스텀 클릭 메뉴 스타일 */
+        #contextMenu, #contextMenu2{
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 5px 0;
+            width: 150px;
+            border-radius: 4px;
+        }
+
+        #contextMenu a, #contextMenu2 a  {
+            display: block;
+            padding: 8px 10px;
+            text-decoration: none;
+            color: black;
+            cursor: pointer;
+        }
+
+        #contextMenu a:hover, #contextMenu2 a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* 체크인 카드만 예쁘게 변경 ^^ */
+        .checkin-card {
+            background-color: #fcf8e3; /* 예쁜 노란색 */
+            color: #000; /* 글자색을 검정으로 */
+            border: 1px solid #ffcd39; /* 경계선 색상 */
+        }
+        .checkin-card:hover {
+            background-color: #ffecb5; /* 체크인 카드에 마우스를 올렸을 때 밝은 노란색 */
+            border-color: #ffcd39;
+        }
+
+        /* 예약 중 카드만 예쁘게 변경 ^^ */
+        .res-card {
+            background-color: #F0F8FF; /* 예쁜 노란색 */
+            color: #000; /* 글자색을 검정으로 */
+            border: 1px solid #D6E8F3; /* 경계선 색상 */
+        }
+        .res-card:hover {
+            background-color: #D6E8F3; /* 체크인 카드에 마우스를 올렸을 때 밝은 노란색 */
+            border-color: #ADD8E6;
+        }
+
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="p-5">
+    <div class="container mt-5">
+        <div class="row p-5 bg-white">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <h2 class="text-center">예약 목록 현황</h2>
+                <!-- 검색 영역 -->
+                <form th:action="@{/room/bo/reserve}" method="get">
+                    <div class="input-group mb-3 mt-3">
+                        <input type="date" class="form-control" name="sdate" th:value="${sdate}">
+                        <input type="date" class="form-control" name="edate" th:value="${edate}">
+                        <input type="hidden" name="organ_idx" th:value="${organ_idx}">
+                        <button type="submit" class="btn btn-primary">검색</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetSearch()">지우기</button>
+                    </div>
+                </form>
+                <!-- 검색 영역 끝 -->
+            </div>
+            <div class="col-lg-2"></div>
+            <!-- 데이터 목록 -->
+            <div class="row mt-5">
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4" th:each="data : ${reserveDTOList}">
+                    <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                        <div class="card-body text-center" th:onclick="|showContextMenu2(event, ${data.idx})|"
+                             th:classappend="${data.resStatus == '2' ? ' res-card' : ''}">
+                            <p class="card-text" style="font-size: 12px">
+                                <strong>번호:</strong> <span th:text="${data.idx}">1</span>
+                            </p>
+                            <p>
+                                <i class="bi bi-tags-fill"></i>
+                                <span class="card-title" th:text="${data.roomName}">방 이름</span>
+                            </p>
+                            <p>
+                                <strong>예약자:</strong> <span th:text="${data.username}"></span>
+                            </p>
+                            <p style="font-size: 12px">
+                                <span th:text="${#temporals.format(data.startDate, 'yyyy-MM-dd')}">2024-01-21</span> ~
+                                <span th:text="${#temporals.format(data.endDate, 'yyyy-MM-dd')}">2024-01-21</span>
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-center">
+                                <p class="badge rounded-pill text-bg-secondary" style="font-size: 13px" th:if="${data.resStatus == '1'}">예약 중</p>
+                                <p class="badge rounded-pill text-bg-primary" style="font-size: 13px" th:if="${data.resStatus == '2'}">예약 완료</p>
+                                <p class="badge rounded-pill text-bg-danger" style="font-size: 13px" th:if="${data.resStatus == '3'}">체크인</p>
+                                <p class="badge rounded-pill text-bg-danger" style="font-size: 13px" th:if="${data.resStatus == '4'}">체크아웃</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 데이터 목록 끝 -->
+        </div>
+    </div>
+</div>
+</body>
+</html>

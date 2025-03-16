@@ -321,17 +321,17 @@
                 background-color: #0b5ed7;
             }
 
-            .recovery p.mssg {
-                opacity: 0;
-                -webkit-transition: opacity 1s .5s ease;
-                -moz-transition: opacity 1s .5s ease;
-                -o-transition: opacity 1s .5s ease;
-                transition: opacity 1s .5s ease;
-            }
+            /*.recovery p.mssg {*/
+            /*    opacity: 0;*/
+            /*    -webkit-transition: opacity 1s .5s ease;*/
+            /*    -moz-transition: opacity 1s .5s ease;*/
+            /*    -o-transition: opacity 1s .5s ease;*/
+            /*    transition: opacity 1s .5s ease;*/
+            /*}*/
 
-            .recovery p.mssg.animate {
-                opacity: 1;
-            }
+            /*.recovery p.mssg.animate {*/
+            /*    opacity: 1;*/
+            /*}*/
 
 
             /* TOGGLE */
@@ -961,7 +961,6 @@
                 outline: none;
                 background-color: #fff;
             }
-
         </style>
 </head>
 <body>
@@ -982,7 +981,7 @@
                     <!-- 로고 -->
                     <div class="logo">
                         <a href="#"><img
-                                src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/6CanDoIt%EB%A1%9C%EA%B3%A0.png"
+                                src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/6CanDoIt_Hotel_Logo.png"
                                 alt=""></a>
                             </div>
                     <!-- 토글 -->
@@ -1323,12 +1322,12 @@ E-mail : himyeongsun@gmail.com
                             입력하신 이메일로 임시 비밀번호가 발급됩니다.<br></p>
                         <p>임시비밀번호 로그인한 후에는 <strong>반드시 비밀번호를 변경</strong>해주세요.</p>
                         <form class="recovery-form" th:action="@{/admin/password}" method="post" onsubmit="return validatePasswordReset()">
-                            <input type="email" class="input" id="resetEmail" name="adminEmail" placeholder="이메일">
-                            <input type="text" class="input" id="resetName" name="adminName" placeholder="이름">
+                            <input type="email" class="input" id="resetEmail" name="adminEmail" placeholder="이메일" required>
+                            <input type="text" class="input" id="resetName" name="adminName" placeholder="이름" required>
                             <input type="submit" class="button" value="비밀번호 재발급">
                             <div id="resetMessage" style="text-align: center; margin-top: 10px;"></div>
                         </form>
-                        <p class="mssg">이메일로 임시 비밀번호가 전송되었습니다.</p>
+<!--                        <p class="mssg">이메일로 임시 비밀번호가 전송되었습니다.</p>-->
                     </div>
 
 
@@ -1536,20 +1535,20 @@ E-mail : himyeongsun@gmail.com
             });
         });
 
-        // 메세지
-        $(function () {
-            $('.recovery .button').on('click', function (event) {
-                event.preventDefault();
-                $('.recovery .mssg').addClass('animate');
-                setTimeout(function () {
-                    $('.form-wrap').swapClass('open', 'closed');
-                    $('.recovery').swapClass('open', 'closed');
-                    $('#toggle-terms').swapClass('open', 'closed');
-                    $('.tabs-content .fa').swapClass('active', 'inactive');
-                    $('.recovery .mssg').removeClass('animate');
-                }, 2500);
-            });
-        });
+        // // 메세지
+        // $(function () {
+        //     $('.recovery .button').on('click', function (event) {
+        //         event.preventDefault();
+        //         $('.recovery .mssg').addClass('animate');
+        //         setTimeout(function () {
+        //             $('.form-wrap').swapClass('open', 'closed');
+        //             $('.recovery').swapClass('open', 'closed');
+        //             $('#toggle-terms').swapClass('open', 'closed');
+        //             $('.tabs-content .fa').swapClass('active', 'inactive');
+        //             $('.recovery .mssg').removeClass('animate');
+        //         }, 2500);
+        //     });
+        // });
 
         // // 제출 거부
         // $(function() {
@@ -1737,36 +1736,51 @@ E-mail : himyeongsun@gmail.com
             const email = document.getElementById('resetEmail').value;
             const messageDiv = document.getElementById('resetMessage');
 
+            // FormData 객체 생성
+            const formData = new FormData();
+            formData.append('adminName', name);
+            formData.append('adminEmail', email);
+
+            console.log('비밀번호 재발급 요청:', {
+                adminName: name,
+                adminEmail: email
+            });
+
             // 서버에 비밀번호 재발급 요청
-            fetch('/admin/password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'text/plain'
-                },
-                body: JSON.stringify({
+            $.ajax({
+                url: '/admin/password',
+                type: 'POST',
+                data: {
                     adminName: name,
                     adminEmail: email
-                })
-            })
-                .then(response => response.text())
-                .then(result => {
-                    if (result === 'success') {
+                },
+                success: function(response) {
+                    console.log('서버 응답:', response);
+                    if (response === 'success') {
                         messageDiv.style.color = '#4CAF50';
                         messageDiv.textContent = '이메일로 임시 비밀번호가 발송되었습니다.';
+                        
+                        // 2초 후 로그인 폼으로 전환
                         setTimeout(() => {
-                            showLoginForm();
+                            $('.form-wrap').swapClass('open', 'closed');
+                            $('.recovery').swapClass('open', 'closed');
+                            $('#toggle-terms').swapClass('open', 'closed');
+                            $('.tabs-content .fa').swapClass('active', 'inactive');
                         }, 2000);
                     } else {
                         messageDiv.style.color = '#333333';
                         messageDiv.textContent = '이름 또는 이메일이 일치하지 않습니다.';
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+                },
+                error: function(xhr, status, error) {
+                    console.error('에러 발생:', error);
+                    console.error('상태:', status);
+                    console.error('XHR:', xhr.responseText);
+                    
                     messageDiv.style.color = '#333333';
                     messageDiv.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
-                });
+                }
+            });
 
             return false; // 폼 기본 제출 방지
         }

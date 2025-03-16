@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/superlayout}">
 
@@ -12,235 +13,336 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+        .payment-list {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
+        .payment-header {
+            background: linear-gradient(135deg, #6B8E23, #556B2F);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            color: white;
         }
         .filter-container {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
         }
-        .filter-container label, .filter-container select, .filter-container input {
-            padding: 8px;
-            font-size: 14px;
+        .statistics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
-        .filter-container div {
-            margin-bottom: 15px;
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        .stat-title {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
         }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .status-N {
-            color: red;
-            font-weight: bold;
-        }
-        .status-Y {
-            color: green;
-            font-weight: bold;
-        }
-        .button-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .btn {
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            border: none;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-            border: none;
+        .stat-value {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 600;
         }
         .chart-container {
-            width: 100%;
-            height: 400px;
-            margin-top: 40px;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .payment-table {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .table thead th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .status-Y {
+            color: #28a745;
+            background-color: #28a74520;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .status-N {
+            color: #dc3545;
+            background-color: #dc354520;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .btn-search {
+            background: linear-gradient(135deg, #6B8E23, #556B2F);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .btn-search:hover {
+            background: linear-gradient(135deg, #556B2F, #4B5F27);
+            transform: translateY(-2px);
         }
     </style>
 </head>
 
 <body>
 <div layout:fragment="content" class="p-5">
-    <h1>정산조회</h1>
-
-    <!-- 정산 내역 테이블 -->
-    <table>
-        <thead>
-        <tr>
-            <th>이용수</th>
-            <th>매출금액</th>
-            <th>정산금액</th>
-            <th>정산상태</th>
-            <th>매출일자</th>
-            <th>정산일자</th>
-            <th>정산수수료</th>
-        </tr>
-        </thead>
-        <tbody id="settlementTable">
-        <tr>
-            <td>이용자 1</td>
-            <td>500,000원</td>
-            <td>450,000원</td>
-            <td>
-                <select onchange="updateStatus(this)">
-                    <option value="N">N</option>
-                    <option value="Y">Y</option>
-                </select>
-            </td>
-            <td>2025-01-15</td>
-            <td>2025-01-20</td>
-            <td>50,000원</td>
-        </tr>
-        <tr>
-            <td>이용자 2</td>
-            <td>300,000원</td>
-            <td>280,000원</td>
-            <td>
-                <select onchange="updateStatus(this)">
-                    <option value="N">N</option>
-                    <option value="Y">Y</option>
-                </select>
-            </td>
-            <td>2025-01-10</td>
-            <td>2025-01-15</td>
-            <td>20,000원</td>
-        </tr>
-        <tr>
-            <td>이용자 3</td>
-            <td>700,000원</td>
-            <td>630,000원</td>
-            <td>
-                <select onchange="updateStatus(this)">
-                    <option value="N">N</option>
-                    <option value="Y">Y</option>
-                </select>
-            </td>
-            <td>2025-01-12</td>
-            <td>2025-01-18</td>
-            <td>70,000원</td>
-        </tr>
-        </tbody>
-    </table>
-    <br>
-    <div class="filter-container d-flex align-items-center gap-3">
-        <div class="d-inline-flex align-items-center gap-2">
-            <label for="sales" class="mb-0">매출:</label>
-            <input type="date" id="sales" name="sales" class="form-control w-auto">
+    <div class="payment-list">
+        <div class="payment-header">
+            <h2 class="mb-3">정산조회</h2>
+            <p class="mb-0">
+                <i class="fas fa-user-circle me-2"></i>
+                <span th:text="${memberEmail}">사용자</span>님의 정산 내역입니다.
+            </p>
         </div>
 
-        <div class="d-inline-flex align-items-center gap-2">
-            <label for="amount" class="mb-0">정산:</label>
-            <input type="date" id="amount" name="amount" class="form-control w-auto">
+        <div class="filter-container">
+            <div class="row align-items-end g-3">
+                <div class="col-md-4">
+                    <label for="salesDate" class="form-label">매출일자</label>
+                    <input type="date" id="salesDate" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label for="settlementDate" class="form-label">정산일자</label>
+                    <input type="date" id="settlementDate" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <button onclick="searchData()" class="btn btn-search w-100">
+                        <i class="fas fa-search me-2"></i>조회
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <button class="btn btn-primary">조회</button>
+        <div class="statistics-container">
+            <div class="stat-card">
+                <div class="stat-title">총 매출액</div>
+                <div class="stat-value" id="totalSales">0원</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">정산금액</div>
+                <div class="stat-value" id="settlementAmount">0원</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">수수료</div>
+                <div class="stat-value" id="commission">0원</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
+
+        <div class="payment-table">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>이용수</th>
+                        <th>매출금액</th>
+                        <th>정산금액</th>
+                        <th>정산상태</th>
+                        <th>매출일자</th>
+                        <th>정산일자</th>
+                        <th>정산수수료</th>
+                    </tr>
+                    </thead>
+                    <tbody id="settlementTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
-
-
-    <!-- 차트 표시 영역 -->
-    <div class="chart-container">
-        <canvas id="salesChart"></canvas>
-    </div>
-
-    <script>
-        // 조회 버튼 클릭 시 동작하는 함수
-        async function search() {
-            const startDate = document.getElementById('sales').value;
-            const endDate = document.getElementById('amount').value;
-
-            console.log('검색 조건:', { startDate, endDate });
-
-            // 예시: 서버에서 데이터를 가져오는 방법
-            const response = await fetch(`/api/getData?startDate=${startDate}&endDate=${endDate}`);
-            const data = await response.json();
-
-            // 차트 데이터 업데이트
-            salesChart.data.labels = data.users;  // 사용자 목록으로 업데이트
-            salesChart.data.datasets[0].data = data.salesAmounts;  // 매출 금액 업데이트
-            salesChart.data.datasets[1].data = data.settlementAmounts;  // 정산 금액 업데이트
-            salesChart.update();
-        }
-
-        // 차트 생성
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        const salesChart = new Chart(ctx, {
-            type: 'bar',  // 차트 타입: 막대그래프
-            data: {
-                labels: ['이용자 1', '이용자 2', '이용자 3'],  // x축 데이터 (이용자)
-                datasets: [{
-                    label: '매출 금액',
-                    data: [500000, 300000, 700000],  // 매출 금액 (기본값)
-                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                    borderColor: 'rgba(0, 123, 255, 1)',
-                    borderWidth: 1
-                }, {
-                    label: '정산 금액',
-                    data: [450000, 280000, 630000],  // 정산 금액 (기본값)
-                    backgroundColor: 'rgba(40, 167, 69, 0.5)',
-                    borderColor: 'rgba(40, 167, 69, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        // 정산 상태 변경 시 호출되는 함수
-        function updateStatus(selectElement) {
-            const status = selectElement.value;
-            console.log("정산 상태 변경됨:", status);
-
-            // 예를 들어, 서버로 상태를 전송
-            const row = selectElement.closest('tr');
-            const userId = row.querySelector('td:first-child').textContent;
-
-            fetch(`/api/updateStatus`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: userId,
-                    status: status
-                })
-            })
-                .then(response => response.json())
-                .then(data => console.log('정산 상태 업데이트:', data))
-                .catch(error => console.error('에러 발생:', error));
-        }
-    </script>
 </div>
 
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        let salesChart;
+
+        window.addEventListener('load', function() {
+            initializeChart();
+            // 페이지 로드 시 오늘 날짜 설정
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('salesDate').value = today;
+            document.getElementById('settlementDate').value = today;
+            searchData();
+        });
+
+        function initializeChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '매출금액',
+                        data: [],
+                        backgroundColor: 'rgba(107, 142, 35, 0.5)',
+                        borderColor: 'rgba(107, 142, 35, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: '정산금액',
+                        data: [],
+                        backgroundColor: 'rgba(85, 107, 47, 0.5)',
+                        borderColor: 'rgba(85, 107, 47, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '원';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y.toLocaleString() + '원';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function searchData() {
+            const salesDate = document.getElementById('salesDate').value;
+            const settlementDate = document.getElementById('settlementDate').value;
+
+            if (!salesDate || !settlementDate) {
+                alert('매출일자와 정산일자를 모두 선택해주세요.');
+                return;
+            }
+
+            const startDate = new Date(salesDate);
+            const endDate = new Date(settlementDate);
+
+            if (endDate < startDate) {
+                alert('정산일자는 매출일자보다 이후여야 합니다.');
+                return;
+            }
+
+            // 날짜 차이 계산 (최대 5일)
+            const dayDiff = Math.min(Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1, 5);
+
+            const dates = [];
+            const payments = [];
+            let totalSales = 0;
+
+            // 선택한 날짜 범위에 대한 데이터 생성
+            for (let i = 0; i < dayDiff; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                const dateStr = currentDate.toISOString().split('T')[0];
+                dates.push(dateStr);
+
+                // 각 날짜별 1~3개의 결제 생성
+                const paymentCount = Math.floor(Math.random() * 3) + 1;
+                for (let j = 0; j < paymentCount; j++) {
+                    const price = Math.floor(Math.random() * 5000000) + 500000; // 50만원 ~ 550만원
+                    const state = Math.random() > 0.2 ? 'Y' : 'N'; // 80% 확률로 완료
+                    if (state === 'Y') totalSales += price;
+
+                    payments.push({
+                        idx: payments.length + 1,
+                        paymentPrice: price,
+                        paymentState: state,
+                        regDate: dateStr
+                    });
+                }
+            }
+
+            const dummyData = {
+                totalSales: totalSales,
+                settlementAmount: Math.floor(totalSales * 0.9),
+                commission: Math.floor(totalSales * 0.1),
+                dates: dates,
+                payments: payments.sort((a, b) => b.regDate.localeCompare(a.regDate) || b.idx - a.idx)
+            };
+
+            updateDisplay(dummyData);
+        }
+
+        function updateDisplay(data) {
+            // 통계 업데이트
+            document.getElementById('totalSales').innerHTML = `${data.totalSales.toLocaleString()}원`;
+            document.getElementById('settlementAmount').innerHTML = `${data.settlementAmount.toLocaleString()}원`;
+            document.getElementById('commission').innerHTML = `${data.commission.toLocaleString()}원`;
+
+            // 차트 데이터 업데이트
+            const salesByDate = {};
+            data.dates.forEach(date => {
+                salesByDate[date] = 0;
+            });
+
+            data.payments.forEach(payment => {
+                if (payment.paymentState === 'Y') {
+                    salesByDate[payment.regDate] += payment.paymentPrice;
+                }
+            });
+
+            const salesData = data.dates.map(date => salesByDate[date]);
+            const settlementData = salesData.map(amount => Math.floor(amount * 0.9));
+
+            salesChart.data.labels = data.dates;
+            salesChart.data.datasets[0].data = salesData;
+            salesChart.data.datasets[1].data = settlementData;
+            salesChart.update();
+
+            // 테이블 업데이트
+            const tbody = document.getElementById('settlementTable');
+            tbody.innerHTML = '';
+
+            data.payments.forEach(payment => {
+                const tr = document.createElement('tr');
+                const settlementDate = new Date(payment.regDate);
+                settlementDate.setDate(settlementDate.getDate() + 5);
+
+                tr.innerHTML = `
+                    <td>${payment.idx}</td>
+                    <td>${payment.paymentPrice.toLocaleString()}원</td>
+                    <td>${Math.floor(payment.paymentPrice * 0.9).toLocaleString()}원</td>
+                    <td>
+                        <span class="status-${payment.paymentState}">
+                            ${payment.paymentState === 'Y' ? '완료' : '취소'}
+                        </span>
+                    </td>
+                    <td>${payment.regDate}</td>
+                    <td>${settlementDate.toISOString().split('T')[0]}</td>
+                    <td>${Math.floor(payment.paymentPrice * 0.1).toLocaleString()}원</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</th:block>
 </body>
 </html>

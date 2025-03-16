@@ -1,13 +1,11 @@
 package com.sixcandoit.roomservice.controller.payment;
 
 import com.sixcandoit.roomservice.dto.orders.PaymentDTO;
-import com.sixcandoit.roomservice.dto.room.ReservationDTO;
 import com.sixcandoit.roomservice.entity.orders.PaymentEntity;
 import com.sixcandoit.roomservice.repository.orders.PaymentRepository;
 import com.sixcandoit.roomservice.service.orders.PaymentService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +27,11 @@ public class PaymentController {
     private final ReservationService reservationService;
     private final PaymentRepository paymentRepository;
 
-    // 사용자 정보를 모델에 추가하는 메서드
+    /**
+     * ---------------------------------------------------------------------------
+     * 사용자 정보를 모델에 추가하는 메서드
+     * ---------------------------------------------------------------------------
+     */
     private void addUserInfoToModel(Model model) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -51,22 +53,26 @@ public class PaymentController {
         }
     }
 
-    // 결제 목록 조회
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/list
+     * 인수 : Model model
+     * 출력 : 결제 목록 조회
+     * 설명 : 로그인한 사용자의 결제 목록을 조회하여 반환합니다. 비로그인 사용자는 빈 목록 반환.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/payment/list")
-    public String list(Model model) {
+        public String list(Model model) {
         log.info("결제 목록을 조회합니다.");
         try {
-            // 현재 로그인한 사용자 정보 가져오기
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String memberEmail = "게스트";
 
             List<PaymentDTO> paymentDTOList;
             if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
                 memberEmail = auth.getName();
-                // 로그인한 사용자의 결제 목록만 조회
                 paymentDTOList = paymentService.listByMember(memberEmail);
             } else {
-                // 비로그인 사용자는 빈 목록 반환
                 paymentDTOList = List.of();
             }
 
@@ -79,7 +85,14 @@ public class PaymentController {
         }
     }
 
-    // 결제 체크아웃 페이지
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/checkout
+     * 인수 : Integer amount, String orderId, Model model
+     * 출력 : 결제 체크아웃 페이지
+     * 설명 : 결제 체크아웃 페이지를 생성하여 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/payment/checkout")
     public String checkout(@RequestParam("amount") Integer amount,
                            @RequestParam("orderId") String orderId,
@@ -103,7 +116,14 @@ public class PaymentController {
         }
     }
 
-    // 결제 체크아웃 페이지 (기존 결제)
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/checkout/{idx}
+     * 인수 : Integer idx, Model model
+     * 출력 : 기존 결제 체크아웃 페이지
+     * 설명 : 기존 결제에 대한 체크아웃 페이지를 생성하여 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/payment/checkout/{idx}")
     public String checkoutWithId(@PathVariable("idx") Integer idx, Model model) {
         log.info("기존 결제 체크아웃 페이지 로드 - idx: {}", idx);
@@ -118,7 +138,14 @@ public class PaymentController {
         }
     }
 
-    // 결제 상세 정보 조회
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/{idx}
+     * 인수 : Integer idx
+     * 출력 : 결제 상세 정보
+     * 설명 : 결제의 상세 정보를 조회하여 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/payment/{idx}")
     @ResponseBody
     public ResponseEntity<?> getPaymentDetails(@PathVariable("idx") Integer idx) {
@@ -132,7 +159,14 @@ public class PaymentController {
         }
     }
 
-    // 주문별 결제 내역 조회
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/order/{orderIdx}
+     * 인수 : Integer orderIdx
+     * 출력 : 주문별 결제 내역
+     * 설명 : 특정 주문에 대한 결제 내역을 조회하여 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/payment/order/{orderIdx}")
     @ResponseBody
     public ResponseEntity<?> getPaymentByOrder(@PathVariable("orderIdx") Integer orderIdx) {
@@ -146,7 +180,14 @@ public class PaymentController {
         }
     }
 
-    // 결제 상태 조회
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/status/{idx}
+     * 인수 : Integer idx
+     * 출력 : 결제 상태
+     * 설명 : 결제 상태를 조회하여 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/payment/status/{idx}")
     @ResponseBody
     public ResponseEntity<?> getPaymentStatus(@PathVariable("idx") Integer idx) {
@@ -160,7 +201,14 @@ public class PaymentController {
         }
     }
 
-    // 결제 성공 처리
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/paymentsuccess
+     * 인수 : String paymentKey, String orderId, Integer amount, Model model
+     * 출력 : 결제 성공 처리 페이지
+     * 설명 : 결제 성공 후 해당 결제 정보와 함께 성공 처리 페이지를 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/paymentsuccess")
     public String paymentSuccess(
             @RequestParam("paymentKey") String paymentKey,
@@ -170,7 +218,6 @@ public class PaymentController {
         log.info("결제 성공 처리 - paymentKey: {}, orderId: {}, amount: {}", paymentKey, orderId, amount);
 
         try {
-            // 현재 로그인한 사용자 정보 가져오기
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
                 throw new IllegalStateException("로그인이 필요합니다.");
@@ -208,7 +255,14 @@ public class PaymentController {
         }
     }
 
-    // 결제 실패 처리
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/fail
+     * 인수 : String code, String message, String orderId, Model model
+     * 출력 : 결제 실패 처리 페이지
+     * 설명 : 결제 실패 후 해당 오류 메시지와 함께 실패 처리 페이지를 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/payment/fail")
     public String paymentFail(
             @RequestParam("code") String code,
@@ -218,7 +272,6 @@ public class PaymentController {
         log.info("결제 실패 처리 - code: {}, message: {}, orderId: {}", code, message, orderId);
 
         try {
-            // 현재 로그인한 사용자 정보 가져오기
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
                 throw new IllegalStateException("로그인이 필요합니다.");
@@ -244,29 +297,36 @@ public class PaymentController {
         }
     }
 
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/cancel/{idx}
+     * 인수 : Integer idx, Model model, RedirectAttributes redirectAttributes
+     * 출력 : 결제 취소 페이지
+     * 설명 : 특정 결제에 대한 취소 페이지를 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @GetMapping("/orders/payment/cancel/{idx}")
     public String cancel(@PathVariable("idx") Integer idx, Model model, RedirectAttributes redirectAttributes) {
         log.info("결제 취소 페이지 요청 - idx:{}", idx);
         try {
-            // 현재 로그인한 사용자 정보 가져오기
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
                 throw new IllegalStateException("로그인이 필요합니다.");
             }
             String memberEmail = auth.getName();
-            
+
             PaymentDTO paymentDTO;
-            
+
             // 예약 번호로 들어온 경우 (ROOM_로 시작하는 orderId를 가진 결제 찾기)
             String orderId = "ROOM_" + idx;
             PaymentEntity paymentEntity = paymentRepository.findByOrderId(orderId)
                     .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다."));
-            
+
             // 본인의 결제인지 확인
             if (!memberEmail.equals(paymentEntity.getMemberJoin().getMemberEmail())) {
                 throw new IllegalStateException("본인의 결제만 취소할 수 있습니다.");
             }
-            
+
             paymentDTO = paymentService.convertToDTO(paymentEntity);
 
             if (paymentDTO == null) {
@@ -284,13 +344,19 @@ public class PaymentController {
         }
     }
 
-    // 결제 취소 처리
+    /**
+     * ---------------------------------------------------------------------------
+     * 경로 : /orders/payment/cancel
+     * 인수 : Integer idx, RedirectAttributes redirectAttributes
+     * 출력 : 결제 취소 처리
+     * 설명 : 결제 취소를 처리한 후, 리다이렉트하여 취소 처리 완료 페이지를 반환합니다.
+     * ---------------------------------------------------------------------------
+     */
     @PostMapping("/orders/payment/cancel")
     public String cancelPayment(@RequestParam("idx") Integer idx, RedirectAttributes redirectAttributes) {
         log.info("결제 취소를 처리합니다. idx: {}", idx);
 
         try {
-            // 현재 로그인한 사용자 정보 가져오기
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
                 throw new IllegalStateException("로그인이 필요합니다.");
@@ -300,12 +366,10 @@ public class PaymentController {
             PaymentEntity paymentEntity = paymentRepository.findById(idx)
                     .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다. idx: " + idx));
 
-            // 본인의 결제인지 확인
             if (!memberEmail.equals(paymentEntity.getMemberJoin().getMemberEmail())) {
                 throw new IllegalStateException("본인의 결제만 취소할 수 있습니다.");
             }
 
-            // 결제 상태 검증
             if ("N".equals(paymentEntity.getPaymentState())) {
                 throw new IllegalStateException("이미 취소된 결제입니다.");
             }

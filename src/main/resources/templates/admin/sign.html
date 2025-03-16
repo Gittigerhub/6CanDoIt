@@ -1412,7 +1412,7 @@ E-mail : himyeongsun@gmail.com
     </div>
 </div>
 
-<script>
+<script th:inline="javascript">
     var privacyTerms = $("#privacyTerms");
     var serviceTerms = $("#serviceTerms");
         // 이메일 인증
@@ -1784,7 +1784,14 @@ E-mail : himyeongsun@gmail.com
 
             return false; // 폼 기본 제출 방지
         }
-        </script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const error = [[${param.error}]];
+            if (error) {
+                alert("회원정보를 다시 확인해주세요.");
+            }
+        });
+    </script>
 
 </body>
 </html>

@@ -307,6 +307,10 @@ public class AdminService {
 
     }
 
-
+    // 관리자 정보 확인(조직관리에서 사용)
+    public AdminEntity findAdmin(String email) {
+        return adminRepository.findByAdminEmail(email)
+                .orElseThrow(() -> new RuntimeException("관리자 정보를 찾을 수 없습니다."));
+    }
 
 }

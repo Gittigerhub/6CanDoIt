@@ -9,10 +9,7 @@ import com.sixcandoit.roomservice.entity.event.EventEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import com.sixcandoit.roomservice.entity.room.RoomEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +63,7 @@ public class OrganizationEntity extends BaseEntity {
     private OrganizationEntity hotels;           // 본사 + 지사
 
     // 관리자 회원 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationJoin")
+    @OneToMany(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AdminEntity> adminJoin;
 
     // 매장 상세 테이블과 1:1 매핑
@@ -74,7 +71,7 @@ public class OrganizationEntity extends BaseEntity {
     private ShopDetailEntity shopDetailJoin;
 
     // 메뉴 테이블과 1:N 매핑
-    @OneToMany(mappedBy = "organizationJoin")
+    @OneToMany(mappedBy = "organizationJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MenuEntity> menuJoin;
 
     // 룸 테이블과 1:N 매핑

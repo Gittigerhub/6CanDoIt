@@ -3,7 +3,9 @@ package com.sixcandoit.roomservice.controller.office;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.service.ImageFileService;
+import com.sixcandoit.roomservice.service.admin.AdminService;
 import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.service.office.ShopDetailService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -21,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +40,7 @@ public class OfficeController {
     private final PageNationUtil pageNationUtil;
     private final ShopDetailService shopDetailService;
     private final ImageFileService imageFileService;
+    private final AdminService adminService;
 
 
     /* -----------------------------------------------------------------------------
@@ -48,11 +52,20 @@ public class OfficeController {
     @GetMapping("/list")
     public String list(@PageableDefault(page=1) Pageable page,
                        @RequestParam(value="keyword", defaultValue = "") String keyword,
-                       @RequestParam(value="type", defaultValue = "") String type,
-                       Model model) {
+                       @RequestParam(value="type", defaultValue = "ALL") String type,
+                       Model model, Principal principal) {
+
+        // 로그인한 회원 이메일
+        String email = principal.getName();
+
+        // 이메일로 회원정보 검색
+        AdminEntity admin = adminService.findAdmin(email);
+
+        // 회원의 조직FK Idx
+        Integer adminIdx = null;
 
         // 서비스에 조회 요청
-        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
+        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword, adminIdx);
 
         // 조회결과를 이용한 페이지 처리
         Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
@@ -92,7 +105,7 @@ public class OfficeController {
                        HttpServletRequest request, Model model) {
 
         // 서비스에 조회 요청
-        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
+        Page<OrganizationDTO> organDTO = organizationService.hotelList(page, type, keyword);
 
         // 조회결과를 이용한 페이지 처리
         Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
@@ -150,21 +163,45 @@ public class OfficeController {
 
     @GetMapping("/ho/list")
     public String holist(@PageableDefault(page=1) Pageable page,
-                       @RequestParam(value="keyword", defaultValue = "") String keyword,
-                       @RequestParam(value="type", defaultValue = "") String type,
-                       HttpServletRequest request, Model model) {
+                         @RequestParam(value="keyword", defaultValue = "") String keyword,
+                         @RequestParam(value="type", defaultValue = "ALLHO") String type,
+                         HttpServletRequest request, Model model, Principal principal) {
+
+        // 로그인한 회원 이메일
+        String email = principal.getName();
+
+        // 이메일로 회원정보 검색
+        AdminEntity admin = adminService.findAdmin(email);
+
+        // 회원의 조직FK Idx
+        Integer adminIdx = admin.getOrganizationJoin().getIdx();
+
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
+        // 조직 정보 서비스로 조회
+        OrganizationDTO organDTO =
+                organizationService.organRead(adminIdx);
+
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(adminIdx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
 
         // 서비스에 조회 요청
-        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
+        Page<OrganizationDTO> organDTOPage = organizationService.organList(page, type, keyword, adminIdx);
 
         // 조회결과를 이용한 페이지 처리
-        Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
+        Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTOPage);
 
         // 매장 상세정보 서비스로 조회
         // 각 OrganizationDTO에 대해 exists 값을 계산하여 리스트에 추가
         List<Boolean> existsList = new ArrayList<>();
 
-        for (OrganizationDTO organization : organDTO) {
+        for (OrganizationDTO organization : organDTOPage) {
 
             // shopCheck 메소드 호출하여 exists 값을 확인
             boolean exists = shopDetailService.shopCheck(organization.getIdx()); // 조직의 idx를 사용
@@ -173,11 +210,14 @@ public class OfficeController {
 
         // 페이지 정보, 조회내용, 검색어, 조직 타입을 전달
         model.addAllAttributes(pageInfo);
-        model.addAttribute("organDTO", organDTO);
+        model.addAttribute("organDTO", organDTOPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("type", type);
         model.addAttribute("existsList", existsList); // exists 값 리스트를 모델에 추가
         model.addAttribute("request", request); // 현재 페이지 url
+        model.addAttribute("organ", organDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
 
         return "office/hoadminlist";
 
@@ -186,20 +226,44 @@ public class OfficeController {
     @GetMapping("/bo/list")
     public String bolist(@PageableDefault(page=1) Pageable page,
                          @RequestParam(value="keyword", defaultValue = "") String keyword,
-                         @RequestParam(value="type", defaultValue = "") String type,
-                         HttpServletRequest request, Model model) {
+                         @RequestParam(value="type", defaultValue = "ALLBO") String type,
+                         HttpServletRequest request, Model model, Principal principal) {
+
+        // 로그인한 회원 이메일
+        String email = principal.getName();
+
+        // 이메일로 회원정보 검색
+        AdminEntity admin = adminService.findAdmin(email);
+
+        // 회원의 조직FK Idx
+        Integer adminIdx = admin.getOrganizationJoin().getIdx();
+
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
+        // 조직 정보 서비스로 조회
+        OrganizationDTO organDTO =
+                organizationService.organRead(adminIdx);
+
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(adminIdx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
 
         // 서비스에 조회 요청
-        Page<OrganizationDTO> organDTO = organizationService.organList(page, type, keyword);
+        Page<OrganizationDTO> organDTOPage = organizationService.organList(page, type, keyword, adminIdx);
 
         // 조회결과를 이용한 페이지 처리
-        Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTO);
+        Map<String,Integer> pageInfo = pageNationUtil.Pagination(organDTOPage);
 
         // 매장 상세정보 서비스로 조회
         // 각 OrganizationDTO에 대해 exists 값을 계산하여 리스트에 추가
         List<Boolean> existsList = new ArrayList<>();
 
-        for (OrganizationDTO organization : organDTO) {
+        for (OrganizationDTO organization : organDTOPage) {
 
             // shopCheck 메소드 호출하여 exists 값을 확인
             boolean exists = shopDetailService.shopCheck(organization.getIdx()); // 조직의 idx를 사용
@@ -208,24 +272,91 @@ public class OfficeController {
 
         // 페이지 정보, 조회내용, 검색어, 조직 타입을 전달
         model.addAllAttributes(pageInfo);
-        model.addAttribute("organDTO", organDTO);
+        model.addAttribute("organDTO", organDTOPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("type", type);
         model.addAttribute("existsList", existsList); // exists 값 리스트를 모델에 추가
         model.addAttribute("request", request); // 현재 페이지 url
+        model.addAttribute("organ", organDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
 
         return "office/boadminlist";
+
+    }
+
+    // 모달 상위조직 등록 조회
+    @PostMapping("/search/list")
+    @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
+    public ResponseEntity<List<OrganizationDTO>> searchOrganSuper(@RequestParam(value = "searchType", defaultValue = "") String searchType,
+                                                             @RequestParam(value = "searchWord", defaultValue = "") String searchWord,
+                                                             Principal principal) {
+
+        try {
+            // 로그인한 회원 이메일
+            String email = principal.getName();
+
+            // 이메일로 회원정보 검색
+            AdminEntity admin = adminService.findAdmin(email);
+
+            // 회원의 조직FK Idx
+            Integer adminIdx = null;
+
+            // 서비스에 조회 요청
+            List<OrganizationDTO> organizationDTO = organizationService.searchOrgan(searchType, searchWord, adminIdx);
+
+            // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
+            return ResponseEntity.ok(organizationDTO);
+
+        } catch (Exception e) {
+            log.error("등록 중 오류발생", e);
+
+            // 등록 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+    }
+
+    // 모달 상위조직 등록 조회
+    @PostMapping("/search/hotels/list")
+    @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
+    public ResponseEntity<List<OrganizationDTO>> searchOrgan(@RequestParam(value = "searchType", defaultValue = "") String searchType,
+                                                             @RequestParam(value = "searchWord", defaultValue = "") String searchWord,
+                                                             Principal principal) {
+
+        try {
+            // 로그인한 회원 이메일
+            String email = principal.getName();
+
+            // 이메일로 회원정보 검색
+            AdminEntity admin = adminService.findAdmin(email);
+
+            // 회원의 조직FK Idx
+            Integer adminIdx = admin.getOrganizationJoin().getIdx();
+
+            // 서비스에 조회 요청
+            List<OrganizationDTO> organizationDTO = organizationService.searchOrgan(searchType, searchWord, adminIdx);
+
+            // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
+            return ResponseEntity.ok(organizationDTO);
+
+        } catch (Exception e) {
+            log.error("등록 중 오류발생", e);
+
+            // 등록 실패 시, HTTP에 상태 코드 500과 함께 응답을 보낸다.
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
 
     }
 
     // 모달로 조직 등록
     @PostMapping("/organ/register")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
-    public ResponseEntity<String> register(@ModelAttribute OrganizationDTO organizationDTO, List<MultipartFile> imageFiles) {
+    public ResponseEntity<String> register(@ModelAttribute OrganizationDTO organizationDTO, Integer findIdx, String hoORshop, List<MultipartFile> imageFiles) {
 
         try {
             // 서비스에 등록 요청
-            organizationService.organRegister(organizationDTO, imageFiles);
+            organizationService.organRegister(organizationDTO, findIdx, hoORshop, imageFiles);
 
             // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
             return ResponseEntity.ok("등록 하였습니다.");
@@ -253,6 +384,10 @@ public class OfficeController {
     @PostMapping("/organ/update")
     @ResponseBody //HTTP 요청에 대한 응답을 JSON, XML, 텍스트 등의 형태로 반환
     public ResponseEntity<String> update(@ModelAttribute OrganizationDTO organizationDTO, String join, List<MultipartFile> imageFiles) {
+
+        System.out.println("imageFiles : " + imageFiles.toString());
+        System.out.println("imageFiles : " + imageFiles.size());
+        System.out.println("체크 1");
 
         try {
             // 서비스에 등록 요청
@@ -294,6 +429,34 @@ public class OfficeController {
         model.addAttribute("hasRepImage", hasRepImage);
 
         return "office/organdetail";
+
+    }
+
+    // 조직 상세보기
+    @GetMapping("/organ/ho")
+    public String organHODetail(Integer idx, Model model) {
+
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
+        // 조직 정보 서비스로 조회
+        OrganizationDTO organDTO =
+                organizationService.organRead(idx);
+
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+        // view로 전달
+        model.addAttribute("organDTO", organDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
+
+        return "office/hodetail";
 
     }
 
@@ -351,6 +514,8 @@ public class OfficeController {
                                                    List<MultipartFile> imageFiles, Integer organIdx){
         // 이미지 조회할 join
         String join = "organ";
+        System.out.println("imageFiles : " + imageFiles.toString());
+        System.out.println("imageFiles : " + imageFiles.size());
         System.out.println("체크 1");
         try {
             shopDetailService.update(shopDetailDTO, organizationDTO, join, imageFiles, organIdx);
@@ -425,6 +590,70 @@ public class OfficeController {
         model.addAttribute("hasRepImage", hasRepImage);
 
         return "office/shopread";
+
+    }
+
+    @GetMapping("/shopdetail/realread/ho")
+    public String shopdetailRealreadHo(Integer idx, Model model) {
+
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
+        // 조직 정보 서비스로 조회
+        OrganizationDTO organDTO =
+                organizationService.organRead(idx);
+
+        // 매장 상세 정보 서비스로 조회
+        ShopDetailDTO shopDTO =
+                shopDetailService.findOrgan(idx);
+
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+        // view로 전달
+        model.addAttribute("organDTO", organDTO);
+        model.addAttribute("shopDTO", shopDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
+
+        return "office/hoshopread";
+
+    }
+
+    @GetMapping("/shopdetail/realread/bo")
+    public String shopdetailRealreadBo(Integer idx, Model model) {
+
+        // 이미지 조회전 join값 생성
+        String join = "organ";
+
+        // 조직 정보 서비스로 조회
+        OrganizationDTO organDTO =
+                organizationService.organRead(idx);
+
+        // 매장 상세 정보 서비스로 조회
+        ShopDetailDTO shopDTO =
+                shopDetailService.findOrgan(idx);
+
+        // 이미지 정보 서비스로 조회
+        List<ImageFileDTO> imageFileDTOS =
+                imageFileService.readImage(idx, join);
+
+        // 대표이미지 존재여부 확인
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+        // view로 전달
+        model.addAttribute("organDTO", organDTO);
+        model.addAttribute("shopDTO", shopDTO);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+        model.addAttribute("hasRepImage", hasRepImage);
+
+        return "office/boshopread";
 
     }
 

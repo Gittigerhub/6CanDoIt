@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -69,7 +66,7 @@ public class ShopDetailEntity extends BaseEntity {
     private List<CalculateEntity> calculateJoins;
 
     // 메뉴 테이블과 1:N 매칭
-    @OneToMany(mappedBy = "shopDetailJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "shopDetailJoin")
     private List<MenuEntity> menuJoin;
 
 

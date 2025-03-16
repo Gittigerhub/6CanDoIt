@@ -18,6 +18,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!--알림창 스크립트-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        td {
+            white-space: nowrap;         /* 텍스트가 한 줄로 표시되도록 함 */
+            overflow: hidden;            /* 텍스트가 넘칠 경우 숨기기 */
+            text-overflow: ellipsis;     /* 넘친 텍스트를 '...'으로 표시 */
+        }
+    </style>
+
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
@@ -53,7 +62,7 @@
 
                 <div class="col-1 d-flex justify-content-end">
                     <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
-                    <button type="submit" class="btn btn-success">조회</button>
+                    <button type="submit" class="btn btn-outline-secondary">조회</button>
                 </div>
             </div>
 
@@ -78,7 +87,17 @@
                 <tbody> <!--조직 테이블 데이터 출력-->
                 <tr style="height: 50px; vertical-align: middle" th:each="data:${organDTO}"> <!--읽어온 조직 데이터 만큼 반복 출력-->
                     <td th:text="${data.idx}"></td>
-                    <td th:text="${data.organType}"></td>
+                    <td>
+                        <th:block th:if="${data.organType == 'HO'}">
+                            본사
+                        </th:block>
+                        <th:block th:if="${data.organType == 'BO'}">
+                            지사
+                        </th:block>
+                        <th:block th:if="${data.organType == 'SHOP'}">
+                            매장
+                        </th:block>
+                    </td>
                     <td>
                         <!-- 조직 분류가 매장이 아닐때 -->
                         <a style="text-decoration: none; font-weight: bold" th:href="@{/office/organ(idx=${data.idx})}" th:if="${data.organType != 'SHOP'}" th:text="${data.organName}"></a>
@@ -94,15 +113,15 @@
                             </th:block>
                             <!-- 매장 상세내용이 존재하지 않는다면 등록 진행 -->
                             <th:block th:unless="${existsList[dataStat.index]}">
-                                <a style="text-decoration: none; font-weight: bold" th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}" th:data-tel="${data.organTel}"></a>
+                                <a style="text-decoration: none; font-weight: bold" th:href="'javascript:void(0);'" class="open-modal" th:text="${data.organName}" th:data-id="${data.idx}" th:data-name="${data.organName}" th:data-tel="${data.organTel}" th:data-active="${data.activeYn}"></a>
                             </th:block>
                         </th:block>
                     </td>
-                    <td th:text="${data.organAddress}"></td>
+                    <td th:text="${data.organAddress}" th:title="${data.organAddress}"></td>
                     <td th:text="${data.organTel}"></td>
                     <td>
-                        <button style="font-size: 12px" th:if="${data.activeYn == 'Y'}" class="btn btn-primary">활성화</button>
-                        <button style="font-size: 12px" th:unless="${data.activeYn == 'Y'}" class="btn btn-danger">비활성화</button>
+                        <span th:if="${data.activeYn == 'Y'}" class="badge rounded-pill text-bg-primary">활성화</span>
+                        <span th:unless="${data.activeYn == 'Y'}" class="badge rounded-pill text-bg-danger">비활성화</span>
                     </td>
                 </tr>
                 </tbody>
@@ -141,7 +160,7 @@
 
             <!-- 등록 모달 열기 버튼 시작 -->
             <div class="d-flex justify-content-end">
-                <button id="btn-add" type="button" class="btn btn-success">추가</button>
+                <button id="btn-add" type="button" class="btn btn-outline-secondary">추가</button>
             </div>
             <!-- 등록 모달 열기 버튼 끝 -->
 
@@ -166,16 +185,87 @@
                             <p>새로운 조직을 등록합니다.</p>
                             <div class="row">
                                 <!-- 분류 -->
-                                <div class="col-sm-6 pe-0">
+                                <div class="col-sm-6">
                                     <div class="form-group form-group-default">
                                         <label>*분류 :</label>
-                                        <select id="category" name="organType" class="form-select mt-2" required>
+                                        <select id="category" name="organType" class="form-select mt-3" required onchange="toggleHOField()">
                                             <option value="HO">본사</option>
                                             <option value="BO">지사</option>
                                             <option value="SHOP">매장</option>
                                         </select>
                                     </div>
                                 </div>
+
+                                <!-- 상위조직 검색창이 추가될 부분 -->
+                                <div class="col-sm-6" id="hoField"></div>
+                                <script>
+                                    function toggleHOField() {
+                                        var category = document.getElementById("category").value;
+                                        var hoField = document.getElementById("hoField");
+
+                                        // 기존에 있던 내용을 비운다 (추가된 내용이 중복되지 않게 하기 위함)
+                                        hoField.innerHTML = "";
+
+                                        if (category === "BO") {
+                                            hoField.innerHTML = `
+                                                                    <div class="form-group form-group-default">
+                                                                        <label>*본사 :</label>
+                                                                        <input class="text-end" type="button" id="searchButton" value="조회"><!-- 조직 검색 버튼 -->
+                                                                        <input style="background: ghostwhite" id="findHO" name="findHO" type="text" class="form-control mt-2" readonly>
+                                                                        <input type="hidden" id="findIdx" name="findIdx">
+                                                                        <input type="hidden" id="hoORshop" name="hoORshop">
+                                                                    </div>
+                                                                `;
+
+                                            // '조회' 버튼 클릭 시 처리할 함수 추가
+                                            document.getElementById("searchButton").addEventListener("click", function() {
+
+                                                // 폼 리셋
+                                                var form = $("#searchForm")[0];
+                                                form.reset();
+
+                                                // 테이블 내용 초기화 (tbody 비우기)
+                                                $("#searchModal tbody").empty();  // tbody 내부의 모든 내용 삭제
+
+                                                // 이전 모달창을 화면에서 숨긴다.
+                                                $("#addModal").modal('hide');
+
+                                                // 검색 모달창을 화면에 띄운다.
+                                                $("#searchModal").modal('show');
+
+                                            });
+
+                                        } else if (category === "SHOP") {
+                                            hoField.innerHTML = `
+                                                                    <div class="form-group form-group-default">
+                                                                        <label>*호텔 :</label>
+                                                                        <input class="text-end" type="button" id="searchButton2" value="조회"><!-- 조직 검색 버튼 -->
+                                                                        <input style="background: ghostwhite" id="findHotels" name="findHotels" type="text" class="form-control mt-2" readonly>
+                                                                        <input type="hidden" id="findIdx2" name="findIdx">
+                                                                        <input type="hidden" id="hoORshop2" name="hoORshop">
+                                                                    </div>
+                                                                `;
+
+                                            // '조회' 버튼 클릭 시 처리할 함수 추가
+                                            document.getElementById("searchButton2").addEventListener("click", function() {
+
+                                                // 폼 리셋
+                                                var form = $("#searchForm2")[0];
+                                                form.reset();
+
+                                                // 테이블 내용 초기화 (tbody 비우기)
+                                                $("#searchModal2 tbody").empty();  // tbody 내부의 모든 내용 삭제
+
+                                                // 이전 모달창을 화면에서 숨긴다.
+                                                $("#addModal").modal('hide');
+
+                                                // 검색 모달창을 화면에 띄운다.
+                                                $("#searchModal2").modal('show');
+
+                                            });
+                                        }
+                                    }
+                                </script>
 
                                 <!-- 조직 명 -->
                                 <div class="col-sm-12 mt-2">
@@ -324,8 +414,8 @@
                             </div>
                         </div>
                         <div class="modal-footer border-0">
-                            <button type="button" id="addButton" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                            <button type="button" id="addButton" class="btn btn-outline-secondary"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
                         </div>
                     </form>
                 </div>
@@ -430,10 +520,7 @@
                                 <div class="col-sm-6 mt-2">
                                     <div class="form-group form-group-default">
                                         <label>*활성화 유무:</label>
-                                        <select id="activeYn" name="activeYn" class="form-select">
-                                            <option value="0">활성화</option>
-                                            <option value="1">비활성화</option>
-                                        </select>
+                                        <input id="activeYn2" name="activeYn2" type="text" class="form-control" value="활성화" readonly>
                                     </div>
                                 </div>
 
@@ -479,18 +566,287 @@
                         </div>
                         <!-- Modal body 끝 -->
                         <div class="modal-footer border-0">
-                            <button type="button" id="register" class="btn btn-success"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
+                            <button type="button" id="register" class="btn btn-outline-secondary"><i class="bi-file-earmark-check"></i>&nbsp;저장</button> <!--신규등록 저장버튼-->
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal"><i class="bi-file-earmark-excel"></i>&nbsp;취소</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
         <!-- 매장 등록 모달 끝-->
+
+        <!-- 상위조직(지사) 검색 모달 시작 -->
+        <div class="modal fade" id="searchModal" tabindex="-1" role="modal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span id="searchTitle" class="fw-light">업체 검색</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                    </div>
+                    <!--입력폼-->
+                    <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                    <form id="searchForm" method="post">
+                        <div class="modal-body">
+                            <p>업체를 검색합니다.</p>
+
+                            <div class="row">
+                                <!-- 연관 조직 분류 -->
+                                <div class="col-3">
+                                    <div class="form-group form-group-default">
+                                        <label>*분류 :</label>
+                                        <input type="hidden" id="searchType" name="searchType" class="form-control" value="HO">
+                                        <input type="text" class="form-control" value="본사" readonly>
+                                    </div>
+                                </div>
+                                <!-- 연관 조직 명칭 -->
+                                <div class="col-sm-12">
+                                    <div class="form-group form-group-default">
+                                        <label>*업체 검색 :</label>
+                                        <span class="d-flex">
+                                        <!--검색할 단어 입력-->
+                                        <input type="text" id="searchWord" name="searchWord" style="width: 83%" class="form-control me-3" placeholder="조직명을 입력하세요"/>
+                                            <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
+                                        <button type="button" id="searchOrgan" class="btn btn-outline-secondary">조회</button>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--조회 테이블-->
+                        <table class="table table-bordered mt-2" id="resultsTable" style="text-align: center">
+                            <thead>
+                            <tr style="height: 50px; vertical-align: middle">
+                                <th style="width: 20%">분류</th>
+                                <th style="width: 50%">업체명</th>
+                                <th style="width: 30%">상태</th>
+                            </tr>
+                            </thead>
+                            <tbody class="overflow-auto">
+                            <!-- 검색 결과가 동적으로 추가됨 -->
+                            </tbody>
+                        </table>
+
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- 상위조직(지사) 검색 모달 끝 -->
+
+        <!-- 상위조직(매장) 검색 모달 시작 -->
+        <div class="modal fade" id="searchModal2" tabindex="-1" role="modal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span id="searchTitle2" class="fw-light">업체 검색</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button><!--모달 닫기 버튼-->
+                    </div>
+                    <!--입력폼-->
+                    <!--많은 작업을 하나의 대화상자를 이용시 idx는 반드시 form밖에 작업-->
+                    <form id="searchForm2" method="post">
+                        <div class="modal-body">
+                            <p>업체를 검색합니다.</p>
+
+                            <div class="row">
+                                <!-- 연관 조직 분류 -->
+                                <div class="col-3">
+                                    <div class="form-group form-group-default">
+                                        <label>*분류 :</label>
+                                        <select id="searchType2" name="searchType" class="form-select" required>
+                                            <option value="HO">본사</option>
+                                            <option value="BO">지사</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- 연관 조직 명칭 -->
+                                <div class="col-sm-12">
+                                    <div class="form-group form-group-default">
+                                        <label>*업체 검색 :</label>
+                                        <span class="d-flex">
+                                        <!--검색할 단어 입력-->
+                                        <input type="text" id="searchWord2" name="searchWord2" style="width: 83%" class="form-control me-3" placeholder="조직명을 입력하세요"/>
+                                            <!--조회 버튼을 클릭 시, keyword의 값을 가지고 Controller에 조회를 요청한다.-->
+                                        <button type="button" id="searchOrgan2" class="btn btn-outline-secondary">조회</button>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--조회 테이블-->
+                        <table class="table table-bordered mt-2" id="resultsTable2" style="text-align: center">
+                            <thead>
+                            <tr style="height: 50px; vertical-align: middle">
+                                <th style="width: 20%">분류</th>
+                                <th style="width: 50%">업체명</th>
+                                <th style="width: 30%">상태</th>
+                            </tr>
+                            </thead>
+                            <tbody class="overflow-auto">
+                            <!-- 검색 결과가 동적으로 추가됨 -->
+                            </tbody>
+                        </table>
+
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- 상위조직(매장) 검색 모달 끝 -->
+
     </div>
 
     <script th:inline="javascript">
         $(document).ready(function () {
+
+            // 호텔 검색에서 조회 버튼 클릭 시
+            $("#searchOrgan2").on("click", function(e) {
+
+                var searchType = $("#searchType2").val();
+                var searchWord = $("#searchWord2").val();
+
+                $.ajax({
+                    url: "/office/search/list",
+                    type: "POST",
+                    data: {
+                        searchType: searchType,
+                        searchWord: searchWord
+                    },
+                    dataType: "json",
+                    success: function(data) {
+
+                        var tbody = $("#resultsTable2 tbody");
+                        tbody.empty();  // 기존 결과 초기화
+
+                        var row = "";
+                        // 각 결과 객체를 <tr> 태그로 추가
+                        $.each(data, function(index, item) {
+                            row += `
+                                        <tr style="height: 50px; vertical-align: middle">
+                                            <td>${item.organType}</td>
+                                            <td class="organ-name">${item.organName}<input type="hidden" class="idx" value="${item.idx}"></td>
+                                            <td>
+                                                ${item.activeYn === 'Y'
+                                                    ? '<span class="badge rounded-pill text-bg-primary">활성화</span>'
+                                                    : '<span class="badge rounded-pill text-bg-danger">비활성화</span>'}
+                                            </td>
+                                        </tr>
+                                    `;
+                        });
+                        tbody.append(row);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("검색 오류:", error);
+                        alert("검색 중 오류가 발생했습니다.");
+                    }
+                });
+            });
+
+            // 호텔 검색에서 업체명 클릭시
+            // 동적으로 생성된 .organ-name 요소에 대해서도 클릭 이벤트를 처리
+            $(document).on('click', '.organ-name', function() {
+
+                // 클릭한 td의 텍스트 값 가져오기
+                var organ2 = $(this).text();
+                // 클릭된 .organ-name 요소 내의 input.idx 값을 가져옵니다.
+                var organIdx2 = $(this).find('.idx').val();  // input 요소의 value 값을 가져옴
+                var typeOrgan2 = "hotels";
+                console.log(organ2);
+                console.log(organIdx2);
+                console.log(typeOrgan2);
+
+                // 이전 모달 input에 organName 값 넣기
+                $("#findHotels").val(organ2);
+                $("#findIdx2").val(organIdx2);
+                $("#hoORshop2").val(typeOrgan2);
+
+                // 검색 모달창을 숨긴다
+                $("#searchModal2").modal('hide');
+
+                // 이전 모달창을 화면에 띄운다.
+                $("#addModal").modal('show');
+
+            });
+
+            // =======================================================================
+
+            // 본사 검색에서 조회 버튼 클릭 시
+            $("#searchOrgan").on("click", function(e) {
+
+                var searchType = $("#searchType").val();
+                var searchWord = $("#searchWord").val();
+
+                $.ajax({
+                    url: "/office/search/list",
+                    type: "POST",
+                    data: {
+                        searchType: searchType,
+                        searchWord: searchWord
+                    },
+                    dataType: "json",
+                    success: function(data) {
+
+                        var tbody = $("#resultsTable tbody");
+                        tbody.empty();  // 기존 결과 초기화
+
+                        var row = "";
+                        // 각 결과 객체를 <tr> 태그로 추가
+                        $.each(data, function(index, item) {
+                            row += `
+                                        <tr style="height: 50px; vertical-align: middle">
+                                            <td>${item.organType}</td>
+                                            <td class="organ-name">${item.organName}<input type="hidden" class="idx" value="${item.idx}"></td>
+                                            <td>
+                                                ${item.activeYn === 'Y'
+                                                    ? '<span class="badge rounded-pill text-bg-primary">활성화</span>'
+                                                    : '<span class="badge rounded-pill text-bg-danger">비활성화</span>'}
+                                            </td>
+                                        </tr>
+                                    `;
+                        });
+                        tbody.append(row);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("검색 오류:", error);
+                        alert("검색 중 오류가 발생했습니다.");
+                    }
+                });
+            });
+
+            // 본사 검색에서 업체명 클릭시
+            // 동적으로 생성된 .organ-name 요소에 대해서도 클릭 이벤트를 처리
+            $(document).on('click', '.organ-name', function() {
+
+                // 클릭한 td의 텍스트 값 가져오기
+                var organ = $(this).text();
+                // 클릭된 .organ-name 요소 내의 input.idx 값을 가져옵니다.
+                var organIdx = $(this).find('.idx').val();  // input 요소의 value 값을 가져옴
+                var typeOrgan = "head";
+                console.log(organ);
+                console.log(organIdx);
+                console.log(typeOrgan);
+
+                // 이전 모달 input에 organName 값 넣기
+                $("#findHO").val(organ);
+                $("#findIdx").val(organIdx);
+                $("#hoORshop").val(typeOrgan);
+
+                // 검색 모달창을 숨긴다
+                $("#searchModal").modal('hide');
+
+                // 이전 모달창을 화면에 띄운다.
+                $("#addModal").modal('show');
+
+            });
+
+            // =================================================================
 
             // shopdetailDTO가 없는 매장명을 클릭 시
             $(document).on('click', '.open-modal', function () {
@@ -599,6 +955,10 @@
 
                 // 이미지 추가창 리셋 함수
                 resetImageInput();
+
+                // 상위조직 검색창 리셋
+                var hoField = document.getElementById("hoField");
+                hoField.innerHTML = "";
 
                 // 모달창을 화면에 띄운다.
                 $("#addModal").modal('show');

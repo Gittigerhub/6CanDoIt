@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/superlayout}">
+      layout:decorate="~{layouts/holayout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -123,7 +123,7 @@
             <div class="d-flex justify-content-end mt-5">
                 <button type="button" class="btn btn-outline-secondary" th:onclick="|location.href='/room/main?organ_idx=' + ${organDTO.idx}|">룸 관리</button>
                 <button type="button" class="btn btn-outline-secondary ms-2" id="btn-update" th:data-id="${organDTO.idx}">수정</button>
-                <button type="button" class="btn btn-outline-secondary ms-2" onclick="location.href='/office/list'">목록</button>
+                <button type="button" class="btn btn-outline-secondary ms-2" onclick="location.href='/office/ho/list'">목록</button>
                 <button type="button" class="btn btn-outline-danger btn-delete ms-2" th:data-id="${organDTO.idx}">삭제</button>
             </div>
         </div>

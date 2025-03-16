@@ -190,14 +190,21 @@ public class RoomService {
             if (type.equals("1") && roomType != null && !roomType.isEmpty()) {
                 // 객실 타입으로 검색
                 roomEntities = roomRepository.findByOrganIdxAndRoomType(organ_idx, roomType, pageable);
-            } else if (keyword != null && !keyword.isEmpty()) {
-                if (type.equals("1")) {
-                    roomEntities = roomRepository.searchRoomTypeByOrgan(keyword, organ_idx, pageable);
-                } else if (type.equals("2")) {
-                    roomEntities = roomRepository.searchRoomNameByOrgan(keyword, organ_idx, pageable);
-                } else {
-                    roomEntities = roomRepository.findByOrganIdx(organ_idx, pageable);
-                }
+            } else if (type.equals("2") && keyword != null && !keyword.isEmpty()) {
+                // 객실 이름으로 검색
+                roomEntities = roomRepository.searchRoomNameByOrgan(keyword, organ_idx, pageable);
+            } else if (type.equals("3")) {
+                // 조식 있음 검색
+                roomEntities = roomRepository.searchRoomBreakfast(pageable);
+            } else if (type.equals("4")) {
+                // 빈 방 검색
+                roomEntities = roomRepository.searchRes1(pageable);
+            } else if (type.equals("5")) {
+                // 체크인 검색
+                roomEntities = roomRepository.searchRes2(pageable);
+            } else if (type.equals("6")) {
+                // 체크아웃 검색
+                roomEntities = roomRepository.searchRes3(pageable);
             } else {
                 roomEntities = roomRepository.findByOrganIdx(organ_idx, pageable);
             }

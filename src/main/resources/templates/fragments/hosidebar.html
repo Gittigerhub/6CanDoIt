@@ -74,7 +74,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="/room/main" class="nav-link text-white" id="link3" aria-current="page">
+            <a th:href="@{/room/ho/main(organ_idx=${#authentication.principal.admin.organizationJoin.idx})}" class="nav-link text-white" id="link3" aria-current="page">
                 <i class="bi bi-gear-fill"></i>
                 룸 관리
             </a>

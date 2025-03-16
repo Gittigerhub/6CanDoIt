@@ -35,26 +35,22 @@
         <div id="row" class="row">
             <div class="col"></div>
             <div class="col-10">
-                <form th:action="@{/room/update}" th:object="${roomDTO}" method="post" enctype="multipart/form-data">
+                <form th:action="@{/room/ho/register}" th:object="${roomDTO}" method="post" enctype="multipart/form-data">
                     <div class="card">
                         <div class="card-header">
                             <h4>객실 등록</h4>
                         </div>
                         <div class="card-body">
+                            <!-- organ_idx를 hidden 필드로 추가 -->
+                            <input type="hidden" th:field="*{organ_idx}" />
 
                             <!-- 객실 대표 사진 -->
                             <div class="col-sm-12 mt-2">
                                 <div class="form-group form-group-default" id="inputImage">
                                     <label>*대표 이미지 :</label>
-                                    <th:block th:if="${hasRepImage}">
-                                        <input disabled name="imageFiles" type="file" class="form-control mt-2" accept="image/*"/>
-                                    </th:block>
-                                    <th:block th:unless="${hasRepImage}">
-                                        <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*"/>
-                                    </th:block>
+                                    <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*" required>
                                 </div>
                             </div>
-
                             <!-- 객실 사진 -->
                             <div class="col-sm-12 mt-2">
                                 <div class="form-group form-group-default" id="inputImage2">
@@ -62,7 +58,8 @@
                                     <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
                                 </div>
                             </div>
-
+                            <!-- 객실 사진 미리보기 -->
+                            <div id="main"></div>
                             <!-- 객실 사진 추가버튼 -->
                             <div class="col-sm-12 mt-2">
                                 <div class="form-group form-group-default">
@@ -70,13 +67,6 @@
                                 </div>
                             </div>
 
-                            <!--번호 숨김 처리-->
-                            <input type="hidden" name="id" th:value="${roomDTO.idx}">
-                            <div class="mb-3 mt-3">
-                                <label for="idx" class="form-label">번호:</label>
-                                <input type="text" class="form-control" id="idx" name="idx"
-                                       th:value="${roomDTO.idx}" readonly>
-                            </div>
                             <div class="mb-3 mt-3"><!--객실 유형-->
                                 <label for="roomType" class="form-label">객실 타입:</label>
                                 <select id="roomType" th:field="*{roomType}" class="form-select" aria-label="Default select example">
@@ -90,6 +80,8 @@
                                     <option value="STE">스위트</option>
                                     <option value="PH">팬트하우스</option>
                                 </select>
+                            </div>
+                            <div class="mb-3 mt-3"><!--객실 전망-->
                                 <label for="roomView" class="form-label">객실 전망:</label>
                                 <select id="roomView" th:field="*{roomView}" class="form-select" aria-label="Default select example">
                                     <option value="N" selected>창문 없음</option>
@@ -98,11 +90,15 @@
                                     <option value="M">마운틴뷰</option>
                                     <option value="G">가든뷰</option>
                                 </select>
+                            </div>
+                            <div class="mb-3 mt-3"><!--객실 이름-->
                                 <label for="roomName" class="form-label">객실 이름:</label>
                                 <input type="text" th:field="*{roomName}" class="form-control" id="roomName" name="roomName">
                                 <span th:if="${#fields.hasErrors('roomName')}"
                                       style="color: red;"
                                       th:errors="*{roomName}"></span> <!-- 오류 메시지 출력 -->
+                            </div>
+                            <div class="mb-3 mt-3"><!--침대 유형-->
                                 <label for="roomBed" class="form-label">침대 유형:</label>
                                 <select id="roomBed" th:field="*{roomBed}" class="form-select" aria-label="Default select example">
                                     <option value="0" selected>싱글 사이즈</option>
@@ -110,6 +106,8 @@
                                     <option value="2">퀸 사이즈</option>
                                     <option value="3">킹 사이즈</option>
                                 </select>
+                            </div>
+                            <div>
                                 <label for="roomSize" class="form-label">객실 크기:</label>
                                 <input type="number" th:field="*{roomSize}" class="form-control" id="roomSize" name="roomSize">
                                 <label for="roomNum" class="form-label">투숙객 수:</label>
@@ -119,7 +117,7 @@
                             </div>
                             <div class="mb-3 mt-3"><!--객실 정보-->
                                 <label for="roomInfo">객실 정보:</label>
-                                <textarea th:field="*{roomInfo}" class="form-control" rows="5" id="roomInfo" name="roomInfo" placeholder="객실 정보를 입력하세요."></textarea>
+                                <textarea th:field="*{roomInfo}" class="form-control" id="roomInfo" name="roomInfo" placeholder="객실 정보를 입력하세요."></textarea>
                                 <span th:if="${#fields.hasErrors('roomInfo')}"
                                       style="color: red;"
                                       th:errors="*{roomInfo}"></span> <!-- 오류 메시지 출력 -->
@@ -164,8 +162,9 @@
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">등록</button>
-                            <button type="reset" class="btn btn-secondary">초기화</button>
-                            <button onclick="history.back()" type="button" class="btn btn-danger">취소</button>
+                            <button type="reset" class="btn btn-secondary" onclick="resetImageInput()">초기화</button>
+                            <button type="button" class="btn btn-danger"
+                                    th:onclick="|location.href='@{/room/ho/list}'|">취소</button>
                         </div>
                     </div>
                 </form>
@@ -177,13 +176,10 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         $(document).ready(function () {
-
             // 이미지 추가 버튼 클릭했을 때
             $("#addImage").on('click', function() {
-
                 // 이미지 추가 함수
                 addImageInput();
-
             });
 
             // 이미지 추가

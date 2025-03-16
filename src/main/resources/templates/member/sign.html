@@ -564,6 +564,8 @@
             </div>
             <div class="input__block">
                 <input type="password" name="password" id="password" placeholder="비밀번호" required>
+                <div id="passwordFeedback" class="invalid-feedback">8~18자리 영문자와 숫자 조합으로 작성하세요.</div>
+                <div id="passwordValid" class="valid-feedback">올바른 비밀번호 형식입니다.</div>
             </div>
             <div class="input__block">
                 <input type="password" name="confirmPassword" id="confirmPassword" placeholder="비밀번호 확인" required>
@@ -1130,17 +1132,17 @@ E-mail : himyeongsun@gmail.com
             });
         });
 
-        // 회원가입 폼 제출 시 필수 약관 확인
-        function validateForm() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password !== confirmPassword) {
-                alert('비밀번호가 일치하지 않습니다.');
-                return false;
-            }
-            return true;
-        }
+        // // 회원가입 폼 제출 시 필수 약관 확인
+        // function validateForm() {
+        //     const password = document.getElementById('password').value;
+        //     const confirmPassword = document.getElementById('confirmPassword').value;
+        //
+        //     if (password !== confirmPassword) {
+        //         alert('비밀번호가 일치하지 않습니다.');
+        //         return false;
+        //     }
+        //     return true;
+        // }
 
         // 비밀번호 확인
         document.getElementById("password").addEventListener("input", checkPasswordMatch);
@@ -1369,6 +1371,65 @@ E-mail : himyeongsun@gmail.com
                 alert("회원정보를 다시 확인해주세요.");
             }
         });
+
+        // 비밀번호 유효성 검사
+        document.getElementById("password").addEventListener("input", function() {
+            var password = this.value;
+            var passwordInput = this;
+            var passwordFeedback = document.getElementById("passwordFeedback");
+            var passwordValid = document.getElementById("passwordValid");
+
+            // 비밀번호 형식 검사 (8~18자리 영문자+숫자)
+            var passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,18}$/;
+
+            // 입력값이 비어있는 경우
+            if (password === "") {
+                passwordInput.classList.remove("is-invalid", "is-valid");
+                passwordFeedback.style.display = "none";
+                passwordValid.style.display = "none";
+                return;
+            }
+
+            if (!passwordPattern.test(password)) {
+                passwordInput.classList.remove("is-valid");
+                passwordInput.classList.add("is-invalid");
+                passwordFeedback.style.display = "block";
+                passwordValid.style.display = "none";
+            } else {
+                passwordInput.classList.remove("is-invalid");
+                passwordInput.classList.add("is-valid");
+                passwordFeedback.style.display = "none";
+                passwordValid.style.display = "block";
+            }
+        });
+
+        // 회원가입 폼 제출 시 비밀번호 확인 및 필수 약관 확인
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,18}$/;
+
+            if (!passwordPattern.test(password)) {
+                alert('비밀번호는 8~18자리의 영문자와 숫자 조합이어야 합니다.');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return false;
+            }
+
+            const serviceTerms = document.getElementById('serviceTerms');
+            const privacyTerms = document.getElementById('privacyTerms');
+
+            if (!serviceTerms.checked || !privacyTerms.checked) {
+                alert('약관 동의는 필수입니다.');
+                return false;
+            }
+
+            return true;
+        }
+
     </script>
 </th:block>
 </body>

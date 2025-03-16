@@ -339,55 +339,44 @@ public class RoomController {
     ----------------------------------------------------------------------------- */
     // 룸 수정 수정하기
     @PostMapping("/room/ho/update")
-    public String updateProc(@Valid @ModelAttribute RoomDTO roomDTO,
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateProc(@Valid @ModelAttribute RoomDTO roomDTO,
                              BindingResult bindingResult,
-                             List<MultipartFile> imageFiles){
+                             List<MultipartFile> imageFiles) {
+        Map<String, Object> response = new HashMap<>();
 
-        log.info("수정된 데이터를 저장합니다.");
+        if (bindingResult.hasErrors()) {
+            log.info("유효성 검사 오류 발생");
+            bindingResult.getAllErrors().forEach(error -> log.error("Validation error: " + error.getDefaultMessage()));
+            response.put("success", false);
+            response.put("message", "입력값을 확인해주세요.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
         try {
-
             String join = "room";
             // roomWifi, roomTv, roomAir, roomBath가 null일 경우 N으로 설정
-            if (roomDTO.getRoomWifi() == null) {
-                roomDTO.setRoomWifi("N");
-            }
-            if (roomDTO.getRoomTv() == null) {
-                roomDTO.setRoomTv("N");
-            }
-            if (roomDTO.getRoomAir() == null) {
-                roomDTO.setRoomAir("N");
-            }
-            if (roomDTO.getRoomBath() == null) {
-                roomDTO.setRoomBath("N");
-            }
-            if (roomDTO.getRoomBreakfast() == null) {
-                roomDTO.setRoomBreakfast("N");
-            }
-            if (roomDTO.getRoomSmokingYn() == null) {
-                roomDTO.setRoomSmokingYn("N");
-            }
-            // 체크인, 체크아웃 값이 없으면 기본값을 설정
-            if (roomDTO.getRoomCheckIn() == null) {
-                roomDTO.setRoomCheckIn(LocalTime.of(14, 0)); // 기본 체크인 시간 (14:00)
-            }
-            if (roomDTO.getRoomCheckOut() == null) {
-                roomDTO.setRoomCheckOut(LocalTime.of(11, 0)); // 기본 체크아웃 시간 (11:00)
-            }
+            if (roomDTO.getRoomWifi() == null) roomDTO.setRoomWifi("N");
+            if (roomDTO.getRoomTv() == null) roomDTO.setRoomTv("N");
+            if (roomDTO.getRoomAir() == null) roomDTO.setRoomAir("N");
+            if (roomDTO.getRoomBath() == null) roomDTO.setRoomBath("N");
+            if (roomDTO.getRoomBreakfast() == null) roomDTO.setRoomBreakfast("N");
+            if (roomDTO.getRoomSmokingYn() == null) roomDTO.setRoomSmokingYn("N");
 
-            if (bindingResult.hasErrors()){ // 유효성 검사에 실패 시
-                log.info("유효성 검사 오류 발생");
-                bindingResult.getAllErrors().forEach(error -> log.error("Validation error: " + error.getDefaultMessage()));
-                return "room/ho/update"; // update로 돌아간다
-            }
-            // 유효성 검사 성공 시 수정 처리
+            // 체크인, 체크아웃 값이 없으면 기본값을 설정
+            if (roomDTO.getRoomCheckIn() == null) roomDTO.setRoomCheckIn(LocalTime.of(14, 0));
+            if (roomDTO.getRoomCheckOut() == null) roomDTO.setRoomCheckOut(LocalTime.of(11, 0));
+
             roomService.roomUpdate(roomDTO, join, imageFiles);
 
-            return "redirect:/room/ho/detail?idx=" + roomDTO.getIdx();
-
+            response.put("success", true);
+            response.put("message", "객실이 성공적으로 수정되었습니다.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // 예외가 발생했을 경우 사용자에게 오류 메시지 전달
-            log.error(e.getMessage());
-            return "room/ho/update"; // 수정 페이지로 돌아가면서 오류 메시지 전달
+            log.error("객실 수정 중 오류 발생: " + e.getMessage());
+            response.put("success", false);
+            response.put("message", "객실 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

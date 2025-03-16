@@ -11,12 +11,10 @@
 </head>
 <body>
 <div layout:fragment="content" class="p-5">
-
   <div class="container p-5 bg-white">
     <div class="row">
       <div class="col"></div>
       <div class="col-10">
-        <!--디자인-->
         <div class="card">
           <div class="card-header">
             <h2 class="text-center fs-1">공지사항</h2>
@@ -53,10 +51,8 @@
             <div class="d-flex justify-content-end mt-4">
               <a th:href="@{/notice/list}" class="btn btn-secondary">목록</a>
               <a th:href="@{/notice/update(idx=${noticeDTO.idx})}" class="btn btn-warning ms-2">수정</a>
-              <form th:action="@{|/notice/delete/${noticeDTO.idx}|}" method="post" style="display: inline-block;" class="ms-2"
-                    onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-                <button type="submit" class="btn btn-danger">삭제</button>
-              </form>
+              <!-- 삭제 버튼 -->
+              <button th:data-idx="${noticeDTO.idx}" id="deleteBtn" class="btn btn-danger ms-2">삭제</button>
             </div>
           </div>
         </div>
@@ -67,28 +63,43 @@
 </div>
 
 <!-- SweetAlert2 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<!-- 삭제 확인 스크립트 -->
 <script th:inline="javascript">
-document.querySelector('form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
+  document.getElementById('deleteBtn').addEventListener('click', function() {
+    const idx = this.getAttribute('data-idx');
     Swal.fire({
-        title: '삭제 확인',
-        text: "정말로 이 공지사항을 삭제하시겠습니까?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: '삭제',
-        cancelButtonText: '취소'
+      title: '삭제 확인',
+      text: "정말로 이 공지사항을 삭제하시겠습니까?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소'
     }).then((result) => {
-        if (result.isConfirmed) {
-            this.submit();
-        }
+      if (result.isConfirmed) {
+        fetch(`/notice/delete/${idx}`, {
+          method: 'POST',  // POST 요청
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+                .then(response => {
+                  if (response.ok) {
+                    window.location.href = '/notice/list';  // 삭제 후 목록 페이지로 리디렉션
+                  } else {
+                    Swal.fire('삭제 실패', '삭제 요청을 처리할 수 없습니다.', 'error');
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  Swal.fire('삭제 실패', '오류가 발생했습니다.', 'error');
+                });
+      }
     });
-});
+  });
 </script>
+
+
+
 </body>
 </html>

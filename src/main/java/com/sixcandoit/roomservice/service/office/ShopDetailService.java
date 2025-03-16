@@ -35,18 +35,38 @@ public class ShopDetailService {
     ---------------------------------------------------*/
     public void register(ShopDetailDTO shopDetailDTO, Integer organIdx) {
         try {
-            // DTO => Entity 변환
-            ShopDetailEntity shopEntity = modelMapper.map(shopDetailDTO, ShopDetailEntity.class);
+            System.out.println(shopDetailDTO.toString());
+            System.out.println(organIdx);
 
             // 조직정보 조회
             OrganizationEntity organEntity = organizationRepository.findById(organIdx)
                     .orElseThrow(() -> new EntityNotFoundException("해당 조직을 찾을 수 없습니다: " + organIdx));;
 
+            System.out.println("1");
+
+            // DTO => Entity 변환
+            ShopDetailEntity shopDetailEntity = new ShopDetailEntity();
+            shopDetailEntity.setOpenTime(shopDetailDTO.getOpenTime());
+            shopDetailEntity.setCloseTime(shopDetailDTO.getCloseTime());
+            shopDetailEntity.setRestDay(shopDetailDTO.getRestDay());
+            shopDetailEntity.setOpenState(shopDetailDTO.getOpenState());
+            shopDetailEntity.setPartnerState(shopDetailDTO.getPartnerState());
+            shopDetailEntity.setType(shopDetailDTO.getType());
+            shopDetailEntity.setBankNum(shopDetailDTO.getBankNum());
+            shopDetailEntity.setBankName(shopDetailDTO.getBankName());
+            shopDetailEntity.setBankOwner(shopDetailDTO.getBankOwner());
+            shopDetailEntity.setDayFee(shopDetailDTO.getDayFee());
+            shopDetailEntity.setDayFeePercent(shopDetailDTO.getDayFeePercent());
+
+            System.out.println("2");
+
             // 연관관계 데이터 추가
-            shopEntity.setOrganizationJoin(organEntity);
+            shopDetailEntity.setOrganizationJoin(organEntity);
+
+            System.out.println("3");
 
             // DB에 저장
-            shopDetailRepository.save(shopEntity);
+            shopDetailRepository.save(shopDetailEntity);
 
         } catch (Exception e) {
             throw new RuntimeException("상점 저장 실패 : "+e.getMessage());
@@ -143,6 +163,7 @@ public class ShopDetailService {
         System.out.println("체크 3");
         System.out.println("shopDetailDTO : " + shopDetailDTO.toString());
         System.out.println("organizationDTO : " + organizationDTO.toString());
+        System.out.println("imageFiles : " + imageFiles.toString());
         try {
             // organizationDTO.getIdx()로 조직 데이터 조회
             OrganizationEntity organ = organizationRepository.findById(organIdx)
@@ -155,23 +176,41 @@ public class ShopDetailService {
             ShopDetailEntity shopEntity = shopDetailRepository.findById(shopDetailDTO.getIdx())
                     .orElseThrow(() -> new RuntimeException("상점 조회 실패"));
 
+            System.out.println("organ : " + organ.getIdx());
+            System.out.println("shopEntity : " + shopEntity.getIdx());
             System.out.println("체크 5");
-            System.out.println("shopEntity : " + shopEntity.toString());
 
             // 빠진 idx값 주입
             organizationDTO.setIdx(organIdx);
-
-            // DTO -> Entity로 변환
-            // 기존 엔티티 객체의 필드만 업데이트
-            modelMapper.map(organizationDTO, organ);
-            modelMapper.map(shopDetailDTO, shopEntity);
-
+            System.out.println(organIdx);
+            System.out.println("organizationDTO : " + organizationDTO.toString());
+            System.out.println("shopDetailDTO : " + shopDetailDTO.toString());
             System.out.println("체크 6");
 
-            // 이미지 추가 등록
-            List<ImageFileEntity> images = imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
+            // DTO -> Entity로 변환
+            OrganizationEntity organization = modelMapper.map(organizationDTO, OrganizationEntity.class);
+            organization.setAdminJoin(organ.getAdminJoin());
+            organization.setShopDetailJoin(organ.getShopDetailJoin());
+            organization.setAdvertisementJoin(organ.getAdvertisementJoin());
+            organization.setMenuJoin(organ.getMenuJoin());
+            organization.setRoomJoin(organ.getRoomJoin());
+            organization.setEventJoin(organ.getEventJoin());
+            organization.setImageFileJoin(organ.getImageFileJoin());
 
+            ShopDetailEntity shopDetail = modelMapper.map(shopDetailDTO, ShopDetailEntity.class);
+            shopDetail.setMenuJoin(shopEntity.getMenuJoin());
+            shopDetail.setCalculateJoins(shopEntity.getCalculateJoins());
+            shopDetail.setOrganizationJoin(shopEntity.getOrganizationJoin());
+
+            System.out.println("organ : " + organ.getIdx());
+            System.out.println("shopEntity : " + shopEntity.getIdx());
             System.out.println("체크 7");
+
+            // 이미지 추가 등록
+            List<ImageFileEntity> images =
+                    imageFileService.updateImage(imageFiles, join, organizationDTO.getIdx());
+
+            System.out.println("체크 8");
 
             // 이미지 정보 추가
             // 양방향 연관관계 편의 메서드 사용
@@ -180,11 +219,6 @@ public class ShopDetailService {
                     organ.addImage(image);  // FK 자동 설정
                 }
             }
-
-            System.out.println("체크 8");
-
-            // 연관 관계 설정 (필요 시)
-            shopEntity.setOrganizationJoin(organ);
 
             System.out.println("체크 9");
 

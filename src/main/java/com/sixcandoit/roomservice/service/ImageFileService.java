@@ -119,24 +119,38 @@ public class ImageFileService {
     -------------------------------------------------------------------- */
     public List<ImageFileEntity> updateImage(List<MultipartFile> imageFiles, String join, Integer idx) throws Exception {
 
+        System.out.println("imageFiles : " + imageFiles.toString());
+        System.out.println("join : " + join);
+        System.out.println("idx : " + idx);
+
         // 기존에 존재하던 이미지 리스트
         List<ImageFileEntity> existingImages = new ArrayList<>();
+        System.out.println("기존에 존재하던 이미지 리스트를 담을 리스트 existingImages 생성");
 
         if (join.equals("organ")) {
             existingImages = imageFileRepository.organizationJoin(idx);
+            System.out.println("organ 기본이미지 리스트 : " + existingImages.toString());
         } else if (join.equals("room")) {
             existingImages = imageFileRepository.roomJoin(idx);
+            System.out.println("room 기본이미지 리스트 : " + existingImages.toString());
         } else if (join.equals("notice")) {
             existingImages = imageFileRepository.noticeJoin(idx);
+            System.out.println("notice 기본이미지 리스트 : " + existingImages.toString());
         } else if (join.equals("qna")) {
             existingImages = imageFileRepository.qnaJoin(idx);
+            System.out.println("qna 기본이미지 리스트 : " + existingImages.toString());
         } else if (join.equals("event")) {
             existingImages = imageFileRepository.eventJoin(idx);
+            System.out.println("event 기본이미지 리스트 : " + existingImages.toString());
         } else if (join.equals("adver")) {
             existingImages = imageFileRepository.advertisementJoin(idx);
+            System.out.println("adver 기본이미지 리스트 : " + existingImages.toString());
         } else if (join.equals("menu")) {
             existingImages = imageFileRepository.menuJoin(idx);
+            System.out.println("menu 기본이미지 리스트 : " + existingImages.toString());
         }
+
+        System.out.println("이미지 서비스 - 기존 이미지 리스트 조회완료");
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
 
@@ -147,9 +161,11 @@ public class ImageFileService {
                     log.warn("빈 파일이 업로드 되었습니다.:{}", imagefile.getOriginalFilename());
                     continue;
                 }
+                System.out.println("이미지 서비스 - 빈파일인지 확인");
 
                 // FileEntity에 저장할 오리지널네임
                 String originalFilename = imagefile.getOriginalFilename();
+
                 // S3 업로드 성공 시, 생성된 파일 이름
                 String newFileName = "";
 
@@ -157,6 +173,8 @@ public class ImageFileService {
                 if (originalFilename != null) { // 작업 할 파일이 존재하면
                     newFileName = s3Uploader.upload(imagefile, imgUploadLocation);   // S3업로드
                 }
+
+                System.out.println("이미지 서비스 - S3까지 업로드");
 
                 // 엔티티 셋
                 ImageFileEntity fileEntity = new ImageFileEntity();

@@ -7,6 +7,7 @@ import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.cart.CartEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
+import com.sixcandoit.roomservice.entity.orders.OrdersMenuEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -78,6 +79,10 @@ public class MenuEntity extends BaseEntity {
     // 메뉴 옵션 테이블과 1:N 매핑
     @OneToMany(mappedBy = "menuJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MenuOptionEntity> menuOptionJoin;
+
+    // 주문 메뉴 옵션 테이블과 1:N 매핑
+    @OneToMany(mappedBy = "menuJoin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrdersMenuEntity> ordersMenuJoin;
 
     // 장바구니 테이블과 N:1 매핑
     @ManyToOne(fetch = FetchType.LAZY)

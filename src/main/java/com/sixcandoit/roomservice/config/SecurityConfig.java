@@ -69,6 +69,7 @@ public class SecurityConfig{
                     auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico","/error").permitAll();
                     auth.requestMatchers("/h2-console/**").permitAll();
                     auth.requestMatchers("/admin/login").permitAll();
+                    auth.requestMatchers("/admin/adminlist","/admin/holist").permitAll();
                     //ajax 허용
                     auth.requestMatchers("/member/checkEmail", "/admin/checkEmail",
                             "/member/checkEmailCode", "/admin/checkEmailCode", "/admin/sendEmailCode", "/member/sendEmailCode").permitAll();
@@ -146,6 +147,8 @@ public class SecurityConfig{
             auth.requestMatchers("/h2-console/**").permitAll();
             auth.requestMatchers("/admin/updateRole").permitAll();
             auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
+            auth.requestMatchers("/admin/adminlist","/admin/holist").permitAll();
+
             auth.requestMatchers("/member/checkPhone", "/admin/checkPhone",
                     "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode","/member/checkEmailCode").permitAll();
             auth.requestMatchers("/member/checkEmail", "/admin/checkEmail").permitAll();

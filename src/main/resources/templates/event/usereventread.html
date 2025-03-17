@@ -62,39 +62,16 @@
                                     <span>글 제목: <input class="form-control" type="text" name="eventTitle"
                                                        th:value="${eventDTORead.eventTitle}"></span>
                                 </div>
-                                <div class="info-item col-sm-6">
+                                <div class="info-item col-12">
                                     <i class="bi bi-calendar"></i>
                                     <span>이벤트 기간:
-                                    <input class="form-control col-6" type="datetime-local"
+                                    <input class="form-control col-12" type="datetime-local"
                                            name="eventStartDate"
                                            th:value="${eventDTORead.eventStartDate}" readonly> ~
-                                            <input class="form-control col-6" style="float: right" type="datetime-local"
+                                            <input class="form-control col-12" style="float: right" type="datetime-local"
                                                    name="eventEndDate"
                                                    th:value="${eventDTORead.eventEndDate}" readonly>
                                         </span>
-                                </div>
-                                <div class="info-item">
-                                    <i class="bi bi-activity"></i>
-                                    <span>이벤트 상태:
-                                        <th:block th:if="${eventDTORead.eventState=='Y'}">
-                                        <input class="form-control" th:value="진행중" readonly>
-                                        </th:block>
-                                        <th:block th:if="${eventDTORead.eventState=='N'}">
-                                        <input class="form-control" th:value="종료" readonly>
-                                        </th:block>
-
-                                    </span>
-                                </div>
-                                <div class="info-item">
-                                    <i class="bi bi-skip-start-circle"></i>
-                                    <span>이밴트 활성 :
-                                        <th:block th:if="${eventDTORead.activeYn=='Y'}">
-                                        <input class="form-control" th:value="활성화" readonly>
-                                        </th:block>
-                                        <th:block th:if="${eventDTORead.activeYn=='N'}">
-                                        <input class="form-control" th:value="비활성화" readonly>
-                                        </th:block>
-                                    </span>
                                 </div>
                                 <!-- 객실 설명 추가 -->
                                 <div class="info-item mt-4">

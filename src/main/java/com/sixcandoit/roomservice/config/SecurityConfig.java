@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig{
+public class SecurityConfig {
 
     private final CustomLoginSuccessHandler customLoginSuccessHandler;
     private final AuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -65,39 +65,39 @@ public class SecurityConfig{
         //사용권한
         http//.addFilterBefore(userAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .securityMatcher("/admin/**")
-                .authorizeHttpRequests((auth)-> {
-                    auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico","/error").permitAll();
+                .authorizeHttpRequests((auth) -> {
+                    auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico", "/error").permitAll();
                     auth.requestMatchers("/h2-console/**").permitAll();
 
                     // 메인 페이지
                     auth.requestMatchers("/admin/").hasRole("ADMIN");
-                    auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
-                    auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
-                    auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
+                    auth.requestMatchers("/ho/**").hasAnyRole("ADMIN", "HO");
+                    auth.requestMatchers("/bo/**").hasAnyRole("ADMIN", "HO", "BO");
+                    auth.requestMatchers("/guest/**").hasAnyRole("ADMIN", "HO", "BO", "GUEST");
                     auth.requestMatchers("/member/").permitAll();
 
                     // 로그인, 회원가입, 회원정보 관련
-                    auth.requestMatchers("/admin/login","/member/login","/admin/logout","/member/logout").permitAll();
-                    auth.requestMatchers("/admin/password","/member/password","/admin/register","/member/register",
-                            "/admin/checkEmail","/member/checkEmail","/admin/checkPhone","/member/checkPhone",
-                            "/admin/sendEmailCode","/member/sendEmailCode","/admin/checkEmailCode","/member/checkEmailCode").permitAll();
-                    auth.requestMatchers("/admin/verify","/admin/modify","/admin/modifypw","/admin/deleteAdmin","/admin/deleteMember").hasAnyRole("ADMIN","HO","BO");
-                    auth.requestMatchers("/member/verify","/member/modify","/member/modifypw","/member/deleteMember").hasRole("MEMBER");
+                    auth.requestMatchers("/admin/login", "/member/login", "/admin/logout", "/member/logout").permitAll();
+                    auth.requestMatchers("/admin/password", "/member/password", "/admin/register", "/member/register",
+                            "/admin/checkEmail", "/member/checkEmail", "/admin/checkPhone", "/member/checkPhone",
+                            "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode", "/member/checkEmailCode").permitAll();
+                    auth.requestMatchers("/admin/verify", "/admin/modify", "/admin/modifypw", "/admin/deleteAdmin", "/admin/deleteMember").hasAnyRole("ADMIN", "HO", "BO");
+                    auth.requestMatchers("/member/verify", "/member/modify", "/member/modifypw", "/member/deleteMember").hasRole("MEMBER");
                     auth.requestMatchers("/member/mypage").hasRole("MEMBER");
 
                     // 회원 목록 관련
-                    auth.requestMatchers("/admin/adminlist","/admin/memberlist").hasRole("ADMIN");
-                    auth.requestMatchers("/admin/holist","/admin/updateRole").hasAnyRole("ADMIN","HO");
+                    auth.requestMatchers("/admin/adminlist", "/admin/memberlist").hasRole("ADMIN");
+                    auth.requestMatchers("/admin/holist", "/admin/updateRole").hasAnyRole("ADMIN", "HO");
 
                     // 전체
-                    auth.requestMatchers("/member/**").hasAnyRole("ADMIN","HO","BO","MEMBER");
-                    auth.requestMatchers("/admin/**").hasAnyRole("ADMIN","HO","BO");
+                    auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+                    auth.requestMatchers("/admin/**").hasAnyRole("ADMIN", "HO", "BO");
 
                     // 공지사항 페이지 접근 권한
-                    auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update").hasAnyRole("ADMIN");
-                    auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN","HO");
-                    auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN","HO","BO");
-                    auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+                    auth.requestMatchers("/notice/list", "/notice/read", "/notice/register", "/notice/update").hasAnyRole("ADMIN");
+                    auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN", "HO");
+                    auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN", "HO", "BO");
+                    auth.requestMatchers("/notice/userlist", "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
 
                     // 오더 페이지 접근 권한
                     auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
@@ -119,8 +119,9 @@ public class SecurityConfig{
                     // 메뉴, 카트 페이지 접근 권한 - RequestMapping 되어 있어서 미작성
 
                     // 이벤트 및 포인트 페이지 접근 권한
-                    auth.requestMatchers("/event/**").hasAnyRole("ADMIN","HO","BO");
-                    auth.requestMatchers("/event/userevent/**","/event/usereventread/**","/event/usermemberpoint/**").hasRole("MEMBER");
+                    auth.requestMatchers("/event/**").permitAll();
+                    auth.requestMatchers("/event/event/**", "/event/eventread/**", "/event/eventregister/**", "/event/eventupdate", "event/memberpoint/**").hasAnyRole("ADMIN", "HO", "BO");
+                    auth.requestMatchers("/event/userevent/**", "/event/usereventread/**", "/event/usermemberpoint/**").hasRole("MEMBER");
 
 
 
@@ -135,21 +136,21 @@ public class SecurityConfig{
 
         //관리자회원 로그인
         http.formLogin(login -> login
-                .defaultSuccessUrl("/admin/", true)
-                .failureUrl("/admin/login?error=true")
-                .loginPage("/admin/login")
-                .usernameParameter("adminEmail")
-                .permitAll()
-                .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
+                        .defaultSuccessUrl("/admin/", true)
+                        .failureUrl("/admin/login?error=true")
+                        .loginPage("/admin/login")
+                        .usernameParameter("adminEmail")
+                        .permitAll()
+                        .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
 
 
         //CSRF 보호를 비활성화
         http.csrf(AbstractHttpConfigurer::disable);
 
         //로그아웃
-        http.logout(logout-> logout
+        http.logout(logout -> logout
                 .logoutUrl("/admin/logout")
                 .logoutSuccessUrl("/admin/login")); //로그아웃
 
@@ -163,39 +164,39 @@ public class SecurityConfig{
     @Order(2)
     public SecurityFilterChain filterChain2(HttpSecurity http) throws Exception {
         //사용권한
-        http.authorizeHttpRequests((auth)-> {
-            auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico","/error").permitAll();
+        http.authorizeHttpRequests((auth) -> {
+            auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico", "/error").permitAll();
             auth.requestMatchers("/h2-console/**").permitAll();
 
             // 메인 페이지
             auth.requestMatchers("/admin/").hasRole("ADMIN");
-            auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
-            auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
-            auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
+            auth.requestMatchers("/ho/**").hasAnyRole("ADMIN", "HO");
+            auth.requestMatchers("/bo/**").hasAnyRole("ADMIN", "HO", "BO");
+            auth.requestMatchers("/guest/**").hasAnyRole("ADMIN", "HO", "BO", "GUEST");
             auth.requestMatchers("/member/").permitAll();
 
             // 로그인, 회원가입, 회원정보 관련
-            auth.requestMatchers("/admin/login","/member/login","/admin/logout","/member/logout").permitAll();
-            auth.requestMatchers("/admin/password","/member/password","/admin/register","/member/register",
-                    "/admin/checkEmail","/member/checkEmail","/admin/checkPhone","/member/checkPhone",
-                    "/admin/sendEmailCode","/member/sendEmailCode","/admin/checkEmailCode","/member/checkEmailCode").permitAll();
-            auth.requestMatchers("/admin/verify","/admin/modify","/admin/modifypw","/admin/deleteAdmin","/admin/deleteMember").hasAnyRole("ADMIN","HO","BO");
-            auth.requestMatchers("/member/verify","/member/modify","/member/modifypw","/member/deleteMember").hasRole("MEMBER");
+            auth.requestMatchers("/admin/login", "/member/login", "/admin/logout", "/member/logout").permitAll();
+            auth.requestMatchers("/admin/password", "/member/password", "/admin/register", "/member/register",
+                    "/admin/checkEmail", "/member/checkEmail", "/admin/checkPhone", "/member/checkPhone",
+                    "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode", "/member/checkEmailCode").permitAll();
+            auth.requestMatchers("/admin/verify", "/admin/modify", "/admin/modifypw", "/admin/deleteAdmin", "/admin/deleteMember").hasAnyRole("ADMIN", "HO", "BO");
+            auth.requestMatchers("/member/verify", "/member/modify", "/member/modifypw", "/member/deleteMember").hasRole("MEMBER");
             auth.requestMatchers("/member/mypage").hasRole("MEMBER");
 
             // 회원 목록 관련
-            auth.requestMatchers("/admin/adminlist","/admin/memberlist").hasRole("ADMIN");
-            auth.requestMatchers("/admin/holist","/admin/updateRole").hasAnyRole("ADMIN","HO");
+            auth.requestMatchers("/admin/adminlist", "/admin/memberlist").hasRole("ADMIN");
+            auth.requestMatchers("/admin/holist", "/admin/updateRole").hasAnyRole("ADMIN", "HO");
 
             // 전체
-            auth.requestMatchers("/member/**").hasAnyRole("ADMIN","HO","BO","MEMBER");
-            auth.requestMatchers("/admin/**").hasAnyRole("ADMIN","HO","BO");
+            auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+            auth.requestMatchers("/admin/**").hasAnyRole("ADMIN", "HO", "BO");
 
             // 공지사항 페이지 접근 권한
-            auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update").hasAnyRole("ADMIN");
-            auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN","HO");
-            auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN","HO","BO");
-            auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+            auth.requestMatchers("/notice/list", "/notice/read", "/notice/register", "/notice/update").hasAnyRole("ADMIN");
+            auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN", "HO");
+            auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN", "HO", "BO");
+            auth.requestMatchers("/notice/userlist", "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
 
             // 오더 페이지 접근 권한
             auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
@@ -217,8 +218,9 @@ public class SecurityConfig{
             // 메뉴, 카트 페이지 접근 권한 - RequestMapping 되어 있어서 미작성
 
             // 이벤트 및 포인트 페이지 접근 권한
-            auth.requestMatchers("/event/**").hasAnyRole("ADMIN","HO","BO");
-            auth.requestMatchers("/event/userevent/**","/event/usereventread/**","/event/usermemberpoint/**").hasRole("MEMBER");
+            auth.requestMatchers("/event/**").permitAll();
+            auth.requestMatchers("/event/event/**", "/event/eventread/**", "/event/eventregister/**", "/event/eventupdate", "event/memberpoint/**").hasAnyRole("ADMIN", "HO", "BO");
+            auth.requestMatchers("/event/userevent/**", "/event/usereventread/**", "/event/usermemberpoint/**").hasRole("MEMBER");
 
 
 
@@ -228,24 +230,25 @@ public class SecurityConfig{
             auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
             // 광고 페이지 접근 권한
             auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
-            });
+
+        });
 
         //일반회원 로그인
         http.formLogin(login -> login
-                .defaultSuccessUrl("/member/", true)
-                .failureUrl("/member/login?error=true")
-                .loginPage("/member/login")
-                .usernameParameter("memberEmail")
-                .permitAll()
-                .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
-        .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
+                        .defaultSuccessUrl("/member/", true)
+                        .failureUrl("/member/login?error=true")
+                        .loginPage("/member/login")
+                        .usernameParameter("memberEmail")
+                        .permitAll()
+                        .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
 
         //CSRF 보호를 비활성화
         http.csrf(AbstractHttpConfigurer::disable);
 
         //로그아웃
-        http.logout(logout-> logout
+        http.logout(logout -> logout
                 .logoutUrl("/member/logout")
                 .logoutSuccessUrl("/member/login")); //로그아웃
 

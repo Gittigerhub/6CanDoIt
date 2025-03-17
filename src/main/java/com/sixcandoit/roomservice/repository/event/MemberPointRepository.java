@@ -23,12 +23,12 @@ public interface MemberPointRepository extends JpaRepository<MemberPointEntity, 
     Page<MemberPointEntity> findByEmail(@Param("keyword") String keyword, Pageable pageable);
 
     //회원 이름으로 검색
-    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberJoin.memberName LIKE %:keyword")
+    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberJoin.memberName LIKE CONCAT('%', :keyword, '%')")
     Page<MemberPointEntity> findByName(@Param("keyword") String keyword, Pageable pageable);
 
 
     //회원 이름 또는 내용으로 검색
-    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberJoin.memberEmail LIKE %:keyword OR  m.memberJoin.memberName LIKE %:keyword")
+    @Query("SELECT m FROM MemberPointEntity m WHERE m.memberJoin.memberEmail LIKE CONCAT('%', :keyword, '%') OR  m.memberJoin.memberName LIKE CONCAT('%', :keyword, '%')")
     Page<MemberPointEntity> findByNameOrEmail(@Param("keyword") String keyword, Pageable pageable);
 
     /*  여기는 userMemberpoint   */

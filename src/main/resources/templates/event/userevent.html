@@ -23,7 +23,7 @@
             <div class="col-12">
                 <div class="input-group mb-3 bg-white">
                     <select class="form-select" id="selectBox" name="type">
-                        <option th:selected="${type==null}">선택안함</option>
+                        <option value="" th:selected="${type==null}">선택안함</option>
                         <option value="1" th:selected="${type=='1'}">내용</option>
                         <option value="2" th:selected="${type=='2'}">활성화</option>
                         <option value="3" th:selected="${type=='3'}">기간</option>
@@ -53,29 +53,32 @@
         <div class="row">
             <div class="col-12 mainTable">
                 <table class="table" style="text-align: center">
-                    <thead class="table" >
+                    <thead class="table">
                     <tr>
-                        <th style="width: 5%">No.</th>
-                        <th style="width: 20%">이벤트 제목</th>
-                        <th style="width: 35%">이벤트 내용</th>
-                        <th style="width: 20%">이벤트 기간</th>
-                        <th style="width: 20%">이벤트 활성화 여부</th>
+                        <th style="width: 10%;">No.</th>
+                        <th style="width: 25%;">이벤트 제목</th>
+                        <th style="width: 40%;">이벤트 내용</th>
+                        <th style="width: 25%;">이벤트 기간</th>
                     </tr>
                     </thead>
+
                     <tbody>
+
+
                     <tr class="column" th:each="eventDTO:${userEventDTO}" th:data-id="${eventDTO.idx}">
-                        <td th:text="${eventDTO.idx}"></td>
-                        <td th:text="${eventDTO.eventTitle}"></td>
-                        <td class="contents" th:text="${#strings.length(eventDTO.eventContents)>30 ? #strings.substring(eventDTO.eventContents,0,30)+'...':
+                        <th:block th:if="${eventDTO.eventState.equals('Y')}">
+                            <td th:text="${eventDTO.idx}"></td>
+                            <td th:text="${eventDTO.eventTitle}"></td>
+                            <td class="contents" th:text="${#strings.length(eventDTO.eventContents)>30 ? #strings.substring(eventDTO.eventContents,0,30)+'...':
                         eventDTO.eventContents}"></td>
-                        <td th:text="${#temporals.format(eventDTO.eventStartDate, 'yy-MM-dd')}+'~'+${#temporals.format(eventDTO.eventEndDate, 'yy-MM-dd')}"></td>
-                        <th:block th:if="${eventDTO.activeYn.equals('Y')}">
-                            <td style="text-align: center"><span class="banner-button text-bg-primary">활성화 됨</span></td>
+                            <td th:text="${#temporals.format(eventDTO.eventStartDate, 'yy-MM-dd')}+'~'+${#temporals.format(eventDTO.eventEndDate, 'yy-MM-dd')}"></td>
                         </th:block>
-                        <th:block th:if="${eventDTO.activeYn.equals('N')}">
-                            <td style="text-align: center"><span class="banner-button text-bg-danger">활성화 안됨</span></td>
+                        <th:block th:if="${eventDTO.eventState.equals('N')}">
+
                         </th:block>
                     </tr>
+
+
                     </tbody>
                 </table>
             </div>
@@ -136,7 +139,9 @@
                 let selectedValue = $("#selectBox").val(); // 선택된 값 가져오기
                 console.log("작동중!! 선택된 값:", selectedValue);
 
-                if (selectedValue === '1') {
+                if (selectedValue === '') {
+                    window.location.href = window.location.pathname+'';
+                } else if (selectedValue === '1') {
                     window.location.href = window.location.pathname + "?type=1";
                 } else if (selectedValue === '2') {
                     window.location.href = window.location.pathname + "?type=2";

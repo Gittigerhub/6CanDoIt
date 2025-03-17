@@ -23,7 +23,7 @@
             <div class="col-12">
                 <div class="input-group mb-3">
                     <select class="form-select" name="type">
-                        <option th:selected="${type==null}"></option>
+                        <option th:selected="${type==null}">선택없음</option>
                         <option value="0" th:selected="${type=='0'}">전체</option>
                         <option value="1" th:selected="${type=='1'}">이메일</option>
                         <option value="2" th:selected="${type=='2'}">이름</option>
@@ -260,7 +260,7 @@
                                 content: 'text-dark',
                             },
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 10000,
                             willOpen: () => {
                                 Swal.showLoading();
                             },
@@ -282,7 +282,7 @@
                                 content: 'text-dark',
                             },
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 10000,
                             willOpen: () => {
                                 Swal.showLoading();
                             },
@@ -473,6 +473,11 @@
 
             });//수정버튼 클릭 끝
 
+            //DTO 객체 선언
+
+
+
+
             // 총합이 찍히는 함수
             function calculateTotalPoints() {
 
@@ -488,6 +493,8 @@
                         }
                     }
                     $(".totalPoints").text(totalPoints);
+
+
                 });
 
 
@@ -495,6 +502,10 @@
 
 
             calculateTotalPoints();
+
+
+
+
 
         }); //document 끝
     </script>

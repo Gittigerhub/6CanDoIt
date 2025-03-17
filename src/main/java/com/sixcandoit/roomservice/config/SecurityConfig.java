@@ -68,48 +68,69 @@ public class SecurityConfig{
                 .authorizeHttpRequests((auth)-> {
                     auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico","/error").permitAll();
                     auth.requestMatchers("/h2-console/**").permitAll();
-                    auth.requestMatchers("/admin/login").permitAll();
-                    auth.requestMatchers("/admin/adminlist","/admin/holist").permitAll();
-                    //ajax 허용
-                    auth.requestMatchers("/member/checkEmail", "/admin/checkEmail",
-                            "/member/checkEmailCode", "/admin/checkEmailCode", "/admin/sendEmailCode", "/member/sendEmailCode").permitAll();
-                    auth.requestMatchers("/member/checkPhone", "/admin/checkPhone").permitAll();
-                    auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
-                    auth.requestMatchers("/member/**").hasAnyRole("ADMIN", "HO","BO", "MEMBER");
-                    auth.requestMatchers("/admin/**", "/member/**").hasAnyRole("ADMIN","HO","BO");
-                    // 조직-매장 페이지 접근 권한
-                    auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
-                    // 이벤트-멤버포인트 페이지 접근 권한
-                    auth.requestMatchers("/event/**", "/event/memberpoint/**", "/event/usermemberpoint/**","/event/userevent/**").permitAll();
+
+                    // 메인 페이지
+                    auth.requestMatchers("/admin/").hasRole("ADMIN");
+                    auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
+                    auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
+                    auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
+                    auth.requestMatchers("/member/").permitAll();
+
+                    // 로그인, 회원가입, 회원정보 관련
+                    auth.requestMatchers("/admin/login","/member/login","/admin/logout","/member/logout").permitAll();
+                    auth.requestMatchers("/admin/password","/member/password","/admin/register","/member/register",
+                            "/admin/checkEmail","/member/checkEmail","/admin/checkPhone","/member/checkPhone",
+                            "/admin/sendEmailCode","/member/sendEmailCode","/admin/checkEmailCode","/member/checkEmailCode").permitAll();
+                    auth.requestMatchers("/admin/verify","/admin/modify","/admin/modifypw","/admin/deleteAdmin","/admin/deleteMember").hasAnyRole("ADMIN","HO","BO");
+                    auth.requestMatchers("/member/verify","/member/modify","/member/modifypw","/member/deleteMember").hasRole("MEMBER");
+                    auth.requestMatchers("/member/mypage").hasRole("MEMBER");
+
+                    // 회원 목록 관련
+                    auth.requestMatchers("/admin/adminlist","/admin/memberlist").hasRole("ADMIN");
+                    auth.requestMatchers("/admin/holist","/admin/updateRole").hasAnyRole("ADMIN","HO");
+
+                    // 전체
+                    auth.requestMatchers("/member/**").hasAnyRole("ADMIN","HO","BO","MEMBER");
+                    auth.requestMatchers("/admin/**").hasAnyRole("ADMIN","HO","BO");
+
+                    // 공지사항 페이지 접근 권한
+                    auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update").hasAnyRole("ADMIN");
+                    auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN","HO");
+                    auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN","HO","BO");
+                    auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+
+                    // 오더 페이지 접근 권한
+                    auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+
                     // QnA 페이지 접근 권한
                     auth.requestMatchers("/qna/qnalist/**").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/qna/list", "/qna/read", "/qna/register", "/qna/update", "/qna/delete").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
                     auth.requestMatchers("/qna/favYn/update").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/qna/adminread").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/reply/**").hasAnyRole("ADMIN", "HO", "BO");
+
                     // 룸 관리, 룸 예약 페이지 접근 권한
                     auth.requestMatchers("/room/member/list").permitAll();
                     auth.requestMatchers("/room/ho/**", "/res/ho/**").hasAnyRole("ADMIN", "HO");
                     auth.requestMatchers("/room/bo/**").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/res/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
                     auth.requestMatchers("/room/**").permitAll();
-                    // 공지사항 페이지 접근 권한
-                    auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update", "/notice/delete").hasAnyRole("ADMIN","HO", "BO");
-                    auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
-                    // 오더 페이지 접근 권한
-                    auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
-                    // 메뉴 페이지 접근 권한
-                    auth.requestMatchers("/menu/**").permitAll();
-                    // 장바구니 페이지 접근 권한
-                    auth.requestMatchers("/cart/**").permitAll();
+
+                    // 메뉴, 카트 페이지 접근 권한 - RequestMapping 되어 있어서 미작성
+
+                    // 이벤트 및 포인트 페이지 접근 권한
+                    auth.requestMatchers("/event/**").hasAnyRole("ADMIN","HO","BO");
+                    auth.requestMatchers("/event/userevent/**","/event/usereventread/**","/event/usermemberpoint/**").hasRole("MEMBER");
+
+
+
+                    /*--------------------------------------------------------------------------------------------------------------------------*/
+
+                    // 조직-매장 페이지 접근 권한
+                    auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
                     // 광고 페이지 접근 권한
                     auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
-                    // 이미지 컨트롤러 접근 권한
-                    auth.requestMatchers("/images/**").permitAll();
-                    // ho, bo 권한 설정
-                    auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
-                    auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
-                    auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
+
                 });
 
         //관리자회원 로그인
@@ -145,54 +166,69 @@ public class SecurityConfig{
         http.authorizeHttpRequests((auth)-> {
             auth.requestMatchers("/", "/assets/**", "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico","/error").permitAll();
             auth.requestMatchers("/h2-console/**").permitAll();
-            auth.requestMatchers("/admin/updateRole").permitAll();
-            auth.requestMatchers("/login", "/logout", "/member/register", "/admin/register","/member/password","/admin/password").permitAll();
-            auth.requestMatchers("/admin/adminlist","/admin/holist").permitAll();
 
-            auth.requestMatchers("/member/checkPhone", "/admin/checkPhone",
-                    "/admin/sendEmailCode", "/member/sendEmailCode", "/admin/checkEmailCode","/member/checkEmailCode").permitAll();
-            auth.requestMatchers("/member/checkEmail", "/admin/checkEmail").permitAll();
-            auth.requestMatchers("/member/**").hasAnyRole("ADMIN","HO","BO", "MEMBER");
-            auth.requestMatchers("/admin/**", "/member/**").hasAnyRole("ADMIN","HO","BO");
-            // 조직-매장 페이지 접근 권한
-            auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
-            // 이벤트-멤버포인트 페이지 접근 권한
-            auth.requestMatchers("/event/**", "/event/memberpoint/**", "/upload/**","/event/update/**","/event/delete","/event/user/**").permitAll();
+            // 메인 페이지
+            auth.requestMatchers("/admin/").hasRole("ADMIN");
+            auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
+            auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
+            auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
+            auth.requestMatchers("/member/").permitAll();
+
+            // 로그인, 회원가입, 회원정보 관련
+            auth.requestMatchers("/admin/login","/member/login","/admin/logout","/member/logout").permitAll();
+            auth.requestMatchers("/admin/password","/member/password","/admin/register","/member/register",
+                    "/admin/checkEmail","/member/checkEmail","/admin/checkPhone","/member/checkPhone",
+                    "/admin/sendEmailCode","/member/sendEmailCode","/admin/checkEmailCode","/member/checkEmailCode").permitAll();
+            auth.requestMatchers("/admin/verify","/admin/modify","/admin/modifypw","/admin/deleteAdmin","/admin/deleteMember").hasAnyRole("ADMIN","HO","BO");
+            auth.requestMatchers("/member/verify","/member/modify","/member/modifypw","/member/deleteMember").hasRole("MEMBER");
+            auth.requestMatchers("/member/mypage").hasRole("MEMBER");
+
+            // 회원 목록 관련
+            auth.requestMatchers("/admin/adminlist","/admin/memberlist").hasRole("ADMIN");
+            auth.requestMatchers("/admin/holist","/admin/updateRole").hasAnyRole("ADMIN","HO");
+
+            // 전체
+            auth.requestMatchers("/member/**").hasAnyRole("ADMIN","HO","BO","MEMBER");
+            auth.requestMatchers("/admin/**").hasAnyRole("ADMIN","HO","BO");
+
+            // 공지사항 페이지 접근 권한
+            auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update").hasAnyRole("ADMIN");
+            auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN","HO");
+            auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN","HO","BO");
+            auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+
+            // 오더 페이지 접근 권한
+            auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
+
             // QnA 페이지 접근 권한
             auth.requestMatchers("/qna/qnalist/**").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/qna/list", "/qna/read", "/qna/register", "/qna/update", "/qna/delete").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             auth.requestMatchers("/qna/favYn/update").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/qna/adminread").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/reply/**").hasAnyRole("ADMIN", "HO", "BO");
+
             // 룸 관리, 룸 예약 페이지 접근 권한
             auth.requestMatchers("/room/member/list").permitAll();
             auth.requestMatchers("/room/ho/**", "/res/ho/**").hasAnyRole("ADMIN", "HO");
             auth.requestMatchers("/room/bo/**").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/res/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             auth.requestMatchers("/room/**").permitAll();
-            // 공지사항 페이지 접근 권한
-            auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update", "/notice/delete").hasAnyRole("ADMIN","HO", "BO");
-            auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
-            // 오더 페이지 접근 권한
-            auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
-            // 메뉴 페이지 접근 권한
-            auth.requestMatchers("/menu/**").permitAll();
-            // 장바구니 페이지 접근 권한
-            auth.requestMatchers("/cart/**").permitAll();
+
+            // 메뉴, 카트 페이지 접근 권한 - RequestMapping 되어 있어서 미작성
+
+            // 이벤트 및 포인트 페이지 접근 권한
+            auth.requestMatchers("/event/**").hasAnyRole("ADMIN","HO","BO");
+            auth.requestMatchers("/event/userevent/**","/event/usereventread/**","/event/usermemberpoint/**").hasRole("MEMBER");
+
+
+
+            /*--------------------------------------------------------------------------------------------------------------------------*/
+
+            // 조직-매장 페이지 접근 권한
+            auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
             // 광고 페이지 접근 권한
             auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
-            // 이미지 컨트롤러 접근 권한
-            auth.requestMatchers("/images/**").permitAll();
-            // ho, bo, guest 권한 설정
-            auth.requestMatchers("/ho/**").hasAnyRole("ADMIN","HO");
-            auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
-            auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
-
             });
-
-        //http.exceptionHandling(exceptionHandling ->exceptionHandling
-        //         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-        // );
 
         //일반회원 로그인
         http.formLogin(login -> login

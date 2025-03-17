@@ -1789,7 +1789,7 @@ E-mail : himyeongsun@gmail.com
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const error = [[${param.error}]];
+            const error = /*[[${param.error}]]*/ null;
             if (error) {
                 alert("회원정보를 다시 확인해주세요.");
             }

@@ -153,10 +153,16 @@ public class MemberMenuController {
     @GetMapping("/menu/ajax/listmenu")
     public String ajaxListMenu(@RequestParam(value = "category", defaultValue = "ALL") String category,
                                @PageableDefault(page = 1) Pageable page,
-                               Model model){
+                               Model model, Principal principal){
+
+        // 로그인한 회원정보로 예약건 찾아서 해당 호텔정보 가져오기
+        OrganizationDTO organizationDTO = menuService.findMemberRes(principal.getName());
+
+        // 호텔의 idx
+        Integer organIdx = organizationDTO.getIdx();
 
         // 해당 페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
-        Page<MenuDTO> menuDTOS = menuService.selectCate(page, category);
+        Page<MenuDTO> menuDTOS = menuService.selectCate(page, category, organIdx);
 
         // DTO들 리스트로 가져오기
         List<MenuDTO> menu = menuDTOS.getContent();

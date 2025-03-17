@@ -9,7 +9,15 @@ public class AppConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+
+        modelMapper.getConfiguration()
+                .setFieldMatchingEnabled(true)
+                .setSkipNullEnabled(true); // setFieldAccessLevel 제거
+
+        return modelMapper;
     }
 
 }
+
+// 무한루프 참조 방지

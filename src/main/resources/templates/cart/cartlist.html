@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -166,13 +166,13 @@
             // 주문처리 요청
             $.ajax({
                 url: '/member/orders',
-                type: 'POST',
-                contentType: 'application/json', // 요청 데이터 타입을 JSON으로 설정
-                data: JSON.stringify({
+                type: 'GET',
+
+                data: {
                     cartMenuIdxList: cartMenuIdxList,
                     ordersPhone: ordersPhone,
                     ordersMemo: ordersMemo
-                }), // 객체를 JSON 문자열로 변환
+                },
                 success: function(response) {
                     console.log("주문 완료, response",response);
                     Swal.fire({

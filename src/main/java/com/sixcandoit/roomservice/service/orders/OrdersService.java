@@ -247,7 +247,7 @@ public class OrdersService {
 
     //관리자 화면
     // 1. 관리자용 주문 목록 조회 (검색 기능 포함)
-    public Page<OrdersHistDTO> getAdminOrderList(String type, String keyword, Pageable page) {
+    public Page<OrdersHistDTO> getAdminOrderList(String type, String keyword, Integer organ_idx, Pageable page) {
         log.info("관리자 주문 목록 조회");
 
         try {
@@ -267,26 +267,24 @@ public class OrdersService {
             if (keyword != null && !keyword.isEmpty()) {
                 if (type.equals("1")) { //type 분류 1, 주문번호로 검색할 때
                     log.info("주문번호로 검색 하는 중...");
-                    ordersEntities = ordersRepository.searchByOrderIdx(keyword, pageable);
+                    ordersEntities = ordersRepository.searchByOrderIdxAndOrganIdx(keyword, organ_idx, pageable);
                 } else if (type.equals("2")) { //type 분류 2, 주문자명으로 검색할 때
                     log.info("주문자명으로 검색 하는 중...");
-                    ordersEntities = ordersRepository.searchByMemberName(keyword, pageable);
+                    ordersEntities = ordersRepository.searchByMemberNameAndOrganIdx(keyword, organ_idx, pageable);
                 } else if (type.equals("3")) { //type 분류 3, 주문상태로 검색할 때
                     log.info("주문상태로 검색 하는 중...");
                     OrderStatus status = OrderStatus.valueOf(keyword);
-                    ordersEntities = ordersRepository.searchByOrderStatus(status, pageable);
+                    ordersEntities = ordersRepository.searchByOrderStatusAndOrganIdx(status, organ_idx, pageable);
                 } else {    //type 분류 4, 전체로 검색할 때
                     log.info("전체 조회 검색중...");
-                    ordersEntities = ordersRepository.findAll(pageable);
+                    ordersEntities = ordersRepository.findByOrganIdx(organ_idx, pageable);
                 }
-
             } else {  //검색어가 존재하지 않으면 모두 검색
-                ordersEntities = ordersRepository.findAll(pageable);
+                ordersEntities = ordersRepository.findByOrganIdx(organ_idx, pageable);
             }
 
             //3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             //Entity를 DTO로 변환 후 저장
-
             Page<OrdersHistDTO> ordersHistDTOS = ordersEntities.map(
                     data -> modelMapper.map(data, OrdersHistDTO.class));
 
@@ -318,20 +316,7 @@ public class OrdersService {
         OrdersEntity ordersEntity = ordersRepository.findByIdx(orderIdx)
                 .orElseThrow(() -> new EntityNotFoundException("해당 주문을 찾을 수 없습니다."));
 
-        OrdersHistDTO ordersHistDTO = new OrdersHistDTO();
-//        ordersHistDTO.setOrdersIdx(ordersEntity.getIdx());
-//        ordersHistDTO.setOrderStatus(ordersEntity.getOrdersStatus());
-
-        List<OrdersMenuEntity> ordersMenuEntityList = ordersEntity.getOrdersMenuJoin();
-
-        for (OrdersMenuEntity ordersMenuEntity : ordersMenuEntityList) {
-            OrdersMenuDTO ordersMenuDTO = new OrdersMenuDTO();
-            ordersMenuDTO.setIdx(ordersMenuEntity.getIdx());
-            ordersMenuDTO.setCount(ordersMenuEntity.getCount());
-//            ordersHistDTO.getOrdersMenuDTOList().add(ordersMenuDTO);
-        }
-
-        return ordersHistDTO;
+        return modelMapper.map(ordersEntity, OrdersHistDTO.class);
     }
 
     // 4. 관리자용 상태별 주문 목록 조회

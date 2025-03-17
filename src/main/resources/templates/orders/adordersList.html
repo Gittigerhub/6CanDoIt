@@ -33,9 +33,44 @@
             <div class="row mt-5 p-3 bg-white">
                 <div class="mb-5 p-3">
                     <h2>주문 관리</h2>
+                    <!-- 주문현황 컨테이너 추가 -->
+                    <div class="row mt-4 mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">주문현황</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h6>신규주문</h6>
+                                            <span class="badge bg-danger" th:text="${newCount}">0</span>
+                                        </div>
+                                        <div class="col text-center">
+                                            <h6>접수완료</h6>
+                                            <span class="badge bg-primary" th:text="${checkCount}">0</span>
+                                        </div>
+                                        <div class="col text-center">
+                                            <h6>조리중</h6>
+                                            <span class="badge bg-warning" th:text="${cookingCount}">0</span>
+                                        </div>
+                                        <div class="col text-center">
+                                            <h6>완료</h6>
+                                            <span class="badge bg-success" th:text="${closeCount}">0</span>
+                                        </div>
+                                        <div class="col text-center">
+                                            <h6>취소</h6>
+                                            <span class="badge bg-secondary" th:text="${cancelCount}">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-12">
                         <!-- 검색 필터 -->
                         <form th:action="@{/admin/orders/adordersList}" method="get" class="row g-3 mt-2 mb-4">
+                            <input type="hidden" name="organ_idx" th:value="${organ_idx}">
                             <div class="col-md-3">
                                 <select name="type" class="form-select">
                                     <option value="">검색 유형 선택</option>
@@ -84,7 +119,7 @@
                                 <tbody>
                                 <!-- 주문 항목 반복 출력 -->
                                 <tr th:each="order : ${orders}">
-                                    <td style="vertical-align: middle;" th:text="${order.ordersIdx}"></td>
+                                    <td style="vertical-align: middle;" th:text="${order.idx}"></td>
                                     <td style="vertical-align: middle;" th:text="${order.memberName}"></td>
                                     <td style="vertical-align: middle;" th:text="${order.roomNumber}"></td>
                                     <td style="vertical-align: middle;">
@@ -96,16 +131,17 @@
                                         th:text="${#temporals.format(order.insDate, 'yyyy-MM-dd HH:mm')}"></td>
                                     <td style="vertical-align: middle;">
                                         <select class="form-select status-select"
-                                                th:data-order-idx="${order.ordersIdx}"
+                                                th:data-order-idx="${order.idx}"
                                                 th:if="${order.orderStatus != 'CLOSE' && order.orderStatus != 'CANCEL'}">
                                             <option value="">상태변경</option>
                                             <option value="CHECK" th:if="${order.orderStatus == 'NEW'}">접수완료</option>
                                             <option value="COOKING" th:if="${order.orderStatus == 'CHECK'}">조리중</option>
                                             <option value="CLOSE" th:if="${order.orderStatus == 'COOKING'}">완료</option>
+                                            <option value="CANCEL" th:if="${order.orderStatus != 'CLOSE'}">취소</option>
                                         </select>
                                     </td>
                                     <td style="vertical-align: middle;">
-                                        <a th:href="@{/admin/orders/adordersRead/{orderIdx}(orderIdx=${order.ordersIdx})}"
+                                        <a th:href="@{/admin/orders/adordersRead/{orderIdx}(orderIdx=${order.idx})}"
                                            class="btn btn-sm btn-info">상세보기</a>
                                     </td>
                                 </tr>
@@ -117,22 +153,22 @@
                         <div class="mt-3 d-flex justify-content-center">
                             <ul class="pagination">
                                 <li class="page-item" th:unless="${startPage>=1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=1, type=${type}, keyword=${keyword})}">≪</a>
+                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=1, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≪</a>
                                 </li>
                                 <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${prevPage}, type=${type}, keyword=${keyword})}">＜</a>
+                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${prevPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＜</a>
                                 </li>
                                 <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}"><!--숫자 카운터-->
                                 <li class="page-item">
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
+                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${page}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}" th:text="${page}"></a>
                                 </li>
                             </span>
                                 <!--11,12,13,14,15 다음 마지막(15)-->
                                 <li class="page-item" th:unless="${currentPage>=endPage}">
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${nextPage}, type=${type}, keyword=${keyword})}">＞</a>
+                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${nextPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＞</a>
                                 </li>
                                 <li class="page-item" th:unless="${currentPage>endPage}">
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${endPage}, type=${type}, keyword=${keyword})}">≫</a>
+                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${endPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≫</a>
                                 </li>
                             </ul>
                         </div><!--페이징 끝-->
@@ -149,12 +185,14 @@
             // 상태별 필터 버튼 클릭 시 주문 목록 갱신
             $('.status-btn').on('click', function() {
                 var status = $(this).data('status');
+                var organIdx = [[${organ_idx}]];
 
                 $.ajax({
                     url: '/admin/orders/ajax/adordersList',
                     type: 'GET',
                     data: {
-                        status: status
+                        status: status,
+                        organ_idx: organIdx
                     },
                     success: function(response) {
                         $('#orderListContainer').html(response);
@@ -176,6 +214,7 @@
 
                 var orderIdx = $(this).data('order-idx');
                 var newStatus = this.value;
+                var organIdx = [[${organ_idx}]];
 
                 Swal.fire({
                     title: '주문 상태 변경',
@@ -190,7 +229,8 @@
                             url: `/admin/orders/${orderIdx}/status`,
                             type: 'POST',
                             data: {
-                                status: newStatus
+                                status: newStatus,
+                                organ_idx: organIdx
                             },
                             success: function(response) {
                                 Swal.fire({
@@ -214,6 +254,28 @@
                     }
                 });
             });
+
+            // 주문현황 업데이트
+            function updateOrderCounts() {
+                var organIdx = [[${organ_idx}]];
+                $.ajax({
+                    url: '/admin/orders/counts',
+                    type: 'GET',
+                    data: {
+                        organ_idx: organIdx
+                    },
+                    success: function(response) {
+                        $('.badge').each(function() {
+                            var status = $(this).closest('.col').find('h6').text().toUpperCase();
+                            $(this).text(response[status.replace(/\s+/g, '')] || 0);
+                        });
+                    }
+                });
+            }
+
+            // 페이지 로드 시와 주기적으로 주문현황 업데이트
+            updateOrderCounts();
+            setInterval(updateOrderCounts, 30000); // 30초마다 업데이트
         });
     </script>
 </th:block>

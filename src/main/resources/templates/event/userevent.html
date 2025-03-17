@@ -70,10 +70,10 @@
                         eventDTO.eventContents}"></td>
                         <td th:text="${#temporals.format(eventDTO.eventStartDate, 'yy-MM-dd')}+'~'+${#temporals.format(eventDTO.eventEndDate, 'yy-MM-dd')}"></td>
                         <th:block th:if="${eventDTO.activeYn.equals('Y')}">
-                            <td class="text-bg-primary"><i class="bi bi-activity"></i></td>
+                            <td style="text-align: center"><span class="banner-button text-bg-primary">활성화 됨</span></td>
                         </th:block>
                         <th:block th:if="${eventDTO.activeYn.equals('N')}">
-                            <td class="text-bg-danger"><i class="bi bi-calendar-x-fill"></i></td>
+                            <td style="text-align: center"><span class="banner-button text-bg-danger">활성화 안됨</span></td>
                         </th:block>
                     </tr>
                     </tbody>

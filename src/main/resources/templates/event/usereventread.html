@@ -19,7 +19,7 @@
             <div class="col">
                 <input type="hidden" th:value="${eventDTORead.idx}" name="idx">
             </div>
-            <div class="col">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -108,9 +108,7 @@
                         </div>
                     </div>
                 </div>
-                <a style="float: right" class="btn btn-success" th:href="@{/event/event}" type="submit">목록</a>
-                <a style="float: right" type="submit" class="btn btn-primary"
-                   th:href="@{/event/eventupdate(idx=${eventDTORead.idx})}">수정</a>
+                <a style="float: right" class="btn btn-outline-secondary" th:href="@{/event/event}" type="submit">목록</a>
             </div>
         </div>
 

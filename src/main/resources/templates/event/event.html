@@ -12,7 +12,32 @@
         .tbV .column, .text-bg-primary {vertical-align: middle}
     </style>
 </head>
+<style>
 
+    .tbV .column, .text-bg-primary {
+        vertical-align: middle
+    }
+
+    .banner-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        vertical-align: middle;
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        padding: 15px 30px;
+        border-radius: 10px;
+        text-align: center;
+        cursor: default; /* 클릭 기능 제거 */
+        user-select: none; /* 텍스트 선택 방지 */
+        height: 100%;
+        margin-top: 10px;
+
+    }
+
+
+</style>
 <body>
 <div layout:fragment="content" class="p-5 tbV" >
 
@@ -45,8 +70,7 @@
                     <th:block th:if="${type=='3'}">
                         <input class="form-control" name="startDate" type="datetime-local" th:value="${startDate}">
                         ~
-                        <input class="form-control" name="endDate" type="datetime-local"
-                            th:value="${endDate}">
+                        <input class="form-control" name="endDate" type="datetime-local" th:value="${endDate}">
                     </th:block>
                     <button class="btn btn-success" type="submit">검색</button>
                 </div>
@@ -83,22 +107,21 @@
                             john@example.com
                         </td>
                         <th:block th:if="${events.activeYn.equals('Y')}">
-                            <td class="text-bg-primary" style="text-align: center"><span>활성화 됨</span></td>
+                            <td style="text-align: center"><span class="banner-button text-bg-primary">활성화 됨</span></td>
                         </th:block>
                         <th:block th:if="${events.activeYn.equals('N')}">
-                            <td class="text-bg-danger" style="text-align: center"><span>활성화 안됨</span></td>
+                            <td style="text-align: center"><span class="banner-button text-bg-danger">활성화 안됨</span></td>
                         </th:block>
                         <td class="button_and_image">
-                            <button type="button" style="text-align: center;" class="btn btn-primary eventRead" th:data-id="${events.idx}">보기
+                            <button type="button" style="text-align: center;" class="btn btn-outline-primary eventRead" th:data-id="${events.idx}">보기
                             </button>
-                            <button type="button" style="text-align: center;" class="btn btn-secondary eventDelete" th:data-id="${events.idx}">삭제
+                            <button type="button" style="text-align: center;" class="btn btn-outline-danger eventDelete" th:data-id="${events.idx}">삭제
                             </button>
                         </td>
                     </tr>
                     </tbody>
-
                 </table>
-                <button style="float: right" type="button" class="btn mb-2 btn-primary" id="register-btn">등록</button>
+                <button style="float: right" type="button" class="btn mb-2 btn-outline-primary" id="register-btn">등록</button>
             </div>
         </div>
     </div>

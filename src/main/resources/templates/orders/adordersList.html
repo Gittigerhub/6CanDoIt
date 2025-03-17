@@ -34,46 +34,13 @@
                 <div class="mb-5 p-3">
                     <h2>주문 관리</h2>
                     <!-- 주문현황 컨테이너 추가 -->
-                    <div class="row mt-4 mb-4">
-<!--                        <div class="col-12">-->
-<!--                            <div class="card">-->
-<!--                                <div class="card-header">-->
-<!--                                    <h5 class="mb-0">주문현황</h5>-->
-<!--                                </div>-->
-<!--                                <div class="card-body">-->
-<!--                                    <div class="row">-->
-<!--                                        <div class="col text-center">-->
-<!--                                            <h6>신규주문</h6>-->
-<!--                                            <span class="badge bg-danger" th:text="${newCount}">0</span>-->
-<!--                                        </div>-->
-<!--                                        <div class="col text-center">-->
-<!--                                            <h6>접수완료</h6>-->
-<!--                                            <span class="badge bg-primary" th:text="${checkCount}">0</span>-->
-<!--                                        </div>-->
-<!--                                        <div class="col text-center">-->
-<!--                                            <h6>조리중</h6>-->
-<!--                                            <span class="badge bg-warning" th:text="${cookingCount}">0</span>-->
-<!--                                        </div>-->
-<!--                                        <div class="col text-center">-->
-<!--                                            <h6>완료</h6>-->
-<!--                                            <span class="badge bg-success" th:text="${closeCount}">0</span>-->
-<!--                                        </div>-->
-<!--                                        <div class="col text-center">-->
-<!--                                            <h6>취소</h6>-->
-<!--                                            <span class="badge bg-secondary" th:text="${cancelCount}">0</span>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
                     <div class="col-12">
                         <!-- 검색 필터 -->
                         <form th:action="@{/admin/orders/adordersList}" method="get" class="row g-3 mt-2 mb-4">
                             <input type="hidden" name="organ_idx" th:value="${organ_idx}">
                             <div class="col-md-3">
                                 <select name="type" class="form-select">
-                                    <option value="">검색 유형 선택</option>
+                                    <option value="">전체</option>
                                     <option value="1" th:selected="${type == '1'}">주문번호</option>
                                     <option value="2" th:selected="${type == '2'}">주문자명</option>
                                     <option value="3" th:selected="${type == '3'}">주문상태</option>
@@ -134,9 +101,9 @@
                                                 th:data-order-idx="${order.idx}"
                                                 th:if="${order.ordersStatus != 'CLOSE' && order.ordersStatus != 'CANCEL'}">
                                             <option value="">상태변경</option>
-                                            <option value="CHECK" th:if="${order.ordersStatus == 'NEW'}">접수완료</option>
-                                            <option value="COOKING" th:if="${order.ordersStatus == 'CHECK'}">조리중</option>
-                                            <option value="CLOSE" th:if="${order.ordersStatus == 'COOKING'}">완료</option>
+                                            <option value="CHECK" th:if="${order.ordersStatus != 'NEW'}">접수완료</option>
+                                            <option value="COOKING" th:if="${order.ordersStatus != 'CHECK'}">조리중</option>
+                                            <option value="CLOSE" th:if="${order.ordersStatus != 'COOKING'}">완료</option>
                                             <option value="CANCEL" th:if="${order.ordersStatus != 'CLOSE'}">취소</option>
                                         </select>
                                     </td>
@@ -183,9 +150,22 @@
     <script th:inline="javascript">
         $(document).ready(function() {
             // 상태별 필터 버튼 클릭 시 주문 목록 갱신
-            $('.status-btn').on('click', function() {
+            $('.status-btn').on('click', function(e) {
+                e.preventDefault(); // 기본 동작 방지
+                e.stopPropagation(); // 이벤트 전파 중단
+                
+                // 활성화된 버튼 스타일 변경
+                $('.status-btn').removeClass('active');
+                $(this).addClass('active');
+                
                 var status = $(this).data('status');
                 var organIdx = [[${organ_idx}]];
+
+                // 전체 버튼 클릭 시 기본 목록으로 이동
+                if (status === 'ALL') {
+                    window.location.href = '/admin/orders/adordersList?organ_idx=' + organIdx;
+                    return;
+                }
 
                 $.ajax({
                     url: '/admin/orders/ajax/adordersList',
@@ -195,7 +175,111 @@
                         organ_idx: organIdx
                     },
                     success: function(response) {
-                        $('#orderListContainer').html(response);
+                        // 테이블 내용 업데이트
+                        var tbody = $('<tbody>');
+                        response.content.forEach(function(order) {
+                            var row = $('<tr>');
+                            row.append($('<td>').text(order.idx));
+                            row.append($('<td>').text(order.memberName));
+                            row.append($('<td>').text(order.roomName));
+                            row.append($('<td>').html(
+                                '<span class="order-status status-' + order.ordersStatus + '">' + 
+                                order.ordersStatus + '</span>'
+                            ));
+                            row.append($('<td>').text(new Date(order.insDate).toLocaleString()));
+                            
+                            // 상태 변경 드롭다운
+                            var statusSelect = $('<select>')
+                                .addClass('form-select status-select')
+                                .attr('data-order-idx', order.idx);
+                            
+                            if (order.ordersStatus !== 'CLOSE' && order.ordersStatus !== 'CANCEL') {
+                                statusSelect.append($('<option>').val('').text('상태변경'));
+                                if (order.ordersStatus !== 'NEW') {
+                                    statusSelect.append($('<option>').val('CHECK').text('접수완료'));
+                                }
+                                if (order.ordersStatus !== 'CHECK') {
+                                    statusSelect.append($('<option>').val('COOKING').text('조리중'));
+                                }
+                                if (order.ordersStatus !== 'COOKING') {
+                                    statusSelect.append($('<option>').val('CLOSE').text('완료'));
+                                }
+                                if (order.ordersStatus !== 'CLOSE') {
+                                    statusSelect.append($('<option>').val('CANCEL').text('취소'));
+                                }
+                            }
+                            
+                            row.append($('<td>').append(statusSelect));
+                            
+                            // 상세보기 버튼
+                            row.append($('<td>').append(
+                                $('<a>')
+                                    .addClass('btn btn-sm btn-info')
+                                    .attr('href', '/admin/orders/adordersRead/' + order.idx + '?organ_idx=' + organIdx)
+                                    .text('상세보기')
+                            ));
+                            
+                            tbody.append(row);
+                        });
+                        
+                        $('#orderListContainer table tbody').replaceWith(tbody);
+                        
+                        // 페이징 정보 업데이트
+                        if (response.totalPages > 1) {
+                            var pagination = $('<ul>').addClass('pagination');
+                            
+                            // 이전 페이지 버튼
+                            if (response.number > 0) {
+                                pagination.append(
+                                    $('<li>').addClass('page-item').append(
+                                        $('<a>')
+                                            .addClass('page-link')
+                                            .attr('href', '#')
+                                            .text('＜')
+                                            .on('click', function(e) {
+                                                e.preventDefault();
+                                                loadPage(response.number);
+                                            })
+                                    )
+                                );
+                            }
+                            
+                            // 페이지 번호
+                            for (var i = 0; i < response.totalPages; i++) {
+                                pagination.append(
+                                    $('<li>')
+                                        .addClass('page-item' + (i === response.number ? ' active' : ''))
+                                        .append(
+                                            $('<a>')
+                                                .addClass('page-link')
+                                                .attr('href', '#')
+                                                .text(i + 1)
+                                                .on('click', function(e) {
+                                                    e.preventDefault();
+                                                    loadPage($(this).text() - 1);
+                                                })
+                                        )
+                                );
+                            }
+                            
+                            // 다음 페이지 버튼
+                            if (response.number < response.totalPages - 1) {
+                                pagination.append(
+                                    $('<li>').addClass('page-item').append(
+                                        $('<a>')
+                                            .addClass('page-link')
+                                            .attr('href', '#')
+                                            .text('＞')
+                                            .on('click', function(e) {
+                                                e.preventDefault();
+                                                loadPage(response.number + 1);
+                                            })
+                                    )
+                                );
+                            }
+                            
+                            $('.pagination').replaceWith(pagination);
+                        }
                     },
                     error: function() {
                         Swal.fire({
@@ -207,6 +291,72 @@
                     }
                 });
             });
+
+            // 페이지 로드 함수
+            function loadPage(page) {
+                var status = $('.status-btn.active').data('status') || 'ALL';
+                var organIdx = [[${organ_idx}]];
+
+                $.ajax({
+                    url: '/admin/orders/ajax/adordersList',
+                    type: 'GET',
+                    data: {
+                        status: status,
+                        organ_idx: organIdx,
+                        page: page
+                    },
+                    success: function(response) {
+                        // 테이블 내용 업데이트
+                        var tbody = $('<tbody>');
+                        response.content.forEach(function(order) {
+                            var row = $('<tr>');
+                            row.append($('<td>').text(order.idx));
+                            row.append($('<td>').text(order.memberName));
+                            row.append($('<td>').text(order.roomName));
+                            row.append($('<td>').html(
+                                '<span class="order-status status-' + order.ordersStatus + '">' +
+                                order.ordersStatus + '</span>'
+                            ));
+                            row.append($('<td>').text(new Date(order.insDate).toLocaleString()));
+
+                            // 상태 변경 드롭다운
+                            var statusSelect = $('<select>')
+                                .addClass('form-select status-select')
+                                .attr('data-order-idx', order.idx);
+
+                            if (order.ordersStatus !== 'CLOSE' && order.ordersStatus !== 'CANCEL') {
+                                statusSelect.append($('<option>').val('').text('상태변경'));
+                                if (order.ordersStatus !== 'NEW') {
+                                    statusSelect.append($('<option>').val('CHECK').text('접수완료'));
+                                }
+                                if (order.ordersStatus !== 'CHECK') {
+                                    statusSelect.append($('<option>').val('COOKING').text('조리중'));
+                                }
+                                if (order.ordersStatus !== 'COOKING') {
+                                    statusSelect.append($('<option>').val('CLOSE').text('완료'));
+                                }
+                                if (order.ordersStatus !== 'CLOSE') {
+                                    statusSelect.append($('<option>').val('CANCEL').text('취소'));
+                                }
+                            }
+
+                            row.append($('<td>').append(statusSelect));
+
+                            // 상세보기 버튼
+                            row.append($('<td>').append(
+                                $('<a>')
+                                    .addClass('btn btn-sm btn-info')
+                                    .attr('href', '/admin/orders/adordersRead/' + order.idx + '?organ_idx=' + organIdx)
+                                    .text('상세보기')
+                            ));
+
+                            tbody.append(row);
+                        });
+
+                        $('#orderListContainer table tbody').replaceWith(tbody);
+                    }
+                });
+            }
 
             // 상태 변경 처리
             $(document).on('change', '.status-select', function() {

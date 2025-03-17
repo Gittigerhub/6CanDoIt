@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -80,4 +81,20 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
     @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE o.ordersStatus = :status AND r.roomJoin.organizationJoin.idx = :organ_idx")
     Page<OrdersEntity> searchByOrdersStatusAndOrganIdx(@Param("status") OrdersStatus status, @Param("organ_idx") Integer organ_idx, Pageable pageable);
 
+    @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE o.ordersStatus = :status AND r.roomJoin.organizationJoin.idx = :organ_idx")
+    Page<OrdersEntity> findByOrdersStatusAndOrganIdx(@Param("status") OrdersStatus status, @Param("organ_idx") Integer organ_idx, Pageable pageable);
+
+    // 기관별 주문 상태와 키워드로 검색
+    @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE o.ordersStatus = :status AND r.roomJoin.organizationJoin.idx = :organ_idx AND (CAST(o.idx AS string) LIKE %:keyword% OR o.memberJoin.memberName LIKE %:keyword%)")
+    Page<OrdersEntity> searchByOrdersStatusAndKeywordAndOrganIdx(@Param("status") OrdersStatus status, @Param("keyword") String keyword, @Param("organ_idx") Integer organ_idx, Pageable pageable);
+
+    // 기관별 주문 목록 조회 (상태별)
+    @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE r.roomJoin.organizationJoin.idx = :organ_idx AND (:status IS NULL OR o.ordersStatus = :status)")
+    Page<OrdersEntity> findByOrganIdxAndStatus(@Param("organ_idx") Integer organ_idx, @Param("status") OrdersStatus status, Pageable pageable);
+
+    // 기관별 주문 목록 조회 (키워드 검색)
+    @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r " +
+           "WHERE r.roomJoin.organizationJoin.idx = :organ_idx " +
+           "AND (CAST(o.idx AS string) LIKE %:keyword% OR o.memberJoin.memberName LIKE %:keyword%)")
+    Page<OrdersEntity> findByOrganIdxAndKeyword(@Param("organ_idx") Integer organ_idx, @Param("keyword") String keyword, Pageable pageable);
 }

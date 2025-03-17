@@ -421,68 +421,107 @@ public class OrdersService {
     }
 
     // 4. 관리자용 상태별 주문 목록 조회
-    public Page<OrdersHistDTO> getOrdersByStatus(String status, Pageable pageable) {
-        log.info("상태별 주문 목록 조회");
+    public Page<OrdersHistDTO> getOrdersByStatus(String status, Integer organ_idx, String keyword, Pageable pageable) {
+        log.info("상태별 주문 목록 조회 - status: {}, organ_idx: {}, keyword: {}", status, organ_idx, keyword);
 
-        List<OrdersEntity> ordersEntityList;
-        int totalCount;
-
-        if (status.equals("ALL")) {
-            ordersEntityList = ordersRepository.findAll(pageable).getContent();
-            totalCount = (int) ordersRepository.count();
+        // 상태 변환 (ALL인 경우 null)
+        OrdersStatus ordersStatus = status.equals("ALL") ? null : OrdersStatus.valueOf(status);
+        
+        // 키워드가 있는 경우와 없는 경우를 구분하여 조회
+        Page<OrdersEntity> ordersEntityPage;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // 키워드 검색
+            ordersEntityPage = ordersRepository.findByOrganIdxAndKeyword(organ_idx, keyword, pageable);
         } else {
-            OrdersStatus ordersStatus = OrdersStatus.valueOf(status);
-            ordersEntityList = ordersRepository.findByOrdersStatus(ordersStatus, pageable).getContent();
-            totalCount = ordersEntityList.size();
+            // 상태별 검색
+            ordersEntityPage = ordersRepository.findByOrganIdxAndStatus(organ_idx, ordersStatus, pageable);
         }
 
-        List<OrdersHistDTO> ordersHistDTOList = new ArrayList<>();
+        return ordersEntityPage.map(entity -> {
+            OrdersHistDTO dto = new OrdersHistDTO();
+            
+            // 기본 필드 직접 매핑
+            dto.setIdx(entity.getIdx());
+            dto.setOrdersPaymentType(entity.getOrdersPaymentType());
+            dto.setOrdersStatus(entity.getOrdersStatus());
+            dto.setOrdersPhone(entity.getOrdersPhone());
+            dto.setOrdersMemo(entity.getOrdersMemo());
+            dto.setInsDate(entity.getInsDate());
+            dto.setMemberName(entity.getMemberJoin().getMemberName());
+            dto.setMemberJoin(modelMapper.map(entity.getMemberJoin(), MemberDTO.class));
 
-        for (OrdersEntity ordersEntity : ordersEntityList) {
-            OrdersHistDTO ordersHistDTO = new OrdersHistDTO();
-//            ordersHistDTO.setOrdersIdx(ordersEntity.getIdx());
-//            ordersHistDTO.setOrderStatus(ordersEntity.getOrdersStatus());
+            // 주문자의 체크인된 예약 정보 조회
+            ReservationEntity reservationEntity = reservationRepository.CheckInReserv(entity.getMemberJoin().getIdx())
+                .orElse(null);
 
-            List<OrdersMenuEntity> ordersMenuEntityList = ordersEntity.getOrdersMenuJoin();
-
-            for (OrdersMenuEntity ordersMenuEntity : ordersMenuEntityList) {
-                OrdersMenuDTO ordersMenuDTO = new OrdersMenuDTO();
-                ordersMenuDTO.setIdx(ordersMenuEntity.getIdx());
-                ordersMenuDTO.setCount(ordersMenuEntity.getCount());
-//                ordersHistDTO.getOrdersMenuDTOList().add(ordersMenuDTO);
+            // 예약 정보가 있다면 객실 정보 설정
+            if (reservationEntity != null && reservationEntity.getRoomJoin() != null) {
+                dto.setRoomName(reservationEntity.getRoomJoin().getRoomName());
             }
-            ordersHistDTOList.add(ordersHistDTO);
-        }
 
-        return new PageImpl<>(ordersHistDTOList, pageable, totalCount);
+            // ordersMenuJoin이 null이 아닐 때만 변환
+            if (entity.getOrdersMenuJoin() != null) {
+                List<OrdersMenuDTO> ordersMenuDTOList = entity.getOrdersMenuJoin().stream()
+                    .map(menuEntity -> {
+                        OrdersMenuDTO menuDTO = new OrdersMenuDTO();
+                        menuDTO.setIdx(menuEntity.getIdx());
+                        menuDTO.setCount(menuEntity.getCount());
+                        
+                        // MenuDTO 정보 설정
+                        MenuDTO menuInfo = modelMapper.map(menuEntity.getMenuJoin(), MenuDTO.class);
+                        menuDTO.setMenuJoin(menuInfo);
+                        menuDTO.setOrdersJoin(null);
+                        
+                        return menuDTO;
+                    })
+                    .collect(Collectors.toList());
+                dto.setOrdersMenuJoin(ordersMenuDTOList);
+
+                // 총 주문 금액 계산
+                int totalAmount = ordersMenuDTOList.stream()
+                    .mapToInt(menuDTO -> menuDTO.getMenuJoin().getMenuPrice() * menuDTO.getCount())
+                    .sum();
+                dto.setTotalAmount(totalAmount);
+            }
+
+            return dto;
+        });
     }
 
     // 주문 상태 변경 유효성 검사
     private void validateStatusChange(OrdersStatus currentStatus, OrdersStatus newStatus) {
-        if (newStatus == OrdersStatus.CANCEL) {
-            throw new IllegalStateException("관리자는 주문을 취소할 수 없습니다.");
+        // 완료된 주문은 상태 변경 불가
+        if (currentStatus == OrdersStatus.CLOSE) {
+            throw new IllegalStateException("완료된 주문의 상태는 변경할 수 없습니다.");
         }
 
+        // 취소된 주문은 상태 변경 불가
+        if (currentStatus == OrdersStatus.CANCEL) {
+            throw new IllegalStateException("취소된 주문의 상태는 변경할 수 없습니다.");
+        }
+
+        // 취소 상태로 변경 시에는 모든 상태에서 가능
+        if (newStatus == OrdersStatus.CANCEL) {
+            return;
+        }
+
+        // 일반적인 상태 변경 흐름
         switch (currentStatus) {
             case NEW:
-                if (newStatus != OrdersStatus.CHECK) {
+                if (newStatus != OrdersStatus.CHECK && newStatus != OrdersStatus.CANCEL) {
                     throw new IllegalStateException("신규 주문은 접수 상태로만 변경할 수 있습니다.");
                 }
                 break;
             case CHECK:
-                if (newStatus != OrdersStatus.COOKING) {
+                if (newStatus != OrdersStatus.COOKING && newStatus != OrdersStatus.CANCEL) {
                     throw new IllegalStateException("접수된 주문은 조리 중 상태로만 변경할 수 있습니다.");
                 }
                 break;
             case COOKING:
-                if (newStatus != OrdersStatus.CLOSE) {
+                if (newStatus != OrdersStatus.CLOSE && newStatus != OrdersStatus.CANCEL) {
                     throw new IllegalStateException("조리 중인 주문은 완료 상태로만 변경할 수 있습니다.");
                 }
                 break;
-            case CLOSE:
-                throw new IllegalStateException("완료된 주문의 상태는 변경할 수 없습니다.");
-            case CANCEL:
-                throw new IllegalStateException("취소된 주문의 상태는 변경할 수 없습니다.");
         }
     }
 

@@ -131,13 +131,15 @@ public class AdminOrdersController {
     @ResponseBody
     public ResponseEntity<Page<OrdersHistDTO>> getOrdersByStatus(
             @RequestParam(required = false, defaultValue = "ALL") String status,
+            @RequestParam(required = false) Integer organ_idx,
+            @RequestParam(required = false) String keyword,
             @PageableDefault(page = 1) Pageable page) {
 
-        log.info("상태별 주문 목록 조회 : ", status);
+        log.info("상태별 주문 목록 조회 : {}, organ_idx: {}, keyword: {}", status, organ_idx, keyword);
 
         try {
             Page<OrdersHistDTO> ordersHistDTOPage =
-                    ordersService.getOrdersByStatus(status, page);
+                    ordersService.getOrdersByStatus(status, organ_idx, keyword, page);
             return ResponseEntity.ok(ordersHistDTOPage);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

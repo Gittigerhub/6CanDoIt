@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/bolayout}">
 <head>
-    <title>예약 관리</title>
+    <title>룸 관리</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -109,7 +109,8 @@
         <div class="row p-5 bg-white">
             <div class="col-lg-2"></div>
             <div class="col-lg-8">
-                <h2 class="text-center">예약 목록 현황</h2>
+                <h2 class="text-center">객실 목록 현황</h2>
+                <p>현재 이용 중인 객실 목록 현황입니다.</p>
                 <!-- 검색 영역 -->
                 <form th:action="@{/room/bo/reserve}" method="get">
                     <div class="input-group mb-3 mt-3">

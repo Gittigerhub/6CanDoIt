@@ -292,4 +292,36 @@ public class ReservationService {
         return reservationRepository.findByIdx(idx)
                 .orElseThrow(() -> new EntityNotFoundException("예약 정보를 찾을 수 없습니다. idx: " + idx));
     }
+
+    public List<ReservationDTO> getCurrentlyOccupiedRooms(Integer organ_idx) {
+        log.info("Fetching currently occupied rooms for organ_idx: {}", organ_idx);
+        
+        // Debug: Check all reservations status
+        if (organ_idx != null) {
+            List<Object[]> allReservations = reservationRepository.findReservationStatusByOrgan(organ_idx);
+            log.info("All reservations for organ_idx {}: ", organ_idx);
+            for (Object[] res : allReservations) {
+                log.info("Reservation ID: {}, Status: {}, Room: {}, Date: {}", res[0], res[1], res[2], res[3]);
+            }
+        }
+        
+        List<ReservationEntity> occupiedRooms;
+        if (organ_idx != null) {
+            occupiedRooms = reservationRepository.findCurrentlyOccupiedRooms(organ_idx);
+            log.info("Found {} occupied rooms for organization {}", occupiedRooms.size(), organ_idx);
+        } else {
+            // organ_idx가 null일 경우 모든 체크인된 예약을 조회
+            occupiedRooms = reservationRepository.findByResStatus("3");
+            log.info("Found {} occupied rooms across all organizations", occupiedRooms.size());
+        }
+        
+        List<ReservationDTO> result = Arrays.asList(modelMapper.map(occupiedRooms, ReservationDTO[].class));
+        log.info("Mapped to {} DTOs", result.size());
+        
+        // Debug: Print mapped DTOs
+        result.forEach(dto -> log.info("Mapped reservation - Room: {}, Status: {}", 
+            dto.getRoomName(), dto.getResStatus()));
+            
+        return result;
+    }
 }

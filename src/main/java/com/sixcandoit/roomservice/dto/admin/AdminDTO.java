@@ -30,6 +30,11 @@ public class AdminDTO {
     private String adminPhone;            // 연락처
 //    private String activeYn;              // 활성 유무
 
+    public AdminDTO setOrganDTO(OrganizationDTO organDTO){
+         this.organDTO = organDTO;
+         return this;
+    }
+
     private Level level;
     //열거형 키(설명)
     private String levelDescription; //열거형 설명을 저장할 변수

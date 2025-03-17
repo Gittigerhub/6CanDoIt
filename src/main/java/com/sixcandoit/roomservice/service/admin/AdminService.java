@@ -3,6 +3,7 @@ package com.sixcandoit.roomservice.service.admin;
 import com.sixcandoit.roomservice.config.CustomUserDetails;
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.dto.admin.AdminDTO;
+import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.service.EmailService;
@@ -266,14 +267,25 @@ public class AdminService {
             }else { // 전체 검색 = 0
                 log.info("전체 조회 검색 중...");
                 adminEntities = adminRepository.searchAdminNameAndEmailAndPhone(keyword, pageable);
+
             }
         } else { // 검색어가 존재하지 않으면 모두 검색
             adminEntities = adminRepository.findAll(pageable);
+
         }
 
         // Entity를 DTO로 변환 후 저장
         Page<AdminDTO> adminDTOS = adminEntities.map(
-                data -> modelMapper.map(data, AdminDTO.class));
+                data -> {
+                    AdminDTO adminDTO1 = modelMapper.map(data, AdminDTO.class);
+                    if(data.getOrganizationJoin() != null){
+                        adminDTO1.setOrganDTO(modelMapper.map(data.getOrganizationJoin(), OrganizationDTO.class));
+                    }
+                    else{
+                        adminDTO1.setOrganDTO(null);
+                    }
+                    return adminDTO1;
+                });
 
         return adminDTOS;
     }

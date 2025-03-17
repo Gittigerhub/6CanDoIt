@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/bolayout}">
+<head>
+    <meta charset="UTF-8">
+    <title>룸 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!--JQuery 반드시 추가-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--Jquery를 이용한 드래그 앤 드롭, 리사이즈, 애니메이션 등 인터랙티브 기능을 구현-->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!--부트스트랩 아이콘-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--알림창 스크립트-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        a {
+            text-decoration: none; /* 밑줄 없애기 */
+            color: black; /* 글자 색을 검은색으로 변경 */
+        }
+        /* 테이블 스타일 추가 */
+        .table {
+            border: 1px solid #dee2e6;
+            margin-bottom: 1rem;
+            background-color: #fff;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            padding: 1rem;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 600;
+            color: #495057;
+            white-space: nowrap;  /* 헤더 텍스트가 줄바꿈되지 않도록 */
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+        }
+
+        .table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 클릭 가능한 행에 대한 스타일 */
+        .table tbody tr[onclick] {
+            cursor: pointer;
+        }
+
+        /* 버튼 스타일 개선 */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* 뱃지 스타일 개선 */
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+        }
+
+        .badge.text-bg-light {
+            color: #666 !important;
+            background-color: #f8f9fa !important;
+            border-color: #dee2e6 !important;
+        }
+
+        .badge.text-bg-light:hover {
+            background-color: #e9ecef !important;
+        }
+
+        .badge.text-bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        /* 게시글 목록 제목 스타일 */
+        .table-title {
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        /* 셀렉트 박스 스타일 */
+        .form-select {
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .form-select option {
+            padding: 8px 12px;
+        }
+
+        .form-select option:disabled {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            margin: 8px 0;
+            cursor: default;
+        }
+
+        .form-select option:not(:disabled) {
+            padding-left: 12px;
+            margin: 4px 0;
+        }
+
+        .search-select {
+            max-width: 140px;
+        }
+
+        .status-select {
+            max-width: 160px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="p-5">
+
+    <div class="container">
+        <!--검색 기능(keyword) 시작-->
+        <form th:action="@{/room/bo/list}" method="get">
+            <div class="row p-5 bg-white"><!--틀-->
+                <div class="mb-3">
+                    <h3>객실 검색</h3>
+                </div>
+                <input type="hidden" name="organ_idx" th:value="${organ_idx}">
+                <div class="col-2">
+                    <select class="form-select" name="type" onchange="this.form.submit()">
+                        <option value="0" th:selected="${type == '0'}">전체</option>
+                        <option value="1" th:selected="${type == '1'}">객실 타입</option>
+                        <option value="2" th:selected="${type == '2'}">객실 이름</option>
+                        <option value="3" th:selected="${type == '3'}">조식 있음</option>
+                        <option value="4" th:selected="${type == '4'}">빈 방</option>
+                        <option value="5" th:selected="${type == '5'}">체크인</option>
+                        <option value="6" th:selected="${type == '6'}">체크아웃</option>
+                    </select>
+                </div><!--검색 분류-->
+                <div class="col-2">
+                    <select class="form-select" name="roomType" th:disabled="${type != '1' || type == null}">
+                        <option value="">타입</option>
+                        <option value="STD" th:selected="${roomType == 'STD'}">스탠다드</option>
+                        <option value="ROH" th:selected="${roomType == 'ROH'}">런 오브 하우스</option>
+                        <option value="MOD" th:selected="${roomType == 'MOD'}">모더레이트</option>
+                        <option value="SUP" th:selected="${roomType == 'SUP'}">슈페리어</option>
+                        <option value="DLX" th:selected="${roomType == 'DLX'}">디럭스</option>
+                        <option value="STU" th:selected="${roomType == 'STU'}">스튜디오</option>
+                        <option value="JRSTE" th:selected="${roomType == 'JRSTE'}">쥬니어 스위트</option>
+                        <option value="STE" th:selected="${roomType == 'STE'}">스위트</option>
+                        <option value="PH" th:selected="${roomType == 'PH'}">팬트하우스</option>
+                    </select>
+                </div><!--객실 타입 선택-->
+                <div class="col-2">
+                    <select class="form-select" name="order">
+                        <option value="" th:selected="${order == ''}">기본</option>
+                        <option value="ASC" th:selected="${order == 'ASC'}">가격 낮은순</option>
+                        <option value="DESC" th:selected="${order == 'DESC'}">가격 높은순</option>
+                    </select>
+                </div><!--가격순-->
+                <div class="col-2">
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}">
+                </div><!--검색어-->
+                <div class="col-2">
+                    <button type="submit" class="btn btn-success">검색</button>
+                </div><!--검색버튼-->
+                <div class="col-2">
+                    <a th:href="@{/room/bo/register(organ_idx=${organ_idx})}" class="btn btn-primary btn-lg">객실 등록</a>
+                </div><!--추가버튼-->
+            </div>
+        </form>  <!--검색 기능(keyword) 끝-->
+
+        <!--객실 목록-->
+        <div class="row mt-5 p-5 bg-white">
+            <div class="mb-3">
+                <h3>객실 목록</h3>
+            </div>
+            <div class="col"></div>
+            <div class="col-12">
+                <table class="table table-hover w-100 shadow-sm">
+                    <thead class="table table-dark">
+                    <tr>
+                        <th>No</th>
+                        <th>대표 이미지</th>
+                        <th>객실 유형</th>
+                        <th>최대 인원</th>
+                        <th>판매가</th>
+                        <th>선택사항</th>
+                        <th>시즌</th>
+                        <th>상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--Controller에서 전달받은 list로 반복처리-->
+                    <tr th:each="data : ${roomDTOS.content}" th:onclick="'window.location.href=\'' + @{detail(idx=${data.idx})} + '\''">
+                        <td th:text="${data.idx}"></td>
+                        <td>
+                            <!-- 대표 이미지가 없을때 나오는 이미지 -->
+                            <div style="flex-basis: 100%; text-align: left">
+                                <th:block th:if="${!repImageMap[data.idx]}">
+                                    <img style="max-width: 250px; height: auto; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                                </th:block>
+                            </div>
+
+                            <th:block th:each="image:${imageFileMap[data.idx]}" th:if="${repImageMap[data.idx]}">
+                                <!-- 대표 이미지 -->
+                                <th:block th:if="${image.repimageYn == 'Y'}">
+                                    <div style="flex-basis: 100%; text-align: left">
+                                        <img style="max-width: 250px; height: auto; object-fit: cover; margin: 5px" th:src="${image.url}" th:alt="${image.originName}">
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </td>
+                        <td>
+                            <!--객실 타입과 이름-->
+                            <h5 style="margin: 0; display: inline-block;">
+                                <span th:if="${data.roomType == 'STD'}">스탠다드</span>
+                                <span th:if="${data.roomType == 'ROH'}">런 오브 하우스</span>
+                                <span th:if="${data.roomType == 'MOD'}">모더레이트</span>
+                                <span th:if="${data.roomType == 'SUP'}">슈페리어</span>
+                                <span th:if="${data.roomType == 'DLX'}">디럭스</span>
+                                <span th:if="${data.roomType == 'STU'}">스튜디오</span>
+                                <span th:if="${data.roomType == 'JRSTE'}">쥬니어 스위트</span>
+                                <span th:if="${data.roomType == 'STE'}">스위트</span>
+                                <span th:if="${data.roomType == 'PH'}">팬트하우스</span>
+                                <span th:text="${' ' + data.roomName}"></span>
+                            </h5>
+                            <p><!--침대 타입-->
+                                <span th:if="${data.roomBed == 0}">싱글 침대</span>
+                                <span th:if="${data.roomBed == 1}">더블 침대</span>
+                                <span th:if="${data.roomBed == 2}">퀸 침대</span>
+                                <span th:if="${data.roomBed == 3}">킹 침대</span>
+                                <i class="bi bi-usb-mini-fill"></i>
+                            </p>
+                            <!--객실 옵션--><i class="bi bi-tags-fill"></i>
+                            <span th:text="${data.roomSize} + ' ㎡'" class="badge rounded-pill text-bg-light"></span>
+                            <span th:if="${data.roomSmokingYn == 'Y'}" class="badge rounded-pill text-bg-light">흡연 가능</span>
+                            <span th:unless="${data.roomSmokingYn == 'Y'}" class="badge rounded-pill text-bg-light">금연</span>
+                            <span th:if="${data.roomWifi == 'Y'}" class="badge rounded-pill text-bg-light">무료 WiFi</span>
+                            <span th:if="${data.roomTv == 'Y'}" class="badge rounded-pill text-bg-light">TV</span>
+                            <span th:if="${data.roomAir == 'Y'}" class="badge rounded-pill text-bg-light">에어컨</span>
+                            <span th:if="${data.roomBath == 'Y'}" class="badge rounded-pill text-bg-light">전용 욕실</span>
+                            <!--체크인 / 체크아웃 시각-->
+                            <p class="mt-3" style="font-size: 12px">
+                                체크인 : <span th:text="${#temporals.format(data.roomCheckIn, 'HH:mm')}"></span>
+                                / 체크아웃 : <span th:text="${#temporals.format(data.roomCheckOut, 'HH:mm')}"></span>
+                            </p>
+                        </td>
+                        <!--투숙객 수-->
+                        <td>
+                            <p>
+                                <i class="bi bi-people-fill"></i>
+                                <span th:text="${data.roomNum}"></span>
+                            </p>
+                        </td>
+                        <!--가격-->
+                        <td th:text="${#numbers.formatInteger(data.roomPrice, 0, 'COMMA')} + '원'"></td>
+                        <!--조식여부-->
+                        <td>
+                            <p th:if="${data.roomBreakfast == 'Y'}">무료 조식</p>
+                            <p th:unless="${data.roomBreakfast == 'Y'}">조식 없음</p>
+                        </td>
+                        <!--성수기 여부-->
+                        <td>
+                            <button th:unless="${data.roomSeason == 'peak'}" class="btn btn-light">비성수기</button>
+                            <button th:if="${data.roomSeason == 'peak'}" class="btn btn-danger">성수기</button>
+                        </td>
+                        <!--예약 상태 여부-->
+                        <td>
+                            <button th:if="${data.resStatus == '1'}" class="btn btn-outline-secondary">빈 방</button>
+                            <button th:if="${data.resStatus == '2'}" class="btn btn-outline-warning">체크인</button>
+                            <button th:if="${data.resStatus == '3'}" class="btn btn-outline-dark">체크아웃</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <!--페이징 시작-->
+                <div class="mt-3 d-flex justify-content-center">
+                    <ul class="pagination">
+                        <li class="page-item" th:unless="${startPage>1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
+                            <a class="page-link" th:href="@{/room/bo/list(page=1, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≪</a>
+                        </li>
+                        <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
+                            <a class="page-link" th:href="@{/room/bo/list(page=${prevPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＜</a>
+                        </li>
+                        <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}"><!--숫자 카운터-->
+                        <li class="page-item">
+                            <a class="page-link" th:href="@{/room/bo/list(page=${page}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}" th:text="${page}"></a>
+                        </li>
+                    </span>
+                        <!--11,12,13,14,15 다음 마지막(15)-->
+                        <li class="page-item" th:unless="${currentPage>=endPage}">
+                            <a class="page-link" th:href="@{/room/bo/list(page=${nextPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＞</a>
+                        </li>
+                        <li class="page-item" th:unless="${currentPage>endPage}">
+                            <a class="page-link" th:href="@{/room/bo/list(page=${endPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≫</a>
+                        </li>
+                    </ul>
+                </div><!--페이징 끝-->
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

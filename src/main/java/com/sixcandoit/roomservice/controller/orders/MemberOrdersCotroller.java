@@ -71,6 +71,7 @@ public class MemberOrdersCotroller {
 //        return new ResponseEntity<String>("주문 완료", HttpStatus.OK);
 //    }
 
+
     // 주문하기
     // 주문하기는 별도의 읽기페이지 제작 X
     /* -----------------------------------------------------------------------------
@@ -101,6 +102,7 @@ public class MemberOrdersCotroller {
         return new ResponseEntity<String>("주문 완료", HttpStatus.OK);
 
     }
+
 
     /* -----------------------------------------------------------------------------
         경로 : /orders
@@ -184,6 +186,13 @@ public class MemberOrdersCotroller {
 
     }
 
+
+    /* -----------------------------------------------------------------------------
+      경로 : /orders/{orderIdx}/cancel
+      인수 : Integer orderIdx, Principal principal
+      출력 : 주문 취소 처리 결과
+      설명 : 사용자가 주문을 취소할 수 있도록 주문 상태를 변경하고 그 결과를 반환
+  ----------------------------------------------------------------------------- */
     //주문 취소
     @PostMapping("/orders/{orderIdx}/cancel")
     public ResponseEntity ordersCancel(@PathVariable("orderIdx") Integer orderIdx, Principal principal) {

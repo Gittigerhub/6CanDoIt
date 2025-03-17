@@ -30,6 +30,12 @@ public class CartController {
     private final MenuService menuService;
 
 
+    /* -----------------------------------------------------------------------------
+       경로 : /member/cart
+       인수 : Integer idx, int count, Principal principal
+       출력 : 장바구니에 메뉴 추가
+       설명 : 장바구니에 메뉴를 추가하고, 수량을 지정한 후 장바구니 추가 결과를 리턴
+   ----------------------------------------------------------------------------- */
     //장바구니 등록
     @PostMapping("/cart")
     public ResponseEntity<?> registerCart(Integer idx, @RequestParam(value = "count", defaultValue = "0") int count, Principal principal) {
@@ -67,6 +73,12 @@ public class CartController {
     }
 
 
+    /* -----------------------------------------------------------------------------
+       경로 : /member/cart/cartlist
+       인수 : Principal principal, Model model
+       출력 : 장바구니 목록 페이지
+       설명 : 로그인한 사용자에 대한 장바구니 목록을 가져와서 화면에 전달
+   ----------------------------------------------------------------------------- */
     @GetMapping("/cart/cartlist")
     public String getCart(Principal principal, Model model) {
         // 사용자 이메일을 이용해 장바구니 정보 가져오기
@@ -82,6 +94,13 @@ public class CartController {
         return "cart/cartlist";
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /member/cart/cartmenu
+       인수 : CartMenuDTO cartMenuDTO, BindingResult bindingResult, Principal principal
+       출력 : 수량 변경 결과
+       설명 : 장바구니 메뉴의 수량을 변경
+   ----------------------------------------------------------------------------- */
     //변경
     @PostMapping("/cart/cartmenu")
     public ResponseEntity updateCartMenu(@Valid CartMenuDTO cartMenuDTO, BindingResult bindingResult,
@@ -112,6 +131,13 @@ public class CartController {
         return new ResponseEntity<>(cartMenuDTO.getMenuidx(), HttpStatus.OK);
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /member/cart/cartlist/delete/{cartmenuidx}
+       인수 : Integer cartmenuidx, Principal principal
+       출력 : 장바구니 목록 페이지로 리다이렉트
+       설명 : 장바구니 메뉴를 삭제 후 장바구니 목록 페이지로 리다이렉트
+   ----------------------------------------------------------------------------- */
     @PostMapping("/cart/cartlist/delete/{cartmenuidx}")
     public String deleteCartMenu(@PathVariable("cartmenuidx") Integer cartmenuidx,
                                          Principal principal) {
@@ -144,6 +170,13 @@ public class CartController {
 //        return new ResponseEntity<Integer>(orderidx, HttpStatus.OK);
 //    }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /member/cart/count
+       인수 : Principal principal
+       출력 : 장바구니 메뉴 개수
+       설명 : 사용자의 장바구니에 담긴 메뉴 개수를 반환
+   ----------------------------------------------------------------------------- */
     //장바구니 개수 반환하는 메서드 추가
     @GetMapping("/cart/count")
     @ResponseBody

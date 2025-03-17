@@ -39,6 +39,13 @@ public class AdminOrdersController {
         return "orders/bo/main";
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /orders/adordersList
+       인수 : Pageable page, String type, String keyword, Integer organ_idx, Model model
+       출력 : 주문 목록 페이지
+       설명 : 관리자 주문 목록을 조회하여 페이지에 반환, 검색 기능을 포함
+   ----------------------------------------------------------------------------- */
     //1. 주문 목록 페이지 (+검색 기능)
     @GetMapping("/orders/adordersList")
     public String ordersList(@PageableDefault(page = 1) Pageable page,
@@ -64,6 +71,13 @@ public class AdminOrdersController {
         return "orders/adordersList";
     }
 
+
+    /* -----------------------------------------------------------------------------
+      경로 : /orders/{orderIdx}/status
+      인수 : Integer orderIdx, String status
+      출력 : 주문 상태 변경 결과 메시지
+      설명 : 주문 상태를 변경하고 결과를 반환
+  ----------------------------------------------------------------------------- */
     //2. 주문 상태 변경
     @PostMapping("/orders/{orderIdx}/status")
     @ResponseBody
@@ -83,6 +97,13 @@ public class AdminOrdersController {
         }
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /orders/adordersRead/{orderIdx}
+       인수 : Integer orderIdx, Model model
+       출력 : 주문 상세 페이지
+       설명 : 주문의 상세 정보를 조회하여 페이지에 반환
+   ----------------------------------------------------------------------------- */
     //3. 주문 상세 정보 조회
     @GetMapping("/orders/adordersRead/{orderIdx}")
     public String readOrder(@PathVariable Integer orderIdx, Model model) {
@@ -97,6 +118,13 @@ public class AdminOrdersController {
         }
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /orders/ajax/adordersList
+       인수 : String status, Pageable page
+       출력 : 상태별 주문 목록
+       설명 : 주문 상태별로 주문 목록을 조회하여 반환 (AJAX)
+   ----------------------------------------------------------------------------- */
     //4. 상태별 주문 목록 조회(AJAX)
     @GetMapping("/orders/ajax/adordersList")
     @ResponseBody

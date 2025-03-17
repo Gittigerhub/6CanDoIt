@@ -43,6 +43,13 @@ public class MemberMenuController {
     private final MenuService menuService;
     private final ImageFileService imageFileService;
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /member/menu/readmenu
+       인수 : Integer menuidx, Model model, RedirectAttributes redirectAttributes
+       출력 : 메뉴 정보 페이지
+       설명 : menuidx를 통해 메뉴 정보를 조회하고, 메뉴에 관련된 이미지를 함께 전달하여 화면에 표시
+   ----------------------------------------------------------------------------- */
     //메뉴 목록 확인
     @GetMapping("/menu/readmenu")
     public String readMenu(Integer menuidx, Model model, RedirectAttributes redirectAttributes) {
@@ -89,6 +96,14 @@ public class MemberMenuController {
         }
     }
 
+
+    /* -----------------------------------------------------------------------------
+      경로 : /member/menu/listmenu
+      인수 : @PageableDefault(page = 1) Pageable page, String type, String keyword,
+            Model model, Principal principal
+      출력 : 메뉴 목록 페이지
+      설명 : 로그인한 사용자의 호텔 정보를 바탕으로 메뉴 목록을 조회하여 페이지에 전달
+  ----------------------------------------------------------------------------- */
     //메뉴 목록 확인
     @GetMapping("/menu/listmenu")
     public String listMenu(@PageableDefault(page = 1) Pageable page, //페이지 정보
@@ -149,6 +164,14 @@ public class MemberMenuController {
 
     }
 
+
+    /* -----------------------------------------------------------------------------
+       경로 : /member/menu/ajax/listmenu
+       인수 : String category, @PageableDefault(page = 1) Pageable page,
+             Model model, Principal principal
+       출력 : 카테고리별 메뉴 목록 부분 반환
+       설명 : Ajax 요청에 의해 카테고리별로 메뉴 목록을 조회하고, 이를 fragment로 반환
+   ----------------------------------------------------------------------------- */
     //Ajax 요청에 의해 카테고리별 메뉴목록을 반환하는 메소드
     @GetMapping("/menu/ajax/listmenu")
     public String ajaxListMenu(@RequestParam(value = "category", defaultValue = "ALL") String category,

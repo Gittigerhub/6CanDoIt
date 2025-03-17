@@ -64,4 +64,20 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
     @Query("SELECT COUNT(o) FROM OrdersEntity o WHERE o.ordersStatus = :status")
     Long countByOrdersStatus(@Param("status") OrderStatus status);
 
+    // 기관별 주문 조회
+    @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE r.roomJoin.organizationJoin.idx = :organ_idx")
+    Page<OrdersEntity> findByOrganIdx(@Param("organ_idx") Integer organ_idx, Pageable pageable);
+
+    // 1. 주문번호와 기관으로 검색
+    @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE o.idx = :keyword AND r.roomJoin.organizationJoin.idx = :organ_idx")
+    Page<OrdersEntity> searchByOrderIdxAndOrganIdx(@Param("keyword") String keyword, @Param("organ_idx") Integer organ_idx, Pageable pageable);
+
+    // 2. 주문자명과 기관으로 검색
+    @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE o.memberJoin.memberName LIKE %:keyword% AND r.roomJoin.organizationJoin.idx = :organ_idx")
+    Page<OrdersEntity> searchByMemberNameAndOrganIdx(@Param("keyword") String keyword, @Param("organ_idx") Integer organ_idx, Pageable pageable);
+
+    // 3. 주문상태와 기관으로 검색
+    @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE o.ordersStatus = :status AND r.roomJoin.organizationJoin.idx = :organ_idx")
+    Page<OrdersEntity> searchByOrderStatusAndOrganIdx(@Param("status") OrderStatus status, @Param("organ_idx") Integer organ_idx, Pageable pageable);
+
 }

@@ -44,11 +44,12 @@ public class AdminOrdersController {
     public String ordersList(@PageableDefault(page = 1) Pageable page,
                            @RequestParam(value = "type", defaultValue = "") String type,
                            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                           @RequestParam(required = false) Integer organ_idx,
                            Model model) {
         log.info("관리자 주문 목록 페이지");
 
         //주문 목록 조회
-        Page<OrdersHistDTO> ordersHistDTOPage = ordersService.getAdminOrderList(type, keyword, page);
+        Page<OrdersHistDTO> ordersHistDTOPage = ordersService.getAdminOrderList(type, keyword, organ_idx, page);
 
         //html에 필요한 페이지 정보를 받기
         Map<String, Integer> pageInfo = PageNationUtil.Pagination(ordersHistDTOPage);
@@ -57,6 +58,7 @@ public class AdminOrdersController {
         model.addAttribute("orders", ordersHistDTOPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("type", type);
+        model.addAttribute("organ_idx", organ_idx);
         model.addAllAttributes(pageInfo);
 
         return "orders/adordersList";

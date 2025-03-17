@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,9 +34,9 @@ public class UserMemberPointService {
     ---------------------------------------------------*/
     public Page<MemberPointDTO> memberlist(Integer idx, Pageable page, String type, String keyword, LocalDateTime startDate, LocalDateTime endDate) {
 
+        List<MemberPointEntity> memberPointlist = memberPointRepository.findByMemberJoinIdx(idx);
         try {
-            List<MemberPointEntity> memberPointlist = memberPointRepository.findByMemberJoinIdx(idx);
-            if (!memberPointlist.isEmpty()) {
+
                 // List<MemberPointDTO> memberPointDTOlist = Arrays.asList(modelMapper.map(memberPointlist, MemberPointDTO[].class));
                 Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
                 System.out.println("실행중:" + pageable.getPageNumber());
@@ -43,26 +44,26 @@ public class UserMemberPointService {
                 System.out.println("서비스에 들어오는 타입:" + type);
                 if (!type.isEmpty()) {
                     switch (type) {
-                        case "1" :
+                        case "1":
                             log.info("포인트 내용으로 검색하는 중");
                             memberPointEntities = memberPointRepository.findByContents(keyword, pageable);
-                            if(keyword==null){
+                            if (keyword == null) {
                                 memberPointEntities = memberPointRepository.findAll(pageable);
                             }
                             break;
 
-                        case "2" :
+                        case "2":
                             log.info("포인트 사용기간으로 검색하는 중");
                             memberPointEntities = memberPointRepository.findByDateRange(startDate, endDate, pageable);
-                            if(startDate==null && endDate==null){
+                            if (startDate == null && endDate == null) {
                                 memberPointEntities = memberPointRepository.findAll(pageable);
                             }
                             break;
 
-                        case "3" :
+                        case "3":
                             log.info("포인트 사용가능으로 검색");
                             memberPointEntities = memberPointRepository.findByPointOperationYn(keyword, pageable);
-                            if(keyword==null){
+                            if (keyword == null) {
                                 memberPointEntities = memberPointRepository.findAll(pageable);
                             }
                             break;
@@ -78,14 +79,12 @@ public class UserMemberPointService {
                 System.out.println("실행중2:" + memberPointDTOS.getSize());
 
                 return memberPointDTOS;
-            } else {
-                throw new Exception("리스트 조회 실패");
-            }
-        } catch (
-                Exception e) {
+
+        } catch (Exception e) {
             throw new RuntimeException("리스트 조회 실패입니다:" + e.getMessage());
         }
     }
+
 
     /*
         public Page<MemberPointDTO> selectList (Integer idx, Pageable page, String buttonValue){

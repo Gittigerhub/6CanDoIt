@@ -65,7 +65,7 @@ public class UserEventController {
 
 
 
-        return "event/userevent";
+        return "/event/userevent";
     }
 
     @GetMapping("/usereventread")
@@ -80,7 +80,7 @@ public class UserEventController {
         model.addAttribute("eventDTORead", eventDTORead);
         model.addAttribute("imageFileDTOList", imageFileDTOList);
         model.addAttribute("hasRepImage", hasRepImage);
-        return "event/usereventread";
+        return "/event/usereventread";
     }
 
 

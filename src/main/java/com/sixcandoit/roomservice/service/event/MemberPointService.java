@@ -152,13 +152,13 @@ public class MemberPointService {
     출력 : 목록
     설명 : 회원별 포인트 목록을 출력할때 사용
     ---------------------------------------------------*/
-    public List<MemberPointDTO> memberlist(Integer idx){
+    /*public List<MemberPointDTO> memberlist(Integer idx){
         List<MemberPointEntity> memberPointlist = memberPointRepository.findByMemberJoinIdx(idx);
 
         List<MemberPointDTO> memberPointDTOlist = Arrays.asList(modelMapper.map(memberPointlist, MemberPointDTO[].class));
 
         return memberPointDTOlist;
-    }
+    }*/
     /*-------------------------------------------------
 
 

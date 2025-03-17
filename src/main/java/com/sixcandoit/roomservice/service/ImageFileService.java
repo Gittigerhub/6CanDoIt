@@ -64,7 +64,9 @@ public class ImageFileService {
     -------------------------------------------------------------------- */
     public List<ImageFileEntity> saveImages(List<MultipartFile> imageFiles) throws Exception {
 
-        // 모아서 반환할 리스트
+        System.out.println("이지미 파일스 사이즈 : " + imageFiles.size());
+
+        // 유효한 이미지만 모아서 반환할 리스트
         List<ImageFileEntity> images = new ArrayList<>();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
@@ -74,34 +76,37 @@ public class ImageFileService {
                 // 빈 파일인지 확인
                 if (imagefile.isEmpty()) {
                     log.warn("빈 파일이 업로드 되었습니다.:{}", imagefile.getOriginalFilename());
-                    continue;
-                }
 
-                // FileEntity에 저장할 오리지널네임
-                String originalFilename = imagefile.getOriginalFilename();
-                // S3 업로드 성공 시, 생성된 파일 이름
-                String newFileName = "";
-
-                // FileEntity에 저장할 url
-                if (originalFilename != null) { // 작업 할 파일이 존재하면
-                    newFileName = s3Uploader.upload(imagefile, imgUploadLocation);   // S3업로드
-                }
-
-                // 엔티티 셋
-                ImageFileEntity fileEntity = new ImageFileEntity();
-                fileEntity.setName(newFileName);
-                fileEntity.setOriginName(originalFilename);
-                fileEntity.setUrl("https://" + bucket + ".s3." +
-                        region + ".amazonaws.com/" + imgUploadLocation + "/" + newFileName);
-
-                // 대표이미지 여부 확인
-                if (imageFiles.indexOf(imagefile) == 0) {
-                    fileEntity.setRepimageYn("Y");      // 대표이미지 O
                 } else {
-                    fileEntity.setRepimageYn("N");      // 대표이미지 X
-                }
 
-                images.add(fileEntity);
+                    // FileEntity에 저장할 오리지널네임
+                    String originalFilename = imagefile.getOriginalFilename();
+
+                    // S3 업로드 성공 시, 생성된 파일 이름
+                    String newFileName = "";
+
+                    // FileEntity에 저장할 url
+                    if (originalFilename != null) { // 작업 할 파일이 존재하면
+                        newFileName = s3Uploader.upload(imagefile, imgUploadLocation);   // S3업로드
+                    }
+
+                    // 엔티티 셋
+                    ImageFileEntity fileEntity = new ImageFileEntity();
+                    fileEntity.setName(newFileName);
+                    fileEntity.setOriginName(originalFilename);
+                    fileEntity.setUrl("https://" + bucket + ".s3." +
+                            region + ".amazonaws.com/" + imgUploadLocation + "/" + newFileName);
+
+                    // 대표이미지 여부 확인
+                    if (imageFiles.indexOf(imagefile) == 0) {
+                        fileEntity.setRepimageYn("Y");      // 대표이미지 O
+                    } else {
+                        fileEntity.setRepimageYn("N");      // 대표이미지 X
+                    }
+
+                    images.add(fileEntity);
+
+                }
 
             }
 

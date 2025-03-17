@@ -352,6 +352,7 @@ public class OfficeController {
 
             // 등록 성공 시, HTTP에 상태 코드 200(OK)와 함께 응답을 보낸다.
             return ResponseEntity.ok("등록 하였습니다.");
+
         } catch (Exception e) {
             log.error("등록 중 오류발생", e);
 

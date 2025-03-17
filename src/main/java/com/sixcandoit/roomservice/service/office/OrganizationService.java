@@ -64,31 +64,41 @@ public class OrganizationService {
             }
             System.out.println("FK 자동 등록");
 
-            if (hoORshop.trim().equals("head")) {
-                // 본사 데이터 조회
-                OrganizationEntity hoOrgan = organizationRepository.findById(findIdx).orElseThrow(() -> new RuntimeException("본사를 찾을 수 없습니다."));
+            System.out.println(findIdx);
+            System.out.println(hoORshop);
 
-                // 본사 FK 연결
-                organ.setHead(hoOrgan);
+            if (findIdx != null && hoORshop != null) {
+                if (hoORshop.trim().equals("head")) {
+                    // 본사 데이터 조회
+                    OrganizationEntity hoOrgan = organizationRepository.findById(findIdx).orElseThrow(() -> new RuntimeException("본사를 찾을 수 없습니다."));
 
-                // Entity 테이블에 저장
-                organizationRepository.save(organ);
-                System.out.println("head까지 저장 최최최종");
-            } else if (hoORshop.trim().equals("hotels")) {
-                // 호텔 데이터 조회
-                OrganizationEntity hotelsOrgan = organizationRepository.findById(findIdx).orElseThrow(() -> new RuntimeException("호텔을 찾을 수 없습니다."));
+                    // 본사 FK 연결
+                    organ.setHead(hoOrgan);
 
-                // 호텔 FK 연결
-                organ.setHotels(hotelsOrgan);
+                    // Entity 테이블에 저장
+                    organizationRepository.save(organ);
+                    System.out.println("head까지 저장 최최최종");
+                } else if (hoORshop.trim().equals("hotels")) {
+                    // 호텔 데이터 조회
+                    OrganizationEntity hotelsOrgan = organizationRepository.findById(findIdx).orElseThrow(() -> new RuntimeException("호텔을 찾을 수 없습니다."));
 
-                // Entity 테이블에 저장
-                organizationRepository.save(organ);
-                System.out.println("hotels까지 저장 최최최종");
+                    // 호텔 FK 연결
+                    organ.setHotels(hotelsOrgan);
+
+                    // Entity 테이블에 저장
+                    organizationRepository.save(organ);
+                    System.out.println("hotels까지 저장 최최최종");
+                } else {
+                    // Entity 테이블에 저장
+                    organizationRepository.save(organ);
+                    System.out.println("저장 최최최종");
+                }
             } else {
                 // Entity 테이블에 저장
                 organizationRepository.save(organ);
                 System.out.println("저장 최최최종");
             }
+
 
         } catch (Exception e) {             // 오류발생시 오류 처리
             throw new RuntimeException("등록 실패");

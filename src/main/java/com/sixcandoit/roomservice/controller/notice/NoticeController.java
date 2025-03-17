@@ -215,23 +215,35 @@ public class NoticeController {
         설명 : 공지사항 삭제 후 목록 페이지로 리디렉션
     -------------------------------------------------------------------------- */
     @PostMapping("/notice/delete/{idx}")
-    public String delete(@PathVariable("idx") Integer idx) {
+    public String deleteNotice(@PathVariable("idx") Integer idx, Model model) {
         try {
-            noticeService.noticeDelete(idx, "notice");
-            return "redirect:/notice/list";
+            // Delete the notice by its idx
+            noticeService.deleteNotice(idx);
+            log.info("공지사항 삭제 완료 - 번호: {}", idx);
+            return "redirect:/notice/list";  // Redirect to the list page after deletion
         } catch (Exception e) {
-            log.error("공지사항 삭제 중 오류 발생: {}", e.getMessage());
-            return "redirect:/notice/list";
+            log.error("공지사항 삭제 중 오류 발생: {}", e.getMessage(), e);
+            return "redirect:/notice/list?error=true";  // Error occurred, redirect back to list with an error
+        }
+
+    }
+        @GetMapping("/notice/ho/list")
+                public String noticeHO(Model model){
+            log.info("HoList");
+
+            return "notice/ho/list";
+        }
+
+        @GetMapping("/notice/bo/list")
+            public String noticeBO(Model model){
+        log.info("BoList");
+
+        return "notice/bo/list";
         }
     }
 
-    /* --------------------------------------------------------------------------
-        경로 : /notice/getModelMapper
-        인수 : 없음
-        출력 : ModelMapper 객체 반환
-        설명 : ModelMapper 객체를 반환
-    -------------------------------------------------------------------------- */
-    public ModelMapper getModelMapper() {
-        return modelMapper;
-    }
-}
+
+
+
+
+

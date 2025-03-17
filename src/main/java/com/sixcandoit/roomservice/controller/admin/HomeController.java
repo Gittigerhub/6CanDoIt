@@ -19,6 +19,13 @@ public class HomeController {
 //        return "index";
 //    }
 
+    // HO (Head Office) 페이지
+    /* -----------------------------------------------------------------------------
+        경로 : /ho (GET)
+        인수 : HttpSession session, AdminDTO adminDTO
+        출력 : "hoindex" 페이지
+        설명 : HO 페이지로 이동하며, 세션에 관리자 이름을 저장하여 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/ho")
     public String hoIndexForm(HttpSession session, AdminDTO adminDTO) {
         log.info("HO 페이지 진입");
@@ -26,6 +33,13 @@ public class HomeController {
         return "hoindex";
     }
 
+    // BO (Branch Office) 페이지
+    /* -----------------------------------------------------------------------------
+        경로 : /bo (GET)
+        인수 : HttpSession session, AdminDTO adminDTO
+        출력 : "boindex" 페이지
+        설명 : BO 페이지로 이동하며, 세션에 관리자 이름을 저장하여 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/bo")
     public String boIndexForm(HttpSession session, AdminDTO adminDTO) {
         log.info("BO 페이지 진입");
@@ -33,6 +47,13 @@ public class HomeController {
         return "boindex";
     }
 
+    // Guest 페이지
+    /* -----------------------------------------------------------------------------
+        경로 : /guest (GET)
+        인수 : HttpSession session, AdminDTO adminDTO
+        출력 : "guestindex" 페이지
+        설명 : Guest 페이지로 이동하며, 세션에 관리자 이름을 저장하여 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/guest")
     public String guestIndexForm(HttpSession session, AdminDTO adminDTO) {
         log.info("게스트 페이지 진입");

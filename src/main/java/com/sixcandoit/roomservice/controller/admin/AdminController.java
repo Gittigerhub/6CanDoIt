@@ -43,6 +43,12 @@ public class AdminController {
     private final OrganizationService organizationService;
     private final EmailService emailService;
 
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/
+        인수 : HttpSession session, AdminDTO adminDTO
+        출력 : 관리자 대시보드 페이지
+        설명 : 관리자 페이지로 진입 시, 해당 관리자 이름을 세션에 저장하고 대시보드로 이동
+    ----------------------------------------------------------------------------- */
     @GetMapping("/")
     public String IndexForm(HttpSession session, AdminDTO adminDTO) {
         log.info("최고 관리자 페이지 진입");
@@ -65,6 +71,12 @@ public class AdminController {
 //    }
 
     // 로그인
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/login
+        인수 : Model model
+        출력 : 로그인 페이지
+        설명 : 로그인 페이지를 출력하고, 호텔 목록을 가져와 모델에 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/login")
     public String showLoginPage(Model model){
         log.info("로그인 페이지를 내놔라");
@@ -77,6 +89,12 @@ public class AdminController {
     }
 
     // 로그아웃
+     /* -----------------------------------------------------------------------------
+        경로 : /admin/logout
+        인수 : HttpSession session
+        출력 : 로그인 페이지로 리다이렉트
+        설명 : 로그아웃 시 세션을 무효화하고 로그인 페이지로 리다이렉트
+    ----------------------------------------------------------------------------- */
     @GetMapping("/logout")
     public String showLogoutPage(HttpSession session) {
         session.invalidate();
@@ -84,7 +102,13 @@ public class AdminController {
         return "redirect:/admin/login";
     }
 
-    // 회원 가입
+    // 관리자 회원 가입
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/register (GET)
+        인수 : Model model
+        출력 : 관리자 회원 가입 페이지
+        설명 : 관리자 회원 가입 페이지를 출력하고, 호텔 목록을 가져와 모델에 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/register")
     public String register(Model model) {
         log.info("관리자 회원 가입 접속");
@@ -96,6 +120,12 @@ public class AdminController {
         return "admin/sign";
     }
 
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/register (POST)
+        인수 : AdminDTO adminDTO
+        출력 : 로그인 페이지로 리다이렉트
+        설명 : 관리자 회원 가입 처리 후 로그인 페이지로 리다이렉트
+    ----------------------------------------------------------------------------- */
     @PostMapping("/register")
     public String registerProc(@ModelAttribute AdminDTO adminDTO){
 
@@ -107,6 +137,12 @@ public class AdminController {
     }
 
     // 이메일 중복 확인
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/checkEmail
+        인수 : String email
+        출력 : 이메일 중복 확인 결과 (1: 중복, 0: 중복 아님)
+        설명 : 주어진 이메일이 이미 존재하는지 확인하여 결과를 반환
+    ----------------------------------------------------------------------------- */
     @PostMapping("/checkEmail")
     @ResponseBody
     public String checkEmail(@RequestParam("email") String email) {
@@ -119,6 +155,12 @@ public class AdminController {
     }
 
     // 연락처 중복 확인
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/checkPhone
+        인수 : String phone
+        출력 : 연락처 중복 확인 결과 (1: 중복, 0: 중복 아님)
+        설명 : 주어진 연락처가 이미 존재하는지 확인하여 결과를 반환
+    ----------------------------------------------------------------------------- */
     @PostMapping("/checkPhone")
     @ResponseBody
     public String checkPhone(@RequestParam("phone") String phone) {
@@ -130,6 +172,13 @@ public class AdminController {
         return result;  // 응답 반환
     }
 
+    // 이메일 코드 전송
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/sendEmailCode
+        인수 : String email
+        출력 : 이메일 발송 결과
+        설명 : 이메일을 전송하고 응답 상태에 따라 결과 반환
+    ----------------------------------------------------------------------------- */
     @PostMapping("/sendEmailCode")
     @ResponseBody
     public ResponseEntity<String> sendEmail(@RequestParam("email") String email){
@@ -146,6 +195,13 @@ public class AdminController {
     }
 
 
+    // 이메일 인증 코드 확인
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/checkEmailCode
+        인수 : String email, String authenticationCode
+        출력 : 인증 코드 검증 결과
+        설명 : 입력된 인증 코드가 일치하는지 확인하고 결과 반환
+    ----------------------------------------------------------------------------- */
     @PostMapping("/checkEmailCode")
     @ResponseBody
     public ResponseEntity<String> CheckEmailCode(@RequestParam("email") String email, @RequestParam("authenticationCode") String authenticationCode){
@@ -159,6 +215,12 @@ public class AdminController {
     }
 
     // 회원 수정 전 비밀번호 확인 페이지
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/verify (GET)
+        인수 : HttpSession session, Model model
+        출력 : 비밀번호 확인 페이지
+        설명 : 비밀번호 확인 페이지로 이동하며 세션에서 관리자 이메일을 가져옴
+    ----------------------------------------------------------------------------- */
     @GetMapping("/verify")
     public String ShowPasswordVerificationPage(HttpSession session, Model model){
         log.info("비밀번호 확인 진입 했어?");
@@ -176,6 +238,12 @@ public class AdminController {
     }
 
     // 비밀번호 검증 처리
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/verify (POST)
+        인수 : String password, String adminEmail, HttpSession session
+        출력 : 회원 정보 수정 페이지 또는 비밀번호 확인 페이지로 리디렉션
+        설명 : 입력된 비밀번호와 관리자 이메일을 통해 비밀번호를 검증하고 결과에 따라 처리
+    ----------------------------------------------------------------------------- */
     @PostMapping("/verify")
     public String verifyPassword(@RequestParam String password,
                                  @RequestParam String adminEmail,
@@ -213,6 +281,12 @@ public class AdminController {
     }
 
     // 회원 정보 수정
+     /* -----------------------------------------------------------------------------
+        경로 : /admin/modify (GET)
+        인수 : HttpSession session, Model model
+        출력 : 회원 정보 수정 페이지
+        설명 : 관리자 이메일로 회원 정보를 가져와 수정 페이지를 출력
+    ----------------------------------------------------------------------------- */
     @GetMapping("/modify")
     public String showModifyPage(HttpSession session, Model model){
         log.info("회원 정보 수정 진입 했니?");
@@ -230,6 +304,12 @@ public class AdminController {
         return "admin/modify";
     }
 
+    /* -----------------------------------------------------------------------------
+       경로 : /admin/modify (POST)
+       인수 : AdminDTO adminDTO
+       출력 : 관리자 대시보드 페이지로 리다이렉트
+       설명 : 관리자 정보를 수정한 후 대시보드로 리디렉트
+   ----------------------------------------------------------------------------- */
     @PostMapping("/modify")
     public String modifyAdmin(@ModelAttribute AdminDTO adminDTO){
         adminService.modify(adminDTO);
@@ -239,6 +319,12 @@ public class AdminController {
     }
 
     // 비밀번호 수정
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/modifypw (GET)
+        인수 : String error (선택사항), HttpSession session, Model model
+        출력 : 비밀번호 수정 페이지
+        설명 : 비밀번호 변경 페이지로 이동하며, 비밀번호 오류가 있을 경우 오류 메시지 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/modifypw")
     public String showModifyPWPage(@RequestParam(value = "error", required = false) String error,
                                    HttpSession session, Model model){
@@ -260,6 +346,12 @@ public class AdminController {
         return "admin/modifypw";
     }
 
+    /* -----------------------------------------------------------------------------
+    경로 : /admin/modifypw (POST)
+    인수 : String currentPassword, String newPassword, String confirmPassword, HttpSession session, RedirectAttributes redirectAttributes
+    출력 : 관리자 대시보드 페이지로 리디렉트
+    설명 : 비밀번호 변경 요청을 처리하고, 성공/실패 메시지에 따라 리다이렉트
+----------------------------------------------------------------------------- */
     @PostMapping("/modifypw")
     public String modifyPW(@RequestParam String currentPassword,
                            @RequestParam String newPassword,
@@ -289,6 +381,12 @@ public class AdminController {
     }
 
     // 임시비밀번호 발급
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/password (POST)
+        인수 : AdminDTO adminDTO
+        출력 : "success" 또는 "fail"
+        설명 : 관리자에게 임시 비밀번호를 발급하는 메서드
+    ----------------------------------------------------------------------------- */
     @PostMapping("/password")
     @ResponseBody
     public String modifyPassword(@RequestBody AdminDTO adminDTO){
@@ -298,6 +396,12 @@ public class AdminController {
     }
 
     // 회원 삭제 (일반 회원)
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/deleteMember (POST)
+        인수 : Integer idx
+        출력 : "success" 또는 "fail"
+        설명 : 회원 삭제 요청을 처리하는 메서드
+    ----------------------------------------------------------------------------- */
     @PostMapping("/deleteMember")
     @ResponseBody
     public String deleteMember(@RequestParam Integer idx) {
@@ -308,6 +412,12 @@ public class AdminController {
     }
 
     // 관리자 삭제 (관리자 계정)
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/deleteAdmin (POST)
+        인수 : Integer idx
+        출력 : "success" 또는 "fail"
+        설명 : 관리자 삭제 요청을 처리하는 메서드
+    ----------------------------------------------------------------------------- */
     @PostMapping("/deleteAdmin")
     @ResponseBody
     public String deleteAdmin(@RequestParam Integer idx) {
@@ -318,6 +428,12 @@ public class AdminController {
     }
 
     // 일반 회원 목록
+     /* -----------------------------------------------------------------------------
+        경로 : /admin/memberlist (GET)
+        인수 : Pageable page, String type, String keyword, Model model
+        출력 : 회원 목록 페이지
+        설명 : 페이지네이션을 지원하며, 키워드와 검색 유형에 맞춰 회원 목록을 조회하고 페이지 정보를 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/memberlist")
     public String showMemberList(@PageableDefault(page = 1) Pageable page, // 페이지 정보
                                  @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
@@ -342,6 +458,12 @@ public class AdminController {
     }
 
     // 최고 관리자 회원 목록
+     /* -----------------------------------------------------------------------------
+        경로 : /admin/adminlist (GET)
+        인수 : Pageable page, String type, String keyword, Level level, Model model
+        출력 : 최고 관리자 목록 페이지
+        설명 : 페이지네이션을 지원하며, 검색 조건에 맞는 최고 관리자 목록을 조회하고 페이지 정보를 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/adminlist")
     public String showAdminList(@PageableDefault(page = 1) Pageable page, // 페이지 정보
                                 @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
@@ -365,6 +487,12 @@ public class AdminController {
     }
 
     // 본사 관리자 회원 목록
+     /* -----------------------------------------------------------------------------
+        경로 : /admin/holist (GET)
+        인수 : Pageable page, String type, String keyword, Level level, Model model
+        출력 : 본사 관리자 목록 페이지
+        설명 : 페이지네이션을 지원하며, 검색 조건에 맞는 본사 관리자 목록을 조회하고 페이지 정보를 전달
+    ----------------------------------------------------------------------------- */
     @GetMapping("/holist")
     public String showHoList(@PageableDefault(page = 1) Pageable page, // 페이지 정보
                              @RequestParam(value = "type", defaultValue = "") String type, // 검색대상
@@ -388,6 +516,12 @@ public class AdminController {
     }
 
     // 관리자 권한 변경 처리
+    /* -----------------------------------------------------------------------------
+        경로 : /admin/updateRole (POST)
+        인수 : Integer idx, Level level, Principal principal
+        출력 : "success" 또는 "fail" / "unauthorized"
+        설명 : 관리자의 권한을 변경하는 메서드. 권한이 없는 경우 "unauthorized" 반환
+    ----------------------------------------------------------------------------- */
     @PostMapping("/updateRole")
     @ResponseBody
     public String updateAdminRole(@RequestParam("idx") Integer idx, @RequestParam("level") Level level, Principal principal) {

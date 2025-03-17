@@ -36,6 +36,7 @@ import java.util.Map;
 @Log4j2
 public class MemberController {
 
+    // 의존성 주입
     private final MemberService memberService;
     private final ReservationService reservationService;
     private final QnaService qnaService;
@@ -44,6 +45,13 @@ public class MemberController {
     private final AdvertisementService advertisementService;
     private final ImageFileService imageFileService;
 
+
+    /* -----------------------------------------------------------------------------
+        경로 : /member/ (GET)
+        인수 : HttpSession session, MemberDTO memberDTO, Model model
+        출력 : "memberindex" 페이지
+        설명 : 회원 메인 페이지로 이동하며, 광고 목록과 해당 광고에 대한 이미지 정보를 세션과 모델에 저장
+    ----------------------------------------------------------------------------- */
     @GetMapping("/")
     public String IndexForm(HttpSession session, MemberDTO memberDTO, Model model) {
 
@@ -80,6 +88,12 @@ public class MemberController {
     }
 
     // 로그인
+    /* -----------------------------------------------------------------------------
+        경로 : /member/login (GET)
+        인수 : 없음
+        출력 : "member/sign" 페이지
+        설명 : 로그인 페이지로 이동
+    ----------------------------------------------------------------------------- */
     @GetMapping("/login")
     public String showLoginPage(){
         log.info("로그인 페이지!");
@@ -87,6 +101,12 @@ public class MemberController {
     }
 
     // 로그아웃
+     /* -----------------------------------------------------------------------------
+        경로 : /member/logout (GET)
+        인수 : HttpSession session
+        출력 : 로그인 페이지로 리디렉션
+        설명 : 로그아웃 처리 후 로그인 페이지로 리디렉션
+    ----------------------------------------------------------------------------- */
     @GetMapping("/logout")
     public String showLogoutPage(HttpSession session){
         session.invalidate();
@@ -94,11 +114,23 @@ public class MemberController {
     }
 
     // 회원가입
+    /* -----------------------------------------------------------------------------
+        경로 : /member/register (GET)
+        인수 : 없음
+        출력 : "member/sign" 페이지
+        설명 : 회원가입 페이지로 이동
+    ----------------------------------------------------------------------------- */
     @GetMapping("/register")
     public String memberRegister() {
         return "member/sign";
     }
 
+    /* -----------------------------------------------------------------------------
+        경로 : /member/register (POST)
+        인수 : @ModelAttribute MemberDTO memberDTO
+        출력 : 로그인 페이지로 리디렉션
+        설명 : 회원가입 처리 후 로그인 페이지로 리디렉션
+    ----------------------------------------------------------------------------- */
     @PostMapping("/register")
     public String registerProc(@ModelAttribute MemberDTO memberDTO){
         if (memberService.register(memberDTO) == null){
@@ -108,6 +140,12 @@ public class MemberController {
     }
 
     // 이메일 중복 확인
+    /* -----------------------------------------------------------------------------
+        경로 : /member/checkEmail (POST)
+        인수 : @RequestParam("email") String email
+        출력 : "1" 또는 "0"
+        설명 : 이메일 중복 여부를 확인하고 중복되면 "1", 없으면 "0" 반환
+    ----------------------------------------------------------------------------- */
     @PostMapping("/checkEmail")
     @ResponseBody
     public String checkEmail(@RequestParam("email") String email) {
@@ -120,6 +158,12 @@ public class MemberController {
     }
 
     // 연락처 중복 확인
+    /* -----------------------------------------------------------------------------
+        경로 : /member/checkPhone (POST)
+        인수 : @RequestParam("phone") String phone
+        출력 : "1" 또는 "0"
+        설명 : 연락처 중복 여부를 확인하고 중복되면 "1", 없으면 "0" 반환
+    ----------------------------------------------------------------------------- */
     @PostMapping("/checkPhone")
     @ResponseBody
     public String checkPhone(@RequestParam("phone") String phone) {
@@ -132,6 +176,13 @@ public class MemberController {
     }
 
     // 회원 수정 전 비밀번호 확인 페이지
+    /* -----------------------------------------------------------------------------
+    경로 : /member/verify (GET)
+    인수 : HttpSession session, Model model
+    출력 : "member/verify" 페이지
+    설명 : 회원 수정 전에 비밀번호를 확인하는 페이지로 이동. 세션에서 memberEmail을 가져와서 해당 이메일에 대한 비밀번호를 확인하는 절차를 시작.
+    만약 세션에 memberEmail이 없으면 로그인 페이지로 리디렉션.
+ ----------------------------------------------------------------------------- */
     @GetMapping("/verify")
     public String ShowPasswordVerificationPage(HttpSession session, Model model){
         String memberEmail = (String) session.getAttribute("memberEmail");
@@ -147,6 +198,13 @@ public class MemberController {
     }
 
     // 비밀번호 검증 처리
+    /* -----------------------------------------------------------------------------
+    경로 : /member/verify (POST)
+    인수 : String password, String memberEmail, HttpSession session, RedirectAttributes redirectAttributes
+    출력 : 회원 정보 수정 페이지로 리디렉션 또는 비밀번호 확인 페이지로 리디렉션
+    설명 : 사용자가 입력한 비밀번호를 DB에 저장된 비밀번호와 비교하여 검증.
+    비밀번호가 일치하면 회원 정보 수정 페이지로 리디렉션하고, 그렇지 않으면 비밀번호 확인 페이지로 다시 리디렉션.
+ ----------------------------------------------------------------------------- */
     @PostMapping("/verify")
     public String verifyPassword(@RequestParam String password,
                                  @RequestParam String memberEmail,
@@ -173,6 +231,13 @@ public class MemberController {
     }
 
     // 회원 정보 수정
+    /* -----------------------------------------------------------------------------
+    경로 : /member/modify (GET)
+    인수 : HttpSession session, Model model
+    출력 : "member/modify" 페이지
+    설명 : 회원 정보 수정 페이지로 이동. 세션에서 회원 이메일을 가져와 해당 이메일로 회원 정보를 조회 후,
+    수정할 회원 정보를 모델에 전달하여 수정 페이지를 띄운다.
+ ----------------------------------------------------------------------------- */
     @GetMapping("/modify")
     public String showModifyPage(HttpSession session, Model model){
         String memberEmail = (String) session.getAttribute("memberEmail");
@@ -187,6 +252,12 @@ public class MemberController {
         return "member/modify";
     }
 
+    /* -----------------------------------------------------------------------------
+    경로 : /member/modify (POST)
+    인수 : @ModelAttribute MemberDTO memberDTO
+    출력 : 회원 목록 페이지로 리디렉션
+    설명 : 회원 수정 정보를 처리 후, 수정된 회원 정보를 DB에 저장하고, 회원 목록 페이지로 리디렉션.
+ ----------------------------------------------------------------------------- */
     @PostMapping("/modify")
     public String modifyMember(@ModelAttribute MemberDTO memberDTO){
         memberService.modify(memberDTO);
@@ -196,12 +267,25 @@ public class MemberController {
     }
 
     // 비밀번호 수정
+    /* -----------------------------------------------------------------------------
+    경로 : /member/modifypw (GET)
+    인수 : 없음
+    출력 : "member/modifypw" 페이지
+    설명 : 비밀번호 수정 페이지로 이동. 현재 비밀번호와 새 비밀번호를 입력받을 수 있는 페이지 제공.
+ ----------------------------------------------------------------------------- */
     @GetMapping("/modifypw")
     public String showModifyPWPage(HttpSession session, Model model){
         log.info("비밀번호 변경을 해요!!");
         return "member/modifypw";
     }
 
+    /* -----------------------------------------------------------------------------
+    경로 : /member/modifypw (POST)
+    인수 : String currentPassword, String newPassword, HttpSession session, RedirectAttributes redirectAttributes
+    출력 : 회원 목록 페이지로 리디렉션 또는 비밀번호 수정 페이지로 리디렉션
+    설명 : 사용자가 입력한 현재 비밀번호와 새 비밀번호를 비교하여 비밀번호를 변경.
+    비밀번호 변경에 성공하면 회원 목록 페이지로 리디렉션하고, 실패하면 비밀번호 수정 페이지로 돌아가 에러 메시지 표시.
+ ----------------------------------------------------------------------------- */
     @PostMapping("/modifypw")
     public String modifyPW(@RequestParam String currentPassword,
                            @RequestParam String newPassword,
@@ -224,6 +308,13 @@ public class MemberController {
     }
 
     // 임시비밀번호 발급
+    /* -----------------------------------------------------------------------------
+    경로 : /member/password (POST)
+    인수 : MemberDTO memberDTO
+    출력 : "success" 또는 "fail"
+    설명 : 사용자가 요청한 이메일로 임시 비밀번호를 발급하여 해당 이메일로 전송.
+    memberService의 passwordSend 메서드를 호출하여 임시 비밀번호를 발급하고, 성공 여부에 따라 결과를 반환.
+ ----------------------------------------------------------------------------- */
     @PostMapping("/password")
     @ResponseBody
     public String modifyPassword(@RequestBody MemberDTO memberDTO){
@@ -233,6 +324,12 @@ public class MemberController {
     }
 
     // 회원 삭제 (일반 회원)
+    /* -----------------------------------------------------------------------------
+    경로 : /member/deleteMember (POST)
+    인수 : Integer idx
+    출력 : "success" 또는 "fail"
+    설명 : 회원 삭제 요청을 처리. idx를 이용해 삭제할 회원을 특정하고, memberService의 deleteMember 메서드를 호출하여 회원을 삭제.
+ ----------------------------------------------------------------------------- */
     @PostMapping("/deleteMember")
     @ResponseBody
     public String deleteMember(@RequestParam Integer idx) {
@@ -243,6 +340,12 @@ public class MemberController {
     }
 
     // 마이페이지
+    /* -----------------------------------------------------------------------------
+    경로 : /member/mypage (GET)
+    인수 : @AuthenticationPrincipal CustomUserDetails userDetails, @PageableDefault(page=1) Pageable page, Model model
+    출력 : "member/mypage" 페이지
+    설명 : 로그인한 사용자의 마이페이지를 조회. 사용자의 정보, 예약 목록, 주문 내역, 최근 문의 내역을 모델에 담아 뷰로 전달.
+ ----------------------------------------------------------------------------- */
     @GetMapping("/mypage")
     public String myPage(@AuthenticationPrincipal CustomUserDetails userDetails,
                          @PageableDefault(page=1) Pageable page, Model model) {
@@ -268,6 +371,14 @@ public class MemberController {
         return "member/mypage";
     }
 
+    // 이메일 인증 코드 전송
+    /* -----------------------------------------------------------------------------
+    경로 : /member/sendEmailCode (POST)
+    인수 : String email
+    출력 : ResponseEntity<String> (상태 200 또는 400)
+    설명 : 사용자가 입력한 이메일로 인증 코드를 발송. 이메일 발송 서비스(emailService)에서 이메일 코드 전송을 처리.
+    이메일 유형에 따라 코드 전송 (admin = 1, member = 2)
+    ----------------------------------------------------------------------------- */
     @PostMapping("/sendEmailCode")
     @ResponseBody
     public ResponseEntity<String> sendEmail(@RequestParam("email") String email){
@@ -282,6 +393,13 @@ public class MemberController {
             return ResponseEntity.badRequest().body("이메일 발송 에러");
         }
     }
+    // 이메일 인증 코드 확인
+    /* -----------------------------------------------------------------------------
+    경로 : /member/checkEmailCode (POST)
+    인수 : String email, String authenticationCode
+    출력 : ResponseEntity<String> (인증 결과)
+    설명 : 사용자가 입력한 인증 코드와 이메일을 비교하여 인증 여부를 확인. 인증 성공 여부를 반환.
+    ----------------------------------------------------------------------------- */
     @PostMapping("/checkEmailCode")
     @ResponseBody
     public ResponseEntity<String> CheckEmailCode(@RequestParam("email") String email, @RequestParam("authenticationCode") String authenticationCode){

@@ -40,7 +40,7 @@
                         <select class="form-select" id="level" name="level" style="display: none;">
                             <option value="">권한 선택</option>
                             <option th:each="lvl : ${T(com.sixcandoit.roomservice.constant.Level).values()}"
-                                    th:value="${lvl}" th:text="${lvl}" th:selected="${level == lvl}"></option>
+                                    th:value="${lvl}" th:text="${lvl.description}" th:selected="${level == lvl}"></option>
                         </select>
 
                         <button class="btn btn-success" type="submit">검색</button>

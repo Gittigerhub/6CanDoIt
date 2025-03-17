@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/holayout}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!--알림창 스크립트-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+<div layout:fragment="content" class="container-fluid">
+    <div class="row mt-5">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <!-- 검색 결과 테이블 -->
+            <div class="row mt-5 p-3 bg-white">
+                <div class="mb-5 p-3">
+                    <h2>메뉴 목록</h2>
+                    <!-- URL에서 shopIdx를 가져옵니다. -->
+                    <div th:if="${param.organidx}">
+                        <p>Shop Index: <span th:text="${param.organidx}"></span></p>
+                    </div>
+                    <!-- url에서 가져온 organIdx값을 담아둘 input태그 -->
+                    <input type="hidden" id="organIdxInput" name="organ.idx">
+
+                    <div class="col-12">
+                        <!-- 카테고리 선택 UI -->
+                        <div class="row mb-5 mt-4 bg-white text-center">
+                            <div class="col-12">
+                                <div class="btn-group w-75" role="group" aria-label="Category Selection">
+                                    <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Korean">한식</button>
+                                    <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Chinese">중식</button>
+                                    <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Western">양식</button>
+                                    <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Japanese">일식</button>
+                                    <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Drink">음료</button>
+                                </div>
+                                <div class="position-relative d-inline-block ms-3">
+                                    <div>
+                                        <button class="btn btn-outline-secondary" onclick="location.href='/admin/menu/ho/registermenu'">등록</button>
+                                    </div><!--추가버튼-->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--메뉴 목록 표시-->
+                        <div id="menuListContainer">
+
+                            <div th:fragment="menulistfragment">
+
+                                <table class="table table-hover" style="text-align: center;">
+                                    <thead>
+                                    <tr style="text-align: center;">
+                                        <th style="width: 10%">카테고리</th>
+                                        <th style="width: 10%">메뉴명</th>
+                                        <th style="width: 15%">메뉴사진</th>
+                                        <th style="width: 20%">메뉴설명</th>
+                                        <th style="width: 10%">가격</th>
+                                        <th style="width: 15%">등록일</th>
+                                        <th style="width: 10%">수정</th>
+                                        <th style="width: 10%">삭제</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- 메뉴 항목 반복 출력 -->
+                                    <tr th:each="menu : ${menulist}">
+                                        <td style="vertical-align: middle; text-align: center;" th:text="${menu.menuCategory.displayName}"></td>
+                                        <td style="vertical-align: middle; text-align: center;">
+                                            <!-- 메뉴명 클릭 시 상세보기로 이동하는 링크 추가 -->
+                                            <a style="text-decoration: none; font-weight: bold" th:href="@{/admin/menu/ho/adreadmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
+                                        </td>
+                                        <td>
+                                            <!-- 대표 이미지가 없을때 나오는 이미지 -->
+                                            <div style="flex-basis: 100%; text-align: center">
+                                                <th:block th:if="${!repImageMap[menu.idx]}">
+                                                    <img style="width: 100px; height: 100px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                                                </th:block>
+                                            </div>
+
+                                            <th:block th:each="data:${imageFileMap[menu.idx]}" th:if="${repImageMap[menu.idx]}">
+                                                <!-- 대표 이미지 -->
+                                                <th:block th:if="${data.repimageYn == 'Y'}">
+                                                    <div style="flex-basis: 100%; text-align: center">
+                                                        <img style="width: 100px; height: 100px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                                    </div>
+                                                </th:block>
+                                            </th:block>
+                                        </td>
+                                        <td style="vertical-align: middle; text-align: center;" th:text="${menu.menuContent}"></td>
+                                        <td style="vertical-align: middle; text-align: center;" th:text="${#numbers.formatInteger(menu.menuPrice, 0, 'COMMA')} + '원'"></td>
+                                        <td style="vertical-align: middle; text-align: center;" th:text="${#temporals.format(menu.insDate, 'yyyy-MM-dd')}"></td>
+                                        <td style="vertical-align: middle; text-align: center;">
+                                            <button class="btn btn-sm btn-outline-secondary" th:onclick="|location.href='/admin/menu/ho/updatemenu?idx='+ ${menu.idx}|">수정</button>
+                                        </td>
+                                        <td style="vertical-align: middle; text-align: center;">
+                                            <button class="btn btn-sm btn-outline-danger delMoveBtn" th:data-id="${menu.idx}">삭제</button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!--페이징 시작-->
+                        <div class="mt-3 d-flex justify-content-center">
+                            <ul class="pagination">
+                                <li class="page-item" th:unless="${startPage>1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
+                                    <a class="page-link" th:href="@{/admin/menu/adlistmenu(page=1, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}">≪</a>
+                                </li>
+                                <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
+                                    <a class="page-link" th:href="@{/admin/menu/adlistmenu(page=${prevPage}, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}">＜</a>
+                                </li>
+                                <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}"><!--숫자 카운터-->
+                                    <li class="page-item">
+                                        <a class="page-link" th:href="@{/admin/menu/adlistmenu(page=${page}, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}" th:text="${page}"></a>
+                                    </li>
+                                </span>
+                                <!--11,12,13,14,15 다음 마지막(15)-->
+                                <li class="page-item" th:unless="${currentPage>=endPage}">
+                                    <a class="page-link" th:href="@{/admin/menu/adlistmenu(page=${nextPage}, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}">＞</a>
+                                </li>
+                                <li class="page-item" th:unless="${currentPage>endPage}">
+                                    <a class="page-link" th:href="@{/admin/menu/adlistmenu(page=${endPage}, type=${type}, keyword=${keyword}, organIdx=${param.organIdx})}">≫</a>
+                                </li>
+                            </ul>
+                        </div><!--페이징 끝-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-2"></div>
+</div>
+</div>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function() {
+
+            // 카테고리 버튼 클릭 시 메뉴 목록 갱신
+            $('.category-btn').on('click', function() {
+                var category = $(this).data('category');  // 선택된 카테고리 값
+
+                $.ajax({
+                    url: '/admin/menu/ajax/adlistmenu',  // 현재 페이지에서 처리할 주소
+                    type: 'GET',
+                    data: {
+                        category: category,  // 선택된 카테고리 값
+                    },
+                    success: function (response) {
+                        $('#menuListContainer').html(response);  // 받은 데이터를 메뉴 목록 영역에 표시
+                    },
+                    error: function () {
+                        alert("메뉴 목록을 불러오는 데 실패했습니다.");
+                    }
+                });
+
+            });
+
+            //삭제 버튼 클릭시
+            $(".delMoveBtn").on("click", function() {
+                var idx = $(this).data("id")
+
+                $.ajax({
+                    url: "/admin/menu/removemenu",
+                    type: 'GET',
+                    data: {
+                        idx: idx                        // 전달값 : 메뉴 ID
+                    },
+                    success: function (response) {      // 작업 성공시
+                        Swal.fire({
+                            icon: null,
+                            text: "삭제하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        }).then(() => {
+                            location.reload();              // 현재 목록페이지를 다시 읽어온다.
+                        });
+                    },
+                    error: function () {                // 작업 실패시
+                        Swal.fire({
+                            icon: null,
+                            text: "삭제를 실패하였습니다",
+                            customClass: {
+                                container: 'bootstrap-swal-container',
+                                popup: 'card shadow-sm',
+                                title: 'h4 text-success',
+                                content: 'text-dark',
+                            },
+                            showConfirmButton: false,
+                            timer: 2000,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            },
+                            buttonsStyling: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false
+                        });
+                    }
+                });
+            });
+
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

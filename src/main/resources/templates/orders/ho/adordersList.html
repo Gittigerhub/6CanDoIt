@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/bolayout}"
+      layout:decorate="~{layouts/holayout}"
 >
 <head>
     <meta charset="UTF-8">
@@ -36,7 +36,7 @@
                     <!-- 주문현황 컨테이너 추가 -->
                     <div class="col-12">
                         <!-- 검색 필터 -->
-                        <form th:action="@{/admin/orders/adordersList}" method="get" class="row g-3 mt-2 mb-4">
+                        <form th:action="@{/admin/orders/ho/adordersList}" method="get" class="row g-3 mt-2 mb-4">
                             <input type="hidden" name="organ_idx" th:value="${organ_idx}">
                             <div class="col-md-3">
                                 <select name="type" class="form-select">
@@ -109,7 +109,7 @@
                                         </select>
                                     </td>
                                     <td style="vertical-align: middle;">
-                                        <a th:href="@{/admin/orders/adordersRead/{orderIdx}(orderIdx=${order.idx}, organ_idx=${organ_idx})}"
+                                        <a th:href="@{/admin/orders/ho/adordersRead/{orderIdx}(orderIdx=${order.idx}, organ_idx=${organ_idx})}"
                                            class="btn btn-sm btn-info">상세보기</a>
                                     </td>
                                 </tr>
@@ -121,22 +121,22 @@
                         <div class="mt-3 d-flex justify-content-center">
                             <ul class="pagination">
                                 <li class="page-item" th:unless="${startPage>=1}"><!--현재 1페이지가 아니면 처음버튼 사용-->
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=1, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≪</a>
+                                    <a class="page-link" th:href="@{/admin/orders/ho/adordersList(page=1, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≪</a>
                                 </li>
                                 <li class="page-item" th:unless="${currentPage==1}"><!--현재 1페이지가 아니면-->
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${prevPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＜</a>
+                                    <a class="page-link" th:href="@{/admin/orders/ho/adordersList(page=${prevPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＜</a>
                                 </li>
                                 <span th:each="page:${#numbers.sequence(startPage, endPage, 1)}"><!--숫자 카운터-->
                                 <li class="page-item">
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${page}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}" th:text="${page}"></a>
+                                    <a class="page-link" th:href="@{/admin/orders/ho/adordersList(page=${page}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}" th:text="${page}"></a>
                                 </li>
                             </span>
                                 <!--11,12,13,14,15 다음 마지막(15)-->
                                 <li class="page-item" th:unless="${currentPage>=endPage}">
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${nextPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＞</a>
+                                    <a class="page-link" th:href="@{/admin/orders/ho/adordersList(page=${nextPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">＞</a>
                                 </li>
                                 <li class="page-item" th:unless="${currentPage>endPage}">
-                                    <a class="page-link" th:href="@{/admin/orders/adordersList(page=${endPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≫</a>
+                                    <a class="page-link" th:href="@{/admin/orders/ho/adordersList(page=${endPage}, type=${type}, keyword=${keyword}, organ_idx=${organ_idx})}">≫</a>
                                 </li>
                             </ul>
                         </div><!--페이징 끝-->
@@ -164,12 +164,12 @@
 
                 // 전체 버튼 클릭 시 기본 목록으로 이동
                 if (status === 'ALL') {
-                    window.location.href = '/admin/orders/adordersList?organ_idx=' + organIdx;
+                    window.location.href = '/admin/orders/ho/adordersList?organ_idx=' + organIdx;
                     return;
                 }
 
                 $.ajax({
-                    url: '/admin/orders/ajax/adordersList',
+                    url: '/admin/orders/ho/ajax/adordersList',
                     type: 'GET',
                     data: {
                         status: status,
@@ -217,7 +217,7 @@
                             row.append($('<td>').append(
                                 $('<a>')
                                     .addClass('btn btn-sm btn-info')
-                                    .attr('href', '/admin/orders/adordersRead/' + order.idx + '?organ_idx=' + organIdx)
+                                    .attr('href', '/admin/orders/ho/adordersRead/' + order.idx + '?organ_idx=' + organIdx)
                                     .text('상세보기')
                             ));
                             
@@ -300,7 +300,7 @@
                 var organIdx = [[${organ_idx}]];
 
                 $.ajax({
-                    url: '/admin/orders/ajax/adordersList',
+                    url: '/admin/orders/ho/ajax/adordersList',
                     type: 'GET',
                     data: {
                         status: status,
@@ -348,7 +348,7 @@
                             row.append($('<td>').append(
                                 $('<a>')
                                     .addClass('btn btn-sm btn-info')
-                                    .attr('href', '/admin/orders/adordersRead/' + order.idx + '?organ_idx=' + organIdx)
+                                    .attr('href', '/admin/orders/ho/adordersRead/' + order.idx + '?organ_idx=' + organIdx)
                                     .text('상세보기')
                             ));
 
@@ -378,7 +378,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/orders/${orderIdx}/status`,
+                            url: `/admin/orders/ho/${orderIdx}/status`,
                             type: 'POST',
                             data: {
                                 status: newStatus,
@@ -411,7 +411,7 @@
             function updateOrderCounts() {
                 var organIdx = [[${organ_idx}]];
                 $.ajax({
-                    url: '/admin/orders/counts',
+                    url: '/admin/orders/ho/counts',
                     type: 'GET',
                     data: {
                         organ_idx: organIdx

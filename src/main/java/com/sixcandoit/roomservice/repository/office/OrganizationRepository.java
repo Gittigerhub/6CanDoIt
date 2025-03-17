@@ -38,7 +38,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     // 조직 검색
 
     // 전체(슈퍼 바이저)
-    @Query("SELECT o FROM OrganizationEntity o where o.organType = 'HO' or o.organType = 'BO'")
+    @Query("SELECT o FROM OrganizationEntity o where o.organType = 'HO' or o.organType = 'BO' or o.organType = 'SHOP'")
     Page<OrganizationEntity> searchALL(Pageable pageable);
 
     // 본사(슈퍼 바이저)
@@ -54,7 +54,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     Page<OrganizationEntity> searchSHOP(Pageable pageable);
 
     // 전체 + 조직명(슈퍼 바이저)
-    @Query("SELECT o FROM OrganizationEntity o WHERE (o.organType = 'HO' or o.organType = 'BO') and o.organName like %:keyword%")
+    @Query("SELECT o FROM OrganizationEntity o WHERE (o.organType = 'HO' or o.organType = 'BO' or o.organType = 'SHOP') and o.organName like %:keyword%")
     Page<OrganizationEntity> searchALLName(@Param("keyword") String keyword, Pageable pageable);
 
     // 본사 + 조직명(슈퍼 바이저)

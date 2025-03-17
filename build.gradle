@@ -1,11 +1,19 @@
 plugins {
     id 'java'
+    id 'war'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.sixcandoit'
 version = '0.0.1-SNAPSHOT'
+
+apply plugin:'war'
+bootWar {
+    archiveBaseName = '-'
+    archiveFileName = '-.war'
+    archiveVersion = '0.0.0'
+}
 
 java {
     toolchain {
@@ -72,6 +80,11 @@ dependencies {
 
     //spring cloud AWS 외부 라이브러리
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // Spring Boot의 내장 Tomcat 의존성을 "provided"로 설정
+    // "provided"로 설정한다는 것은 해당 의존성이 컴파일 시에는 필요하지만,
+    // 애플리케이션을 배포할 때는 외부(또는 컨테이너)가 이미 제공하기 때문에 패키징 대상에 포함되지 않는다는 뜻입니다.
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

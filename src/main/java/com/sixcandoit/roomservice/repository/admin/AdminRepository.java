@@ -2,7 +2,6 @@ package com.sixcandoit.roomservice.repository.admin;
 
 import com.sixcandoit.roomservice.constant.Level;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
-import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +17,7 @@ public interface AdminRepository extends JpaRepository<AdminEntity, Integer> {
     //로그인 작업순서
     //1. id가 존재하는지 검색 (존재하지 않는 아이디입니다.)
     //2. 조회한 결과의 비밀번호와 입력한 비빌번호가 일치하면 로그인, 아니면 로그아웃(비밀번호가 틀립니다.)
+    @Query("select a from AdminEntity a where a.adminEmail = :adminEmail")
     Optional<AdminEntity> findByAdminEmail(String adminEmail);
 
     //아이디와 비밀번호 조회(개별조회)

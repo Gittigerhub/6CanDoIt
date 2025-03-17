@@ -123,14 +123,20 @@ public class SecurityConfig {
                     auth.requestMatchers("/event/event/**", "/event/eventread/**", "/event/eventregister/**", "/event/eventupdate", "event/memberpoint/**").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/event/userevent/**", "/event/usereventread/**", "/event/usermemberpoint/**").hasRole("MEMBER");
 
-
-
                     /*--------------------------------------------------------------------------------------------------------------------------*/
 
                     // 조직-매장 페이지 접근 권한
-                    auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
+                    auth.requestMatchers("/office/list", "/office/organ", "/office/shopdetail/realread").hasRole("ADMIN");
+                    auth.requestMatchers("/office/ho/list", "/office/organ/ho", "/shopdetail/realread/ho").hasRole("HO");
+                    auth.requestMatchers("/office/bo/list", "/office/shopdetail/realread/bo").hasRole("BO");
+                    auth.requestMatchers("/office/member/list").hasRole("MEMBER");
+                    auth.requestMatchers("/office/search/list", "/office/search/hotels/list",
+                            "/office/organ/register", "/office/organ/read", "/office/organ/update", "/office/organ/delete",
+                            "/office/shopdetail/read", "/office/shopdetail/update", "/office/shopdetail/register", "/office/shopdetail").hasAnyRole("ADMIN", "HO", "BO");
                     // 광고 페이지 접근 권한
-                    auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
+                    auth.requestMatchers("/advertisement/list", "/advertisement/register", "/advertisement/search/list", "/advertisement/update",
+                            "/advertisement/update/read", "/advertisement/read", "/advertisement/delete").hasRole("ADMIN");
+                    auth.requestMatchers("/advertisement/hitsUp").hasRole("MEMBER");
 
                 });
 
@@ -222,14 +228,20 @@ public class SecurityConfig {
             auth.requestMatchers("/event/event/**", "/event/eventread/**", "/event/eventregister/**", "/event/eventupdate", "event/memberpoint/**").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/event/userevent/**", "/event/usereventread/**", "/event/usermemberpoint/**").hasRole("MEMBER");
 
-
-
             /*--------------------------------------------------------------------------------------------------------------------------*/
 
             // 조직-매장 페이지 접근 권한
-            auth.requestMatchers("/office/**", "/office/organ/**", "/office/shopdetail/**").permitAll();
+            auth.requestMatchers("/office/list", "/office/organ", "/office/shopdetail/realread").hasRole("ADMIN");
+            auth.requestMatchers("/office/ho/list", "/office/organ/ho", "/shopdetail/realread/ho").hasRole("HO");
+            auth.requestMatchers("/office/bo/list", "/office/shopdetail/realread/bo").hasRole("BO");
+            auth.requestMatchers("/office/member/list").hasRole("MEMBER");
+            auth.requestMatchers("/office/search/list", "/office/search/hotels/list",
+                    "/office/organ/register", "/office/organ/read", "/office/organ/update", "/office/organ/delete",
+                    "/office/shopdetail/read", "/office/shopdetail/update", "/office/shopdetail/register", "/office/shopdetail").hasAnyRole("ADMIN", "HO", "BO");
             // 광고 페이지 접근 권한
-            auth.requestMatchers("/advertisement/**", "/advertisement/update/**").permitAll();
+            auth.requestMatchers("/advertisement/list", "/advertisement/register", "/advertisement/search/list", "/advertisement/update",
+                    "/advertisement/update/read", "/advertisement/read", "/advertisement/delete").hasRole("ADMIN");
+            auth.requestMatchers("/advertisement/hitsUp").hasRole("MEMBER");
 
         });
 

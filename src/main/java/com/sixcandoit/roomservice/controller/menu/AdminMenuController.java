@@ -456,7 +456,7 @@ public class AdminMenuController {
 
 
     /* -----------------------------------------------------------------------------
-       경로 : /menu/ajax/adlistmenu
+       경로 : /menu/ajax/bo/adlistmenu
        인수 : String category, Pageable page, Model model, Principal principal
        출력 : 카테고리별 메뉴 목록 (AJAX)
        설명 : 카테고리별 메뉴 목록을 반환하는 AJAX 요청 처리
@@ -469,7 +469,62 @@ public class AdminMenuController {
 
         // 로그인한 회원정보로 관리자 호텔정보 가져오기
         AdminEntity admin = adminService.findAdmin(principal.getName());
-        OrganizationEntity organ = organizationService.findById(admin.getIdx())
+        OrganizationEntity organ = organizationService.findById(admin.getOrganizationJoin().getIdx())
+                .orElseThrow(() -> new RuntimeException("조회된 조직이 없습니다."));
+
+        // 호텔의 idx
+        Integer organIdx = organ.getIdx();
+
+        // 해당 페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
+        Page<MenuDTO> menuDTOS = menuService.selectCate(page, category, organIdx);
+
+        // DTO들 리스트로 가져오기
+        List<MenuDTO> menu = menuDTOS.getContent();
+
+        // 이미지 데이터를 담을 Map 생성 (menu의 idx를 key로 저장)
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+
+        for (MenuDTO menuDTO : menu) {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(menuDTO.getIdx(), "menu");
+
+            // Map에 저장 (menu의 idx를 key로 함)
+            imageFileMap.put(menuDTO.getIdx(), imageFileDTOS);
+
+            // 대표 사진 여부 확인 후 저장
+            boolean hasRepImage = imageFileDTOS.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+            repImageMap.put(menuDTO.getIdx(), hasRepImage);
+        }
+
+        // 모델에 추가
+        model.addAttribute("menu", menu);                   // 메뉴 리스트
+        model.addAttribute("imageFileMap", imageFileMap);   // 메뉴별 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap);     // 메뉴별 대표 사진 여부
+        model.addAttribute("menulist", menuDTOS);           // page 데이터 전달
+
+        return "menu/boadlistmenu :: menulistfragment";
+    }
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/ajax/bo/adlistmenu
+       인수 : String category, Pageable page, Model model, Principal principal
+       출력 : 카테고리별 메뉴 목록 (AJAX)
+       설명 : 카테고리별 메뉴 목록을 반환하는 AJAX 요청 처리
+   ----------------------------------------------------------------------------- */
+    //Ajax 요청에 의해 카테고리별 메뉴목록을 반환하는 메소드
+    @GetMapping("/menu/ajax/ho/adlistmenu")
+    public String ajaxListHOMenu(@RequestParam(value = "category", defaultValue = "ALL") String category,
+                                 @PageableDefault(page = 1) Pageable page,
+                                 Model model, Principal principal) {
+
+        // 로그인한 회원정보로 관리자 정보 찾기
+        AdminEntity admin = adminService.findAdmin(principal.getName());
+
+        // 호텔정보 찾기
+        OrganizationEntity organ = organizationService.findById(admin.getOrganizationJoin().getIdx())
                 .orElseThrow(() -> new RuntimeException("조회된 조직이 없습니다."));
 
         // 호텔의 idx

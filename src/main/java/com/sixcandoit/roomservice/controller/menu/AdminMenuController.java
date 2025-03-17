@@ -142,7 +142,7 @@ public class AdminMenuController {
             log.info("유효성 검사 에러");
             log.info(bindingResult.getAllErrors());     //확인된 모든 에러 콘솔창 출력
 
-            return "menu/horegistermenu";  //다시 이전 페이지
+            return "menu/boregistermenu";  //다시 이전 페이지
         }
 
         try {
@@ -249,7 +249,7 @@ public class AdminMenuController {
             model.addAttribute("imageFileDTOList", imageFileDTOList);
             model.addAttribute("hasRepImage", hasRepImage);
 
-            return "menu/hoadreadmenu";
+            return "menu/boadreadmenu";
         }catch (EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("msg", "존재하지 않는 메뉴입니다.");
             return "redirect:/admin/menu/bo/adreadmenu";
@@ -380,9 +380,58 @@ public class AdminMenuController {
         model.addAttribute("menu", menu);                   // 메뉴 리스트
         model.addAttribute("imageFileMap", imageFileMap);   // 메뉴별 이미지 리스트
         model.addAttribute("repImageMap", repImageMap);     // 메뉴별 대표 사진 여부
+        model.addAttribute("type", type);   //검색 분류
+        model.addAttribute("keyword", keyword); //키워드
 
         return "menu/boadlistmenu";
 
+    }
+
+    //Ajax 요청에 의해 카테고리별 메뉴목록을 반환하는 메소드
+    @GetMapping("/menu/ajax/bo/adlistmenu")
+    public String ajaxListBOMenu(@RequestParam(value = "category", defaultValue = "ALL") String category,
+                               @PageableDefault(page = 1) Pageable page,
+                               Model model, Principal principal) {
+
+        // 로그인한 회원정보로 관리자 호텔정보 가져오기
+        AdminEntity admin = adminService.findAdmin(principal.getName());
+        OrganizationEntity organ = organizationService.findById(admin.getIdx())
+                .orElseThrow(() -> new RuntimeException("조회된 조직이 없습니다."));
+
+        // 호텔의 idx
+        Integer organIdx = organ.getIdx();
+
+        // 해당 페이지의 내용을 서비스를 통해 데이터베이스로부터 조회
+        Page<MenuDTO> menuDTOS = menuService.selectCate(page, category, organIdx);
+
+        // DTO들 리스트로 가져오기
+        List<MenuDTO> menu = menuDTOS.getContent();
+
+        // 이미지 데이터를 담을 Map 생성 (menu의 idx를 key로 저장)
+        Map<Integer, List<ImageFileDTO>> imageFileMap = new HashMap<>();
+        Map<Integer, Boolean> repImageMap = new HashMap<>();
+
+        for (MenuDTO menuDTO : menu) {
+            // 이미지 조회
+            List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(menuDTO.getIdx(), "menu");
+
+            // Map에 저장 (menu의 idx를 key로 함)
+            imageFileMap.put(menuDTO.getIdx(), imageFileDTOS);
+
+            // 대표 사진 여부 확인 후 저장
+            boolean hasRepImage = imageFileDTOS.stream()
+                    .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+            repImageMap.put(menuDTO.getIdx(), hasRepImage);
+        }
+
+        // 모델에 추가
+        model.addAttribute("menu", menu);                   // 메뉴 리스트
+        model.addAttribute("imageFileMap", imageFileMap);   // 메뉴별 이미지 리스트
+        model.addAttribute("repImageMap", repImageMap);     // 메뉴별 대표 사진 여부
+        model.addAttribute("menulist", menuDTOS);           // page 데이터 전달
+
+        return "menu/boadlistmenu :: menulistfragment";
     }
 
     //Ajax 요청에 의해 카테고리별 메뉴목록을 반환하는 메소드

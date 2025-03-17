@@ -166,13 +166,13 @@
             // 주문처리 요청
             $.ajax({
                 url: '/member/orders',
-                type: 'GET',
-
-                data: {
+                type: 'POST',
+                contentType: 'application/json',  // JSON 데이터 전송
+                data: JSON.stringify({
                     cartMenuIdxList: cartMenuIdxList,
                     ordersPhone: ordersPhone,
                     ordersMemo: ordersMemo
-                },
+                }),
                 success: function(response) {
                     console.log("주문 완료, response",response);
                     Swal.fire({

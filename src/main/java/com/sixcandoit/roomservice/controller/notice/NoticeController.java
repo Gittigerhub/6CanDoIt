@@ -223,26 +223,19 @@ public class NoticeController {
             return "redirect:/notice/list";  // Redirect to the list page after deletion
         } catch (Exception e) {
             log.error("공지사항 삭제 중 오류 발생: {}", e.getMessage(), e);
-            return "redirect:/notice/list?error=true";  // Error occurred, redirect back to list with an error
+            return "redirect:/notice/list";  // Error occurred, redirect back to list with an error
         }
-
     }
+
     @GetMapping("/notice/ho/list")
     public String noticeHO(Model model){
         log.info("HoList");
-
-        return "notice/ho/list";
+        return "notice/ho/holist";
     }
 
     @GetMapping("/notice/bo/list")
     public String noticeBO(Model model){
         log.info("BoList");
-
-        return "notice/bo/list";
+        return "notice/bo/bolist";
     }
 }
-
-
-
-
-

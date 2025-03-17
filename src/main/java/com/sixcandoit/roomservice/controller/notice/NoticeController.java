@@ -227,21 +227,20 @@ public class NoticeController {
         }
 
     }
-        @GetMapping("/notice/ho/list")
-                public String noticeHO(Model model){
-            log.info("HoList");
+    @GetMapping("/notice/ho/list")
+    public String noticeHO(Model model){
+        log.info("HoList");
 
-            return "notice/ho/list";
-        }
+        return "notice/ho/list";
+    }
 
-        @GetMapping("/notice/bo/list")
-            public String noticeBO(Model model){
+    @GetMapping("/notice/bo/list")
+    public String noticeBO(Model model){
         log.info("BoList");
 
         return "notice/bo/list";
-        }
     }
-
+}
 
 
 

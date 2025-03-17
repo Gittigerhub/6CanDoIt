@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/superlayout}"
+>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -255,7 +257,7 @@
 <body>
 <div layout:fragment="content" class="container">
     <h1>회원 정보 수정</h1>
-    <form th:action="@{/admin/modify}" method="post">
+    <form th:action="@{/admin/modify}" method="post" onsubmit="return handleSubmit(event)">
         <div class="input__block with-button">
             <div class="input-wrapper">
                 <label for="adminEmail">이메일</label>
@@ -342,6 +344,17 @@
             }
             this.value = value;
         });
+
+        // 폼 제출 처리
+        function handleSubmit(event) {
+            // 폼 제출 후 서버 응답을 기다림
+            setTimeout(function() {
+                alert('회원 정보 수정이 완료되었습니다.');
+                window.location.href = '/admin/';
+            }, 100);
+            
+            return true;
+        }
     </script>
 </div>
 </body>

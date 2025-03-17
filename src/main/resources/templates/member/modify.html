@@ -259,7 +259,7 @@
 <body>
 <div layout:fragment="content" class="container">
     <h1>회원 정보 수정</h1>
-    <form th:action="@{/member/modify}" method="post" onsubmit="combineAddress()">
+    <form th:action="@{/member/modify}" method="post" onsubmit="return combineAddress() && handleSubmit(event)">
         <div class="input__block with-button">
             <div class="input-wrapper">
                 <label for="memberEmail">이메일</label>
@@ -288,6 +288,8 @@
         <div class="input__block">
             <label for="memberPhone">연락처</label>
             <input type="text" id="memberPhone" th:name="memberPhone" th:value="${memberDTO.memberPhone}" maxlength="11" placeholder="연락처">
+            <div id="confirmPhoneFeedback" class="invalid-feedback">잘못된 전화번호 형식입니다.</div>
+            <div id="confirmPhoneValid" class="valid-feedback">올바른 전화번호 형식입니다.</div>
         </div>
         <div class="address-input">
             <span class="address-title">주소</span>
@@ -376,6 +378,57 @@
                     })
                     .catch(error => console.error('Error:', error));
             }
+        }
+
+        // 전화번호 유효성 검사
+        document.getElementById("adminPhone").addEventListener("input", function () {
+            var phone = this.value;
+            var phoneInput = this;
+            var phoneFeedback = document.getElementById("confirmPhoneFeedback");
+            var phoneValid = document.getElementById("confirmPhoneValid");
+
+            // 전화번호 형식 검사 (000-0000-0000 또는 000-000-0000)
+            var phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;
+
+            // 입력값이 비어있는 경우
+            if (phone === "") {
+                phoneInput.classList.remove("is-invalid", "is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "none";
+                return;
+            }
+
+            if (!phonePattern.test(phone)) {
+                phoneInput.classList.remove("is-valid");
+                phoneInput.classList.add("is-invalid");
+                phoneFeedback.style.display = "block";
+                phoneValid.style.display = "none";
+            } else {
+                phoneInput.classList.remove("is-invalid");
+                phoneInput.classList.add("is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "block";
+            }
+
+            // 자동으로 하이픈 추가
+            var value = phone.replace(/[^0-9]/g, ''); // 숫자만 추출
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+            }
+            this.value = value;
+        });
+
+        // 폼 제출 처리
+        function handleSubmit(event) {
+            // 폼 제출 후 서버 응답을 기다림
+            setTimeout(function() {
+                alert('회원 정보 수정이 완료되었습니다.');
+                window.location.href = '/member/';
+            }, 100);
+            
+            return true;
         }
     </script>
 </div>

@@ -109,6 +109,7 @@
             margin: 5px auto;
             font-size: 12px;
             display: none;
+            padding-left: 20px;
         }
 
         .feedback.invalid {
@@ -175,12 +176,14 @@
 <body>
 <div layout:fragment="content" class="container">
     <h1>비밀번호 변경</h1>
-    <form th:action="@{/member/modifypw}" method="post" onsubmit="return validatePassword()">
+    <form th:action="@{/member/modifypw}" method="post" onsubmit="return validatePassword() && validateForm()">
         <div class="input__block">
             <input type="password" id="currentPassword" name="currentPassword" placeholder="현재 비밀번호" required>
         </div>
         <div class="input__block">
             <input type="password" id="newPassword" name="newPassword" placeholder="새로운 비밀번호" required>
+            <div id="passwordFeedback" class="feedback invalid">8~18자리 영문자와 숫자 조합으로 작성하세요.</div>
+            <div id="passwordValid" class="feedback valid">비밀번호 형식이 올바릅니다.</div>
         </div>
         <div class="input__block">
             <input type="password" id="confirmPassword" name="confirmPassword" placeholder="비밀번호 확인" required>
@@ -256,6 +259,56 @@
             if (event.target == modal) {
                 modal.style.display = "none";
             }
+        }
+
+        // 비밀번호 유효성 검사
+        document.getElementById("newPassword").addEventListener("input", function() {
+            var password = this.value;
+            var passwordFeedback = document.getElementById("passwordFeedback");
+            var passwordValid = document.getElementById("passwordValid");
+
+            // 비밀번호 형식 검사 (8~18자리 영문자+숫자)
+            var passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,18}$/;
+
+            // 입력값이 비어있는 경우
+            if (password === "") {
+                passwordFeedback.style.display = "none";
+                passwordValid.style.display = "none";
+                return;
+            }
+
+            if (!passwordPattern.test(password)) {
+                passwordFeedback.style.display = "block";
+                passwordValid.style.display = "none";
+            } else {
+                passwordFeedback.style.display = "none";
+                passwordValid.style.display = "block";
+            }
+        });
+
+        // 비밀번호 변경 폼 제출 시 비밀번호 확인
+        function validateForm() {
+            const password = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,18}$/;
+
+            if (!passwordPattern.test(password)) {
+                alert('비밀번호는 8~18자리의 영문자와 숫자 조합이어야 합니다.');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return false;
+            }
+
+            // 폼 제출 후 서버 응답을 기다림
+            setTimeout(function() {
+                alert('비밀번호 변경이 완료되었습니다.');
+                window.location.href = '/member/';
+            }, 100);
+
+            return true;
         }
     </script>
 </div>

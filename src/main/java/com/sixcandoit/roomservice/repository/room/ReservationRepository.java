@@ -18,7 +18,7 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Integer> {
 
     // 회원이 체크인한 예약건 찾기
-    @Query("select r from ReservationEntity r where r.resStatus = '2' and r.memberJoin.idx = :idx")
+    @Query("select r from ReservationEntity r where r.resStatus = '3' and r.memberJoin.idx = :idx")
     ReservationEntity findCheckInRes(Integer idx);
 
     //입력한 2개의 날짜가 시작날짜에 속하는 값을 조회
@@ -92,5 +92,21 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
            "AND org.idx = :organ_idx " +
            "ORDER BY r.startDate DESC")
     List<ReservationEntity> findByMemberEmailAndOrganization(@Param("memberEmail") String memberEmail, @Param("organ_idx") Integer organ_idx);
+
+    @Query("SELECT r FROM ReservationEntity r " +
+           "WHERE r.roomJoin.organizationJoin.idx = :organ_idx " +
+           "AND r.resStatus = '3' " +
+           "ORDER BY r.startDate DESC")
+    List<ReservationEntity> findCurrentlyOccupiedRooms(
+            @Param("organ_idx") Integer organ_idx);
+
+    // Debug query to check reservation status
+    @Query("SELECT r.idx, r.resStatus, r.roomJoin.roomName, r.startDate " +
+           "FROM ReservationEntity r " +
+           "WHERE r.roomJoin.organizationJoin.idx = :organ_idx")
+    List<Object[]> findReservationStatusByOrgan(@Param("organ_idx") Integer organ_idx);
+
+    // 예약 상태로 예약 조회
+    List<ReservationEntity> findByResStatus(String resStatus);
 
 }

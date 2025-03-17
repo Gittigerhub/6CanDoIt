@@ -127,7 +127,6 @@
 
             <!-- 수정/취소 버튼 시작 -->
             <div class="d-flex justify-content-end mt-5">
-                <button type="button" class="btn btn-outline-secondary" th:onclick="|location.href='/room/main?organ_idx=' + ${organ.idx}|">룸 관리</button>
                 <button type="button" class="btn btn-outline-secondary ms-2" id="btn-update" th:data-id="${organ.idx}">수정</button>
             </div>
             <!-- 수정/취소 버튼 끝 -->
@@ -749,10 +748,8 @@
                                 <div class="col-3">
                                     <div class="form-group form-group-default">
                                         <label>*분류 :</label>
-                                        <select id="searchType2" name="searchType" class="form-select" required>
-                                            <option value="HO">본사</option>
-                                            <option value="BO">지사</option>
-                                        </select>
+                                        <input type="hidden" id="searchType2" name="searchType" class="form-control" value="BO">
+                                        <input type="text" value="본사" class="form-control" readonly>
                                     </div>
                                 </div>
                                 <!-- 연관 조직 명칭 -->
@@ -954,7 +951,7 @@
 
                             <!-- 조직 사진 -->
                             <div class="col-sm-12 mt-2">
-                                <div class="form-group form-group-default" id="inputImage23">
+                                <div class="form-group form-group-default" id="inputImage4">
                                     <label>*이미지 :</label>
                                     <input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">
                                 </div>
@@ -1385,25 +1382,25 @@
             });
 
             // 이미지 추가 버튼 클릭했을 때
-            $("#addImage").on('click', function() {
+            $("#addImage3").on('click', function() {
 
                 // 이미지 추가 함수
-                addImageInput();
+                addImageInput2();
 
             });
 
             // 이미지 추가
-            function addImageInput() {
-                const container = document.getElementById('inputImage2');
+            function addImageInput2() {
+                const container = document.getElementById('inputImage4');
                 const newInputDiv = document.createElement('div');
                 newInputDiv.innerHTML = '<input name="imageFiles" type="file" class="form-control mt-2" accept="image/*">';
                 container.appendChild(newInputDiv);
             }
 
             // 이미지 input 초기화
-            function resetImageInput() {
+            function resetImageInput2() {
                 const input = document.querySelector('input[name="imageFiles"]');
-                const container2 = document.getElementById('inputImage2');
+                const container2 = document.getElementById('inputImage4');
 
                 // 파일 선택 초기화
                 if (input) {
@@ -1502,7 +1499,7 @@
             $("#btn-update").on("click", function () {
 
                 // 이미지 추가창 리셋 함수
-                resetImageInput();
+                resetImageInput2();
 
                 // 조직 idx
                 var idx = $(this).data("id");

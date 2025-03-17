@@ -189,4 +189,11 @@ public class AdvertisementController {
         }
     }
 
+    // GET 방식으로 idx 파라미터를 받아 조회수 증가 처리
+    @GetMapping("/hitsUp")
+    public ResponseEntity<String> increaseHits(@RequestParam("idx") Integer idx) {
+        advertisementService.adHitsUp(idx);
+        return ResponseEntity.ok("조회수 증가 완료");
+    }
+
 }

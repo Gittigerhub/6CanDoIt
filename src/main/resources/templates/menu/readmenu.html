@@ -21,118 +21,163 @@
                     <div class="card-body">
                         <h2>메뉴 세부</h2>
                     </div>
+
+                    <!-- menuIdx값을 담는 hidden input -->
+                    <input type="hidden" id="menuIdxInput" name="menuIdx" th:value="${menuDTO.idx}">
+
                     <!--id와 name은 DTO에 변수명으로 작업-->
                     <div class="card-body">
-                        <div class="mb-3">
-                            <label for="menuCategory" class="form-label">카테고리:</label>
-                            <input type="text" class="form-control" id="menuCategory" name="menuCategory"
-                                   th:value="${T(com.sixcandoit.roomservice.constant.MenuCategory).valueOf(menuDTO.menuCategory).name()}" readonly>
-                            <p th:if="${#fields.hasErrors('menuCategory')}" th:errors="*{menuCategory}" class="fieldError"></p>
-                        </div>
-                        <div class="mb-3">
-                            <label for="menuName" class="form-label">메뉴명:</label>
-                            <input type="text" class="form-control" id="menuName" name="menuName" th:field="*{menuName}" required disabled>
-                            <p th:if="${#fields.hasErrors('menuName')}" th:errors="*{menuName}" class="fieldError"></p>
-                        </div>
-                        <div class="mb-3">
-                            <label for="menuContent" class="form-label">설명:</label>
-                            <textarea class="form-control" id="menuContent" rows="3" name="menuContent" th:field="*{menuContent}" disabled></textarea>
-                            <p th:if="${#fields.hasErrors('menuContent')}" th:errors="*{menuContent}" class="fieldError"></p>
-                        </div>
-                        <div class="mb-3">
-                            <div class="imgA">
-                                <div style="display: flex; flex-wrap: wrap; padding: 20px;">
-                                    <!-- 대표 이미지가 없을때 나오는 이미지 -->
-                                    <div style="flex-basis: 100%; text-align: left">
-                                        <th:block th:if="${!hasRepImage}">
-                                            <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+
+                        <div class="row">
+                            <!-- 메뉴 이름 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*메뉴 이름 :</label>
+                                    <input id="menuName" name="menuName" th:value="${menuDTO.menuName}" type="text" class="form-control" disabled/>
+                                </div>
+                            </div>
+
+                            <!-- 카테고리 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*카테고리 :</label>
+                                    <input id="menuCategory" name="menuCategory" th:value="${menuDTO.menuCategory.displayName}" type="text" class="form-control" disabled/>
+                                </div>
+                            </div>
+
+                            <!-- 메뉴 설명 -->
+                            <div class="col-sm-12 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*메뉴 설명 :</label>
+                                    <input id="menuContent" name="menuContent" th:value="${menuDTO.menuContent}" type="text" class="form-control" disabled/>
+                                </div>
+                            </div>
+
+                            <!-- 이미지 -->
+                            <div class="mb-3">
+                                <div class="imgA">
+                                    <div style="display: flex; flex-wrap: wrap; padding: 20px;">
+                                        <!-- 대표 이미지가 없을때 나오는 이미지 -->
+                                        <div style="flex-basis: 100%; text-align: left">
+                                            <th:block th:if="${!hasRepImage}">
+                                                <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" src="https://sixcandoitimage.s3.ap-northeast-2.amazonaws.com/images/noimage.jpg" alt="noimage">
+                                            </th:block>
+                                        </div>
+                                        <!-- 이미지 -->
+                                        <th:block th:each="data:${imageFileDTOList}" th:if="${!hasRepImage}">
+                                            <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                                <div>
+                                                    <label class="form-label">대표 메뉴 이미지:</label>
+                                                    <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                                        <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" alt="대표 이미지">
+                                                        <div>
+                                                            <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>
+                                                        </div>
+                                                    </th:block>
+                                                </div>
+                                            </th:block>
+                                        </th:block>
+
+                                        <!-- 대표 이미지가 있을때 나오는 이미지 -->
+                                        <th:block th:each="data:${imageFileDTOList}" th:if="${hasRepImage}">
+                                            <!-- 대표 이미지 -->
+                                            <th:block th:if="${data.getRepimageYn()} == 'Y'">
+                                                <div style="flex-basis: 100%; text-align: left">
+                                                    <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
+                                                </div>
+                                            </th:block>
+                                        </th:block>
+                                        <th:block th:each="data:${imageFileDTOList}" th:if="${hasRepImage}">
+                                            <!-- 이미지 -->
+                                            <th:block th:unless="${data.getRepimageYn()} == 'Y'">
+                                                <div>
+                                                    <label class="form-label">추가 메뉴 이미지:</label>
+                                                    <img class="menuImg" style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" alt="추가 이미지">
+                                                </div>
+                                            </th:block>
                                         </th:block>
                                     </div>
-                                    <!-- 이미지 -->
-                                    <th:block th:each="data:${imageFileDTOList}" th:if="${!hasRepImage}">
-                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                            <div>
-                                                <label class="form-label">대표 메뉴 이미지:</label>
-                                                <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                                    <img style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" alt="대표 이미지">
-<!--                                                    <div>-->
-<!--                                                        <button type="button" class="btn btn-danger deleteBtn mb-4" th:value="${data.idx}">삭제</button>-->
-<!--                                                    </div>-->
-                                                </th:block>
-                                            </div>
-                                        </th:block>
-                                    </th:block>
+                                </div>
+                            </div>
 
-                                    <!-- 대표 이미지가 있을때 나오는 이미지 -->
-                                    <th:block th:each="data:${imageFileDTOList}" th:if="${hasRepImage}">
-                                        <!-- 대표 이미지 -->
-                                        <th:block th:if="${data.getRepimageYn()} == 'Y'">
-                                            <div style="flex-basis: 100%; text-align: left">
-                                                <img style="width: 300px; height: 300px; object-fit: cover; margin: 10px" th:src="${data.url}" th:alt="${data.originName}">
-                                            </div>
-                                        </th:block>
+                            <!-- 메뉴 가격 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*메뉴 가격 :</label>
+                                    <input id="menuPrice" name="menuPrice" th:value="${menuDTO.menuPrice}" type="text" class="form-control" disabled/>
+                                </div>
+                            </div>
+
+                            <!-- 옵션 여부 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*옵션 여부 :</label>
+                                    <input name="menuOptionYn" type="text" class="form-control" disabled
+                                           th:value="${menuDTO.menuOptionYn == 'Y' ? '옵션 있음' : '옵션 없음'}"/>
+                                </div>
+                            </div>
+
+                            <!-- 활성화 유무 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*활성화 유무 :</label>
+                                    <input id="activeYn" name="activeYn" type="text" class="form-control" disabled
+                                           th:value="${menuDTO.activeYn == 'Y' ? '활성화' : '비활성화'}"/>
+                                </div>
+                            </div>
+
+                            <!-- 세일 여부 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*세일 여부 :</label>
+                                    <input id="menuSalesYn" name="menuSalesYn" type="text" class="form-control" disabled
+                                           th:value="${menuDTO.menuSalesYn == 'Y' ? '세일중' : '세일 없음'}"/>
+                                </div>
+                            </div>
+
+                            <!-- 할인 구분 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*할인 구분 :</label>
+                                    <th:block th:if="${menuDTO.menuSaleType == 'NONE'}">
+                                        <input name="menuSaleType" type="text" class="form-control" value="없음" disabled/>
                                     </th:block>
-                                    <th:block th:each="data:${imageFileDTOList}" th:if="${hasRepImage}">
-                                        <!-- 이미지 -->
-                                        <th:block th:unless="${data.getRepimageYn()} == 'Y'">
-                                            <div>
-                                                <label class="form-label">추가 메뉴 이미지:</label>
-                                                <img class="menuImg" style="width: 200px; height: 200px; object-fit: cover; margin: 10px" th:src="${data.url}" alt="추가 이미지">
-                                            </div>
-                                        </th:block>
+                                    <th:block th:if="${menuDTO.menuSaleType == 'AMOUNT'}">
+                                        <input name="menuSaleType" type="text" class="form-control" value="할인액" disabled/>
+                                    </th:block>
+                                    <th:block th:if="${menuDTO.menuSaleType == 'PERSENT'}">
+                                        <input name="menuSaleType" type="text" class="form-control" value="할인율" disabled/>
                                     </th:block>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="menuOptionYn" class="form-label">메뉴 옵션</label>
-                            <input type="text" class="form-control" th:value="${menuDTO.menuOptionYn == 'Y' ? '있음' : '없음'}" id="menuOptionYn" disabled>
-                        </div>
-                        <div class="mb-3">
-                            <label for="menuPrice" class="form-label">가격:</label>
-                            <input class="form-control" id="menuPrice" rows="3" name="menuPrice" th:field="*{menuPrice}" disabled>
-                            <p th:if="${#fields.hasErrors('menuPrice')}" th:errors="*{menuPrice}" class="fieldError"></p>
-                        </div>
-                        <div class="mb-3">
-                            <label for="activeYn" class="form-label">판매 상태</label>
-                            <input type="text" class="form-control" th:value="${menuDTO.activeYn == 'Y' ? '활성' : '비활성'}" id="activeYn" disabled>
-                        </div>
-                        <!-- 세일 여부 -->
-                        <div class="mb-3">
-                            <label for="menuSalesYn" class="form-label">세일</label>
-                            <input type="text" class="form-control" th:value="${menuDTO.menuSalesYn == 'Y' ? '적용' : '안함'}" id="menuSalesYn" disabled>
-                        </div>
 
-                        <!-- 할인구분 -->
-                        <div class="mb-3">
-                            <label for="menuSaleType" class="form-label">할인구분</label>
-                            <input type="text" class="form-control" th:value="${menuDTO.menuSaleType}" id="menuSaleType" disabled>
-                        </div>
+                            <!-- 원가 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*원가 :</label>
+                                    <input id="originPrice" name="originPrice" th:value="${menuDTO.originPrice}" type="text" class="form-control" disabled/>
+                                </div>
+                            </div>
 
-                        <!-- 원가 -->
-                        <div class="mb-3">
-                            <label for="originPrice" class="form-label">원가:</label>
-                            <input type="text" class="form-control" th:value="${menuDTO.originPrice}" id="originPrice" disabled>
-                        </div>
+                            <!-- 할인액 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*할인액 :</label>
+                                    <input id="menuSaleAmount" name="menuSaleAmount" th:value="${menuDTO.menuSaleAmount}" type="text" class="form-control" disabled/>
+                                </div>
+                            </div>
 
-                        <!-- 할인액 -->
-                        <div class="mb-3">
-                            <label for="menuSaleAmount" class="form-label">할인액:</label>
-                            <input type="text" class="form-control" th:value="${menuDTO.menuSaleAmount}" id="menuSaleAmount" disabled>
-                        </div>
+                            <!-- 할인율 -->
+                            <div class="col-sm-6 mt-2">
+                                <div class="form-group form-group-default">
+                                    <label>*할인율 :</label>
+                                    <input id="menuSalePercent" name="menuSalePercent" th:value="${menuDTO.menuSalePercent}" type="text" class="form-control" disabled/>
+                                </div>
+                            </div>
 
-                        <!-- 할인율 -->
-                        <div class="mb-3">
-                            <label for="menuSalePercent" class="form-label">할인율:</label>
-                            <input type="text" class="form-control" th:value="${menuDTO.menuSalePercent}" id="menuSalePercent" disabled>
-                        </div>
-
-
-                        <div class="col-12">
-<!--                            <button type="button" class="btn btn-warning"-->
-<!--                                    th:onclick="|location.href='/admin/menu/updatemenu?idx='+ ${menuDTO.idx}|">수정</button>-->
-                            <button type="button" class="btn btn-primary"
-                                    th:onclick="|location.href='/member/menu/listmenu'|">목록</button>
+                            <div class="col-12 text-end mt-5">
+                                <button type="button" class="btn btn-outline-secondary" th:onclick="|location.href='/member/menu/listmenu'|">목록</button>
+                            </div>
                         </div>
                     </div>
                 </div>

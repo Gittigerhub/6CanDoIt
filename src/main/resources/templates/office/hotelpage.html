@@ -321,7 +321,7 @@
         <!-- 호텔 리스트 -->
         <div class="row">
             <!-- 호텔 카드 반복 -->
-            <div th:each="hotel:${organDTO}" class="col-md-3 mb-4">
+            <div th:each="hotel:${organDTO}" th:if="${hotel.activeYn == 'Y'}" class="col-md-3 mb-4">
                 <div class="card h-100">
                     <!-- 이미지 시작 -->
                     <!-- 대표 이미지가 없을때 나오는 이미지 -->

@@ -52,7 +52,6 @@ public class MenuService {
     private final ImageFileService imageFileService;
     private final ShopDetailService shopDetailService;
 
-
     // 회원 찾아서 예약건 찾아오기
     public OrganizationDTO findMemberRes(String email) {
 
@@ -224,14 +223,24 @@ public class MenuService {
             // 2. Repository에서 enum조회를 위한 category enum타입으로 변환
             MenuCategory categoryEnum = MenuCategory.valueOf(category);
 
+            System.out.println(categoryEnum);
+            System.out.println(category);
+            System.out.println(organIdx);
+
             // 3. 조회
             // 조회 결과를 저장할 변수 선언
             Page<MenuEntity> menuEntities = menuRepository.selectCate(categoryEnum, organIdx, pageable);
+
+            MenuEntity menu = menuEntities.getContent().get(0);
+            System.out.println(menu);
 
             // 4. 조회한 결과를 HTML에서 사용할 DTO로 변환
             // Entity를 dTO로 변환 후 저장
             Page<MenuDTO> menuDTOS = menuEntities.map(
                     data -> modelMapper.map(data, MenuDTO.class));
+
+            System.out.println("반환하기 전");
+            System.out.println(organIdx);
 
             // 5. 결과값을 전달
             return menuDTOS;

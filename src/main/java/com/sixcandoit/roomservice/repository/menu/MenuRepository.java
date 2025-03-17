@@ -38,7 +38,7 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Integer> {
 
     // 목록 카테고리 선택
     @Query("SELECT u FROM MenuEntity u WHERE u.menuCategory = :categoryEnum and u.organizationJoin.idx = :organIdx")
-    Page<MenuEntity> selectCate(@Param("categoryEnum") MenuCategory categoryEnum, Integer organIdx, Pageable page);
+    Page<MenuEntity> selectCate(@Param("categoryEnum") MenuCategory categoryEnum,@Param("organIdx") Integer organIdx, Pageable page);
 
     //전체
     @Query("SELECT u From MenuEntity u WHERE " +

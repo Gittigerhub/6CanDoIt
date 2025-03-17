@@ -109,7 +109,7 @@
                                 <tr>
                                     <th style="width: 10%">주문번호</th>
                                     <th style="width: 15%">주문자</th>
-                                    <th style="width: 15%">객실번호</th>
+                                    <th style="width: 15%">객실명</th>
                                     <th style="width: 15%">주문상태</th>
                                     <th style="width: 20%">주문일시</th>
                                     <th style="width: 15%">상태변경</th>
@@ -121,6 +121,7 @@
                                 <tr th:each="order : ${orders}">
                                     <td style="vertical-align: middle;" th:text="${order.idx}"></td>
                                     <td style="vertical-align: middle;" th:text="${order.memberName}"></td>
+                                    <td style="vertical-align: middle;" th:text="${order.roomName}"></td>
                                     <td style="vertical-align: middle;">
                                         <span th:text="${order.ordersStatus}"
                                               th:class="'order-status status-' + ${order.ordersStatus}">
@@ -140,7 +141,7 @@
                                         </select>
                                     </td>
                                     <td style="vertical-align: middle;">
-                                        <a th:href="@{/admin/orders/adordersRead/{orderIdx}(orderIdx=${order.idx})}"
+                                        <a th:href="@{/admin/orders/adordersRead/{orderIdx}(orderIdx=${order.idx}, organ_idx=${organ_idx})}"
                                            class="btn btn-sm btn-info">상세보기</a>
                                     </td>
                                 </tr>

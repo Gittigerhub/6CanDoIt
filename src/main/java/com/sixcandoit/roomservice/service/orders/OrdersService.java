@@ -1,6 +1,8 @@
 package com.sixcandoit.roomservice.service.orders;
 
 import com.sixcandoit.roomservice.constant.OrdersStatus;
+import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
+import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersHistDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersMenuDTO;
@@ -23,12 +25,14 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -287,8 +291,56 @@ public class OrdersService {
 
             //3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             //Entity를 DTO로 변환 후 저장
-            Page<OrdersHistDTO> ordersHistDTOS = ordersEntities.map(
-                    data -> modelMapper.map(data, OrdersHistDTO.class));
+            // ModelMapper에서 명시적으로 매핑 규칙을 설정하여 변환
+            Page<OrdersHistDTO> ordersHistDTOS = ordersEntities.map(entity -> {
+                OrdersHistDTO dto = new OrdersHistDTO();
+                
+                // 기본 필드 직접 매핑
+                dto.setIdx(entity.getIdx());
+                dto.setOrdersPaymentType(entity.getOrdersPaymentType());
+                dto.setOrdersStatus(entity.getOrdersStatus());
+                dto.setOrdersPhone(entity.getOrdersPhone());
+                dto.setOrdersMemo(entity.getOrdersMemo());
+                dto.setInsDate(entity.getInsDate());
+                dto.setMemberName(entity.getMemberJoin().getMemberName());
+                dto.setMemberJoin(modelMapper.map(entity.getMemberJoin(), MemberDTO.class));
+
+                // 주문자의 체크인된 예약 정보 조회
+                ReservationEntity reservationEntity = reservationRepository.CheckInReserv(entity.getMemberJoin().getIdx())
+                    .orElse(null);
+
+                // 예약 정보가 있다면 객실 정보 설정
+                if (reservationEntity != null && reservationEntity.getRoomJoin() != null) {
+                    dto.setRoomName(reservationEntity.getRoomJoin().getRoomName());
+                }
+
+                // ordersMenuJoin이 null이 아닐 때만 변환
+                if (entity.getOrdersMenuJoin() != null) {
+                    List<OrdersMenuDTO> ordersMenuDTOList = entity.getOrdersMenuJoin().stream()
+                        .map(menuEntity -> {
+                            OrdersMenuDTO menuDTO = new OrdersMenuDTO();
+                            menuDTO.setIdx(menuEntity.getIdx());
+                            menuDTO.setCount(menuEntity.getCount());
+                            
+                            // MenuDTO 정보 설정
+                            MenuDTO menuInfo = modelMapper.map(menuEntity.getMenuJoin(), MenuDTO.class);
+                            menuDTO.setMenuJoin(menuInfo);
+                            menuDTO.setOrdersJoin(null);
+                            
+                            return menuDTO;
+                        })
+                        .collect(Collectors.toList());
+                    dto.setOrdersMenuDTOList(ordersMenuDTOList);
+
+                    // 총 주문 금액 계산
+                    int totalAmount = ordersMenuDTOList.stream()
+                        .mapToInt(menuDTO -> menuDTO.getMenuJoin().getMenuPrice() * menuDTO.getCount())
+                        .sum();
+                    dto.setTotalAmount(totalAmount);
+                }
+
+                return dto;
+            });
 
             //4. 결과값을 전달
             return ordersHistDTOS;
@@ -319,7 +371,53 @@ public class OrdersService {
         OrdersEntity ordersEntity = ordersRepository.findByIdx(orderIdx)
                 .orElseThrow(() -> new EntityNotFoundException("해당 주문을 찾을 수 없습니다."));
 
-        return modelMapper.map(ordersEntity, OrdersHistDTO.class);
+        OrdersHistDTO dto = new OrdersHistDTO();
+        
+        // 기본 필드 직접 매핑
+        dto.setIdx(ordersEntity.getIdx());
+        dto.setOrdersPaymentType(ordersEntity.getOrdersPaymentType());
+        dto.setOrdersStatus(ordersEntity.getOrdersStatus());
+        dto.setOrdersPhone(ordersEntity.getOrdersPhone());
+        dto.setOrdersMemo(ordersEntity.getOrdersMemo());
+        dto.setInsDate(ordersEntity.getInsDate());
+        dto.setMemberName(ordersEntity.getMemberJoin().getMemberName());
+        dto.setMemberJoin(modelMapper.map(ordersEntity.getMemberJoin(), MemberDTO.class));
+
+        // 주문자의 체크인된 예약 정보 조회
+        ReservationEntity reservationEntity = reservationRepository.CheckInReserv(ordersEntity.getMemberJoin().getIdx())
+            .orElse(null);
+
+        // 예약 정보가 있다면 객실 정보 설정
+        if (reservationEntity != null && reservationEntity.getRoomJoin() != null) {
+            dto.setRoomName(reservationEntity.getRoomJoin().getRoomName());
+        }
+
+        // ordersMenuJoin이 null이 아닐 때만 변환
+        if (ordersEntity.getOrdersMenuJoin() != null) {
+            List<OrdersMenuDTO> ordersMenuDTOList = ordersEntity.getOrdersMenuJoin().stream()
+                .map(menuEntity -> {
+                    OrdersMenuDTO menuDTO = new OrdersMenuDTO();
+                    menuDTO.setIdx(menuEntity.getIdx());
+                    menuDTO.setCount(menuEntity.getCount());
+                    
+                    // MenuDTO 정보 설정
+                    MenuDTO menuInfo = modelMapper.map(menuEntity.getMenuJoin(), MenuDTO.class);
+                    menuDTO.setMenuJoin(menuInfo);
+                    menuDTO.setOrdersJoin(null);
+                    
+                    return menuDTO;
+                })
+                .collect(Collectors.toList());
+            dto.setOrdersMenuJoin(ordersMenuDTOList);
+
+            // 총 주문 금액 계산
+            int totalAmount = ordersMenuDTOList.stream()
+                .mapToInt(menuDTO -> menuDTO.getMenuJoin().getMenuPrice() * menuDTO.getCount())
+                .sum();
+            dto.setTotalAmount(totalAmount);
+        }
+
+        return dto;
     }
 
     // 4. 관리자용 상태별 주문 목록 조회

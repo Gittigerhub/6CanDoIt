@@ -106,12 +106,13 @@ public class AdminOrdersController {
    ----------------------------------------------------------------------------- */
     //3. 주문 상세 정보 조회
     @GetMapping("/orders/adordersRead/{orderIdx}")
-    public String readOrder(@PathVariable Integer orderIdx, Model model) {
+    public String readOrder(@PathVariable Integer orderIdx, Model model, @RequestParam(required = false) Integer organ_idx) {
         log.info("주문 상세 정보 조회:", orderIdx);
 
         try {
             OrdersHistDTO ordersHistDTO = ordersService.getAdminOrderDetail(orderIdx);
             model.addAttribute("orders", ordersHistDTO);
+            model.addAttribute("organ_idx", organ_idx);
             return "orders/adordersRead";
         } catch (Exception e) {
             return "redirect:/admin/orders/adordersList";

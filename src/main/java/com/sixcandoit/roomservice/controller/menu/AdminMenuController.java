@@ -55,6 +55,14 @@ public class AdminMenuController {
     private final AdminService adminService;
     private final OrganizationService organizationService;
 
+
+
+    /* -----------------------------------------------------------------------------
+      경로 : /menu/ho/registermenu
+      인수 : Model model, Principal principal
+      출력 : 메뉴 등록 화면
+      설명 : 로그인 상태를 확인한 후 호텔 메뉴 등록 화면을 반환
+  ----------------------------------------------------------------------------- */
     //아이템 등록
     @GetMapping("/menu/ho/registermenu")
     public String registerHOMenu(Model model, Principal principal) {
@@ -76,6 +84,14 @@ public class AdminMenuController {
         return "menu/horegistermenu";
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/bo/registermenu
+       인수 : Model model, Principal principal
+       출력 : 메뉴 등록 화면
+       설명 : 로그인 상태를 확인한 후 BO 메뉴 등록 화면을 반환
+   ----------------------------------------------------------------------------- */
     @GetMapping("/menu/bo/registermenu")
     public String registerBOMenu(Model model, Principal principal) {
 
@@ -96,6 +112,15 @@ public class AdminMenuController {
         return "menu/boregistermenu";
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/hop/registermenu
+       인수 : @Valid MenuDTO menuDTO, BindingResult bindingResult, List<MultipartFile> imageFiles,
+             Model model, Principal principal
+       출력 : 아이템 등록 후 리다이렉트
+       설명 : 메뉴를 등록하고 유효성 검사 후 등록 서비스 실행
+   ----------------------------------------------------------------------------- */
     //아이템 등록
     @PostMapping("/menu/hop/registermenu")
     public String registerHOMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult,
@@ -129,6 +154,15 @@ public class AdminMenuController {
         }
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/bop/registermenu
+       인수 : @Valid MenuDTO menuDTO, BindingResult bindingResult, List<MultipartFile> imageFiles,
+             Model model, Principal principal
+       출력 : 아이템 등록 후 리다이렉트
+       설명 : 메뉴를 등록하고 유효성 검사 후 등록 서비스 실행
+   ----------------------------------------------------------------------------- */
     //아이템 등록
     @PostMapping("/menu/bop/registermenu")
     public String registerBOMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult,
@@ -162,6 +196,14 @@ public class AdminMenuController {
         }
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+     경로 : /menu/ho/adreadmenu
+     인수 : Integer menuidx, Integer organIdx, Model model, RedirectAttributes redirectAttributes
+     출력 : 메뉴 정보 화면
+     설명 : 메뉴 정보를 조회하고, 해당 정보를 화면에 표시
+ ----------------------------------------------------------------------------- */
     //메뉴 목록 확인
     @GetMapping("/menu/ho/adreadmenu")
     public String readHOMenu(@RequestParam(required = false) Integer menuidx,
@@ -211,6 +253,14 @@ public class AdminMenuController {
         }
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/bo/adreadmenu
+       인수 : Integer menuidx, Integer organIdx, Model model, RedirectAttributes redirectAttributes
+       출력 : 메뉴 정보 화면
+       설명 : 메뉴 정보를 조회하고, 해당 정보를 화면에 표시
+   ----------------------------------------------------------------------------- */
     //메뉴 목록 확인
     @GetMapping("/menu/bo/adreadmenu")
     public String readBOMenu(@RequestParam(required = false) Integer menuidx,
@@ -260,6 +310,14 @@ public class AdminMenuController {
         }
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+      경로 : /menu/ho/adlistmenu
+      인수 : Pageable page, String type, String keyword, Model model, Principal principal
+      출력 : 메뉴 목록 페이지
+      설명 : 메뉴 목록을 페이징하여 검색 기능과 함께 출력
+  ----------------------------------------------------------------------------- */
     //메뉴 목록 확인　｀
     @GetMapping("/menu/ho/adlistmenu")
     public String listHOMenu(@PageableDefault(page = 1) Pageable page, //페이지 정보
@@ -324,6 +382,14 @@ public class AdminMenuController {
 
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/bo/adlistmenu
+       인수 : Pageable page, String type, String keyword, Model model, Principal principal
+       출력 : 메뉴 목록 페이지
+       설명 : 메뉴 목록을 페이징하여 검색 기능과 함께 출력 (호텔 별)
+   ----------------------------------------------------------------------------- */
     //메뉴 목록 확인　｀
     @GetMapping("/menu/bo/adlistmenu")
     public String listBOMenu(@PageableDefault(page = 1) Pageable page, //페이지 정보
@@ -385,6 +451,14 @@ public class AdminMenuController {
 
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/ajax/adlistmenu
+       인수 : String category, Pageable page, Model model, Principal principal
+       출력 : 카테고리별 메뉴 목록 (AJAX)
+       설명 : 카테고리별 메뉴 목록을 반환하는 AJAX 요청 처리
+   ----------------------------------------------------------------------------- */
     //Ajax 요청에 의해 카테고리별 메뉴목록을 반환하는 메소드
     @GetMapping("/menu/ajax/adlistmenu")
     public String ajaxListMenu(@RequestParam(value = "category", defaultValue = "ALL") String category,
@@ -430,6 +504,14 @@ public class AdminMenuController {
         return "menu/adlistmenu :: menulistfragment";
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+      경로 : /menu/ho/updatemenu
+      인수 : Integer menuidx, Model model, Principal principal
+      출력 : 메뉴 수정 페이지
+      설명 : 특정 메뉴 정보를 수정하는 페이지로 이동
+  ----------------------------------------------------------------------------- */
     @GetMapping("/menu/ho/updatemenu")
     public String updateHOMenu(@RequestParam("idx") Integer menuidx, Model model, Principal principal ) {
 
@@ -465,6 +547,14 @@ public class AdminMenuController {
         }
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/bo/updatemenu
+       인수 : Integer menuidx, Model model, Principal principal
+       출력 : 메뉴 수정 페이지
+       설명 : 특정 메뉴 정보를 수정하는 페이지로 이동
+   ----------------------------------------------------------------------------- */
     @GetMapping("/menu/bo/updatemenu")
     public String updateBOMenu(@RequestParam("idx") Integer menuidx, Model model, Principal principal ) {
 
@@ -496,6 +586,14 @@ public class AdminMenuController {
         }
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/ho/updatemenu
+       인수 : MenuDTO menuDTO, BindingResult bindingResult, List<MultipartFile> multipartFile, Model model
+       출력 : 메뉴 수정 후 목록 페이지로 리다이렉트
+       설명 : 메뉴 정보를 업데이트하고 목록 페이지로 리다이렉트
+   ----------------------------------------------------------------------------- */
     @PostMapping("/menu/ho/updatemenu")
     public String updateHOMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult,
                                  List<MultipartFile> multipartFile, Model model) {
@@ -525,6 +623,14 @@ public class AdminMenuController {
 
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+      경로 : /menu/bo/updatemenu
+      인수 : MenuDTO menuDTO, BindingResult bindingResult, List<MultipartFile> multipartFile, Model model
+      출력 : 메뉴 수정 후 목록 페이지로 리다이렉트
+      설명 : 메뉴 정보를 업데이트하고 목록 페이지로 리다이렉트
+  ----------------------------------------------------------------------------- */
     @PostMapping("/menu/bo/updatemenu")
     public String updateBOMenuPost(@Valid MenuDTO menuDTO, BindingResult bindingResult,
                                  List<MultipartFile> multipartFile, Model model) {
@@ -554,6 +660,14 @@ public class AdminMenuController {
 
     }
 
+
+
+    /* -----------------------------------------------------------------------------
+       경로 : /menu/removemenu
+       인수 : Integer idx
+       출력 : 삭제 완료 메시지
+       설명 : 특정 메뉴를 삭제하고 성공 메시지 반환
+   ----------------------------------------------------------------------------- */
     @GetMapping("/menu/removemenu")
     @ResponseBody
     public ResponseEntity<String> removeMenu(@RequestParam Integer idx) {

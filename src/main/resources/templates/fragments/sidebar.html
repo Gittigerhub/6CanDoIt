@@ -175,6 +175,23 @@
 
 
 
+                // 현재 클릭한 메뉴 외 모든 하위 메뉴 닫기
+                document.querySelectorAll('.submenu').forEach(otherSubmenu => {
+                    // 만약 현재 클릭한 메뉴의 하위 메뉴라면 건너뜀
+                    if (submenu && otherSubmenu === submenu) return;
+                    otherSubmenu.style.display = "none";
+                    // 해당 상위 메뉴(active 상태 및 세션 저장)도 초기화
+                    const otherLink = otherSubmenu.previousElementSibling;
+                    if (otherLink) {
+                        otherLink.classList.remove('active');
+                        let currentState = JSON.parse(sessionStorage.getItem('submenuState')) || {};
+                        currentState[otherLink.id] = false;
+                        sessionStorage.setItem('submenuState', JSON.stringify(currentState));
+                    }
+                });
+
+
+
                 // 하위 메뉴 토글
                 // contains = DOM 요소의 클래스 리스트에 특정 클래스를 포함하고 있는지를 확인하는 메서드야.
                 if (submenu && submenu.classList.contains('submenu')) {

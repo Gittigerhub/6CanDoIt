@@ -27,7 +27,9 @@ public class OrdersHistDTO {
 
     private LocalDateTime insDate;           // 주문 일시
 
-    private Integer roomNum;           // 룸 번호
+    private String roomName;           // 룸 이름
+
+    private int totalAmount;           // 총 주문 금액
 
     private MemberDTO memberJoin;
 
@@ -36,6 +38,11 @@ public class OrdersHistDTO {
     private List<OrdersMenuDTO> ordersMenuJoin;
 
     private List<Integer> cartMenuIdxList;
+
+    // setOrdersMenuDTOList 메서드 추가
+    public void setOrdersMenuDTOList(List<OrdersMenuDTO> ordersMenuDTOList) {
+        this.ordersMenuJoin = ordersMenuDTOList;
+    }
 
 }
 // 주문목록에서 값 받아서 오는 DTO

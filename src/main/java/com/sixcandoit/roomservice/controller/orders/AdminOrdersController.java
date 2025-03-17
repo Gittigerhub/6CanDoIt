@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.controller.orders;
 
-import com.sixcandoit.roomservice.constant.OrderStatus;
+import com.sixcandoit.roomservice.constant.OrdersStatus;
 import com.sixcandoit.roomservice.dto.orders.OrdersHistDTO;
 import com.sixcandoit.roomservice.service.orders.OrdersService;
 import com.sixcandoit.roomservice.util.PageNationUtil;
@@ -87,8 +87,8 @@ public class AdminOrdersController {
         log.info("주문 상태 변경", orderIdx, status);
 
         try {
-            OrderStatus newStatus = OrderStatus.valueOf(status);
-            ordersService.updateOrderStatus(orderIdx, newStatus);
+            OrdersStatus newStatus = OrdersStatus.valueOf(status);
+            ordersService.updateOrdersStatus(orderIdx, newStatus);
             return ResponseEntity.ok("주문 상태가 변경 되었습니다.");
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

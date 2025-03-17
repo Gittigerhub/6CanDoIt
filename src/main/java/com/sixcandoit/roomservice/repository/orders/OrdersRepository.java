@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.repository.orders;
 
-import com.sixcandoit.roomservice.constant.OrderStatus;
+import com.sixcandoit.roomservice.constant.OrdersStatus;
 import com.sixcandoit.roomservice.entity.orders.OrdersEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +38,7 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
 
     // 3. 주문상태로 검색
     @Query("SELECT o FROM OrdersEntity o WHERE o.ordersStatus = :status")
-    Page<OrdersEntity> searchByOrderStatus(@Param("status") OrderStatus status, Pageable pageable);
+    Page<OrdersEntity> searchByOrdersStatus(@Param("status") OrdersStatus status, Pageable pageable);
 
     // 4. 전체 검색 (주문번호, 주문자명, 주문상태)
     @Query("SELECT o FROM OrdersEntity o " +
@@ -47,11 +47,11 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
             "OR o.ordersStatus = :status")
     Page<OrdersEntity> searchOrdersAll(@Param("orderIdx") Integer orderIdx,
                                  @Param("keyword") String keyword,
-                                 @Param("status") OrderStatus status,
+                                 @Param("status") OrdersStatus status,
                                  Pageable pageable);
 
     // 5. 특정 상태의 주문 목록 조회
-    Page<OrdersEntity> findByOrdersStatus(OrderStatus status, Pageable pageable);
+    Page<OrdersEntity> findByOrdersStatus(OrdersStatus status, Pageable pageable);
 
     // 6. 특정 기간 내 주문 조회
 //    @Query("SELECT o FROM OrdersEntity o WHERE o.ordersDate BETWEEN :startDate AND :endDate")
@@ -62,7 +62,7 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
 
     // 7. 특정 상태의 주문 수 조회
     @Query("SELECT COUNT(o) FROM OrdersEntity o WHERE o.ordersStatus = :status")
-    Long countByOrdersStatus(@Param("status") OrderStatus status);
+    Long countByOrdersStatus(@Param("status") OrdersStatus status);
 
     // 기관별 주문 조회
     @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE r.roomJoin.organizationJoin.idx = :organ_idx")
@@ -78,6 +78,6 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, Integer> {
 
     // 3. 주문상태와 기관으로 검색
     @Query("SELECT o FROM OrdersEntity o JOIN o.memberJoin.reservationJoin r WHERE o.ordersStatus = :status AND r.roomJoin.organizationJoin.idx = :organ_idx")
-    Page<OrdersEntity> searchByOrderStatusAndOrganIdx(@Param("status") OrderStatus status, @Param("organ_idx") Integer organ_idx, Pageable pageable);
+    Page<OrdersEntity> searchByOrdersStatusAndOrganIdx(@Param("status") OrdersStatus status, @Param("organ_idx") Integer organ_idx, Pageable pageable);
 
 }

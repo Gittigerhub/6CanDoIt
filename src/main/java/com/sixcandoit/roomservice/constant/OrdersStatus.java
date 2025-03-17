@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum OrderStatus {
+public enum OrdersStatus {
 
     NEW("신규") , CHECK("접수") , COOKING("조리 중") ,
     CANCEL("취소") , CLOSE("완료");

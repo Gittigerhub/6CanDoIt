@@ -1,7 +1,7 @@
 package com.sixcandoit.roomservice.entity.orders;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.sixcandoit.roomservice.constant.OrderStatus;
+import com.sixcandoit.roomservice.constant.OrdersStatus;
 import com.sixcandoit.roomservice.entity.base.BaseEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import jakarta.persistence.*;
@@ -31,7 +31,7 @@ public class OrdersEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "orders_status")
-    private OrderStatus ordersStatus;        // 주문 상태(NEW 신규, CHECK 접수, COOKING 조리 중, CANCEL 취소, CLOSE 완료)
+    private OrdersStatus ordersStatus;        // 주문 상태(NEW 신규, CHECK 접수, COOKING 조리 중, CANCEL 취소, CLOSE 완료)
 
     @Column(name = "orders_phone")
     private String ordersPhone;              // 연락받을 연락처

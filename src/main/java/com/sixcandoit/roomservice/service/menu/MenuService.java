@@ -4,18 +4,19 @@ import com.sixcandoit.roomservice.constant.MenuCategory;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
-import com.sixcandoit.roomservice.dto.office.ShopDetailDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
+import com.sixcandoit.roomservice.entity.admin.AdminEntity;
 import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.entity.menu.MenuEntity;
 import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
-import com.sixcandoit.roomservice.entity.office.ShopDetailEntity;
 import com.sixcandoit.roomservice.entity.room.ReservationEntity;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.repository.menu.MenuRepository;
 import com.sixcandoit.roomservice.repository.office.OrganizationRepository;
 import com.sixcandoit.roomservice.repository.office.ShopDetailRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
+import com.sixcandoit.roomservice.service.admin.AdminService;
+import com.sixcandoit.roomservice.service.office.OrganizationService;
 import com.sixcandoit.roomservice.service.office.ShopDetailService;
 import com.sixcandoit.roomservice.service.room.ReservationService;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,7 +46,8 @@ public class MenuService {
     private final ModelMapper modelMapper;
     private final OrganizationRepository organizationRepository;
     private final ShopDetailRepository shopDetailRepository;
-
+    private final OrganizationService organizationService;
+    private final AdminService adminService;
     //이미지 등록할 menuImgService 의존성 추가
     private final ImageFileService imageFileService;
     private final ShopDetailService shopDetailService;
@@ -77,29 +79,36 @@ public class MenuService {
     }
 
     //메뉴 등록
-    public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> multipartFiles,
-                                Integer hotelsId, Integer shopDetailIdx) throws Exception {
+    public Integer menuRegister(MenuDTO menuDTO, List<MultipartFile> imageFiles,
+                                String email) {
 
         try {
-
+            System.out.println(menuDTO.toString());
             // MenuDTO -> MenuEntity로 변환
-            MenuEntity menuEntity = modelMapper.map(menuDTO, MenuEntity.class);
+            MenuEntity menuEntity = new MenuEntity();
+            menuEntity.setMenuCategory(menuDTO.getMenuCategory());
+            menuEntity.setMenuName(menuDTO.getMenuName());
+            menuEntity.setMenuContent(menuDTO.getMenuContent());
+            menuEntity.setMenuPrice(menuDTO.getMenuPrice());
+            menuEntity.setMenuOptionYn(menuDTO.getMenuOptionYn());
+            menuEntity.setActiveYn(menuDTO.getActiveYn());
+            menuEntity.setMenuSalesYn(menuDTO.getMenuSalesYn());
+            menuEntity.setMenuSaleType(menuDTO.getMenuSaleType());
+            menuEntity.setOriginPrice(menuDTO.getOriginPrice());
+            menuEntity.setMenuSaleAmount(menuDTO.getMenuSaleAmount());
+            menuEntity.setMenuSalePercent(menuDTO.getMenuSalePercent());
 
-            // 매장 정보 조회
-            ShopDetailDTO shopDetailDTO = shopDetailService.read(shopDetailIdx);
-            ShopDetailEntity shopDetailEntity = modelMapper.map(shopDetailDTO, ShopDetailEntity.class);
+            // 회원찾기
+            AdminEntity adminEntity = adminService.findByAdminEmail(email);
 
-            // 본사/지사(hotels_id) 조직 정보 조회
-            OrganizationEntity hotelOrganization = organizationRepository.findById(hotelsId)
-                    .orElseThrow(() -> new EntityNotFoundException("해당 본사/지사를 찾을 수 없습니다: " + hotelsId));
+            // 회원값으로 조직 검색
+            OrganizationEntity organization = organizationService.findById(adminEntity.getOrganizationJoin().getIdx())
+                    .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
 
-            // 매장과 본사/지사 정보 설정
-            menuEntity.setShopDetailJoin(shopDetailEntity);
-            menuEntity.setOrganizationJoin(hotelOrganization);  // hotels_id에 해당하는 조직으로 설정
-
+            menuEntity.setOrganizationJoin(organization);
 
             // 이미지 등록
-            List<ImageFileEntity> images = imageFileService.saveImages(multipartFiles);
+            List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
 
             //이미지 정보 추가
             //양방향 연관관계 편의 메서드 사용
@@ -108,21 +117,17 @@ public class MenuService {
             }
             System.out.println("FK 자동 등록");
 
-            //Entity 테이블에 저장
-            imageFileService.saveImages(multipartFiles);
-            System.out.println("진짜 저장됨");
-
             // 메뉴 저장 (DB에 메뉴 정보 저장)
-            menuEntity = menuRepository.save(menuEntity);
+            menuRepository.save(menuEntity);
 
             return menuEntity.getIdx(); // 메뉴의 idx 반환
 
         } catch (Exception e) {   //오류발생시 오류 처리
-            throw new RuntimeException("등록 실패");
+            log.error("메뉴 등록 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("등록 실패", e);
         }
 
     }
-
 
     //메뉴 읽기
     public MenuDTO menuRead(Integer idx) {
@@ -142,7 +147,7 @@ public class MenuService {
     }
 
     //목록 검색
-    public Page<MenuDTO> menuList(Pageable page, String type, String keyword) {
+    public Page<MenuDTO> menuList(Pageable page, String type, String keyword, Integer organIdx) {
         try {
             // 1. 페이지 정보를 재가공
             int currentPage = page.getPageNumber() - 1;  // 화면의 페이지 번호를 db 페이지 번호로
@@ -154,32 +159,7 @@ public class MenuService {
 
             // 2. 조회
             // 조회 결과를 저장할 변수 선언
-            Page<MenuEntity> menuEntities;
-
-            // 여러개를 조회해야 할 땐 if문으로 분류에 따라 조회해야한다.
-            // type : 메뉴명(1), 메뉴설명(2), 메뉴명+메뉴설명(3), 카테고리(4), 전체(0)
-            if (keyword != null && !keyword.isEmpty()) {  //검색어가 존재하면
-                log.info("검색어가 존재하면...");
-                if (type.equals("1")) { //type 분류 1, 메뉴명으로 검색할 때
-                    log.info("메뉴명으로 검색 하는 중...");
-                    menuEntities = menuRepository.searchMenuTitle(keyword, pageable);
-                } else if (type.equals("2")) { //type 분류 2, 메뉴설명으로 검색할 때
-                    log.info("메뉴설명으로 검색 하는 중...");
-                    menuEntities = menuRepository.searchMenuContent(keyword, pageable);
-                } else if (type.equals("3")) { //type 분류 3, 메뉴명+메뉴설명으로 검색할 때
-                    log.info("메뉴명+메뉴설명으로 검색 하는 중...");
-                    menuEntities = menuRepository.searchMenuNameAndMenuContent(keyword, pageable);
-                } else if (type.equals("4")) { //type 분류 4, 카테고리로 검색할 때
-                    log.info("카테고리로 검색 하는 중...");
-                    menuEntities = menuRepository.searchMenuCategory(keyword, pageable);
-                } else { //type 분류 5, 전체로 검색할 때
-                    log.info("전체 조회 검색 중...");
-                    menuEntities = menuRepository.searchMenuAll(keyword, pageable);
-                }
-            }else { //검색어가 존재하지 않으면 모두 검색
-                    menuEntities = menuRepository.findAll(pageable);
-
-            }
+            Page<MenuEntity> menuEntities = menuRepository.AllMenu(pageable, organIdx);
 
             // 3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             //Entity를 dTO로 변환 후 저장
@@ -227,7 +207,10 @@ public class MenuService {
     }
 
     //카테고리 검색
-    public Page<MenuDTO> selectCate(Pageable page, String category) {
+    public Page<MenuDTO> selectCate(Pageable page, String category, Integer organIdx) {
+
+        System.out.println(category);
+        System.out.println(organIdx);
 
         try {
             // 1. 페이지 정보를 재가공
@@ -243,7 +226,7 @@ public class MenuService {
 
             // 3. 조회
             // 조회 결과를 저장할 변수 선언
-            Page<MenuEntity> menuEntities = menuRepository.selectCate(categoryEnum, pageable);
+            Page<MenuEntity> menuEntities = menuRepository.selectCate(categoryEnum, organIdx, pageable);
 
             // 4. 조회한 결과를 HTML에서 사용할 DTO로 변환
             // Entity를 dTO로 변환 후 저장
@@ -269,7 +252,17 @@ public class MenuService {
                             .orElseThrow(EntityNotFoundException::new);
 
             // ModelMapper를 사용하여 DTO의 데이터를 엔티티에 반영
-            modelMapper.map(menuDTO, menuEntity);
+            menuEntity.setMenuCategory(menuDTO.getMenuCategory());
+            menuEntity.setMenuName(menuDTO.getMenuName());
+            menuEntity.setMenuContent(menuDTO.getMenuContent());
+            menuEntity.setMenuPrice(menuDTO.getMenuPrice());
+            menuEntity.setMenuOptionYn(menuDTO.getMenuOptionYn());
+            menuEntity.setActiveYn(menuDTO.getActiveYn());
+            menuEntity.setMenuSalesYn(menuDTO.getMenuSalesYn());
+            menuEntity.setMenuSaleType(menuDTO.getMenuSaleType());
+            menuEntity.setOriginPrice(menuDTO.getOriginPrice());
+            menuEntity.setMenuSaleAmount(menuDTO.getMenuSaleAmount());
+            menuEntity.setMenuSalePercent(menuDTO.getMenuSalePercent());
 
             // 기존 이미지들 업데이트 (새로운 이미지들 추가)
             List<ImageFileEntity> updateImages
@@ -294,19 +287,20 @@ public class MenuService {
         log.info("서비스로 들어온 삭제할 메뉴 번호 : " + idx);
 
         try {
-            //이미지 조회
+            // 이미지 조회
             List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
 
-            //dto -> Entity 변환
+            // dto -> Entity 변환
             List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
                             .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
                             .collect(Collectors.toList());
-            //모든 이미지 삭제
+
+            // 모든 이미지 삭제
             for (ImageFileEntity imageFileEntity : imageFileEntities) {
                 imageFileService.deleteImage(imageFileEntity.getIdx());
             }
 
-            //idx로 조회해서 삭제
+            // idx로 조회해서 삭제
             menuRepository.deleteById(idx);
 
         } catch (Exception e) {

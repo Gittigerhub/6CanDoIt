@@ -40,8 +40,8 @@
                                     <button type="button" class="btn btn-outline-primary category-btn px-5 py-2" data-category="Drink">음료</button>
                                 </div>
                                 <div class="position-relative d-inline-block ms-3">
-                                    <div class="w-75">
-                                        <a href="#" id="moveButton" class="btn btn-sm btn-primary px-3 py-2" style="white-space: nowrap;">등록</a>
+                                    <div>
+                                        <button class="btn btn-outline-secondary" onclick="location.href='/admin/menu/ho/registermenu'">등록</button>
                                     </div><!--추가버튼-->
                                 </div>
                             </div>
@@ -71,7 +71,7 @@
                                         <td style="vertical-align: middle; text-align: center;" th:text="${menu.menuCategory.displayName}"></td>
                                         <td style="vertical-align: middle; text-align: center;">
                                             <!-- 메뉴명 클릭 시 상세보기로 이동하는 링크 추가 -->
-                                            <a th:href="@{/admin/menu/adreadmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
+                                            <a style="text-decoration: none; font-weight: bold" th:href="@{/admin/menu/bo/adreadmenu(menuidx=${menu.idx})}" th:text="${menu.menuName}"></a>
                                         </td>
                                         <td>
                                             <!-- 대표 이미지가 없을때 나오는 이미지 -->
@@ -94,10 +94,10 @@
                                         <td style="vertical-align: middle; text-align: center;" th:text="${#numbers.formatInteger(menu.menuPrice, 0, 'COMMA')} + '원'"></td>
                                         <td style="vertical-align: middle; text-align: center;" th:text="${#temporals.format(menu.insDate, 'yyyy-MM-dd')}"></td>
                                         <td style="vertical-align: middle; text-align: center;">
-                                            <button class="btn btn-sm btn-info" th:onclick="|location.href='/admin/menu/updatemenu?idx='+ ${menu.idx}|">수정</button>
+                                            <button class="btn btn-sm btn-outline-secondary" th:onclick="|location.href='/admin/menu/bo/updatemenu?idx='+ ${menu.idx}|">수정</button>
                                         </td>
                                         <td style="vertical-align: middle; text-align: center;">
-                                            <button class="btn btn-sm btn-danger delMoveBtn" th:data-id="${menu.idx}">삭제</button>
+                                            <button class="btn btn-sm btn-outline-danger delMoveBtn" th:data-id="${menu.idx}">삭제</button>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -140,33 +140,6 @@
     <script th:inline="javascript">
         $(document).ready(function() {
 
-            // 등록 버튼 클릭 시 동작하는 함수
-            document.getElementById('moveButton').addEventListener('click', function(event) {
-                event.preventDefault();  // 기본 링크 이동을 막음 (동적으로 href를 설정하기 위해)
-
-                // input 값 읽어오기
-                const organIdx = document.getElementById('organIdxInput').value;
-
-                // 만약 input 값이 비어 있지 않다면, 해당 값을 링크의 href에 추가
-                if (organIdx) {
-                    const newUrl = `/admin/menu/registermenu?organIdx=${encodeURIComponent(organIdx)}`;
-                    window.location.href = newUrl;  // 페이지 이동
-                } else {
-                    alert('값을 입력해주세요!');
-                }
-            });
-
-            // ========================
-
-            // 현재 페이지 URL에서 쿼리 파라미터를 가져오는 코드
-            const urlParams = new URLSearchParams(window.location.search);
-            const organIdx = urlParams.get('organIdx');  // 쿼리 파라미터 'idx' 값을 가져옴
-
-            // 'organIdx' 값을 input 태그에 자동으로 채움
-            if (organIdx) {
-                document.getElementById('organIdxInput').value = organIdx;
-            }
-
             // 카테고리 버튼 클릭 시 메뉴 목록 갱신
             $('.category-btn').on('click', function() {
                 var category = $(this).data('category');  // 선택된 카테고리 값
@@ -185,44 +158,6 @@
                     }
                 });
 
-            });
-
-            //장바구니에 메뉴 추가
-            $('.addcart').on('click', function() {
-                var menuIdx = $(this).data('id');
-                var count = $(this).closest('tr').find('.count').val();  // 현재 클릭된 버튼이 속한 행(tr) 선택, 같은 행의 input 값 가져오기
-
-                console.log(menuIdx)
-                console.log(count)
-
-                $.ajax({
-                    url: '/cart',
-                    type: 'POST',
-                    contentType: 'application/json', // 데이터를 JSON 형식으로 전송
-                    data: {
-                        menuidx: menuIdx,
-                        count: count
-                    },
-                    success: function (response) {
-                        Swal.fire({
-                            icon: null,
-                            text: "장바구니에 추가되었습니다!",
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                        // 장바구니 배지 수량 증가
-                        var currentCount = parseInt($('.cart-count').text());
-                        $('.cart-count').text(currentCount + 1);
-                    },
-                    error: function () {
-                        Swal.fire({
-                            icon: null,
-                            text: "장바구니 추가에 실패하였습니다!",
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                    }
-                });
             });
 
             //삭제 버튼 클릭시
@@ -255,8 +190,7 @@
                             allowEscapeKey: false,
                             allowEnterKey: false
                         }).then(() => {
-                            // 삭제 완료 후 '/admin/menu/adlistmenu'로 리디렉션
-                            location.href = "/admin/menu/adlistmenu";  // 페이지 이동
+                            location.reload();              // 현재 목록페이지를 다시 읽어온다.
                         });
                     },
                     error: function () {                // 작업 실패시
@@ -283,8 +217,7 @@
                 });
             });
 
-        })
-
+        });
     </script>
 </th:block>
 

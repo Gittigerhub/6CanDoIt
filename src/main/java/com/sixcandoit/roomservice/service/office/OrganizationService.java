@@ -36,7 +36,6 @@ public class OrganizationService {
     private final ImageFileService imageFileService;
     private final RoomRepository roomRepository;
 
-
     /* -----------------------------------------------------------------------------
         함수명 : void organRegister(OrganizationDTO organizationDTO)
         인수 : 입력 폼으로 부터 받는 OrganizationDTO

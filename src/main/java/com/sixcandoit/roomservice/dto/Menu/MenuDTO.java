@@ -32,8 +32,6 @@ public class MenuDTO {
 
     private int menuPrice;                      // 메뉴 가격
 
-    private String menuImg;                     // 메뉴 이미지 경로
-
     private String menuOptionYn;                // 옵션 존재여부(N:없음, Y:있음)
 
     private String activeYn;                    // 활성화유무(N:비활성, Y: 활성)
@@ -56,7 +54,7 @@ public class MenuDTO {
 
     private List<ImageFileDTO> menuImgDTOList;
 
-    private LocalDateTime insDate;
+    private LocalDateTime insDate;              // 등록일
 
     //통합 이미지 파일이 나온다면 그거로 설정
     public MenuDTO setMenuImgDTOList(List<ImageFileEntity> imageFileEntities) {

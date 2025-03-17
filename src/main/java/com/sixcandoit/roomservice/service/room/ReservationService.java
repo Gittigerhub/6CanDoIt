@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -204,7 +206,8 @@ public class ReservationService {
     public List<ReservationDTO> getUserReservations(String memberEmail) {
         log.info("Fetching reservations for user: {}", memberEmail);
         try {
-            List<ReservationEntity> reservations = reservationRepository.findByMemberEmail(memberEmail);
+            Pageable pageable = PageRequest.of(0, 3);
+            List<ReservationEntity> reservations = reservationRepository.findByMemberEmail(memberEmail, pageable);
             log.info("Found {} reservations", reservations.size());
             return Arrays.asList(modelMapper.map(reservations, ReservationDTO[].class));
         } catch (Exception e) {

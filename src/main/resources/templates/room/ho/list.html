@@ -211,7 +211,7 @@
                     <tbody>
                     <!--Controller에서 전달받은 list로 반복처리-->
                     <tr th:each="data : ${roomDTOS.content}" th:onclick="'window.location.href=\'' + @{detail(idx=${data.idx})} + '\''">
-                        <td th:text="${data.idx}"></td>
+                        <td style="font-size: 13px" th:text="${data.idx}"></td>
                         <td>
                             <!-- 대표 이미지가 없을때 나오는 이미지 -->
                             <div style="flex-basis: 100%; text-align: left">
@@ -274,20 +274,20 @@
                         <!--가격-->
                         <td th:text="${#numbers.formatInteger(data.roomPrice, 0, 'COMMA')} + '원'"></td>
                         <!--조식여부-->
-                        <td>
-                            <p th:if="${data.roomBreakfast == 'Y'}">무료 조식</p>
-                            <p th:unless="${data.roomBreakfast == 'Y'}">조식 없음</p>
+                        <td class="col-1">
+                            <p style="font-size: 15px" th:if="${data.roomBreakfast == 'Y'}">무료 조식</p>
+                            <p style="font-size: 15px" th:unless="${data.roomBreakfast == 'Y'}">조식 없음</p>
                         </td>
                         <!--성수기 여부-->
-                        <td>
-                            <button th:unless="${data.roomSeason == 'peak'}" class="btn btn-light">비성수기</button>
-                            <button th:if="${data.roomSeason == 'peak'}" class="btn btn-danger">성수기</button>
+                        <td class="col-1">
+                            <button style="font-size: 11px" th:unless="${data.roomSeason == 'peak'}" class="btn btn-light">비성수기</button>
+                            <button style="font-size: 13px" th:if="${data.roomSeason == 'peak'}" class="btn btn-danger">성수기</button>
                         </td>
                         <!--예약 상태 여부-->
                         <td>
-                            <button th:if="${data.resStatus == '1'}" class="btn btn-outline-secondary">빈 방</button>
-                            <button th:if="${data.resStatus == '2'}" class="btn btn-outline-warning">체크인</button>
-                            <button th:if="${data.resStatus == '3'}" class="btn btn-outline-dark">체크아웃</button>
+                            <button style="font-size: 13px" th:if="${data.resStatus == '1'}" class="btn btn-outline-secondary">빈 방</button>
+                            <button style="font-size: 13px" th:if="${data.resStatus == '2'}" class="btn btn-outline-warning">체크인</button>
+                            <button style="font-size: 13px" th:if="${data.resStatus == '3'}" class="btn btn-outline-dark">체크아웃</button>
                         </td>
                     </tr>
                     </tbody>

@@ -82,7 +82,7 @@
                                 <span th:if="${reservation.resStatus == '1'}" class="badge bg-secondary">예약 중</span>
                                 <span th:if="${reservation.resStatus == '2'}" class="badge bg-primary">예약 완료</span>
                                 <span th:if="${reservation.resStatus == '3'}" class="badge bg-danger">체크인</span>
-                                <span th:if="${reservation.resStatus == '4'}" class="badge bg-danger">체크아웃</span>
+                                <span th:if="${reservation.resStatus == '4'}" class="badge bg-secondary">체크아웃</span>
                             </td>
                             <td>
                                 <button type="button" class="btn btn-sm btn-outline-primary"
@@ -219,7 +219,7 @@
                                 <span th:if="${reservation.resStatus == '1'}" class="badge bg-secondary">예약 중</span>
                                 <span th:if="${reservation.resStatus == '2'}" class="badge bg-primary">예약 완료</span>
                                 <span th:if="${reservation.resStatus == '3'}" class="badge bg-danger">체크인</span>
-                                <span th:if="${reservation.resStatus == '4'}" class="badge bg-danger">체크아웃</span>
+                                <span th:if="${reservation.resStatus == '4'}" class="badge bg-secondary">체크아웃</span>
                             </li>
                         </ul>
                     </div>

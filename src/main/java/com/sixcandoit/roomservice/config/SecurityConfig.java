@@ -112,7 +112,7 @@ public class SecurityConfig{
                     // 룸 관리, 룸 예약 페이지 접근 권한
                     auth.requestMatchers("/room/member/list").permitAll();
                     auth.requestMatchers("/room/ho/**", "/res/ho/**").hasAnyRole("ADMIN", "HO");
-                    auth.requestMatchers("/room/bo/**").hasAnyRole("ADMIN", "HO", "BO");
+                    auth.requestMatchers("/room/bo/**", "/res/bo/**").hasAnyRole("ADMIN", "HO", "BO");
                     auth.requestMatchers("/res/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
                     auth.requestMatchers("/room/**").permitAll();
 
@@ -210,7 +210,7 @@ public class SecurityConfig{
             // 룸 관리, 룸 예약 페이지 접근 권한
             auth.requestMatchers("/room/member/list").permitAll();
             auth.requestMatchers("/room/ho/**", "/res/ho/**").hasAnyRole("ADMIN", "HO");
-            auth.requestMatchers("/room/bo/**").hasAnyRole("ADMIN", "HO", "BO");
+            auth.requestMatchers("/room/bo/**", "/res/bo/**").hasAnyRole("ADMIN", "HO", "BO");
             auth.requestMatchers("/res/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             auth.requestMatchers("/room/**").permitAll();
 

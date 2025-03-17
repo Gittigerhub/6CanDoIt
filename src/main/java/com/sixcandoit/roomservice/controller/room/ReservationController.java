@@ -346,10 +346,43 @@ public class ReservationController {
         }
     }
 
+    // 관리자용 예약 수정 처리
+    @PostMapping("/bo/update/{idx}")
+    @ResponseBody
+    public ResponseEntity<?> boupdateMemberReservation(@PathVariable Integer idx, @RequestBody ReservationDTO reservationDTO) {
+        log.info("관리자 예약 변경 처리 시작....");
+        try {
+            reservationDTO.setIdx(idx);
+            ReservationDTO updatedReservation = reservationService.reserveUpdate(reservationDTO);
+            if (updatedReservation != null) {
+                return ResponseEntity.ok().body(Collections.singletonMap("message", "예약이 변경되었습니다."));
+            } else {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("message", "예약을 찾을 수 없습니다."));
+            }
+        } catch (RuntimeException e) {
+            log.error("예약 변경 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        }
+    }
+
     // 관리자용 예약 취소 처리
     @PostMapping("/ho/cancel/{idx}")
     @ResponseBody
     public ResponseEntity<?> cancelMemberReservation(@PathVariable Integer idx) {
+        log.info("관리자 예약 취소 처리 시작.... idx: {}", idx);
+        try {
+            reservationService.reserveDelete(idx);
+            return ResponseEntity.ok().body(Collections.singletonMap("message", "예약이 취소되었습니다."));
+        } catch (Exception e) {
+            log.error("예약 취소 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "예약 취소 중 오류가 발생했습니다."));
+        }
+    }
+
+    // 관리자용 예약 취소 처리
+    @PostMapping("/bo/cancel/{idx}")
+    @ResponseBody
+    public ResponseEntity<?> bocancelMemberReservation(@PathVariable Integer idx) {
         log.info("관리자 예약 취소 처리 시작.... idx: {}", idx);
         try {
             reservationService.reserveDelete(idx);

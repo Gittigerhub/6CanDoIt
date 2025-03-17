@@ -47,8 +47,8 @@
                                 <tr>
                                     <th>주문 상태</th>
                                     <td>
-                                        <span th:text="${order.orderStatus}"
-                                              th:class="'order-status status-' + ${order.orderStatus}">
+                                        <span th:text="${order.ordersStatus}"
+                                              th:class="'order-status status-' + ${order.ordersStatus}">
                                         </span>
                                     </td>
                                 </tr>
@@ -105,17 +105,17 @@
                     </div>
 
                     <!-- 상태 변경 버튼 -->
-                    <div class="row" th:if="${order.orderStatus != 'CLOSE' && order.orderStatus != 'CANCEL'}">
+                    <div class="row" th:if="${order.ordersStatus != 'CLOSE' && order.ordersStatus != 'CANCEL'}">
                         <div class="col-12">
                             <h5 class="card-title mb-3">주문 상태 변경</h5>
                             <div class="d-flex gap-2">
-                                <button th:if="${order.orderStatus == 'NEW'}"
+                                <button th:if="${order.ordersStatus == 'NEW'}"
                                         class="btn btn-primary"
                                         onclick="updateStatus('CHECK')">접수완료</button>
-                                <button th:if="${order.orderStatus == 'CHECK'}"
+                                <button th:if="${order.ordersStatus == 'CHECK'}"
                                         class="btn btn-warning"
                                         onclick="updateStatus('COOKING')">조리중</button>
-                                <button th:if="${order.orderStatus == 'COOKING'}"
+                                <button th:if="${order.ordersStatus == 'COOKING'}"
                                         class="btn btn-success"
                                         onclick="updateStatus('CLOSE')">완료</button>
                             </div>

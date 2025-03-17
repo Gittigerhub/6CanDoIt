@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.dto.orders;
 
-import com.sixcandoit.roomservice.constant.OrderStatus;
+import com.sixcandoit.roomservice.constant.OrdersStatus;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import lombok.*;
 
@@ -18,7 +18,7 @@ public class OrdersDTO {
 
     private int ordersPaymentType;           // 결제 타입(B:선 결제, A:체크아웃 시 결제)
 
-    private OrderStatus ordersStatus;        // 주문 상태(NEW 신규, CHECK 접수, COOKING 조리 중, CANCEL 취소, CLOSE 완료)
+    private OrdersStatus ordersStatus;        // 주문 상태(NEW 신규, CHECK 접수, COOKING 조리 중, CANCEL 취소, CLOSE 완료)
 
     private String ordersPhone;              // 연락받을 연락처
 

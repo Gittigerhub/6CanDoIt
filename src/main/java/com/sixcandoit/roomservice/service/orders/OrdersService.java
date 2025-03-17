@@ -1,6 +1,6 @@
 package com.sixcandoit.roomservice.service.orders;
 
-import com.sixcandoit.roomservice.constant.OrderStatus;
+import com.sixcandoit.roomservice.constant.OrdersStatus;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersHistDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersMenuDTO;
@@ -69,7 +69,7 @@ public class OrdersService {
         OrdersEntity ordersEntity = ordersRepository.findByIdx(orderIdx)
                 .orElseThrow(EntityNotFoundException::new);
         //주문 -> 주문 취소로 상태 변경
-        ordersEntity.setOrdersStatus(OrderStatus.CANCEL);
+        ordersEntity.setOrdersStatus(OrdersStatus.CANCEL);
 
         //재고가 있는 상태가 아니기 때문에 주문 취소시 menu 재고수량에 다시 되돌려줄 이유가 없음.
     }
@@ -101,7 +101,7 @@ public class OrdersService {
         }
 
         // 주문테이블 컬럼값 추가
-        ordersEntity.setOrdersStatus(OrderStatus.NEW);      // 주문 상태
+        ordersEntity.setOrdersStatus(OrdersStatus.NEW);      // 주문 상태
         ordersEntity.setOrdersPhone(ordersPhone);           // 연락받을 연락처
         ordersEntity.setOrdersMemo(ordersMemo);             // 주문 요청사항
 
@@ -248,7 +248,7 @@ public class OrdersService {
     //관리자 화면
     // 1. 관리자용 주문 목록 조회 (검색 기능 포함)
     public Page<OrdersHistDTO> getAdminOrderList(String type, String keyword, Integer organ_idx, Pageable page) {
-        log.info("관리자 주문 목록 조회");
+        log.info("관리자 주문 목록 조회 시작");
 
         try {
             //1. 페이지 정보를 재가공
@@ -262,6 +262,7 @@ public class OrdersService {
             //조회 결과를 저장할 변수 선언
             Page<OrdersEntity> ordersEntities;
 
+            log.info("검색어: {} , 검색타입: {}, 기관 IDX: {}", keyword, type, organ_idx);
             //여러개를 조회해야 할 땐 if문으로 분류에 따라 조회해야한다.
             //type : 주문번호(1), 주문자명(2), 주문상태(3), 전체(0)
             if (keyword != null && !keyword.isEmpty()) {
@@ -273,15 +274,16 @@ public class OrdersService {
                     ordersEntities = ordersRepository.searchByMemberNameAndOrganIdx(keyword, organ_idx, pageable);
                 } else if (type.equals("3")) { //type 분류 3, 주문상태로 검색할 때
                     log.info("주문상태로 검색 하는 중...");
-                    OrderStatus status = OrderStatus.valueOf(keyword);
-                    ordersEntities = ordersRepository.searchByOrderStatusAndOrganIdx(status, organ_idx, pageable);
+                    OrdersStatus status = OrdersStatus.valueOf(keyword);
+                    ordersEntities = ordersRepository.searchByOrdersStatusAndOrganIdx(status, organ_idx, pageable);
                 } else {    //type 분류 4, 전체로 검색할 때
-                    log.info("전체 조회 검색중...");
+                    log.info("검색어 없음, 모든 주문 조회 중...");
                     ordersEntities = ordersRepository.findByOrganIdx(organ_idx, pageable);
                 }
             } else {  //검색어가 존재하지 않으면 모두 검색
                 ordersEntities = ordersRepository.findByOrganIdx(organ_idx, pageable);
             }
+            log.info("조회된 주문 목록 개수: {}", ordersEntities.getTotalElements());
 
             //3. 조회한 결과를 HTML에서 사용할 DTO로 변환
             //Entity를 DTO로 변환 후 저장
@@ -291,12 +293,13 @@ public class OrdersService {
             //4. 결과값을 전달
             return ordersHistDTOS;
         } catch (Exception e) { //오류 발생시 처리
+            log.error("주문 목록 조회 중 오류 발생: {}", e.getMessage(), e);
             throw new RuntimeException("조회 오류");
         }
     }
 
     // 2. 관리자용 주문 상태 변경
-    public void updateOrderStatus(Integer orderIdx, OrderStatus newStatus) {
+    public void updateOrdersStatus(Integer orderIdx, OrdersStatus newStatus) {
         log.info("주문 상태 변경 시도");
 
         OrdersEntity ordersEntity = ordersRepository.findByIdx(orderIdx)
@@ -330,8 +333,8 @@ public class OrdersService {
             ordersEntityList = ordersRepository.findAll(pageable).getContent();
             totalCount = (int) ordersRepository.count();
         } else {
-            OrderStatus orderStatus = OrderStatus.valueOf(status);
-            ordersEntityList = ordersRepository.findByOrdersStatus(orderStatus, pageable).getContent();
+            OrdersStatus ordersStatus = OrdersStatus.valueOf(status);
+            ordersEntityList = ordersRepository.findByOrdersStatus(ordersStatus, pageable).getContent();
             totalCount = ordersEntityList.size();
         }
 
@@ -357,24 +360,24 @@ public class OrdersService {
     }
 
     // 주문 상태 변경 유효성 검사
-    private void validateStatusChange(OrderStatus currentStatus, OrderStatus newStatus) {
-        if (newStatus == OrderStatus.CANCEL) {
+    private void validateStatusChange(OrdersStatus currentStatus, OrdersStatus newStatus) {
+        if (newStatus == OrdersStatus.CANCEL) {
             throw new IllegalStateException("관리자는 주문을 취소할 수 없습니다.");
         }
 
         switch (currentStatus) {
             case NEW:
-                if (newStatus != OrderStatus.CHECK) {
+                if (newStatus != OrdersStatus.CHECK) {
                     throw new IllegalStateException("신규 주문은 접수 상태로만 변경할 수 있습니다.");
                 }
                 break;
             case CHECK:
-                if (newStatus != OrderStatus.COOKING) {
+                if (newStatus != OrdersStatus.COOKING) {
                     throw new IllegalStateException("접수된 주문은 조리 중 상태로만 변경할 수 있습니다.");
                 }
                 break;
             case COOKING:
-                if (newStatus != OrderStatus.CLOSE) {
+                if (newStatus != OrdersStatus.CLOSE) {
                     throw new IllegalStateException("조리 중인 주문은 완료 상태로만 변경할 수 있습니다.");
                 }
                 break;

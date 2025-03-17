@@ -35,38 +35,38 @@
                     <h2>주문 관리</h2>
                     <!-- 주문현황 컨테이너 추가 -->
                     <div class="row mt-4 mb-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">주문현황</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            <h6>신규주문</h6>
-                                            <span class="badge bg-danger" th:text="${newCount}">0</span>
-                                        </div>
-                                        <div class="col text-center">
-                                            <h6>접수완료</h6>
-                                            <span class="badge bg-primary" th:text="${checkCount}">0</span>
-                                        </div>
-                                        <div class="col text-center">
-                                            <h6>조리중</h6>
-                                            <span class="badge bg-warning" th:text="${cookingCount}">0</span>
-                                        </div>
-                                        <div class="col text-center">
-                                            <h6>완료</h6>
-                                            <span class="badge bg-success" th:text="${closeCount}">0</span>
-                                        </div>
-                                        <div class="col text-center">
-                                            <h6>취소</h6>
-                                            <span class="badge bg-secondary" th:text="${cancelCount}">0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<!--                        <div class="col-12">-->
+<!--                            <div class="card">-->
+<!--                                <div class="card-header">-->
+<!--                                    <h5 class="mb-0">주문현황</h5>-->
+<!--                                </div>-->
+<!--                                <div class="card-body">-->
+<!--                                    <div class="row">-->
+<!--                                        <div class="col text-center">-->
+<!--                                            <h6>신규주문</h6>-->
+<!--                                            <span class="badge bg-danger" th:text="${newCount}">0</span>-->
+<!--                                        </div>-->
+<!--                                        <div class="col text-center">-->
+<!--                                            <h6>접수완료</h6>-->
+<!--                                            <span class="badge bg-primary" th:text="${checkCount}">0</span>-->
+<!--                                        </div>-->
+<!--                                        <div class="col text-center">-->
+<!--                                            <h6>조리중</h6>-->
+<!--                                            <span class="badge bg-warning" th:text="${cookingCount}">0</span>-->
+<!--                                        </div>-->
+<!--                                        <div class="col text-center">-->
+<!--                                            <h6>완료</h6>-->
+<!--                                            <span class="badge bg-success" th:text="${closeCount}">0</span>-->
+<!--                                        </div>-->
+<!--                                        <div class="col text-center">-->
+<!--                                            <h6>취소</h6>-->
+<!--                                            <span class="badge bg-secondary" th:text="${cancelCount}">0</span>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
                     <div class="col-12">
                         <!-- 검색 필터 -->
                         <form th:action="@{/admin/orders/adordersList}" method="get" class="row g-3 mt-2 mb-4">
@@ -121,10 +121,9 @@
                                 <tr th:each="order : ${orders}">
                                     <td style="vertical-align: middle;" th:text="${order.idx}"></td>
                                     <td style="vertical-align: middle;" th:text="${order.memberName}"></td>
-                                    <td style="vertical-align: middle;" th:text="${order.roomNumber}"></td>
                                     <td style="vertical-align: middle;">
-                                        <span th:text="${order.orderStatus}"
-                                              th:class="'order-status status-' + ${order.orderStatus}">
+                                        <span th:text="${order.ordersStatus}"
+                                              th:class="'order-status status-' + ${order.ordersStatus}">
                                         </span>
                                     </td>
                                     <td style="vertical-align: middle;"
@@ -132,12 +131,12 @@
                                     <td style="vertical-align: middle;">
                                         <select class="form-select status-select"
                                                 th:data-order-idx="${order.idx}"
-                                                th:if="${order.orderStatus != 'CLOSE' && order.orderStatus != 'CANCEL'}">
+                                                th:if="${order.ordersStatus != 'CLOSE' && order.ordersStatus != 'CANCEL'}">
                                             <option value="">상태변경</option>
-                                            <option value="CHECK" th:if="${order.orderStatus == 'NEW'}">접수완료</option>
-                                            <option value="COOKING" th:if="${order.orderStatus == 'CHECK'}">조리중</option>
-                                            <option value="CLOSE" th:if="${order.orderStatus == 'COOKING'}">완료</option>
-                                            <option value="CANCEL" th:if="${order.orderStatus != 'CLOSE'}">취소</option>
+                                            <option value="CHECK" th:if="${order.ordersStatus == 'NEW'}">접수완료</option>
+                                            <option value="COOKING" th:if="${order.ordersStatus == 'CHECK'}">조리중</option>
+                                            <option value="CLOSE" th:if="${order.ordersStatus == 'COOKING'}">완료</option>
+                                            <option value="CANCEL" th:if="${order.ordersStatus != 'CLOSE'}">취소</option>
                                         </select>
                                     </td>
                                     <td style="vertical-align: middle;">

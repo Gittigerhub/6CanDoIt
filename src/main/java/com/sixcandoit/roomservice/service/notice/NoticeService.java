@@ -1,6 +1,5 @@
 package com.sixcandoit.roomservice.service.notice;
 
-
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.notice.NoticeDTO;
 import com.sixcandoit.roomservice.entity.ImageFileEntity;
@@ -30,140 +29,95 @@ public class NoticeService {
     private final ModelMapper modelMapper;
     private final ImageFileService imageFileService;
 
-
-
+    // 공지사항 등록
     public void noticeRegister(NoticeDTO noticeDTO, List<MultipartFile> imageFiles) {
-
-        try{
+        try {
             // DTO => Entity 변환
-            NoticeEntity notice=
-                    modelMapper.map(noticeDTO, NoticeEntity.class);
+            NoticeEntity notice = modelMapper.map(noticeDTO, NoticeEntity.class);
 
-            //이미지 등록
+            // 이미지 등록
             log.info("이미지를 저장한다.");
             List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
 
-            //이미지 정보 추가
-            for(ImageFileEntity image : images){
+            // 이미지 정보 추가
+            for (ImageFileEntity image : images) {
                 notice.addImage(image);
             }
 
             // DB에 저장
             log.info("저장을 수행한다");
             noticeRepository.save(notice);
-
-//            //noticeImg 업데이트(첫 번째 이미지를 대표 이미지로 설정
-//            noticeEntity.setNoticeImgFromImageFile();
-//
-//            //저장된 NoticeEntity에서 이미지 Url을 DTO로 전달
-//            noticeDTO.setNoticeImg(noticeEntity.getNoticeImg());
-        }catch (Exception e){
-            throw new RuntimeException("이미지 저장 실패:" +e.getMessage());
+        } catch (Exception e) {
+            log.error("공지사항 등록 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("공지사항 등록 실패: " + e.getMessage());
         }
     }
 
-    //수정
-    public void noticeUpdate( NoticeDTO noticeDTO, String join, List<MultipartFile> imageFiles) {
+    // 공지사항 수정
+    public void noticeUpdate(NoticeDTO noticeDTO, String join, List<MultipartFile> imageFiles) {
         try {
             // 기존의 공지사항 조회
             Optional<NoticeEntity> noticeEntity = noticeRepository.findById(noticeDTO.getIdx());
 
-            if (noticeEntity.isEmpty()) { // QnaEntity가 존재하지 않으면
+            if (noticeEntity.isEmpty()) {
                 throw new RuntimeException("수정할 게시글 조회 실패");
-
             } else {
                 // 받은 DTO를 Entity로 변환
                 NoticeEntity notice = modelMapper.map(noticeDTO, NoticeEntity.class);
 
-                // 빈 파일 제거 후 유효한 파일 리스트만 남김
-                // 자꾸 빈파일이 넘겨져 파일을 넘길때와 같이 길이가 1이되어 오류가 생김으로 유효리스트 생성
+                // 유효한 이미지 파일 리스트만 남기기
                 List<MultipartFile> validImageFiles = imageFiles.stream()
                         .filter(file -> file != null && !file.isEmpty()) // 비어 있지 않은 파일만 필터링
                         .collect(Collectors.toList());
 
-                System.out.println("유효한 이미지 파일 개수: " + validImageFiles.size());
+                log.info("유효한 이미지 파일 개수: {}", validImageFiles.size());
 
-                // 이미지 들어오면
+                // 새로운 이미지가 있으면
                 if (!validImageFiles.isEmpty()) {
-                    System.out.println("이미지 작업 시작!!!!");
-                    // 기존 이미지 조회
-                    List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(noticeDTO.getIdx(), join);
+                    log.info("이미지 작업 시작!!!!");
 
                     // 기존 이미지 삭제
-                    // dto = > entity 변환
-                    log.info("이미지를 삭제한다");
-                    List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
-                            .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
-                            .collect(Collectors.toList());
-
-                    // DB, 저장소에서 모든 이미지 삭제
-                    for(ImageFileEntity imageFileEntity : imageFileEntities){
-                        imageFileService.deleteImage(imageFileEntity.getIdx());
-                    }
+                    List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(noticeDTO.getIdx(), join);
+                    log.info("기존 이미지 삭제");
+                    deleteExistingImages(imageFileDTOS);
 
                     // 새로운 이미지 등록
-                    log.info("이미지를 저장한다");
-                    List<ImageFileEntity> images = imageFileService.saveImages(imageFiles);
+                    log.info("새로운 이미지를 저장한다");
+                    List<ImageFileEntity> images = imageFileService.saveImages(validImageFiles);
 
-                    // 자동 FK 생성
+                    // 새로운 이미지 추가
                     for (ImageFileEntity image : images) {
                         notice.addImage(image);
-
                     }
-
                 } else {
-                    // modelmapper를 이용하면 새로운 객체가 되어 기존 이미지 연관관계가 사라져 버리기 때문에
-                    // 새로 설정해야함
-                    System.out.println("이미지 작업2 시작!!!!");
-                    // 기존 이미지 조회
+                    log.info("기존 이미지 유지");
+                    // 기존 이미지를 유지
                     List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(noticeDTO.getIdx(), join);
-
-                    // dto = > entity 변환
-                    List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
-                            .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
-                            .collect(Collectors.toList());
-
-                    // 자동 FK 생성
-                    for (ImageFileEntity image : imageFileEntities) {
-                        notice.addImage(image);
-
-                    }
-
+                    addExistingImagesToNotice(imageFileDTOS, notice);
                 }
 
-                log.info("NoticeEntity 수정 진행");
+                // 수정된 공지사항 저장
+                log.info("공지사항 수정 진행");
                 noticeRepository.save(notice);
-                log.info("NoticeEntity 수정완료");
-
+                log.info("공지사항 수정 완료");
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("수정 오류 발생");
+            log.error("공지사항 수정 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("공지사항 수정 실패: " + e.getMessage());
         }
-
     }
 
+    // 공지사항 삭제
     public void noticeDelete(Integer idx, String join) {
         try {
             // 이미지 삭제
             List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, join);
 
-            // 이미지가 있는 경우에만 삭제 처리
+            // 이미지가 있으면 삭제
             if (imageFileDTOS != null && !imageFileDTOS.isEmpty()) {
                 log.info("이미지 삭제 시작: {} 개의 이미지", imageFileDTOS.size());
-                List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
-                        .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
-                        .collect(Collectors.toList());
-
-                // DB와 저장소에서 이미지 삭제
-                for (ImageFileEntity imageFileEntity : imageFileEntities) {
-                    try {
-                        imageFileService.deleteImage(imageFileEntity.getIdx());
-                    } catch (Exception e) {
-                        log.error("이미지 삭제 중 오류 발생 (idx: {}): {}", imageFileEntity.getIdx(), e.getMessage());
-                        // 이미지 삭제 실패해도 계속 진행
-                    }
-                }
+                deleteExistingImages(imageFileDTOS);
             } else {
                 log.info("삭제할 이미지가 없습니다. idx: {}", idx);
             }
@@ -177,32 +131,64 @@ public class NoticeService {
         }
     }
 
+    // 기존 이미지 삭제
+    private void deleteExistingImages(List<ImageFileDTO> imageFileDTOS) {
+        List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                .collect(Collectors.toList());
 
+        for (ImageFileEntity imageFileEntity : imageFileEntities) {
+            try {
+                imageFileService.deleteImage(imageFileEntity.getIdx());
+            } catch (Exception e) {
+                log.error("이미지 삭제 중 오류 발생 (idx: {}): {}", imageFileEntity.getIdx(), e.getMessage());
+            }
+        }
+    }
+
+    // 기존 이미지를 공지사항에 추가
+    private void addExistingImagesToNotice(List<ImageFileDTO> imageFileDTOS, NoticeEntity notice) {
+        List<ImageFileEntity> imageFileEntities = imageFileDTOS.stream()
+                .map(imageFileDTO -> modelMapper.map(imageFileDTO, ImageFileEntity.class))
+                .collect(Collectors.toList());
+
+        for (ImageFileEntity image : imageFileEntities) {
+            notice.addImage(image);
+        }
+    }
+
+    // 공지사항 목록 조회
     public Page<NoticeDTO> noticeList(Pageable page, String type, String keyword) {
         Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
         Page<NoticeEntity> noticeEntities;
+
         if (keyword != null) {
             log.info("검색어가 존재하면");
-            if (type.equals("1")) {
-                log.info("제목으로 검색을 하는 중");
-                noticeEntities = noticeRepository.searchNoticeTitle(keyword, pageable);
-            } else if (type.equals("2")) {
-                log.info("내용으로 검색하는 중");
-                noticeEntities = noticeRepository.searchNoticeContents(keyword, pageable);
-            } else {
-                log.info("모든 대상으로 검색을 하는 중");
-                noticeEntities = noticeRepository.searchAll(keyword, pageable);
-            }
+            noticeEntities = searchNoticesByKeyword(type, keyword, pageable);
         } else {
             noticeEntities = noticeRepository.findAll(pageable);
         }
-        Page<NoticeDTO> noticeDTOS =noticeEntities.map(
-                data -> modelMapper.map(data, NoticeDTO.class));
 
-
-        return noticeDTOS;
+        return noticeEntities.map(data -> modelMapper.map(data, NoticeDTO.class));
     }
 
+    // 검색 조건에 따른 공지사항 검색
+    private Page<NoticeEntity> searchNoticesByKeyword(String type, String keyword, Pageable pageable) {
+        Page<NoticeEntity> noticeEntities;
+        if (type.equals("1")) {
+            log.info("제목으로 검색");
+            noticeEntities = noticeRepository.searchNoticeTitle(keyword, pageable);
+        } else if (type.equals("2")) {
+            log.info("내용으로 검색");
+            noticeEntities = noticeRepository.searchNoticeContents(keyword, pageable);
+        } else {
+            log.info("모든 대상으로 검색");
+            noticeEntities = noticeRepository.searchAll(keyword, pageable);
+        }
+        return noticeEntities;
+    }
+
+    // 조회수 증가
     public void count(Integer idx) {
         NoticeEntity noticeEntity = noticeRepository.findById(idx).orElseThrow();
 
@@ -211,15 +197,14 @@ public class NoticeService {
         noticeRepository.save(noticeEntity);
     }
 
+    // 공지사항 읽기
     public NoticeDTO noticeRead(Integer idx) {
-        // 1. 게시글 조회
         Optional<NoticeEntity> noticeEntity = noticeRepository.findById(idx);
 
-        NoticeDTO noticeDTO = modelMapper.map(noticeEntity, NoticeDTO.class);
-
-        return noticeDTO;
+        return modelMapper.map(noticeEntity.orElseThrow(), NoticeDTO.class);
     }
 
+    // 타입에 따른 공지사항 목록 조회
     public Page<NoticeDTO> getNoticeListByType(Pageable page, String type, String keyword, String noticeType) {
         Pageable pageable = PageRequest.of(Math.max(page.getPageNumber() - 1, 0), 10);
         Page<NoticeEntity> noticeEntities;
@@ -227,15 +212,26 @@ public class NoticeService {
         if (keyword == null || keyword.isEmpty()) {
             noticeEntities = noticeRepository.findAllByNoticeType(noticeType, pageable);
         } else {
-            if (type.equals("title")) {
-                noticeEntities = noticeRepository.findByNoticeTitleContainingAndNoticeType(keyword, noticeType, pageable);
-            } else if (type.equals("content")) {
-                noticeEntities = noticeRepository.findByNoticeContentsContainingAndNoticeType(keyword, noticeType, pageable);
-            } else {
-                noticeEntities = noticeRepository.findAllByNoticeTypeAndTitleOrContentsContaining(noticeType, keyword, pageable);
-            }
+            noticeEntities = searchNoticesByTypeAndKeyword(type, keyword, noticeType, pageable);
         }
 
         return noticeEntities.map(notice -> modelMapper.map(notice, NoticeDTO.class));
+    }
+
+    // 타입과 키워드에 따른 공지사항 검색
+    private Page<NoticeEntity> searchNoticesByTypeAndKeyword(String type, String keyword, String noticeType, Pageable pageable) {
+        Page<NoticeEntity> noticeEntities;
+        if (type.equals("title")) {
+            noticeEntities = noticeRepository.findByNoticeTitleContainingAndNoticeType(keyword, noticeType, pageable);
+        } else if (type.equals("content")) {
+            noticeEntities = noticeRepository.findByNoticeContentsContainingAndNoticeType(keyword, noticeType, pageable);
+        } else {
+            noticeEntities = noticeRepository.findAllByNoticeTypeAndTitleOrContentsContaining(noticeType, keyword, pageable);
+        }
+        return noticeEntities;
+    }
+
+    public void deleteNotice(Integer idx) {
+
     }
 }

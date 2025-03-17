@@ -1429,6 +1429,7 @@ E-mail : himyeongsun@gmail.com
                 dataType: 'text',
                 success: function (data) {
                     console.log("메일 발송 완료" + data)
+                    alert("이메일이 전송되었습니다.");
                 },
                 error(xhr, status, err) {
 
@@ -1868,6 +1869,7 @@ E-mail : himyeongsun@gmail.com
             return false;
         }
 
+        alert('회원가입이 완료되었습니다. 관리자 승인 후 이용 가능합니다.');
         return true;
     }
 

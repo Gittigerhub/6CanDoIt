@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/bolayout}"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 회원 정보 수정</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: "Montserrat", sans-serif;
+            background: white;
+        }
+
+        .container {
+            display: block;
+            max-width: 680px;
+            width: 80%;
+            margin: 120px auto;
+        }
+
+        h1 {
+            color: #333333;
+            font-size: 48px;
+            letter-spacing: -3px;
+            text-align: center;
+            margin: 120px 0 80px 0;
+            transition: 0.2s linear;
+        }
+
+        form {
+            width: 100%;
+            max-width: 680px;
+            margin: 40px auto 10px;
+        }
+
+        .input__block {
+            margin: 20px auto;
+            display: block;
+            position: relative;
+            width: 90%;
+            max-width: 680px;
+        }
+
+        .input__block label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333333;
+            font-size: 14px;
+        }
+
+        .input__block input,
+        .radio-group.with-bg,
+        .address-input input[type="text"],
+        .address-input input[readonly] {
+            background: rgba(15, 19, 42, 0.1);
+            display: block;
+            width: 100%;
+            height: 50px;
+            border-radius: 8px;
+            border: none;
+            color: #333333;
+            padding: 0 15px;
+            font-size: 14px;
+            font-family: "Montserrat", sans-serif;
+        }
+
+        .input__block input:focus,
+        .input__block input:active {
+            outline: none;
+            border: none;
+            color: #333333;
+        }
+
+        .input__block input[readonly] {
+            background: rgba(15, 19, 42, 0.25) !important;
+        }
+
+        .radio-group {
+            width: 90%;
+            max-width: 680px;
+            margin: 20px auto;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(15, 19, 42, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-group .radio-title {
+            margin-right: 20px;
+            color: #333333;
+            font-size: 14px;
+            min-width: 80px;
+        }
+
+        .radio-group label {
+            margin-right: 20px;
+            color: #333333;
+        }
+
+        .radio-group input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        .button-group {
+            width: 90%;
+            max-width: 680px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .button-group.main-actions {
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+
+        .button-group.danger-zone {
+            margin-top: 20px;
+        }
+
+        .button {
+            background: #333333;
+            color: white;
+            display: inline-block;
+            width: auto;
+            min-width: 120px;
+            height: 50px;
+            border-radius: 8px;
+            margin: 0 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: "Montserrat", sans-serif;
+            box-shadow: 0 15px 30px rgba(51, 51, 51, 0.2);
+            transition: 0.2s linear;
+        }
+
+        .button:hover {
+            box-shadow: 0 0 0 rgba(51, 51, 51, 0);
+            background: #4a4a4a;
+        }
+
+        .button.danger {
+            background: #dc3545;
+        }
+
+        .button.danger:hover {
+            background: #bb2d3b;
+        }
+
+        .button.light {
+            background: #6c757d;
+        }
+
+        .button.light:hover {
+            background: #5c636a;
+        }
+
+        .address-input {
+            width: 90%;
+            max-width: 680px;
+            margin: 20px auto;
+        }
+
+        .address-input .address-title {
+            display: block;
+            margin-bottom: 8px;
+            color: #333333;
+            font-size: 14px;
+        }
+
+        .address-input .search-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .address-input .search-row input[type="text"] {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .address-input .search-row .button {
+            width: 120px;
+            margin: 0;
+        }
+
+        .address-input input[type="text"] {
+            background: rgba(15, 19, 42, 0.1);
+            height: 50px;
+            border-radius: 8px;
+            border: none;
+            color: #333333;
+            padding: 0 15px;
+            font-size: 14px;
+            font-family: "Montserrat", sans-serif;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .text-muted {
+            color: rgba(15, 19, 42, 0.6);
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .input__block.with-button {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            margin-bottom: 28px;
+        }
+
+        .input__block.with-button .input-wrapper {
+            flex: 1;
+        }
+
+        .input__block.with-button .button {
+            margin: 0;
+            height: 50px;
+            margin-top: 0;
+        }
+
+        .input__block.with-button input {
+            margin-bottom: 0;
+        }
+
+        .input__block.with-button .text-muted {
+            position: absolute;
+            margin-top: 8px;
+        }
+
+        .withdrawal-link {
+            display: block;
+            width: 90%;
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .withdrawal-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <h1>회원 정보 수정</h1>
+    <form th:action="@{/admin/modify}" method="post" onsubmit="return handleSubmit(event)">
+        <div class="input__block with-button">
+            <div class="input-wrapper">
+                <label for="adminEmail">이메일</label>
+                <input type="email" id="adminEmail" th:name="adminEmail" th:value="${adminDTO.adminEmail}"  readonly>
+                <span class="text-muted">이메일은 변경할 수 없습니다.</span>
+            </div>
+            <button type="button" onclick="location.href='/admin/bomodifypw'" class="button">비밀번호 변경</button>
+        </div>
+        <div class="input__block">
+            <label for="adminName">이름</label>
+            <input type="text" id="adminName" th:name="adminName" th:value="${adminDTO.adminName}" placeholder="이름">
+        </div>
+        <div class="input__block">
+            <label for="adminPhone">연락처</label>
+            <input type="text" id="adminPhone" th:name="adminPhone" th:value="${adminDTO.adminPhone}" maxlength="11" placeholder="연락처">
+            <div id="confirmPhoneFeedback" class="invalid-feedback">잘못된 전화번호 형식입니다.</div>
+            <div id="confirmPhoneValid" class="valid-feedback">올바른 전화번호 형식입니다.</div>
+        </div>
+
+        <div class="button-group main-actions">
+            <button type="submit" class="button">수정 완료</button>
+            <button type="button" class="button light" onclick="window.history.back();">취소</button>
+        </div>
+        <a class="withdrawal-link" th:onclick="|deleteAdmin('${adminDTO.idx}')|">회원 탈퇴</a>
+    </form>
+    <script>
+        // 회원 탈퇴
+        function deleteAdmin(idx) {
+            if (confirm("정말 탈퇴하시겠습니까?")) {
+                fetch('/admin/deleteAdmin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ idx: idx })
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        if (result === "success") {
+                            alert("회원 탈퇴가 완료되었습니다.");
+                            window.location.href = "/admin/login"; // 로그인 페이지로 이동
+                        } else {
+                            alert("회원 탈퇴에 실패했습니다.");
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // 전화번호 유효성 검사
+        document.getElementById("adminPhone").addEventListener("input", function () {
+            var phone = this.value;
+            var phoneInput = this;
+            var phoneFeedback = document.getElementById("confirmPhoneFeedback");
+            var phoneValid = document.getElementById("confirmPhoneValid");
+
+            // 전화번호 형식 검사 (000-0000-0000 또는 000-000-0000)
+            var phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;
+
+            // 입력값이 비어있는 경우
+            if (phone === "") {
+                phoneInput.classList.remove("is-invalid", "is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "none";
+                return;
+            }
+
+            if (!phonePattern.test(phone)) {
+                phoneInput.classList.remove("is-valid");
+                phoneInput.classList.add("is-invalid");
+                phoneFeedback.style.display = "block";
+                phoneValid.style.display = "none";
+            } else {
+                phoneInput.classList.remove("is-invalid");
+                phoneInput.classList.add("is-valid");
+                phoneFeedback.style.display = "none";
+                phoneValid.style.display = "block";
+            }
+
+            // 자동으로 하이픈 추가
+            var value = phone.replace(/[^0-9]/g, ''); // 숫자만 추출
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+            }
+            this.value = value;
+        });
+
+        // 폼 제출 처리
+        function handleSubmit(event) {
+            // 폼 제출 후 서버 응답을 기다림
+            setTimeout(function() {
+                alert('회원 정보 수정이 완료되었습니다.');
+                window.location.href = '/bo';
+            }, 100);
+            
+            return true;
+        }
+    </script>
+</div>
+</body>
+</html>

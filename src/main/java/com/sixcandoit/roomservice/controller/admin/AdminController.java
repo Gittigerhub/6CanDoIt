@@ -237,6 +237,38 @@ public class AdminController {
         return "/admin/verify";
     }
 
+    @GetMapping("/hoverify")
+    public String ShowHOPasswordVerificationPage(HttpSession session, Model model){
+        log.info("비밀번호 확인 진입 했어?");
+        String adminEmail = (String) session.getAttribute("adminEmail");
+
+        if (adminEmail == null) {
+            log.warn("세션에 adminEmail 없음! 로그인 확인 필요");
+            return "redirect:/admin/login";
+        }
+
+        model.addAttribute("adminEmail",adminEmail );
+        log.info("어드민 이메일 들어왔니?" + adminEmail);
+
+        return "/admin/hoverify";
+    }
+
+    @GetMapping("/boverify")
+    public String ShowBOPasswordVerificationPage(HttpSession session, Model model){
+        log.info("비밀번호 확인 진입 했어?");
+        String adminEmail = (String) session.getAttribute("adminEmail");
+
+        if (adminEmail == null) {
+            log.warn("세션에 adminEmail 없음! 로그인 확인 필요");
+            return "redirect:/admin/login";
+        }
+
+        model.addAttribute("adminEmail",adminEmail );
+        log.info("어드민 이메일 들어왔니?" + adminEmail);
+
+        return "/admin/boverify";
+    }
+
     // 비밀번호 검증 처리
     /* -----------------------------------------------------------------------------
         경로 : /admin/verify (POST)
@@ -280,6 +312,78 @@ public class AdminController {
         }
     }
 
+    @PostMapping("/hoverify")
+    public String hoVerifyPassword(@RequestParam String password,
+                                 @RequestParam String adminEmail,
+                                 HttpSession session){
+
+        log.info("비밀번호 확인 진입 했나요?");
+        log.info("어드민 이메일 들어왔니? " + adminEmail);
+        log.info("입력된 비밀번호: " + password);
+
+        // 세션에서 adminEmail 가져오기 (필요한 경우)
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            adminEmail = (String) session.getAttribute("adminEmail");
+            log.info("세션에서 가져온 adminEmail: " + adminEmail);
+        }
+
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            log.warn("adminEmail이 null이거나 비어 있음!");
+            return "redirect:/admin/hoverify?error=email_required"; // 에러 메시지 추가 가능
+        }
+
+        // 비밀번호를 DB에서 조회하여 비교
+        boolean isPasswordValid = adminService.verifyPassword(password, adminEmail);
+        log.info("비번 DB에서 조회해서 비교 된거야?"+ isPasswordValid);
+
+        if (isPasswordValid) {
+            // 비밀번호가 맞으면 회원 정보 수정 페이지로 리디렉션
+            session.setAttribute("email", adminEmail);  // 이메일을 세션에 저장
+            System.out.println("비밀번호가 맞습니다.");
+            return "redirect:/admin/homodify";  // 수정 페이지로 이동
+        } else {
+            // 비밀번호가 틀리면 다시 비밀번호 확인 페이지로 돌아가기
+            System.out.println("비밀번호가 틀렸습니다.");
+            return "redirect:/admin/hoverify";  // 비밀번호 페이지로 리디렉션
+        }
+    }
+
+    @PostMapping("/boverify")
+    public String BOVerifyPassword(@RequestParam String password,
+                                   @RequestParam String adminEmail,
+                                   HttpSession session){
+
+        log.info("비밀번호 확인 진입 했나요?");
+        log.info("어드민 이메일 들어왔니? " + adminEmail);
+        log.info("입력된 비밀번호: " + password);
+
+        // 세션에서 adminEmail 가져오기 (필요한 경우)
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            adminEmail = (String) session.getAttribute("adminEmail");
+            log.info("세션에서 가져온 adminEmail: " + adminEmail);
+        }
+
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            log.warn("adminEmail이 null이거나 비어 있음!");
+            return "redirect:/admin/boverify?error=email_required"; // 에러 메시지 추가 가능
+        }
+
+        // 비밀번호를 DB에서 조회하여 비교
+        boolean isPasswordValid = adminService.verifyPassword(password, adminEmail);
+        log.info("비번 DB에서 조회해서 비교 된거야?"+ isPasswordValid);
+
+        if (isPasswordValid) {
+            // 비밀번호가 맞으면 회원 정보 수정 페이지로 리디렉션
+            session.setAttribute("email", adminEmail);  // 이메일을 세션에 저장
+            System.out.println("비밀번호가 맞습니다.");
+            return "redirect:/admin/bomodify";  // 수정 페이지로 이동
+        } else {
+            // 비밀번호가 틀리면 다시 비밀번호 확인 페이지로 돌아가기
+            System.out.println("비밀번호가 틀렸습니다.");
+            return "redirect:/admin/boverify";  // 비밀번호 페이지로 리디렉션
+        }
+    }
+
     // 회원 정보 수정
      /* -----------------------------------------------------------------------------
         경로 : /admin/modify (GET)
@@ -304,6 +408,40 @@ public class AdminController {
         return "admin/modify";
     }
 
+    @GetMapping("/homodify")
+    public String showHOModifyPage(HttpSession session, Model model){
+        log.info("HO회원 정보 수정 진입 했니?");
+        String adminEmail = (String) session.getAttribute("adminEmail");
+        AdminDTO adminDTO = new AdminDTO();
+
+        if (adminEmail != null){
+            log.info("관리자 이메일 ? " + adminEmail);
+            adminDTO = adminService.read(adminEmail);
+        }
+
+        model.addAttribute("adminDTO", adminDTO);
+        log.info("회원 정보 수정 들어왔니?" + adminDTO);
+
+        return "admin/homodify";
+    }
+
+    @GetMapping("/bomodify")
+    public String showBOModifyPage(HttpSession session, Model model){
+        log.info("회원 정보 수정 진입 했니?");
+        String adminEmail = (String) session.getAttribute("adminEmail");
+        AdminDTO adminDTO = new AdminDTO();
+
+        if (adminEmail != null){
+            log.info("관리자 이메일 ? " + adminEmail);
+            adminDTO = adminService.read(adminEmail);
+        }
+
+        model.addAttribute("adminDTO", adminDTO);
+        log.info("회원 정보 수정 들어왔니?" + adminDTO);
+
+        return "admin/bomodify";
+    }
+
     /* -----------------------------------------------------------------------------
        경로 : /admin/modify (POST)
        인수 : AdminDTO adminDTO
@@ -316,6 +454,22 @@ public class AdminController {
         log.info("회원 정보를 수정해줘!!");
 
         return "redirect:/admin/";
+    }
+
+    @PostMapping("/homodify")
+    public String modifyHO(@ModelAttribute AdminDTO adminDTO){
+        adminService.modify(adminDTO);
+        log.info("회원 정보를 수정해줘!!");
+
+        return "redirect:/ho";
+    }
+
+    @PostMapping("/bomodify")
+    public String modifyBO(@ModelAttribute AdminDTO adminDTO){
+        adminService.modify(adminDTO);
+        log.info("회원 정보를 수정해줘!!");
+
+        return "redirect:/bo";
     }
 
     // 비밀번호 수정
@@ -344,6 +498,48 @@ public class AdminController {
         }
 
         return "admin/modifypw";
+    }
+
+    @GetMapping("/homodifypw")
+    public String showHOModifyPWPage(@RequestParam(value = "error", required = false) String error,
+                                   HttpSession session, Model model){
+        log.info("비밀번호 변경을 해요!!");
+
+        // 세션에서 관리자 이메일 가져오기
+        String adminEmail = (String) session.getAttribute("adminEmail");
+
+        if (adminEmail == null) {
+            log.info("로그인을 안 했어요");
+            return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로 이동
+        }
+
+        // 현재 비밀번호 오류 메시지가 있으면 추가
+        if (error != null) {
+            model.addAttribute("error", "현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        return "admin/homodifypw";
+    }
+
+    @GetMapping("/bomodifypw")
+    public String showBOModifyPWPage(@RequestParam(value = "error", required = false) String error,
+                                     HttpSession session, Model model){
+        log.info("비밀번호 변경을 해요!!");
+
+        // 세션에서 관리자 이메일 가져오기
+        String adminEmail = (String) session.getAttribute("adminEmail");
+
+        if (adminEmail == null) {
+            log.info("로그인을 안 했어요");
+            return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로 이동
+        }
+
+        // 현재 비밀번호 오류 메시지가 있으면 추가
+        if (error != null) {
+            model.addAttribute("error", "현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        return "admin/bomodifypw";
     }
 
     /* -----------------------------------------------------------------------------
@@ -378,6 +574,62 @@ public class AdminController {
         log.info("비밀번호 변경 성공 ~");
         redirectAttributes.addFlashAttribute("success", "비밀번호가 변경되었습니다.");
         return "redirect:/admin/";
+    }
+
+    @PostMapping("/homodifypw")
+    public String HomodifyPW(@RequestParam String currentPassword,
+                           @RequestParam String newPassword,
+                           @RequestParam String confirmPassword,
+                           HttpSession session, RedirectAttributes redirectAttributes){
+
+        // 현재 로그인한 관리자 이메일 가져오기
+        String adminEmail = (String) session.getAttribute("adminEmail");
+        log.info("관리자 이메일 들어왔니? " + adminEmail);
+
+        if (adminEmail == null) {
+            log.info("로그인을 안했어요");
+            return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로 이동
+        }
+
+        // 비밀번호 검증 후 변경
+        boolean isUpdated = adminService.changePassword(adminEmail, currentPassword, newPassword);
+
+        if (!isUpdated) {
+            log.warn("현재 비밀번호가 틀렸습니다!");
+            redirectAttributes.addFlashAttribute("error", "true");
+            return "redirect:/admin/homodifypw";
+        }
+        log.info("비밀번호 변경 성공 ~");
+        redirectAttributes.addFlashAttribute("success", "비밀번호가 변경되었습니다.");
+        return "redirect:/ho";
+    }
+
+    @PostMapping("/bomodifypw")
+    public String BOmodifyPW(@RequestParam String currentPassword,
+                             @RequestParam String newPassword,
+                             @RequestParam String confirmPassword,
+                             HttpSession session, RedirectAttributes redirectAttributes){
+
+        // 현재 로그인한 관리자 이메일 가져오기
+        String adminEmail = (String) session.getAttribute("adminEmail");
+        log.info("관리자 이메일 들어왔니? " + adminEmail);
+
+        if (adminEmail == null) {
+            log.info("로그인을 안했어요");
+            return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로 이동
+        }
+
+        // 비밀번호 검증 후 변경
+        boolean isUpdated = adminService.changePassword(adminEmail, currentPassword, newPassword);
+
+        if (!isUpdated) {
+            log.warn("현재 비밀번호가 틀렸습니다!");
+            redirectAttributes.addFlashAttribute("error", "true");
+            return "redirect:/admin/bomodifypw";
+        }
+        log.info("비밀번호 변경 성공 ~");
+        redirectAttributes.addFlashAttribute("success", "비밀번호가 변경되었습니다.");
+        return "redirect:/bo";
     }
 
     // 임시비밀번호 발급

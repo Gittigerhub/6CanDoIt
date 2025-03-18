@@ -486,7 +486,7 @@
                     if (!isNaN(points)) {
                         totalPoints += points;
                         if (points <= 0) {
-                            totalPoints = 0;
+                            totalPoints += 0;
                         }
                     }
                     $(".totalPoints").text(totalPoints);

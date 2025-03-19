@@ -193,7 +193,7 @@ public class AdminService {
                 String to = read.get().getAdminEmail();
                 String subject = "임시 비밀번호 발급";
 
-                log.info(message);
+                log.info("메세지 띄워" + message);
                 emailService.sendEmail(to, subject, message);
                 return true;
 

@@ -641,7 +641,7 @@ public class AdminController {
     ----------------------------------------------------------------------------- */
     @PostMapping("/password")
     @ResponseBody
-    public String modifyPassword(@RequestBody AdminDTO adminDTO){
+    public String modifyPassword(@ModelAttribute AdminDTO adminDTO){
         log.info("임시비밀번호를 발급해줘~!~");
         boolean result = adminService.passwordSend(adminDTO);
         return result ? "success" : "fail";

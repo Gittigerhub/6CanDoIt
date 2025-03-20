@@ -5,7 +5,6 @@ import com.sixcandoit.roomservice.dto.admin.AdminDTO;
 import com.sixcandoit.roomservice.dto.member.MemberDTO;
 import com.sixcandoit.roomservice.dto.office.OrganizationDTO;
 import com.sixcandoit.roomservice.entity.admin.AdminEntity;
-import com.sixcandoit.roomservice.entity.office.OrganizationEntity;
 import com.sixcandoit.roomservice.repository.admin.AdminRepository;
 import com.sixcandoit.roomservice.repository.member.MemberRepository;
 import com.sixcandoit.roomservice.service.EmailService;
@@ -25,7 +24,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.awt.font.LayoutPath;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -234,7 +232,7 @@ public class AdminController {
         model.addAttribute("adminEmail",adminEmail );
         log.info("어드민 이메일 들어왔니?" + adminEmail);
 
-        return "/admin/verify";
+        return "admin/verify";
     }
 
     @GetMapping("/hoverify")
@@ -250,7 +248,7 @@ public class AdminController {
         model.addAttribute("adminEmail",adminEmail );
         log.info("어드민 이메일 들어왔니?" + adminEmail);
 
-        return "/admin/hoverify";
+        return "admin/hoverify";
     }
 
     @GetMapping("/boverify")
@@ -266,7 +264,7 @@ public class AdminController {
         model.addAttribute("adminEmail",adminEmail );
         log.info("어드민 이메일 들어왔니?" + adminEmail);
 
-        return "/admin/boverify";
+        return "admin/boverify";
     }
 
     // 비밀번호 검증 처리

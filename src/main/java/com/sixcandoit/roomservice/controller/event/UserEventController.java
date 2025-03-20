@@ -2,8 +2,6 @@ package com.sixcandoit.roomservice.controller.event;
 
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.event.EventDTO;
-import com.sixcandoit.roomservice.dto.event.MemberPointDTO;
-import com.sixcandoit.roomservice.entity.member.MemberEntity;
 import com.sixcandoit.roomservice.repository.event.EventRepository;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.event.EventService;
@@ -21,11 +19,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -65,7 +61,7 @@ public class UserEventController {
 
 
 
-        return "/event/userevent";
+        return "event/userevent";
     }
 
     @GetMapping("/usereventread")
@@ -80,7 +76,7 @@ public class UserEventController {
         model.addAttribute("eventDTORead", eventDTORead);
         model.addAttribute("imageFileDTOList", imageFileDTOList);
         model.addAttribute("hasRepImage", hasRepImage);
-        return "/event/usereventread";
+        return "event/usereventread";
     }
 
 

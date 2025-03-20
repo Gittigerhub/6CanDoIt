@@ -95,8 +95,8 @@ public class SecurityConfig{
                     auth.requestMatchers("/room/**").permitAll();
                     // 공지사항 페이지 접근 권한
                     auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update","/notice/delete/**").hasAnyRole("ADMIN");
-                    auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN","HO");
-                    auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN","HO","BO");
+                    auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN","HO");
+                    auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN","HO","BO");
                     auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
                     // 오더 페이지 접근 권한
                     auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
@@ -116,14 +116,14 @@ public class SecurityConfig{
 
         //관리자회원 로그인
         http.formLogin(login -> login
-                .defaultSuccessUrl("/admin/", true)
-                .failureUrl("/admin/login?error=true")
-                .loginPage("/admin/login")
-                .usernameParameter("adminEmail")
-                .permitAll()
-                .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
+                        .defaultSuccessUrl("/admin/", true)
+                        .failureUrl("/admin/login?error=true")
+                        .loginPage("/admin/login")
+                        .usernameParameter("adminEmail")
+                        .permitAll()
+                        .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
 
 
         //CSRF 보호를 비활성화
@@ -173,9 +173,9 @@ public class SecurityConfig{
             auth.requestMatchers("/res/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             auth.requestMatchers("/room/**").permitAll();
             // 공지사항 페이지 접근 권한
-            auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update","/notice/delete/**").hasAnyRole("ADMIN");
-            auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN","HO");
-            auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN","HO","BO");
+            auth.requestMatchers("/notice/list","/notice/read", "/notice/register" , "/notice/update","/notice/delete/**").hasAnyRole("ADMIN","HO","BO");
+            auth.requestMatchers("/notice/ho/**").hasAnyRole("ADMIN","HO");
+            auth.requestMatchers("/notice/bo/**").hasAnyRole("ADMIN","HO","BO");
             auth.requestMatchers("/notice/userlist" , "/notice/userread").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
             // 오더 페이지 접근 권한
             auth.requestMatchers("/orders/**", "/orders/payment/**", "/payment/**").hasAnyRole("ADMIN", "HO", "BO", "MEMBER");
@@ -192,7 +192,7 @@ public class SecurityConfig{
             auth.requestMatchers("/bo/**").hasAnyRole("ADMIN","HO","BO");
             auth.requestMatchers("/guest/**").hasAnyRole("ADMIN","HO","BO","GUEST");
 
-            });
+        });
 
         //http.exceptionHandling(exceptionHandling ->exceptionHandling
         //         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
@@ -200,14 +200,14 @@ public class SecurityConfig{
 
         //일반회원 로그인
         http.formLogin(login -> login
-                .defaultSuccessUrl("/member/", true)
-                .failureUrl("/member/login?error=true")
-                .loginPage("/member/login")
-                .usernameParameter("memberEmail")
-                .permitAll()
-                .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
-        .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
+                        .defaultSuccessUrl("/member/", true)
+                        .failureUrl("/member/login?error=true")
+                        .loginPage("/member/login")
+                        .usernameParameter("memberEmail")
+                        .permitAll()
+                        .successHandler(customLoginSuccessHandler))                 // 커스텀 로그인 성공 핸들러 적용
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)); // 로그인 필요 시 원래 페이지 저장
 
         //CSRF 보호를 비활성화
         http.csrf(AbstractHttpConfigurer::disable);

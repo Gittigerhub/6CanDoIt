@@ -4,8 +4,8 @@ package com.sixcandoit.roomservice.controller.orders;
 import com.sixcandoit.roomservice.dto.ImageFileDTO;
 import com.sixcandoit.roomservice.dto.Menu.MenuDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersDTO;
-import com.sixcandoit.roomservice.dto.orders.OrdersHistDTO;
 import com.sixcandoit.roomservice.dto.orders.OrdersMenuDTO;
+import com.sixcandoit.roomservice.dto.orders.OrdersPassDTO;
 import com.sixcandoit.roomservice.dto.room.RoomDTO;
 import com.sixcandoit.roomservice.service.ImageFileService;
 import com.sixcandoit.roomservice.service.cart.CartService;
@@ -81,20 +81,20 @@ public class MemberOrdersCotroller {
         설명 : 사용자가 장바구니에서 주문하기 버튼을 클릭했을 때 장바구니 내에 메뉴들이 지워지며 주문내역으로 넘어감
     ----------------------------------------------------------------------------- */
     @PostMapping("/orders")
-    public ResponseEntity<?> orders(@RequestBody OrdersHistDTO ordersHistDTO, Principal principal) {
+    public ResponseEntity<?> orders(@RequestBody OrdersPassDTO ordersPassDTO, Principal principal) {
 
         // 들어오는지 확인
-        System.out.println("ordersHistDTO : " + ordersHistDTO.toString());
+        System.out.println("ordersHistDTO : " + ordersPassDTO.toString());
         System.out.println("사용자 : " + principal.getName());
 
         //저장
         Integer result
-                = ordersService.createOrders(ordersHistDTO.getCartMenuIdxList(), principal.getName(),
-                ordersHistDTO.getOrdersPhone(), ordersHistDTO.getOrdersMemo());
+                = ordersService.createOrders(ordersPassDTO.getCartMenuIdxList(), principal.getName(),
+                ordersPassDTO   .getOrdersPhone(), ordersPassDTO.getOrdersMemo());
         System.out.println("저장 후");
 
         //장바구니 메뉴 삭제
-        for (Integer cartMenuIdx : ordersHistDTO.getCartMenuIdxList()) {
+        for (Integer cartMenuIdx : ordersPassDTO.getCartMenuIdxList()) {
             cartService.deleteCartMenu(cartMenuIdx);
         }
         System.out.println("장바구니 메뉴 삭제 후");

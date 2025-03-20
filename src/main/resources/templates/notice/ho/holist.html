@@ -31,14 +31,13 @@
 
 <body>
 <div layout:fragment="content" class="p-5">
-    <h2 class="text-center fs-1">공지사항 관리</h2>
 
     <!-- 검색 폼 (Modified) -->
     <div class="container mt-3">
         <form th:action="@{/notice/list}" method="get">
             <div class="row p-5 bg-white">
                 <div class="mb-3">
-                    <h3>게시글 검색</h3>
+                    <h3>공지사항 검색</h3>
                 </div>
                 <div class="col-8">
                     <div class="input-group mb-3">
@@ -55,11 +54,7 @@
                         </span>
                     </div>
                 </div>
-                <!-- '등록' 버튼을 검색 기능 옆에 오른쪽 끝으로 정렬 -->
-                <div class="col-4 d-flex justify-content-end align-items-center">
-                    <!-- Increased button size with btn-lg class -->
-                    <a th:href="@{/notice/register}" class="btn btn-primary btn-lg">등록</a>
-                </div>
+
             </div>
         </form>
     </div>
@@ -81,7 +76,7 @@
             <tr th:each="notice : ${adminNoticeDTO}" class="text-center">
                 <td th:text="${notice.idx}"></td>
                 <td>
-                    <a th:href="@{/notice/read(idx=${notice.idx})}" th:text="${notice.noticeTitle}"></a>
+                    <a th:href="@{/notice/ho/read(idx=${notice.idx})}" th:text="${notice.noticeTitle}"></a>
                 </td>
                 <td th:text="${#temporals.format(notice.insDate, 'yyyy-MM-dd')}"></td>
                 <td th:text="${#temporals.format(notice.modDate, 'yyyy-MM-dd')}"></td>
@@ -108,49 +103,49 @@
         </div>
     </div>
 
-    <!-- 사용자용 공지사항 -->
-    <div class="container mt-5">
-        <h3 class="mb-4">사용자용 공지사항</h3>
-        <table class="table table-hover">
-            <thead class="table-light">
-            <tr class="text-center">
-                <th>No</th>
-                <th>제목</th>
-                <th>작성일</th>
-                <th>수정일</th>
-                <th>조회수</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="notice : ${userNoticeDTO}" class="text-center">
-                <td th:text="${notice.idx}"></td>
-                <td>
-                    <a th:href="@{/notice/read(idx=${notice.idx})}" th:text="${notice.noticeTitle}"></a>
-                </td>
-                <td th:text="${#temporals.format(notice.insDate, 'yyyy-MM-dd')}"></td>
-                <td th:text="${#temporals.format(notice.modDate, 'yyyy-MM-dd')}"></td>
-                <td th:text="${notice.noticeHits}"></td>
-            </tr>
-            </tbody>
-        </table>
+    <!--    &lt;!&ndash; 사용자용 공지사항 &ndash;&gt;-->
+    <!--    <div class="container mt-5">-->
+    <!--        <h3 class="mb-4">사용자용 공지사항</h3>-->
+    <!--        <table class="table table-hover">-->
+    <!--            <thead class="table-light">-->
+    <!--            <tr class="text-center">-->
+    <!--                <th>No</th>-->
+    <!--                <th>제목</th>-->
+    <!--                <th>작성일</th>-->
+    <!--                <th>수정일</th>-->
+    <!--                <th>조회수</th>-->
+    <!--            </tr>-->
+    <!--            </thead>-->
+    <!--            <tbody>-->
+    <!--            <tr th:each="notice : ${userNoticeDTO}" class="text-center">-->
+    <!--                <td th:text="${notice.idx}"></td>-->
+    <!--                <td>-->
+    <!--                    <a th:href="@{/notice/read(idx=${notice.idx})}" th:text="${notice.noticeTitle}"></a>-->
+    <!--                </td>-->
+    <!--                <td th:text="${#temporals.format(notice.insDate, 'yyyy-MM-dd')}"></td>-->
+    <!--                <td th:text="${#temporals.format(notice.modDate, 'yyyy-MM-dd')}"></td>-->
+    <!--                <td th:text="${notice.noticeHits}"></td>-->
+    <!--            </tr>-->
+    <!--            </tbody>-->
+    <!--        </table>-->
 
-        <!-- 사용자용 페이징 -->
-        <div class="mt-3 d-flex justify-content-center">
-            <ul class="pagination">
-                <li class="page-item" th:if="${userPageInfo.prevPage > 0}">
-                    <a class="page-link" th:href="@{/notice/list(page=${userPageInfo.prevPage}, type=${type}, keyword=${keyword})}">＜</a>
-                </li>
-                <span th:each="page : ${#numbers.sequence(userPageInfo.startPage, userPageInfo.endPage, 1)}">
-                    <li class="page-item" th:classappend="${page == userPageInfo.currentPage} ? 'active' : ''">
-                        <a class="page-link" th:href="@{/notice/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>
-                    </li>
-                </span>
-                <li class="page-item" th:if="${userPageInfo.nextPage <= userPageInfo.endPage}">
-                    <a class="page-link" th:href="@{/notice/list(page=${userPageInfo.nextPage}, type=${type}, keyword=${keyword})}">＞</a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <!--        &lt;!&ndash; 사용자용 페이징 &ndash;&gt;-->
+    <!--        <div class="mt-3 d-flex justify-content-center">-->
+    <!--            <ul class="pagination">-->
+    <!--                <li class="page-item" th:if="${userPageInfo.prevPage > 0}">-->
+    <!--                    <a class="page-link" th:href="@{/notice/list(page=${userPageInfo.prevPage}, type=${type}, keyword=${keyword})}">＜</a>-->
+    <!--                </li>-->
+    <!--                <span th:each="page : ${#numbers.sequence(userPageInfo.startPage, userPageInfo.endPage, 1)}">-->
+    <!--                    <li class="page-item" th:classappend="${page == userPageInfo.currentPage} ? 'active' : ''">-->
+    <!--                        <a class="page-link" th:href="@{/notice/list(page=${page}, type=${type}, keyword=${keyword})}" th:text="${page}"></a>-->
+    <!--                    </li>-->
+    <!--                </span>-->
+    <!--                <li class="page-item" th:if="${userPageInfo.nextPage <= userPageInfo.endPage}">-->
+    <!--                    <a class="page-link" th:href="@{/notice/list(page=${userPageInfo.nextPage}, type=${type}, keyword=${keyword})}">＞</a>-->
+    <!--                </li>-->
+    <!--            </ul>-->
+    <!--        </div>-->
+    <!--    </div>-->
 
 </div>
 

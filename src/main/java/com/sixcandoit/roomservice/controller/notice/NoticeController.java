@@ -112,6 +112,48 @@ public class NoticeController {
     }
 
     /* --------------------------------------------------------------------------
+        경로 : /notice/read
+        인수 : Integer idx, Model model
+        출력 : 공지사항 상세 페이지
+        설명 : 공지사항 상세 정보를 조회하고, 대표 이미지 여부와 함께 출력
+    -------------------------------------------------------------------------- */
+    @GetMapping("/notice/ho/read")
+    public String HOread(@RequestParam("idx") Integer idx, Model model) {
+        noticeService.count(idx);
+        NoticeDTO noticeDTO = noticeService.noticeRead(idx);
+        List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, "notice");
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+        model.addAttribute("noticeDTO", noticeDTO);
+        model.addAttribute("hasRepImage", hasRepImage);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+
+        return "notice/ho/horead";
+    }
+
+    /* --------------------------------------------------------------------------
+        경로 : /notice/read
+        인수 : Integer idx, Model model
+        출력 : 공지사항 상세 페이지
+        설명 : 공지사항 상세 정보를 조회하고, 대표 이미지 여부와 함께 출력
+    -------------------------------------------------------------------------- */
+    @GetMapping("/notice/bo/read")
+    public String BOread(@RequestParam("idx") Integer idx, Model model) {
+        noticeService.count(idx);
+        NoticeDTO noticeDTO = noticeService.noticeRead(idx);
+        List<ImageFileDTO> imageFileDTOS = imageFileService.readImage(idx, "notice");
+        boolean hasRepImage = imageFileDTOS.stream()
+                .anyMatch(imageFileDTO -> "Y".equals(imageFileDTO.getRepimageYn()));
+
+        model.addAttribute("noticeDTO", noticeDTO);
+        model.addAttribute("hasRepImage", hasRepImage);
+        model.addAttribute("imageFileDTOS", imageFileDTOS);
+
+        return "notice/bo/boread";
+    }
+
+    /* --------------------------------------------------------------------------
         경로 : /notice/userread
         인수 : Integer idx, Model model
         출력 : 사용자용 공지사항 상세 페이지
@@ -228,14 +270,61 @@ public class NoticeController {
     }
 
     @GetMapping("/notice/ho/list")
-    public String noticeHO(Model model){
-        log.info("HoList");
+    public String HOlist(@PageableDefault(page = 1) Pageable page,
+                         @RequestParam(value = "type", defaultValue = "") String type,
+                         @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                         Model model) {
+
+        log.info("관리자 목록 조회 - type: {}, keyword: {}", type, keyword);
+        // 관리자용 공지사항 목록
+        Page<NoticeDTO> adminNoticeDTOS = noticeService.getNoticeListByType(page, type, keyword, "ADMIN");
+        // 사용자용 공지사항 목록도 함께 보여줌
+        Page<NoticeDTO> userNoticeDTOS = noticeService.getNoticeListByType(page, type, keyword, "USER");
+
+        log.info("관리자 공지 개수: {}, 사용자 공지 개수: {}",
+                adminNoticeDTOS.getTotalElements(),
+                userNoticeDTOS.getTotalElements());
+
+        Map<String, Integer> adminPageInfo = PageNationUtil.Pagination(adminNoticeDTOS);
+        Map<String, Integer> userPageInfo = PageNationUtil.Pagination(userNoticeDTOS);
+
+        model.addAttribute("adminNoticeDTO", adminNoticeDTOS);
+        model.addAttribute("userNoticeDTO", userNoticeDTOS);
+        model.addAttribute("adminPageInfo", adminPageInfo);
+        model.addAttribute("userPageInfo", userPageInfo);
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+
         return "notice/ho/holist";
     }
 
     @GetMapping("/notice/bo/list")
-    public String noticeBO(Model model){
-        log.info("BoList");
+    public String BOlist(@PageableDefault(page = 1) Pageable page,
+                         @RequestParam(value = "type", defaultValue = "") String type,
+                         @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                         Model model) {
+
+        log.info("관리자 목록 조회 - type: {}, keyword: {}", type, keyword);
+        // 관리자용 공지사항 목록
+        Page<NoticeDTO> adminNoticeDTOS = noticeService.getNoticeListByType(page, type, keyword, "ADMIN");
+        // 사용자용 공지사항 목록도 함께 보여줌
+        Page<NoticeDTO> userNoticeDTOS = noticeService.getNoticeListByType(page, type, keyword, "USER");
+
+        log.info("관리자 공지 개수: {}, 사용자 공지 개수: {}",
+                adminNoticeDTOS.getTotalElements(),
+                userNoticeDTOS.getTotalElements());
+
+        Map<String, Integer> adminPageInfo = PageNationUtil.Pagination(adminNoticeDTOS);
+        Map<String, Integer> userPageInfo = PageNationUtil.Pagination(userNoticeDTOS);
+
+        model.addAttribute("adminNoticeDTO", adminNoticeDTOS);
+        model.addAttribute("userNoticeDTO", userNoticeDTOS);
+        model.addAttribute("adminPageInfo", adminPageInfo);
+        model.addAttribute("userPageInfo", userPageInfo);
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+
         return "notice/bo/bolist";
     }
+
 }

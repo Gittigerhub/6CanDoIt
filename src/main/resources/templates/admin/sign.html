@@ -1379,17 +1379,17 @@ E-mail : himyeongsun@gmail.com
                                         <div id="confirmPasswordFeedback" class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
                                         <div id="confirmPasswordValid" class="valid-feedback">비밀번호가 일치합니다.</div>
                                     </div>
-                                    <div class="input">
-                                        <label for="organization" class="form-label" style="color: dimgray; margin-right: 15px; display: inline-block;">호텔명</label>
-                                        <select class="custom-dropdown" id="organization" name="organization" required>
-                                            <option th:if="${#lists.isEmpty(organizations)}" value="" disabled>등록된 호텔이 없습니다.</option>
-                                            <option th:each="org : ${organizations}"
-                                                    th:value="${org.idx}"
-                                                    th:text="${org.organName}"
-                                                    th:selected="${adminDTO != null && adminDTO.organDTO != null && adminDTO.organDTO.idx == org.idx}">
-                                            </option>
-                                        </select>
-                                    </div>
+<!--                                    <div class="input">-->
+<!--                                        <label for="organization" class="form-label" style="color: dimgray; margin-right: 15px; display: inline-block;">호텔명</label>-->
+<!--                                        <select class="custom-dropdown" id="organization" name="organization" required>-->
+<!--                                            <option th:if="${#lists.isEmpty(organizations)}" value="" disabled>등록된 호텔이 없습니다.</option>-->
+<!--                                            <option th:each="org : ${organizations}"-->
+<!--                                                    th:value="${org.idx}"-->
+<!--                                                    th:text="${org.organName}"-->
+<!--                                                    th:selected="${adminDTO != null && adminDTO.organDTO != null && adminDTO.organDTO.idx == org.idx}">-->
+<!--                                            </option>-->
+<!--                                        </select>-->
+<!--                                    </div>-->
                                     <div>
                                         <input type="text" class="input" id="adminName" name="adminName" placeholder="이름" required>
                                     </div>
@@ -1432,8 +1432,8 @@ E-mail : himyeongsun@gmail.com
                     alert("이메일이 전송되었습니다.");
                 },
                 error(xhr, status, err) {
-
                     console.log(xhr, status, err)
+                    alert("이메일 전송에 실패했습니다.")
                 }
             });
         })
